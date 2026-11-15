@@ -1,0 +1,14 @@
+{
+  "format": "tendriller-page",
+  "version": 1,
+  "requires": {
+    "contract": 2,
+    "workflows": {}
+  },
+  "components": [
+    "input-kit",
+    "wakelock",
+    "wakeword"
+  ],
+  "workflows": []
+}
