@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { sessions } from '../server.ts';
+import { build } from 'esbuild';
+import { fileURLToPath } from 'node:url';
+
+// Exercise the same Worker-target compilation as the distribution. Test loading
+// must not depend on the host Node version's TypeScript execution support.
+const compiled = await build({ entryPoints: [fileURLToPath(new URL('../server.ts', import.meta.url))],
+  bundle: true, write: false, platform: 'neutral', format: 'esm', target: 'es2022' });
+const { sessions } = await import('data:text/javascript;base64,' + Buffer.from(compiled.outputFiles[0].contents).toString('base64'));
 
 function fixture() {
   let saved = { state: {}, rev: 0, records: new Map(), scopes: new Map(), events: [], notices: [], pins: [] };
