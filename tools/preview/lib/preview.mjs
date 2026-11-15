@@ -8,6 +8,7 @@ import { readFileSync, existsSync, statSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, resolve, dirname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import { guessType, listFiles } from "../../cli/lib/pack.mjs";
 import { attachRuntime, TRACE_RUNTIME, resolveFixture } from "./preview-runtime.mjs";
 import { assets as runtimeAssets, implementation as runtimeSupport, manifest as runtimeManifest } from "./preview-bundle.mjs";
@@ -91,7 +92,7 @@ export async function startServer(dir, initialState, fixture = {}, options = {})
       if (mock) {
         let body = ""; for await (const chunk of req) { body += chunk; if (body.length > 1024 * 1024) throw new Error("Fixture request is too large"); }
         const parsed = body ? JSON.parse(body) : undefined;
-        const match = !mock.expect_body || Object.entries(mock.expect_body).every(([key, value]) => JSON.stringify(parsed?.[key]) === JSON.stringify(value));
+        const match = !mock.expect_body || Object.entries(mock.expect_body).every(([key, value]) => isDeepStrictEqual(parsed?.[key], value));
         mockedHttp.push({ method: req.method, path: p, body: parsed, matched: match, status: match ? (mock.status || 200) : 400 });
         if (!match) return json(400, { error: { code: "fixture_mismatch", message: "Request body did not match the scenario" } });
         if (mock.once) httpFixtures.splice(httpFixtures.indexOf(mock), 1);

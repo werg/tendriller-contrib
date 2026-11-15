@@ -8,12 +8,6 @@ const session = () => ({ id: workflow.generation("workshop") });
 const owner = () => t.device.role === "owner" && !t.device.pending;
 const writable = () => t.device.role !== "display" && !t.device.pending;
 const cameraAllowed = () => !pageHidden && writable() && !state().paused && (purpose === "general" || purpose === "camera");
-async function pageApi(path, method = "GET", body) {
-  const response = await fetch(`_tendril/${path}`, { method, headers: { ...t.deviceHeaders(), ...(body === undefined ? {} : { "Content-Type": "application/json" }) }, body: body === undefined ? undefined : JSON.stringify(body) });
-  const value = await response.json();
-  if (!response.ok) throw Error(value.error?.message || `Request failed (${response.status})`);
-  return value;
-}
 function describe(result, label) { status(result.status === "rejected" || result.error ? `${label} rejected: ${result.message || result.error}` : result.status === 'queued' ? `${label} kept on this device; waiting for the connection.` : `${label} received. Waiting for the agent's next step.`); }
 function stopTracks(media) { for (const track of media?.getTracks() || []) track.stop(); }
 function stopCamera() {
@@ -70,7 +64,7 @@ async function refresh() {
   purpose = t.device.role === "display" ? "display" : t.device.purpose || "general"; render();
   if (!owner()) return;
   try {
-    const info = await pageApi("devices");
+    const info = await t.request("devices");
     if (generation !== refreshGeneration || !owner() || pageHidden) return;
     devices = info.devices || [];
     const me = devices.find(device => device.id === t.device.id);
@@ -79,9 +73,9 @@ async function refresh() {
     render();
   } catch (error) { status(error.message); }
 }
-$("apply-purpose").onclick = async () => { try { await pageApi("devices", "PATCH", { id: t.device.id, purpose: $("purpose").value }); await refresh(); status("This device's purpose is saved."); } catch (error) { status(error.message); } };
+$("apply-purpose").onclick = async () => { try { await t.request("devices", { method: "PATCH", body: { id: t.device.id, purpose: $("purpose").value } }); await refresh(); status("This device's purpose is saved."); } catch (error) { status(error.message); } };
 $("refresh").onclick = refresh;
-$("focus").onclick = async () => { try { await pageApi("focus", "POST", { device: t.device.id, ttl_seconds: 300 }); status("Attention moved to this device for five minutes."); } catch (error) { status(error.message); } };
+$("focus").onclick = async () => { try { await t.request("focus", { method: "POST", body: { device: t.device.id, ttl_seconds: 300 } }); status("Attention moved to this device for five minutes."); } catch (error) { status(error.message); } };
 $("pause").onclick = async () => { if (!owner()) return; const paused = !state().paused; t.state.set("workshop.paused", paused); if (paused) stopCamera(); describe(await workflow.send("workshop", { type: "workshop.pause", paused, device: t.device.id, at: Date.now() }), paused ? "Pause" : "Resume"); };
 $("done").onclick = async () => {
   const step = state().step; if (!step?.id || state().paused || !writable()) return;

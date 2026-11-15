@@ -145,17 +145,22 @@ export async function attachRuntime(server, { state = {}, role = "owner", name =
         if (!subscription && m.cid && dedupe.has(key)) { ack(dedupe.get(key)); return; }
         let result;
         try {
-          if (m.t === "send" || m.t === "state") {
+          const operation = { send: "event", state: "state", capture_complete: "capture" }[m.t];
+          if (operation) {
             assertValid("preconditions", m);
-            if (!matchesContext(scopes, m, m.t === "send" ? "event" : "state", m.ops || []))
+            if (!matchesContext(scopes, m, operation, m.ops || []))
               throw Object.assign(Error("The fixture scope generation changed after this command was captured."), { code: "stale_generation" });
           }
           switch (m.t) {
             case "stream_subscribe": result = streamFixtures.subscribe(ws, m.stream, m.after); break;
             case "stream_unsubscribe": streamFixtures.unsubscribe(ws, m.stream); result = {}; break;
             case "ping": reply({ t: "pong" }); return;
-            case "send": {
+            case "send":
+            case "capture_complete": {
               if (role === "display") { result = { error: "forbidden", message: "Display devices cannot send" }; break; }
+              if (operation === "capture" && ((m.kind ?? "event") !== "event" || !blobs.has(m.blob))) {
+                result = { error: "bad_capture", message: "Capture completion requires an application event and an uploaded blob reference" }; break;
+              }
               if (JSON.stringify(m.data ?? null).length > 65536) { result = { error: "too_large", message: "Event data exceeds 64 KB" }; break; }
               const instruction = m.kind === "instruction" && role === "owner";
               const event = { seq: ++seq, ts: Date.now(), type: instruction ? "instruction" : "event", role, device: device.id,
@@ -186,7 +191,7 @@ export async function attachRuntime(server, { state = {}, role = "owner", name =
             default: result = { error: "preview_unsupported", message: `${m.t} requires a real service; use the local Worker E2E suite` };
           }
         } catch (error) { result = { error: error.code || "bad_request", message: error.message }; }
-        if (m.cid) { if (!subscription) dedupe.set(key, result || {}); ack(result); }
+        if (m.cid) { if (!subscription && !result?.error) dedupe.set(key, result || {}); ack(result); }
         if (m.t === "state" && result?.error) reply({ t: "state_reset", state: shared, scopes, rev });
       });
     });

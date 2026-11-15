@@ -1,27 +1,4 @@
 {
-  "http": [
-    {
-      "method": "GET",
-      "path": "/_tendril/devices",
-      "json": {
-        "devices": [
-          {
-            "id": "$device.id",
-            "name": "Controller tablet",
-            "purpose": "controller",
-            "connected": true
-          }
-        ]
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/_tendril/focus",
-      "json": {
-        "ok": true
-      }
-    }
-  ],
   "steps": [
     {
       "state_ops": [
