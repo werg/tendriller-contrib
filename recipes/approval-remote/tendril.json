@@ -1,0 +1,22 @@
+{
+  "format": "tendriller-page",
+  "version": 1,
+  "requires": {
+    "contract": 2,
+    "workflows": {
+      "sessions": {
+        "interface_version": "1",
+        "schema_version": "1"
+      }
+    }
+  },
+  "components": [
+    "ptt"
+  ],
+  "workflows": [
+    {
+      "id": "sessions",
+      "scope": "decisions"
+    }
+  ]
+}

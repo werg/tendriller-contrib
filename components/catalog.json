@@ -1,0 +1,330 @@
+{
+  "format": "tendriller-components",
+  "version": 1,
+  "release": "0.2.0-rc.1",
+  "components": [
+    {
+      "id": "bluetooth",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "bluetooth.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "camera",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "camera.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "chart",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "chart.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "connectors",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "connectors.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "geo",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "geo.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "glance",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "glance.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "hardware-lab",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "hardware-lab.js"
+      ],
+      "dependencies": [
+        "connectors",
+        "serial",
+        "bluetooth"
+      ]
+    },
+    {
+      "id": "input-kit",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "input-kit.js"
+      ],
+      "dependencies": [
+        "camera",
+        "motion"
+      ]
+    },
+    {
+      "id": "list",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "list.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "motion",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "motion.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "objects",
+      "status": "experimental",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "objects.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "overlay",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "overlay.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "playground",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "playground.js"
+      ],
+      "dependencies": [
+        "input-kit",
+        "ui",
+        "probe",
+        "hardware-lab",
+        "connectors"
+      ]
+    },
+    {
+      "id": "pose",
+      "status": "experimental",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "pose.js"
+      ],
+      "dependencies": [
+        "camera"
+      ]
+    },
+    {
+      "id": "probe",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "probe.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "ptt",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "ptt.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "qr",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "qr.js",
+        "vendor/qrcode.js",
+        "vendor/qrcode-LICENSE"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "screenshot",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "screenshot.js",
+        "vendor/html-to-image.js",
+        "vendor/html-to-image-LICENSE"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "serial",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "serial.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "stream-view",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "stream-view.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "text",
+      "status": "experimental",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "text.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "ui",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "ui.js"
+      ],
+      "dependencies": [
+        "input-kit",
+        "connectors",
+        "hardware-lab"
+      ]
+    },
+    {
+      "id": "vad",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "vad.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "wakelock",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "wakelock.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "wakeword",
+      "status": "supported",
+      "maintainer": "werg",
+      "requires": {
+        "contract": 2
+      },
+      "files": [
+        "wakeword.js"
+      ],
+      "dependencies": []
+    }
+  ]
+}

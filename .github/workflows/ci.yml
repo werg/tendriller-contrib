@@ -1,0 +1,56 @@
+name: Contrib artifacts
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['22.15.0', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - if: matrix.node == '24'
+        run: npx playwright install --with-deps chromium firefox webkit
+      - if: matrix.node == '24'
+        run: npm run test:components && npm run test:preview && npm run test:portable
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: contrib-failures-${{ matrix.node }}
+          path: test-results/
+  release:
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    needs: check
+    runs-on: ubuntu-latest
+    concurrency:
+      group: contrib-release-${{ github.event.release.tag_name || github.ref_name }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+      - name: Publish immutable release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: node distribution/publish-release.mjs "$RELEASE_TAG"

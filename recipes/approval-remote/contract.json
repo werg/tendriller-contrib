@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Versioned owner decision event",
+  "type": "object",
+  "required": [
+    "type",
+    "decision_id",
+    "decision",
+    "version"
+  ],
+  "properties": {
+    "type": {
+      "const": "decision"
+    },
+    "decision_id": {
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "approve",
+        "reject",
+        "revise"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  },
+  "x-agent-instructions": "AGENT.md",
+  "x-recovery": "Check the matching record/version before external work. The server records a single owner decision; the host deduplicates side effects.",
+  "x-command-context": {
+    "module": "sessions",
+    "scope": "sessions:decisions",
+    "location": "envelope; outside data",
+    "capture": "tendril.scopes.capture(scope)",
+    "contract": 2
+  }
+}

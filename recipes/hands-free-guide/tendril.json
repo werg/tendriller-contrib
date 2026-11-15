@@ -1,0 +1,24 @@
+{
+  "format": "tendriller-page",
+  "version": 1,
+  "requires": {
+    "contract": 2,
+    "workflows": {
+      "sessions": {
+        "interface_version": "1",
+        "schema_version": "1"
+      }
+    }
+  },
+  "components": [
+    "input-kit",
+    "wakelock",
+    "wakeword"
+  ],
+  "workflows": [
+    {
+      "id": "sessions",
+      "scope": "guide"
+    }
+  ]
+}
