@@ -1,6 +1,7 @@
 name: Contrib artifacts
 on:
   push:
+  create:
   pull_request:
   workflow_dispatch:
   release:
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   check:
+    if: github.event_name != 'create' || (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'release/v'))
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -16,6 +18,8 @@ jobs:
         node: ['22.15.0', '24']
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -32,26 +36,31 @@ jobs:
           name: contrib-failures-${{ matrix.node }}
           path: test-results/
   release:
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    if: >-
+      (github.event_name != 'create' || github.event.ref_type == 'branch') &&
+      (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release/v'))
     needs: check
     runs-on: ubuntu-latest
     concurrency:
-      group: contrib-release-${{ github.event.release.tag_name || github.ref_name }}
+      group: contrib-release
       cancel-in-progress: false
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
+      - name: Install and verify the public core release
+        run: npm run core:install
       - run: npm run build
         env:
           SOURCE_COMMIT: ${{ github.sha }}
       - name: Publish immutable release assets
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
-        run: node distribution/publish-release.mjs "$RELEASE_TAG"
+          RELEASE_REF: ${{ github.ref }}
+        run: node distribution/publish-release.mjs "$RELEASE_REF"

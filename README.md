@@ -82,7 +82,11 @@ npm run test:portable
 
 `core.lock.json` records the exact public SDK/runtime archives, release URLs and SHA-256 hashes. Copies in `vendor/core/` make initial development and builds independent of a sibling core checkout. `npm run core:install` refreshes only the locked artifacts after verifying their hashes. Updating the supported pairing requires updating both this lock and the ordinary npm lockfile.
 
-`npm run build` produces the tool archive, standalone commands, static component/example/catalog bundle, separate trusted workflow archive, and a manifest. CI publishes those assets from one release tag. Installed-artifact tests unpack into a fresh directory, scaffold every starter, verify dependency hashes, start the standalone preview, and compare its runtime bytes with the released core manifest.
+`npm run build` produces the tool archive, standalone commands, static component/example/catalog bundle, separate trusted workflow archive, and a manifest. Installed-artifact tests unpack into a fresh directory, scaffold every starter, verify dependency hashes, start the standalone preview, and compare its runtime bytes with the released core manifest.
+
+Create `release/v<package-version>` at the exact source commit to publish a release candidate. Branch creation and subsequent pushes run the full Node/browser gate before CI creates the matching version tag and GitHub pre-release at that tested commit. The release job downloads the public SDK/runtime URLs in `core.lock.json` and verifies their hashes before building, so the pinned core release must already be published. Existing version tags and published releases use the same gate. Manual dispatch publishes only when selected on a matching release branch or version tag.
+
+The publisher requires the ref, package version, manifest version and exact source commit to agree. Existing tags must resolve to that commit, including annotated tags. Publication is serialized and idempotent: it verifies all existing asset bytes, uploads only missing files and publishes the manifest last. A mismatched tag or asset stops publication; use a new version instead of moving a tag or replacing published bytes.
 
 See [source provenance](PROVENANCE.md), [CLI commands](tools/cli/README.md), [collector documentation](docs/COLLECTOR.md), and [host integrations](docs/AGENT_HOSTS.md).
 
