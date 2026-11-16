@@ -34,7 +34,7 @@ Keep the review interaction small: choose fields, inspect paths and types, label
 | Arrays | Select a documented index or retain a bounded structured value. | A deliberate expansion defines stable identities and cardinality. |
 | Collision | Reject the mapping or preserve unambiguous paths. | An explicit reviewed renaming policy resolves it. |
 
-A path segment containing a dot or slash may be a literal key. Do not split it unless the source contract requires that interpretation. For example, `["train.loss"]` and `["train", "loss"]` can select different values. Core collector projection uses literal path arrays and preserves JSON value types; it is selection/renaming rather than an expression engine. Read the [public collector reference](https://github.com/werg/tendriller/blob/master/docs/tools/COLLECTOR.md) before writing its configuration.
+A path segment containing a dot or slash may be a literal key. Do not split it unless the source contract requires that interpretation. For example, `["train.loss"]` and `["train", "loss"]` can select different values. Core collector projection uses literal path arrays and preserves JSON value types; it is selection/renaming rather than an expression engine. Read the [public collector reference](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/tools/COLLECTOR.md) before writing its configuration.
 
 Core's source/run metadata policy also matters: supplied values, including explicit null or an empty string, remain distinguishable from absence, and configured defaults fill absent fields only. Do not overwrite these identities to make a chart look cleaner. Server-assigned producer authority is separate from source-provided labels.
 

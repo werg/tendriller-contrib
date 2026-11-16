@@ -8,7 +8,7 @@ choices: ["Required observations and justified not-applicable outcomes", "Offlin
 capabilities: []
 evidence: "explained"
 related: ["guide-explicit-checkpoints", "capture-reviewed-evidence", "annotate-a-frame", "follow-location-progress", "import-for-review"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md"]
+sources: ["https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/DURABILITY.md"]
 ---
 
 # Complete a field inspection with reviewable evidence
@@ -49,7 +49,7 @@ Keep original observations separate from conclusions. A photograph may show a ga
 
 ## Make offline work and reconnection intelligible
 
-The field view should distinguish a local draft, a durable queued command, an accepted item update, and a reviewed inspection. Use the [public capture contract](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md) for saved media operations. If a storage transaction fails, keep the open preview and offer a deliberate save route; do not claim it will survive reload.
+The field view should distinguish a local draft, a durable queued command, an accepted item update, and a reviewed inspection. Use the [public capture contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md) for saved media operations. If a storage transaction fails, keep the open preview and offer a deliberate save route; do not claim it will survive reload.
 
 Bound local media storage and show practical constraints before a large batch exhausts it. Explain whether stopping the inspection leaves pending uploads to resume, discards only unsent candidates, or requires explicit cancellation. Discarding local queued work does not undo a request the service already accepted.
 

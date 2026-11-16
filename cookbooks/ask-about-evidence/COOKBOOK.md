@@ -38,7 +38,7 @@ Give each evidence item, question, and submitted request a stable ID. A request 
 
 A reply must identify the submitted request and sources it addresses. If a retake arrives while the answer is pending, the older answer should appear with its earlier image or an explicit “Answer about the previous photo” link. Do not draw its annotation over the new preview. A corrected question is a new reviewed request or explicit revision, not an unchanged retry of old work.
 
-Use the [reviewed-capture flow](../capture-reviewed-evidence/COOKBOOK.md) for bytes and semantic submission. Queued, accepted, and answered are different states. Acceptance means the service admitted the original input; it does not guarantee that an agent has inspected it. Keep draft work intact after rejection and preserve original context across retries. See the [public capture contract](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md) for the runtime-owned capture identity and delivery outcomes.
+Use the [reviewed-capture flow](../capture-reviewed-evidence/COOKBOOK.md) for bytes and semantic submission. Queued, accepted, and answered are different states. Acceptance means the service admitted the original input; it does not guarantee that an agent has inspected it. Keep draft work intact after rejection and preserve original context across retries. See the [public capture contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md) for the runtime-owned capture identity and delivery outcomes.
 
 ## Make reasoning inspectable in the reply
 
