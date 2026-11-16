@@ -38,7 +38,7 @@ jobs:
           path: .core-build
       - name: Build public core artifacts
         working-directory: .core-build
-        run: npm ci && npm run build
+        run: npm ci && npm run build:artifacts
       - name: Install browser used by the public-artifact checks
         working-directory: .core-build
         run: npx playwright install --with-deps chromium
