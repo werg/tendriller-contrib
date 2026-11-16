@@ -313,18 +313,6 @@
         "wakelock.js"
       ],
       "dependencies": []
-    },
-    {
-      "id": "wakeword",
-      "status": "supported",
-      "maintainer": "werg",
-      "requires": {
-        "contract": 2
-      },
-      "files": [
-        "wakeword.js"
-      ],
-      "dependencies": []
     }
   ]
 }
