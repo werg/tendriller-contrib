@@ -33,6 +33,28 @@ Choose scenarios from the consequential decisions in the cookbook. Two different
 
 Test both success and the failure that could lose meaning: delayed rejection, changed generation, revoked access, expired history, quota failure, or a stopped sensor's late callback. Record exact artifacts/revisions, commands, and observed limits. Keep “explained,” “exercised,” and “used in a real adaptation” distinct.
 
+## Browser suspension and cached restoration
+
+A browser may restore a document from the back/forward cache without re-running
+its scripts or initializing a new page. Test that path separately from a reload:
+a `pagehide` / persisted `pageshow` pair must not leave capability listeners,
+active-sensor indicators, or stop controls permanently detached. Resubscribe on
+restoration, refresh current status, and discard permission or device reports
+that arrive after the observer is stopped or superseded by a newer read.
+
+Sensitive views have a stronger requirement: clear the visible projection when
+the page is hidden and reauthorize the current identity before restoring drafts
+or records. Increment an authorization epoch on revocation/suspension so that
+late successful reads *and late error handlers* cannot repaint data from a prior
+identity. Retrying a durable submission must still use its original captured
+command, not an implicitly reconstructed one.
+
+Synthetic persisted page-transition events can exercise lifecycle handlers
+deterministically; they do **not** prove that an actual browser admitted the
+document to BFCache. When that guarantee matters, add real back/forward
+navigation on the intended browsers and separately test denied permissions,
+foreground suspension, and stop actions.
+
 ## Avoid false confidence
 
 Do not run a full deployment for every prose edit; validate metadata, links, and changed reasoning. Do not use a fixture screenshot as evidence that private records cannot leak. Remove tests that only protect the shape of a retired product. Preserve tests of target guarantees and rewrite their setup from fresh target state.
