@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs, toPath, parseJsonArg, intFlag } from "../lib/args.mjs";
 import { pack, listFiles, isText, guessType, shouldSkip } from "../lib/pack.mjs";
+import { syncAssets } from "../lib/assets.mjs";
 import {
   resolveConfig, saveConfig, configDir, cursorPath, checkpointPath, readCursor, writeCursor, idFromApi, slug, serverBase,
 } from "../lib/config.mjs";
@@ -66,6 +67,22 @@ test("pack: directory without index.html is refused unless merging", () => {
   assert.deepEqual(pack(d, { merge: true }).files, { "style.css": "body{}" });
 });
 
+test("pack vendors declared components before publication and refuses modified copies", () => {
+  const dir = tmp();
+  writeFileSync(join(dir, "index.html"), '<script src="assets/components/chart.js"></script><script src="assets/components/stream-view.js"></script>');
+  writeFileSync(join(dir, "tendril.json"), JSON.stringify({components:["chart","stream-view"]}));
+  const first = pack(dir);
+  const lock = JSON.parse(readFileSync(join(dir, "tendril.assets.json"), "utf8"));
+  assert.ok(lock.files.some(file => file.path === "assets/components/chart.js"));
+  assert.ok(lock.files.some(file => file.path === "assets/components/stream-view.js"));
+  for (const file of lock.files) assert.ok(first.files[file.path], file.path);
+  writeFileSync(join(dir, "assets/components/chart.js"), "// local edits");
+  assert.throws(() => pack(dir), /Modified or unmanaged component/);
+  assert.ok(syncAssets(dir, {force:true}).written >= 1);
+  assert.doesNotThrow(() => pack(dir));
+  writeFileSync(join(dir,"tendril.json"),JSON.stringify({components:["chart"]}));
+  assert.equal(pack(dir).files["assets/components/stream-view.js"],undefined);
+});
 test("pack: single html file becomes index.html; --as overrides", () => {
   const d = tmp();
   const f = join(d, "page.html");
@@ -115,7 +132,7 @@ test("config: env vars, named config files (mode 600), precedence", () => {
 test("config: dirs, server base, cursor files", () => {
   assert.equal(configDir({ HOME: "/home/u" }), "/home/u/.config/tendril");
   assert.equal(configDir({ HOME: "/home/u", XDG_CONFIG_HOME: "/x" }), "/x/tendril");
-  assert.equal(serverBase({}), "http://localhost:8787");
+  assert.equal(serverBase({}), "https://tendriller.dev");
   assert.equal(serverBase({ TENDRIL_SERVER: "https://t.example/" }), "https://t.example");
   assert.equal(serverBase({ TENDRIL_SERVER: "https://a" }, { server: "https://b" }), "https://b");
   assert.equal(idFromApi("https://x/api/t/abcd/"), "abcd");
