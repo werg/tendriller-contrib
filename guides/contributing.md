@@ -38,6 +38,27 @@ page download. Do not export a stable mount API, add a global component namespac
 or require a universal data model. For pilots and difficult architectural patterns,
 show two meaningfully different layouts with shared semantic checks.
 
+## Develop the whole user experience
+
+Anchor a guide in a recognizable task and follow the person from first use through
+completion, correction, and a later return. Describe what the person sees, what
+they can do next, and which result confirms progress. Distinguish an empty state,
+an unsent draft, pending work, a confirmed result, and unavailable or stale data
+where those states change the task. A successful transport request alone is not
+a useful completion message.
+
+Offer a focused first version and explain which richer features earn their cost.
+Use concrete choices such as single-item versus batch review, intentional versus
+automatic advancement, or local versus shared preferences. Describe keyboard and
+non-sensor alternatives, error correction, and the limits of undo when relevant.
+Follow data through capture, review, storage, sharing, export, and removal only as
+far as the particular task requires; keep authority at the actual service boundary.
+
+Verification scenarios should name the starting condition, the action or failure,
+and the observable result. Proposed scenarios remain a plan until exercised and
+recorded under the evidence guidance. A fuller guide need not add executable code,
+prescribe a screen layout, or claim features that core does not supply.
+
 ## Review and maintain
 
 Compare the new decision with existing guides and consolidate repeated reasoning.
