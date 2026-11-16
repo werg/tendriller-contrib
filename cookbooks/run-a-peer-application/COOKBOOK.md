@@ -99,10 +99,19 @@ view decision and never permission to prune the canonical history.
 ## Make the authority boundary explicit
 
 One native authority key and history owner select the order for a coordinated
-group. The authority commits exact proposals, operation deduplication, positions,
-and its rolling prefix before acknowledging them. Certificates and ordered-entry
-evidence can travel through other authorized peers. A relay forwards data; it
-does not acquire SQL, membership, or finality authority.
+group. In the revised descriptor format, the authority commits the exact envelope
+hash/length and routing metadata, operation deduplication, positions, and its
+rolling prefix before acknowledging order. Full peers retain and fetch the
+detached application envelope. Certificates and ordered-entry evidence can
+travel through other authorized peers. A relay forwards data; it does not
+acquire SQL, membership, or finality authority.
+
+The Cloudflare membership root is a separate role. Signed genesis selects the
+application schema administrator independently, so native application setup does
+not require the host to become a SQL peer. The thin administrator follows small
+descriptors and inline capability/epoch records. It can establish roster progress
+without establishing that an application replica has fetched or executed the
+corresponding payloads.
 
 Keep these facts distinct in both the interface and operations:
 

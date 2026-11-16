@@ -35,6 +35,12 @@ The administrator uses durable metadata storage. A Cloudflare SQLite-backed
 Durable Object can supply that storage without loading or executing the
 **application** SQL engine. Tests must distinguish those two uses of SQL.
 
+Signed genesis selects the initial application schema administrator separately
+from the membership root. Every full replica initializes its SQL ownership model
+from that same signed schema key. The native schema owner can create application
+tables without making the Cloudflare root an application writer, group member or
+SQL executor. A fixture-specific local root override is not a valid substitute.
+
 ## Order small descriptors and fetch payloads through peers
 
 Replace opaque, payload-sized log entries with canonical typed descriptors.

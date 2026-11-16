@@ -147,3 +147,46 @@ browser version and per-scenario outcome. A screenshot or fixture-only browser
 run must not be promoted to that evidence. Network routing, real provider
 idempotency and measured costs remain separate
 [qualification work](../notes/implementation-and-qualification.md).
+
+## Qualify thin Cloudflare membership separately
+
+The [revised membership target](../notes/thin-membership-administration.md)
+has a separate gate because the two-layout application fixture pregrants its
+devices. The membership gate consumes the built public SDK and engine packages,
+runs their default membership provider in the real workerd test harness, and
+connects an actual Chromium/OPFS device to a separate native SQL peer.
+
+```sh
+npm run test:peer-membership -- \
+  --chronolog /exact/chronolog-checkout \
+  --tendriller-artifacts /exact/tendriller-public-dist \
+  --wasm /exact/chronolog-wasm-artifacts \
+  --output /new/membership-evidence
+```
+
+The artifact directory must contain exactly one SDK tarball and one engine
+tarball from the paired revision. The runner installs them into an isolated
+consumer, uses their public testing and membership APIs, and preserves their
+hashes. It does not inject a roster provider or import the host's private source.
+`--build-only` records an artifact/bundle build and explicitly leaves workerd and
+browser scenarios unrun.
+
+The gate is intended to demonstrate device-created keys, account-bound signed
+requests, owner approval, certified control-history verification, authorized key
+delivery, then peer payload catch-up. It separately exercises a lost approval
+reply, real Durable Object eviction, exact retry, direct-path writer revocation,
+browser Worker replacement and future-epoch reader removal. Native SQL queries
+verify that the signed schema administrator is a group admin and the Cloudflare
+membership root is not a group member. The schema choice belongs to signed
+genesis; a local materializer override would make replicas disagree.
+
+Encoded descriptor/control traffic and detached application bytes have separate
+counters. Equal candidate counts with substantially different SQL payload sizes
+must still deliver zero application envelope bytes to the administrator. Keep
+the observed byte report, source/artifact identities and per-stage outcomes.
+This gate is **pending qualification** until its exact complete report is
+recorded. A passing native-only subtest or compiled Worker does not establish
+the Cloudflare/browser result. Even a complete local workerd run leaves actual
+deployed authentication, public-network routes and provider costs to issues
+[#14](https://github.com/werg/tendriller-contrib/issues/14) through
+[#17](https://github.com/werg/tendriller-contrib/issues/17).
