@@ -41,7 +41,7 @@ Errors should explain what can be done now. Connection loss can leave a request 
 
 ## Establish the actual delivery loop
 
-The public headless browser API supplies state, events, streams, durable commands, captures, and publication lifecycle. It does not choose the page's DOM, navigation, or conversation layout. Use the current [current public core entry](https://github.com/werg/tendriller/blob/master/agent.md) for exact operations and service limits. The pinned `sources` above point to a
+The public headless browser API supplies state, events, streams, durable commands, captures, and publication lifecycle. It does not choose the page's DOM, navigation, or conversation layout. Use the [current public core entry](https://github.com/werg/tendriller/blob/master/agent.md) for exact operations and service limits. The pinned `sources` above point to a
 historical contrib example that is no longer on `main`; they are provenance,
 not runnable source-checkout paths. For CLI usage and release installation use
 [core's current CLI guide](https://github.com/werg/tendriller/blob/master/docs/tools/CLI.md).
