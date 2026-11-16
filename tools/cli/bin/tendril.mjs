@@ -38,6 +38,7 @@ Talk to the page
   eval <js> | eval -f <file> | eval -   [--device primary|all|<id>] [--timeout-ms N]
   say <text> [--no-speak] [--in-reply-to SEQ] [--device ID|all] [--speak-on ID|primary|none]
   status <working|idle|done> [text]
+  notifications                push readiness, subscribed devices and quota (no notification sent)
   notify <title> [body] [--url U] [--device D] [--tag T]
   check [--device D]           accessibility audit (axe-core) in the page
 
@@ -226,6 +227,11 @@ const commands = {
     if (args[0]) body.state = args[0];
     if (args.length > 1) body.text = args.slice(1).join(" ");
     out(await api.post("/status", body));
+  },
+
+  async notifications(args, f, api) {
+    if (args.length) fail("usage: tendril notifications", 64);
+    out(await api.get("/notify"));
   },
 
   async notify(args, f, api) {
