@@ -4,11 +4,18 @@ Find an approach for what you want to build, understand the consequential choice
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
 
-Start with the [hosted cookbook gallery](https://tendriller-cookbooks.pages.dev/),
+Start with the [hosted cookbook gallery](https://cookbooks.tendriller.dev/),
 [browsable source index](index.html), [agent reading index](agent.md), or
 [plain reading catalog](catalog.json). The canonical guide is
 `cookbooks/<stable-id>/COOKBOOK.md`; a guide can stand alone with only an ID, title,
 and summary as metadata. Reading it installs nothing.
+
+The gallery is served as Cloudflare Workers static assets on the Tendriller
+domain. To publish a reviewed `main` commit, run `npm ci`, `npm run check`,
+`npm run build`, then `npx wrangler deploy --config wrangler.jsonc`. Publish
+from a clean checkout so `dist/manifest.json` records the exact source commit
+with `source_dirty: false`. Check `https://cookbooks.tendriller.dev/catalog.json`
+with both a browser and Python's default `urllib` user agent after deployment.
 
 Your page owns its HTML, CSS, JavaScript, state vocabulary, and interaction model.
 Copied snippets become editable application source. Core owns the public runtime,
