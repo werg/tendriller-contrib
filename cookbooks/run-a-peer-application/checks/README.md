@@ -137,8 +137,9 @@ signatures, authorization or peer finality.
 
 The paired Chronolog qualification CLI builds and exercises both complete pages
 with the **packaged** Tendriller runtime, two independent OPFS SQL Workers, real
-signed range/evidence synchronization and a native authority. The native worker
-runs the provider-free `examples/resident-agent.ts` task-summary handler. A
+browser/native RTC channels, signed range/evidence synchronization and a native
+authority. The native worker runs the provider-free
+`examples/resident-agent.ts` task-summary handler. A
 loopback bootstrap explicitly grants the two fixture identities; deployment
 enrollment and public-network routing are separate qualification work.
 
@@ -157,10 +158,12 @@ public package containing `package.json` and `assets/kernel.mjs`. The CLI uses
 only that package's assets, and the contrib wrapper invokes the core's public
 qualification command without importing its implementation. `--tendriller-engine`
 identifies the extracted public engine package from the same source. It enables
-the actual local direct-WSS and packaged-workerd-relay routes, explicit route
-swaps, record/capability/outcome comparisons and the safe `route-trace.ndjson`.
-The local relay bridge supplies a synthetic authenticated page session; it does
-not establish production login or Internet reachability. The
+the actual packaged-workerd rendezvous. Both layouts exchange application bytes
+over WebRTC with the native adapter. The runner retires introduction, interrupts
+and reconnects peers, compares original records/capabilities/outcomes, and records
+host introduction separately from RTC data-channel bytes. Its local TLS bridge
+supplies a synthetic authenticated page session; it does not establish production
+login or Internet reachability. The
 [route qualification runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/route-qualification.md)
 defines the counters and limits. `--browser` selects
 an explicit Chromium executable. `--build-only` checks the complete asset graph;
@@ -173,9 +176,9 @@ for issues #14–#17, with executable local/CI entry points kept separate.
 The runner preserves the supplied source heads and dirty-state flags, runtime
 and WASM digests, bundle metadata, complete specimen manifest, browser version,
 per-scenario checks and two screenshots. A failure writes `passed: false` before
-exiting nonzero. The local build produced the complete graph; local Chromium
-launch was blocked by `socket() failed: Operation not permitted`. No browser
-success is inferred from that build. The paired core CI runs the actual gate.
+exiting nonzero. A passing build does not imply that a runtime scenario ran.
+Preserve the new raw RTC report under its exact source/artifact pairing; older
+WSS and relay reports below remain historical evidence for those routes.
 
 Qualification covers these observations:
 
@@ -191,6 +194,8 @@ Qualification covers these observations:
 | Disable Cloudflare application writes | Tasks, messages, worker results and recovery continue through peers. |
 | Use event-only profile | Conversation works with no SQL engine or task query. |
 | Remove the signal grant or expire a signal | Typing disappears without becoming durable history. |
+| Stop introduction during warm RTC work | Original application work continues between authenticated peers with no additional host introduction traffic. |
+| Reconnect and fetch large detached bodies | Same complete signed history and original outcomes, with bounded RTC queues and separate host/data counters. |
 
 ## Qualify the browser/native WebRTC transport
 
@@ -218,7 +223,8 @@ A successful runtime invocation also validates `report.json`: exact source
 commit and dirty state, actual browser/native versions, two introduction
 messages, disposed signaling, zero subsequent signaling, positive bidirectional
 RTC traffic, matching signed-history digests, retained records authored by both
-peers and matching detached-payload digests. Unknown counters cannot become zero,
+peers, matching detached-payload digests, unchanged complete fixture-host counters
+and original accepted final outcomes preserved through exact retry. Unknown counters cannot become zero,
 and a WSS report or build-only result cannot be promoted to RTC evidence. These
 report checks verify the observations recorded by the real runner; their small
 Node tests use explicitly synthetic inputs and are not transport qualification.
