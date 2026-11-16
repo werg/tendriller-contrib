@@ -1,6 +1,6 @@
 import { readResource, hasResource, resourceFiles } from "./resources.mjs";
 // Resolve the complete immutable asset graph at publication time.
-import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, writeFileSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -53,11 +53,72 @@ export function vendorAssets(directory, declaration) {
   writeFileSync(join(directory, 'tendril.assets.json'), JSON.stringify(lock, null, 2) + '\n');
   return lock;
 }
+/** Complete the declared closure before publication without discarding hand edits.
+ * Existing locked bytes can be upgraded; divergent/unmanaged bytes require --force. */
+export function syncAssets(directory, { force = false } = {}) {
+  const manifest = join(directory, 'tendril.json');
+  if (!existsSync(manifest)) throw Error('Missing tendril.json in '+directory);
+  const declaration = json(manifest);
+  if (!Array.isArray(declaration.components || []) || (declaration.components || []).some(name => typeof name !== 'string'))
+    throw Error('tendril.json components must be an array of IDs.');
+  const assets = componentAssets(declaration.components || [], { workflows: !!declaration.workflows?.length });
+  const lockPath = join(directory, 'tendril.assets.json');
+  const old = existsSync(lockPath) ? json(lockPath) : null;
+  if (old && (old.format !== 'tendriller-page-assets' || old.version !== 1 || !Array.isArray(old.files)))
+    throw Error('Invalid page asset lock.');
+  const prior = new Map((old?.files || []).map(item => [item.path, item.sha256]));
+  const desired = new Set(assets.map(asset => asset.path));
+  const base = resolve(directory) + '/';
+  const localPath = path => {
+    if (typeof path !== 'string' || !/^assets\/(?:components|workflows)\/[a-zA-Z0-9_.\/-]+$/.test(path) || path.split('/').includes('..'))
+      throw Error('Invalid managed asset path in lock: '+path);
+    const local = resolve(directory, path);
+    if (!local.startsWith(base)) throw Error('Asset escapes page directory: '+path);
+    return local;
+  };
+  // Check every path before modifying any file.
+  for (const asset of assets) {
+    const path = localPath(asset.path);
+    if (existsSync(path)) {
+      const hash = sha256(readFileSync(path));
+      if (hash !== asset.sha256 && hash !== prior.get(asset.path) && !force)
+        throw Error(`Modified or unmanaged component '${asset.path}'; review or run tendril assets sync <dir> --force.`);
+    }
+  }
+  for (const [name, hash] of prior) if (!desired.has(name)) {
+    const path = localPath(name);
+    if (existsSync(path) && sha256(readFileSync(path)) !== hash && !force)
+      throw Error(`Modified obsolete component '${name}'; review or run tendril assets sync <dir> --force.`);
+  }
+  let written = 0, removed = 0;
+  for (const [name] of prior) if (!desired.has(name)) {
+    const path = localPath(name);
+    if (existsSync(path)) { rmSync(path); removed++; }
+  }
+  for (const asset of assets) {
+    const path = localPath(asset.path);
+    if (!existsSync(path) || sha256(readFileSync(path)) !== asset.sha256) {
+      mkdirSync(dirname(path), {recursive:true}); writeFileSync(path, asset.bytes); written++;
+    }
+  }
+  const lock = assetLock(declaration, assets);
+  writeFileSync(lockPath, JSON.stringify(lock,null,2)+'\n');
+  return {...lock, written, removed};
+}
 export function verifyAssets(directory) {
   const lockPath = join(directory, 'tendril.assets.json');
-  if (!existsSync(lockPath)) return null;
+  const manifest = join(directory, 'tendril.json');
+  if (!existsSync(lockPath)) {
+    if (existsSync(manifest)) throw Error('Missing tendril.assets.json; run tendril assets sync <dir>.');
+    return null;
+  }
   const lock = json(lockPath);
-  if (lock.format !== 'tendriller-page-assets' || lock.version !== 1) throw Error('Invalid page asset lock.');
+  if (lock.format !== 'tendriller-page-assets' || lock.version !== 1 || !Array.isArray(lock.files)) throw Error('Invalid page asset lock.');
+  if (existsSync(manifest)) {
+    const expected = assetLock(json(manifest));
+    if (JSON.stringify(lock.files) !== JSON.stringify(expected.files) || JSON.stringify(lock.requires) !== JSON.stringify(expected.requires))
+      throw Error('Page asset lock does not match the declaration; run tendril assets sync <dir>.');
+  }
   for (const { path, sha256: expected } of lock.files) {
     const local = resolve(directory, path), base = resolve(directory) + '/';
     if (!local.startsWith(base) || !existsSync(local) || sha256(readFileSync(local)) !== expected) throw Error(`Pinned page asset '${path}' is missing or has changed. Resolve and lock the asset set before publication.`);

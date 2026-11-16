@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Tendriller contrib CLI. Requires its pinned core contract and runtime artifacts.
 import { randomUUID } from "node:crypto";
-import { catalog, scaffold } from "../lib/assets.mjs";
+import { catalog, scaffold, syncAssets } from "../lib/assets.mjs";
 import { checkService } from "../lib/service.mjs";
 import { readFileSync, writeFileSync, existsSync, statSync, cpSync, mkdirSync } from "node:fs";
 import { basename, resolve, join, dirname } from "node:path";
@@ -26,7 +26,7 @@ Create / attach
   rm --yes                     delete the tendril and everything in it
 
 Content
-  push <dir|file> [--message M] [--no-replace] [--as <path>] [--no-wait] [--timeout S]
+  push <dir|file> [--message M] [--no-replace] [--as <path>] [--no-wait] [--timeout S]\n  assets sync <dir> [--force]    complete and pin declared component files
   files | versions | rollback [version]
   upload <file> [--name N]     store a blob (e.g. an icon) -> {id,url}
   blobs | blobs info <id> | blobs keep <id> | blobs expire <id>
@@ -71,7 +71,7 @@ Durable work and complete workflows
   scopes list|register|rotate|remove     authoritative generation controls
 
 Config: TENDRIL_API + TENDRIL_TOKEN, or --tendril <name> (~/.config/tendril/<name>.json,
-written by new/adopt), TENDRIL_SERVER (default http://localhost:8787), TENDRIL_OWNER.
+written by new/adopt), TENDRIL_SERVER (default https://tendriller.dev; use --server for local development), TENDRIL_OWNER.
 Creation is ad_hoc. After the owner opens the page, use meta --lifetime resident to keep it.
 Guest invites need owner approval. Display links are created in the owner page control.
 JSON arguments may be @file. Output is JSON; --pretty indents it.`;
@@ -497,6 +497,13 @@ const commands = {
     out(r);
     if (!r.ok) process.exitCode = r.error ? 2 : 1;
   },
+  async assets(args, f) {
+    if (args[0] !== "sync" || !args[1] || args.length !== 2
+      || Object.keys(f).some(k => !["force","pretty"].includes(k)))
+      fail("usage: tendril assets sync <dir> [--force]",64);
+    const result = syncAssets(args[1], {force: !!f.force});
+    out({path: resolve(args[1]), files: result.files.length, written: result.written, removed: result.removed, contrib: result.contrib});
+  },
   async recipes() { out(catalog()); },
   async scaffold(args) {
     const [name, target] = args;
@@ -507,7 +514,7 @@ const commands = {
 
 };
 
-const NO_CONFIG = new Set(["new", "adopt", "preview", "recipes", "scaffold"]);
+const NO_CONFIG = new Set(["new", "adopt", "preview", "recipes", "scaffold", "assets"]);
 
 async function main() {
   let parsed;
