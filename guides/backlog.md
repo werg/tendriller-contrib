@@ -1,19 +1,22 @@
 # Curate new knowledge from actual adaptations
 
-The collection already extracts the plan's first-wave operational decisions. The
-comparison and import guides are explained extensions; concurrent edits, long-running
-work, and actual-person interaction are integrated with their directly related source
-families. Avoid creating a second lightly differentiated guide for the same decision.
+The collection now includes complete user journeys, standard application decisions,
+and [application briefs](use-cases.md) that connect them. An explained design is a
+useful starting point; the next improvement should reveal what happened when a
+person adapted it. Avoid creating a second lightly differentiated guide for the
+same decision or relabeling a proposed scenario as an observed result.
 
 The next useful evidence should come from real adaptations:
 
-| Candidate | Evidence needed before expanding |
+| Published direction | Evidence needed next |
 | --- | --- |
-| Useful “what if” tools | Two tasks with explicit assumptions, constraints, known reference cases, and sensitivity checks. |
-| Application structure choices | Real examples showing when one file, modules, nested pages, or a framework improves maintainability without prescribing a stack. |
-| Deliberate trusted capabilities | Two distinct policies reviewed against the public host, including authority, concurrency, and actual transaction failure cases. |
-| Evidence review | A correction or conflicting-source adaptation that improves the existing reviewed-evidence guide. |
-| Comparison and import | Unrelated real tasks that expose missing data, ambiguous mapping, undo, and sensitivity limits. |
+| [What-if scenarios](../cookbooks/explore-what-if-scenarios/COOKBOOK.md) and [comparison](../cookbooks/compare-options/COOKBOOK.md) | Two unrelated tasks with declared assumptions, known reference cases, and sensitivity checks; document when a score or model made the choice less clear. |
+| [Accessible interactions](../cookbooks/complete-accessible-interactions/COOKBOOK.md), [forms](../cookbooks/build-correctable-forms/COOKBOOK.md), and [localization](../cookbooks/localize-an-interaction/COOKBOOK.md) | Complete tasks, including errors and return visits, with representative input methods, assistive technology, language, and locale needs. |
+| [Offline work](../cookbooks/work-offline-and-reconnect/COOKBOOK.md) and [portable recovery](../cookbooks/export-and-restore-work/COOKBOOK.md) | Actual saved-publication cold starts, storage pressure, partial evidence, and interrupted restore in the stated browser and authority context. |
+| [Shared reservations](../cookbooks/schedule-shared-resources/COOKBOOK.md), [handoffs](../cookbooks/hand-off-responsibility/COOKBOOK.md), and [batch actions](../cookbooks/run-reviewed-batch-actions/COOKBOOK.md) | Deliberately selected trusted policies exercised at the service boundary, with competing actors and uncertain external outcomes. |
+| [Field inspections](../cookbooks/document-a-field-inspection/COOKBOOK.md) and [evidence review](../cookbooks/capture-reviewed-evidence/COOKBOOK.md) | A real correction, conflicting source, or inaccessible capture path that changes the workflow; preserve the observation and rejected alternative. |
+| [Routines](../cookbooks/track-habits-and-routines/COOKBOOK.md) and [practice](../cookbooks/guide-practice-and-feedback/COOKBOOK.md) | Return visits, missed observations, corrections, changing goals, and whether feedback helps people act without overstating progress. |
+| [Application structure](../cookbooks/publish-smallest-page/COOKBOOK.md) and [coherent updates](../cookbooks/publish-coherent-updates/COOKBOOK.md) | Different implementations showing when one file, modules, nested pages, or a framework improves maintainability and preserves active work. |
 
 Rank contributions by repeated decision cost, evidence available, usefulness across
 tasks, and maintenance burden. A failed adaptation that explains an assumption can

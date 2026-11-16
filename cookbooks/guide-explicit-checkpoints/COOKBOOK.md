@@ -7,7 +7,7 @@ tags: ["guidance", "progress", "replanning"]
 choices: ["Checklist, focused step, or non-linear dependency view", "Manual completion, observed evidence, or reviewed inference", "Resume and replanning across definition revisions"]
 capabilities: []
 evidence: "explained"
-related: ["choose-voice-interaction", "keep-task-active", "resume-across-sessions"]
+related: ["choose-voice-interaction", "keep-task-active", "resume-across-sessions", "guide-practice-and-feedback"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/AGENT.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/index.html"]
 ---
 

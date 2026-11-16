@@ -7,7 +7,7 @@ tags: ["comparison", "decisions", "uncertainty"]
 choices: ["Table, small multiples, narrative, or interactive weights", "Hard constraints versus compensating preferences", "Missing evidence and sensitivity to assumptions"]
 capabilities: []
 evidence: "explained"
-related: ["present-live-measurements", "review-exact-proposal", "import-for-review"]
+related: ["present-live-measurements", "review-exact-proposal", "import-for-review", "explore-what-if-scenarios"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js"]
 ---
 

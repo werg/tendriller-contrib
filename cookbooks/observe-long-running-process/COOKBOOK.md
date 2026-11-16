@@ -7,7 +7,7 @@ tags: ["processes", "status", "intervention"]
 choices: ["Completion notice or continuous observation", "Observed process states and freshness", "Polling/events, scoped collectors, and deliberate intervention"]
 capabilities: []
 evidence: "explained"
-related: ["present-live-measurements", "ingest-bounded-telemetry", "review-exact-proposal"]
+related: ["present-live-measurements", "ingest-bounded-telemetry", "review-exact-proposal", "triage-incoming-work"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/README.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md"]
 ---
 

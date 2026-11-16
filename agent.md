@@ -2,6 +2,8 @@
 
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
+Start from an [application journey](guides/use-cases.md) when the user names an outcome rather than a technical decision. Follow the person through first use, correction, completion, and return; preserve the evidence boundary of every claimed check.
+
 ### Choose inputs and algorithms
 
 - [Choose a voice interaction](cookbooks/choose-voice-interaction/COOKBOOK.md) — Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.

@@ -22,7 +22,8 @@
       "related": [
         "reconcile-concurrent-edits",
         "publish-coherent-updates",
-        "capture-reviewed-evidence"
+        "capture-reviewed-evidence",
+        "localize-an-interaction"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
@@ -82,7 +83,8 @@
       "related": [
         "capture-reviewed-evidence",
         "annotate-a-frame",
-        "separate-evidence-interpretation"
+        "separate-evidence-interpretation",
+        "write-with-versioned-feedback"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html",
@@ -171,7 +173,8 @@
       "related": [
         "discover-capabilities",
         "annotate-a-frame",
-        "recover-outdated-work"
+        "recover-outdated-work",
+        "document-a-field-inspection"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js",
@@ -203,7 +206,8 @@
       "related": [
         "recover-outdated-work",
         "collect-private-responses",
-        "reconcile-concurrent-edits"
+        "reconcile-concurrent-edits",
+        "export-and-restore-work"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md",
@@ -234,7 +238,9 @@
       "related": [
         "detect-meaningful-changes",
         "connect-resuming-agent",
-        "choose-voice-interaction"
+        "choose-voice-interaction",
+        "plan-time-and-deadlines",
+        "track-habits-and-routines"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
@@ -301,7 +307,8 @@
       "related": [
         "review-exact-proposal",
         "choose-data-model",
-        "coordinate-devices"
+        "coordinate-devices",
+        "manage-sensitive-data"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts",
@@ -360,7 +367,8 @@
       "related": [
         "present-live-measurements",
         "review-exact-proposal",
-        "import-for-review"
+        "import-for-review",
+        "explore-what-if-scenarios"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
@@ -479,7 +487,8 @@
       "related": [
         "join-across-devices",
         "collect-private-responses",
-        "resume-across-sessions"
+        "resume-across-sessions",
+        "hand-off-responsibility"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md",
@@ -540,7 +549,8 @@
       "related": [
         "capture-reviewed-evidence",
         "choose-voice-interaction",
-        "connect-instrument"
+        "connect-instrument",
+        "complete-accessible-interactions"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js",
@@ -691,7 +701,8 @@
       "related": [
         "choose-voice-interaction",
         "keep-task-active",
-        "resume-across-sessions"
+        "resume-across-sessions",
+        "guide-practice-and-feedback"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/AGENT.md",
@@ -782,7 +793,8 @@
       "related": [
         "turn-records-into-signals",
         "separate-evidence-interpretation",
-        "review-exact-proposal"
+        "review-exact-proposal",
+        "build-correctable-forms"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
@@ -1012,7 +1024,8 @@
       "related": [
         "present-live-measurements",
         "ingest-bounded-telemetry",
-        "review-exact-proposal"
+        "review-exact-proposal",
+        "triage-incoming-work"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/README.md",
@@ -1168,7 +1181,9 @@
       "related": [
         "recover-outdated-work",
         "adapt-without-losing-work",
-        "choose-data-model"
+        "choose-data-model",
+        "search-and-filter-collections",
+        "undo-and-revise-work"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/list.js",
@@ -1198,7 +1213,8 @@
       "related": [
         "capture-reviewed-evidence",
         "review-exact-proposal",
-        "connect-resuming-agent"
+        "connect-resuming-agent",
+        "work-offline-and-reconnect"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts",
@@ -1260,7 +1276,9 @@
       "evidence": "exercised",
       "related": [
         "recover-outdated-work",
-        "observe-long-running-process"
+        "observe-long-running-process",
+        "schedule-shared-resources",
+        "run-reviewed-batch-actions"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",

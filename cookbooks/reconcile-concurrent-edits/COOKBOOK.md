@@ -7,7 +7,7 @@ tags: ["concurrency", "drafts", "collections"]
 choices: ["Append-only, field patches, revision guards, or human merge", "Stable identity separate from ordering", "Deletion, optimistic edits, and stale-draft review"]
 capabilities: []
 evidence: "explained"
-related: ["recover-outdated-work", "adapt-without-losing-work", "choose-data-model"]
+related: ["recover-outdated-work", "adapt-without-losing-work", "choose-data-model", "search-and-filter-collections", "undo-and-revise-work"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/list.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"]
 ---
 

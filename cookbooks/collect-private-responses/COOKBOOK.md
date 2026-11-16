@@ -7,7 +7,7 @@ tags: ["privacy", "collaboration", "transactions"]
 choices: ["Public poll or authorized private records", "Revisioned answers or append-only revisions", "Reviewed aggregate and atomic round reset"]
 capabilities: ["explicit trusted extension", "private records", "transactions"]
 evidence: "exercised"
-related: ["review-exact-proposal", "choose-data-model", "coordinate-devices"]
+related: ["review-exact-proposal", "choose-data-model", "coordinate-devices", "manage-sensitive-data"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"]
 ---
 

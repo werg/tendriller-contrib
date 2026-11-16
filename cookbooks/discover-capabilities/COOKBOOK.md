@@ -7,7 +7,7 @@ tags: ["capabilities", "permissions", "fallbacks"]
 choices: ["No-prompt observation versus a relevant permission request", "API presence, permission, hardware, and actual operation", "Fallbacks that complete the same task"]
 capabilities: []
 evidence: "explained"
-related: ["capture-reviewed-evidence", "choose-voice-interaction", "connect-instrument"]
+related: ["capture-reviewed-evidence", "choose-voice-interaction", "connect-instrument", "complete-accessible-interactions"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html"]
 ---
 

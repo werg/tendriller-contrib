@@ -7,7 +7,7 @@ tags: ["notifications", "attention", "timers"]
 choices: ["Quiet record, agent wake, local cue, timer, or push", "Coalescing, cooldown, and acknowledgement meaning", "Missed-time grace, time zones, and deduplication"]
 capabilities: []
 evidence: "explained"
-related: ["detect-meaningful-changes", "connect-resuming-agent", "choose-voice-interaction"]
+related: ["detect-meaningful-changes", "connect-resuming-agent", "choose-voice-interaction", "plan-time-and-deadlines", "track-habits-and-routines"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md"]
 ---
 

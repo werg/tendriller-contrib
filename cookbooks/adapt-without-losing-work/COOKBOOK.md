@@ -7,7 +7,7 @@ tags: ["adaptation", "accessibility", "drafts"]
 choices: ["Ordinary DOM, framework state, or a narrow declarative model", "Logical identity versus task/question identity", "In-place reconciliation or a deliberate disruptive update"]
 capabilities: []
 evidence: "explained"
-related: ["reconcile-concurrent-edits", "publish-coherent-updates", "capture-reviewed-evidence"]
+related: ["reconcile-concurrent-edits", "publish-coherent-updates", "capture-reviewed-evidence", "localize-an-interaction"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/ui-schema.json", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/adaptive-checkin/index.html", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts"]
 ---
 

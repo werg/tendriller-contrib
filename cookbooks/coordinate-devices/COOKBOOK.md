@@ -7,7 +7,7 @@ tags: ["devices", "attention", "handoff"]
 choices: ["Same view or complementary device purposes", "Targeted display versus authorized private access", "Audio focus, freshness, presentation, and completion"]
 capabilities: []
 evidence: "explained"
-related: ["join-across-devices", "collect-private-responses", "resume-across-sessions"]
+related: ["join-across-devices", "collect-private-responses", "resume-across-sessions", "hand-off-responsibility"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/app.js"]
 ---
 

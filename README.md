@@ -25,6 +25,19 @@ matter for the implementation. Example markup, paths, parameters, and layouts ar
 choices. Publication integrity describes the actual final files, not source-snippet
 byte equality.
 
+## Start with a complete use case
+
+The [application journeys](guides/use-cases.md) connect a small first version to
+richer features and a concrete failure rehearsal. Choose a route for an intake
+form, field inspection, private workshop, team inbox, document review, comparison,
+resource reservation, routine or learning loop, experiment, change observer,
+remote operator console, portable notebook, batch operation, or growing page.
+
+Each route explains what a useful completion looks like and points to the few
+guides that resolve its important decisions. Read only the approaches the task
+needs. Cookbooks include user journeys, feature tradeoffs, data and authority
+boundaries, correction and recovery paths, and scenarios with expected outcomes.
+
 ## Browse by outcome
 
 <!-- cookbook-index:start -->

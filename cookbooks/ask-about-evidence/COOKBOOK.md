@@ -7,7 +7,7 @@ tags: ["evidence", "reasoning", "correlation"]
 choices: ["Question-led source selection and context", "Observed fact, inference, and unresolved uncertainty", "Stable evidence/reply correlation"]
 capabilities: []
 evidence: "explained"
-related: ["capture-reviewed-evidence", "annotate-a-frame", "separate-evidence-interpretation"]
+related: ["capture-reviewed-evidence", "annotate-a-frame", "separate-evidence-interpretation", "write-with-versioned-feedback"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md"]
 ---
 

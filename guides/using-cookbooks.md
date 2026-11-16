@@ -5,6 +5,11 @@ CSS, navigation, rendering library, file organization, application namespace, or
 state schema. A useful page may be one file, nested pages, a framework build, a
 canvas, a dense workspace, or a compact form within core's serving contract.
 
+If the task is easier to name than the technical decision, start with the
+[application journeys](use-cases.md). Each route offers a focused first version,
+useful extensions, and a failure rehearsal. Select its relevant guides; a route
+does not require reading or installing every linked approach.
+
 1. Inspect the person's task, existing files, service capabilities, and constraints.
 2. Browse the generated summaries and read only relevant guides. Follow related
    links when they resolve a decision; they are not executable dependencies.

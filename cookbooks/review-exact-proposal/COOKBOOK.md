@@ -7,7 +7,7 @@ tags: ["approval", "versions", "authority"]
 choices: ["Approval or a simpler authorized progress receipt", "Response-time and execution-time expiry", "Downstream idempotency and uncertain outcomes"]
 capabilities: ["explicit trusted extension"]
 evidence: "exercised"
-related: ["recover-outdated-work", "observe-long-running-process"]
+related: ["recover-outdated-work", "observe-long-running-process", "schedule-shared-resources", "run-reviewed-batch-actions"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs"]
 ---
 

@@ -7,7 +7,7 @@ tags: ["import", "review", "provenance"]
 choices: ["Manual entry or staged import", "All-or-nothing versus explicit partial acceptance", "Ambiguous mappings, preserved originals, and retry identity"]
 capabilities: []
 evidence: "explained"
-related: ["turn-records-into-signals", "separate-evidence-interpretation", "review-exact-proposal"]
+related: ["turn-records-into-signals", "separate-evidence-interpretation", "review-exact-proposal", "build-correctable-forms"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"]
 ---
 
