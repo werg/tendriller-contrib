@@ -24,6 +24,12 @@ application checks retain their original scope. The new gate separately proves
 zero administrator application-envelope traffic, live host-reviewed device
 enrollment and writer/reader revocation; deployed qualification remains open.
 
+The [deployment handoff](deployment-qualification-handoff.md) maps issues
+#14–#17 to the executable route, measurement, recovery and device gates, and to
+the concrete infrastructure and evidence required outside those gates. The
+[native cost review](membership-cost-review-2026-11-16.md) preserves the actual
+before/after administrator write measurements and their source boundaries.
+
 ## Current recorded implementation evidence
 
 [The reviewed implementation's qualification](qualification-review-43957113710.md)

@@ -133,6 +133,7 @@ enrollment and public-network routing are separate qualification work.
 npm run test:peer-application -- \
   --chronolog /exact/chronolog-checkout \
   --tendriller-runtime /exact/tendriller-runtime-package \
+  --tendriller-engine /exact/tendriller-engine-package \
   --wasm /exact/chronolog-wasm-artifacts \
   --output /new/inspection-evidence
 ```
@@ -141,9 +142,20 @@ The Chronolog checkout must have its pinned dependencies, native engine and
 Playwright Chromium installed. `--tendriller-runtime` identifies the extracted
 public package containing `package.json` and `assets/kernel.mjs`. The CLI uses
 only that package's assets, and the contrib wrapper invokes the core's public
-qualification command without importing its implementation. `--browser` selects
+qualification command without importing its implementation. `--tendriller-engine`
+identifies the extracted public engine package from the same source. It enables
+the actual local direct-WSS and packaged-workerd-relay routes, explicit route
+swaps, record/capability/outcome comparisons and the safe `route-trace.ndjson`.
+The local relay bridge supplies a synthetic authenticated page session; it does
+not establish production login or Internet reachability. The
+[route qualification runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/route-qualification.md)
+defines the counters and limits. `--browser` selects
 an explicit Chromium executable. `--build-only` checks the complete asset graph;
 its report explicitly says browser scenarios were **not run**.
+
+The [deployment handoff](../notes/deployment-qualification-handoff.md) lists the
+actual networks, services, permissions and device/storage evidence still needed
+for issues #14–#17, with executable local/CI entry points kept separate.
 
 The runner preserves the supplied source heads and dirty-state flags, runtime
 and WASM digests, bundle metadata, complete specimen manifest, browser version,
