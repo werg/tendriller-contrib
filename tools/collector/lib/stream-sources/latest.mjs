@@ -19,7 +19,15 @@ export async function readLatestFile(source, checkpoint, { open: openFile = open
       if (key === checkpoint?.digest) return {records:[],checkpoint};
       return {records:[errorRecord(source,'line_too_large')],checkpoint:{digest:key}};
     }
-    bytes = await file.readFile();
+    // A bounded read also protects against concurrent growth after stat().
+    const buffer = Buffer.alloc(max+1);
+    let filled=0;
+    while (filled < buffer.length) {
+      const {bytesRead}=await file.read(buffer,filled,buffer.length-filled,filled);
+      if (!bytesRead) break;
+      filled += bytesRead;
+    }
+    bytes=buffer.subarray(0,filled);
     if (bytes.length > max) {
       const key = digest('too_large:'+bytes.length+':'+stat.mtimeMs);
       if (key === checkpoint?.digest) return {records:[],checkpoint};
