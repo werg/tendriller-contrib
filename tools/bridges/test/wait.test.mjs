@@ -99,7 +99,7 @@ test("permanent HTTP errors stop follow and wait without retrying", async () => 
   try {
     for (const args of [["wait"], ["events", "--follow"]]) {
       const r = await run("node", [cli, ...args], { TENDRIL_API: `http://127.0.0.1:${server.address().port}/api/t/abc234abc234`, TENDRIL_TOKEN: "tk_test", TENDRIL_CONFIG_DIR: dir });
-      assert.equal(r.code, 5, r.stderr);
+      assert.equal(r.code, 5, r.stderr); // Authorization has a distinct exit code.
       assert.equal(JSON.parse(r.stderr).status, 403);
     }
     assert.equal(calls, 2);
