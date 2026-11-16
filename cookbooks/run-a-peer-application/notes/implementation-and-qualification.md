@@ -141,7 +141,8 @@ boundaries below remain unchanged.
 | Topic-scoped and ephemeral grants | Chronolog capabilities | Governed grants | Unauthorized topic/SQL/platform operations rejected; revoked old grant stays revoked |
 | Signed publish-only ingress | Chronolog wire/core | Topic grants | Original signature/operation preserved through forwarding, without history keys |
 | Selected application backend | Tendriller public contract/runtime | Small public interface | One write owner and one outbox; hosted and Chronolog implementations consume it |
-| Framed connection/bootstrap and signals | Tendriller public contract + Chronolog adapter | Portable sync | Bounded queues, explicit expiry/domain, application authorization independent of host access |
+| Bounded peer introduction | Tendriller rendezvous | Authenticated participant routing | One complete SDP per side, bounded bytes, fresh session identity and host socket retirement after exchange |
+| WebRTC framed connection and Worker bridge | Chronolog transport | Browser/native RTC and portable sync | Bounded queues, receiver flow control, independent application authorization and zero further introduction traffic |
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
 | Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained inclusion/closure evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
@@ -185,6 +186,10 @@ The following are separate assertions, not a single generic “P2P works” test
 | P2P-22 | Replay a timer occurrence, cancel it, and restart. | Stable occurrence identity and the documented cancellation result, without duplicate dispatch. | Resident scheduler and effect journal |
 | P2P-23 | Expire/reorder/replay transient signals. | Expired/stale frames are dropped and queues stay bounded; no durable cursor claim. | Peer signal protocol |
 | P2P-24 | Commit blob metadata before a second copy exists. | Availability and backup lag remain explicit; metadata is not presented as a replicated-byte receipt. | Blob storage adapter |
+| P2P-25 | Establish browser/native WebRTC, then retire introduction. | Actual authenticated records and detached bodies move in both directions without another signaling message. | Real browser and native RTC implementation |
+| P2P-26 | Hold membership fixed and perform warm application work. | Peer byte counters increase; all page-host request/body-byte counters and administrator work stay unchanged. | Instrumented complete page bootstrap and host |
+| P2P-27 | Stop hosting/introduction after establishing a warm session. | Original operations continue over RTC and reach the selected finality provider; no host reconnect/health loop starts. | Actual peer page, administrator and independent finality provider |
+| P2P-28 | Saturate or close the page/Worker frame bridge. | Bounded buffers, rejected pending sends and disposal of the owned connection without replacing the operation identity. | Actual RTC adapter and MessagePort lifecycle |
 
 ## Deployment issues that require external evidence
 
@@ -196,8 +201,9 @@ them.
 
 Tracking: [contrib #14](https://github.com/werg/tendriller-contrib/issues/14).
 
-Compare the selected framed WSS baseline with direct WSS to a reachable agent or
-browser/native WebRTC as the host permits. Use home Wi-Fi, a mobile hotspot, and a
+Qualify browser/native WebRTC through the bounded introduction service and record
+the selected ICE candidate pair. Preserve the historical framed WSS measurements
+as their own baseline. Use home Wi-Fi, a mobile hotspot, and a
 restrictive corporate network. Include browser suspension, connection interruption,
 agent restart, cold bootstrap, and a warm direct session with hosting unavailable.
 
@@ -207,7 +213,10 @@ bounded-queue behavior and failure recovery. Include tunnel/provider paths in th
 route. A successful socket or a high native direct-connect percentage cannot
 stand in for these measurements. Choose one production path and a practical
 fallback from the results; adding all adapters is not a release prerequisite.
-Report small descriptor/inline-control traffic separately from detached
+Report introduction messages/bytes separately from the established data channel.
+Compare complete host request/body-byte counters before and after warm work and
+an actual host-unavailable interval. A zero application-write counter alone
+does not establish host independence. Report small descriptor/inline-control traffic separately from detached
 application payload traffic. Prove the default Cloudflare administrator does not
 fetch application bodies during live join and catch-up.
 

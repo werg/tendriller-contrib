@@ -190,6 +190,50 @@ Qualification covers these observations:
 | Use event-only profile | Conversation works with no SQL engine or task query. |
 | Remove the signal grant or expire a signal | Typing disappears without becoming durable history. |
 
+## Qualify the browser/native WebRTC transport
+
+The peer transport gate runs actual Chromium, an exclusive browser OPFS Worker
+and Chronolog's native Werift adapter. It uses a small loopback HTTP offer/answer
+fixture, closes that introduction service, then exchanges authenticated records
+and detached bodies through the RTC data channel. The fixture is independent
+of the packaged Tendriller server; complete peer-page host quiescence needs the
+separate [warm-host assertions](../notes/peer-network.md#prove-the-intended-load-boundary).
+
+```sh
+npm run test:peer-webrtc -- \
+  --chronolog /exact/chronolog-checkout \
+  --output /new/webrtc-evidence
+```
+
+The exact Chronolog checkout must have its pinned dependencies, native engine
+and Playwright Chromium installed. `--browser /exact/chromium` selects an
+explicit executable. `--build-only` builds fixture assets and leaves the
+runtime scenarios unexecuted. The output directory must be new. The wrapper
+invokes the core's public qualification command; it imports no private core
+implementation and propagates a failed or interrupted run.
+
+A successful runtime invocation also validates `report.json`: exact source
+commit and dirty state, actual browser/native versions, two introduction
+messages, disposed signaling, zero subsequent signaling, positive bidirectional
+RTC traffic, matching signed-history digests, retained records authored by both
+peers and matching detached-payload digests. Unknown counters cannot become zero,
+and a WSS report or build-only result cannot be promoted to RTC evidence. These
+report checks verify the observations recorded by the real runner; their small
+Node tests use explicitly synthetic inputs and are not transport qualification.
+
+To preserve a derived summary of an existing raw report:
+
+```sh
+node cookbooks/run-a-peer-application/checks/webrtc-report.mjs \
+  --report /exact/webrtc-evidence/report.json \
+  --output /new/webrtc-summary.json
+```
+
+The summary hashes the exact raw input and retains its topology and limitations.
+It does not infer a direct ICE route, real participant authentication, provider
+cost or a deployed-network success rate. Preserve the raw report alongside the
+summary and the actual source/artifact pairing.
+
 Record the exact source heads, public bundle digest, native engine/WASM identity,
 browser version and per-scenario outcome. A screenshot or fixture-only browser
 run must not be promoted to that evidence. Network routing, real provider

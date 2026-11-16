@@ -15,6 +15,7 @@
     "check": "npm run check:generated && npm run check:content && npm test",
     "test:pilots": "node test/pilot-browser.mjs",
     "test:peer-application": "node cookbooks/run-a-peer-application/checks/run.mjs",
-    "test:peer-membership": "node cookbooks/run-a-peer-application/checks/run-membership.mjs"
+    "test:peer-membership": "node cookbooks/run-a-peer-application/checks/run-membership.mjs",
+    "test:peer-webrtc": "node cookbooks/run-a-peer-application/checks/run-webrtc.mjs"
   }
 }
