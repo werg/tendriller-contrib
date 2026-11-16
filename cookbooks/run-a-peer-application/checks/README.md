@@ -97,14 +97,43 @@ reference immutability, and draft preservation. The small read-handle fixtures
 establish page behavior only; they do not prove SQL execution, storage atomicity,
 signatures, authorization or peer finality.
 
-The paired public runtime integration must additionally exercise both complete
-pages in Chromium with a native authority, independent writer identities, actual
-SQL/OPFS and public adapters. Check the following:
+The paired Chronolog qualification CLI builds and exercises both complete pages
+with the **packaged** Tendriller runtime, two independent OPFS SQL Workers, real
+signed range/evidence synchronization and a native authority. The native worker
+runs the provider-free `examples/resident-agent.ts` task-summary handler. A
+loopback bootstrap explicitly grants the two fixture identities; deployment
+enrollment and public-network routing are separate qualification work.
+
+```sh
+npm run test:peer-application -- \
+  --chronolog /exact/chronolog-checkout \
+  --tendriller-runtime /exact/tendriller-runtime-package \
+  --wasm /exact/chronolog-wasm-artifacts \
+  --output /new/inspection-evidence
+```
+
+The Chronolog checkout must have its pinned dependencies, native engine and
+Playwright Chromium installed. `--tendriller-runtime` identifies the extracted
+public package containing `package.json` and `assets/kernel.mjs`. The CLI uses
+only that package's assets, and the contrib wrapper invokes the core's public
+qualification command without importing its implementation. `--browser` selects
+an explicit Chromium executable. `--build-only` checks the complete asset graph;
+its report explicitly says browser scenarios were **not run**.
+
+The runner preserves the supplied source heads and dirty-state flags, runtime
+and WASM digests, bundle metadata, complete specimen manifest, browser version,
+per-scenario checks and two screenshots. A failure writes `passed: false` before
+exiting nonzero. The local build produced the complete graph; local Chromium
+launch was blocked by `socket() failed: Operation not permitted`. No browser
+success is inferred from that build. The paired core CI runs the actual gate.
+
+Qualification covers these observations:
 
 | Scenario | Page observation |
 | --- | --- |
 | Two writers claim the same task | One final claimant; the losing operation is rejected with its draft retained. |
 | Message submit response is delayed while new text is typed | Original message receives its receipt; new text remains in the editor. |
+| Final status arrives before the original submit reply | A delayed queued receipt cannot regress the observed final result. |
 | Reload after the proposal is durably prepared | Same operation identity/result, without a second message or claim. |
 | Finality changes but task rows do not | Receipt changes from provisional to final. |
 | Replay the UI or reopen a device | No additional worker/provider invocation from the reducer. |

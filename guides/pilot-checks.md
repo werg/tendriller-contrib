@@ -6,8 +6,13 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 The new [resident-peer task-board/chat specimen](../cookbooks/run-a-peer-application/checks/README.md)
 has two layouts and focused deterministic page/model checks. It consumes the public
 application-backend boundary, an explicitly supplied public Chronolog bundle, and
-a real deployment bootstrap. These new checks are separate from the historical
-browser results below. Its [qualification matrix](../cookbooks/run-a-peer-application/notes/implementation-and-qualification.md)
+a real deployment bootstrap. `npm run test:peer-application` invokes the paired
+Chronolog qualification CLI with explicit runtime/WASM artifacts; it builds both
+complete graphs and records exact digests. The local graph build passed, while
+local Chromium launch was blocked by the environment's socket restriction. The
+actual browser gate is supplied to paired core CI; no new browser pass is inferred
+from the build. These checks are separate from the historical browser results
+below. Its [qualification matrix](../cookbooks/run-a-peer-application/notes/implementation-and-qualification.md)
 keeps actual SQL/OPFS, native authority, provider effects, network routes, and cost
 measurements at their respective evidence boundaries; none are inferred from a
 read-handle fixture or a screenshot.

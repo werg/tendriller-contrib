@@ -13,6 +13,7 @@
     "check:content": "node distribution/check.mjs",
     "test": "node --test test/*.test.mjs cookbooks/*/checks/*.test.mjs",
     "check": "npm run check:generated && npm run check:content && npm test",
-    "test:pilots": "node test/pilot-browser.mjs"
+    "test:pilots": "node test/pilot-browser.mjs",
+    "test:peer-application": "node cookbooks/run-a-peer-application/checks/run.mjs"
   }
 }

@@ -197,9 +197,11 @@ async function watchTyping() {
   try {
     for await (const event of signals.subscribe({ topics: ['typing'], signal: lifecycle.signal })) {
       if (event.payload?.typing !== true) continue;
+      const remaining = Math.min(2500, event.expiresAtMs - Date.now());
+      if (!Number.isFinite(remaining) || remaining <= 0) continue;
       $('#typing').textContent = 'Someone is typing…';
       clearTimeout(expiry);
-      expiry = setTimeout(() => { $('#typing').textContent = ''; }, 2500);
+      expiry = setTimeout(() => { $('#typing').textContent = ''; }, remaining);
     }
   } catch (error) { if (!lifecycle.signal.aborted) $('#typing').textContent = `Typing unavailable: ${error.message}`; }
   finally { clearTimeout(expiry); }
