@@ -18,11 +18,14 @@ The administrator retains the membership state and key material needed to wrap
 authorized epoch keys to approved reader public keys. A member's private key is
 not uploaded as part of enrollment.
 
-One ordered ledger carries small signed descriptors and inline membership
-controls. Full peers fetch the hash-committed application envelopes and execute
-the application. The native authority orders the ledger; the membership
-administrator decides roster permissions. These responsibilities can have
-different hosts without inventing another application command log.
+One receipt ledger carries small signed descriptors, inline membership controls
+and signed author-time closure markers. Full peers fetch the hash-committed
+application envelopes and derive execution order from signed author timestamps
+and deterministic tie-breakers. The native finality authority certifies inclusion
+and a closed author-time frontier; receipt positions do not choose application
+conflict winners. The membership administrator decides roster permissions at the
+proved control boundaries. These responsibilities can have different hosts
+without inventing another application command log.
 
 Retaining a descriptor proves which bytes were committed, not that a usable copy
 of those bytes still exists. A storage or routing failure must not silently
@@ -42,6 +45,13 @@ identities; build-only output explicitly leaves runtime scenarios unexecuted.
 | Native traffic and retained storage | In Chronolog: `node --import tsx tools/membership-cost.ts --output ...` | Actual signed requests and durable stores; independent body-size/count workloads and membership lifecycle. [Cost guide](measuring-application-costs.md). |
 | Authority loss and restore | In Chronolog: `node --import tsx tools/authority-recovery.ts --output ...` | Separate real processes, SIGKILL at commit boundaries, same-store fencing, retry, complete backup/restore and stale-lineage refusal. [Recovery runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/authority-recovery.md). |
 | Browser storage and authorization | Chronolog Browser peer qualification workflow; focused commands in the runbook | Real Chromium/OPFS ownership, explicit identity creation, metadata/storage-loss refusal, bounded actual quota fixture and publisher negative cases. [Device runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/device-boundary-qualification.md). |
+
+The author-time finality change requires new source-pinned qualification. Earlier
+receipt-order reports remain historical: they do not qualify closure recovery,
+timestamp admission, closure traffic, or the revised reset-versus-stale-edit
+scenario. Record the future-admission window, cutoff lag, closure interval and
+polling cadence in route and cost reports. The native authority backup must
+retain its closure history as well as its certified receipt prefix.
 
 The browser workflow runs independent gates even if an earlier gate fails. Its
 overall result still fails. Read each report's status and scenario list; a later
@@ -74,8 +84,9 @@ passing scenario does not turn an earlier failure into a successful workflow.
   reported quota alone must not be accepted as evidence that writes failed.
 - SQLite's same-file writer fence does not fence copied volumes on independent
   hosts. A retained local certificate helps detect partial loss; it cannot
-  detect a rollback that removes every newer copy of evidence. Keep an
-  independently verified latest acknowledged prefix outside the restored disk.
+  detect a rollback that removes every newer copy of evidence. Keep independently
+  verified acknowledged inclusion and closure evidence outside the restored
+  disk, and validate the complete retained closure history during recovery.
 - No second-durable-copy-before-acknowledgment contract, automatic failover,
   generic Cloudflare-to-native administrator export/import command, or erasure
   of plaintext already read by a revoked device is claimed. If such a promise
