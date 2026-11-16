@@ -1,0 +1,23 @@
+{
+  "format": "peer-application-pricebook/v1",
+  "currency": "USD",
+  "checkedAt": "2026-11-16",
+  "scope": "Public Workers Paid / SQLite Durable Objects reference rates, checked against Cloudflare documentation. Recheck for the actual deployment date, plan, contract, and account allocation. These are not measured usage or a complete provider price list.",
+  "rates": [
+    { "meter": "cloudflare-worker-requests", "unit": "request", "includedUnits": 10000000, "unitSize": 1000000, "billingStep": 0, "rate": 0.30, "source": "https://developers.cloudflare.com/workers/platform/pricing/" },
+    { "meter": "cloudflare-worker-cpu", "unit": "millisecond", "includedUnits": 30000000, "unitSize": 1000000, "billingStep": 0, "rate": 0.02, "source": "https://developers.cloudflare.com/workers/platform/pricing/" },
+    { "meter": "cloudflare-durable-requests", "unit": "billing-request", "includedUnits": 1000000, "unitSize": 1000000, "billingStep": 1000000, "rate": 0.15, "source": "https://developers.cloudflare.com/durable-objects/platform/pricing/" },
+    { "meter": "cloudflare-durable-duration", "unit": "GB-second", "includedUnits": 400000, "unitSize": 1000000, "billingStep": 1000000, "rate": 12.50, "source": "https://developers.cloudflare.com/durable-objects/platform/pricing/" },
+    { "meter": "cloudflare-durable-rows-read", "unit": "row", "includedUnits": 25000000000, "unitSize": 1000000, "billingStep": 1000000, "rate": 0.001, "source": "https://developers.cloudflare.com/durable-objects/platform/pricing/" },
+    { "meter": "cloudflare-durable-rows-written", "unit": "row", "includedUnits": 50000000, "unitSize": 1000000, "billingStep": 1000000, "rate": 1.00, "source": "https://developers.cloudflare.com/durable-objects/platform/pricing/" },
+    { "meter": "cloudflare-durable-storage", "unit": "GB-month", "includedUnits": 5, "unitSize": 1, "billingStep": 1, "rate": 0.20, "source": "https://developers.cloudflare.com/durable-objects/platform/pricing/" },
+    { "meter": "allocated-cloudflare-subscription", "unit": "USD", "includedUnits": 0, "unitSize": 1, "billingStep": 0, "rate": 1, "source": "https://developers.cloudflare.com/workers/platform/pricing/" }
+  ],
+  "notes": [
+    "The subscription meter consumes the explicitly allocated subscription amount, not an additional automatic per-case fee.",
+    "Durable Object requests require the provider billing definition, including its incoming WebSocket message adjustment. Raw protocol frames and local signed HTTP requests are not interchangeable with this meter.",
+    "Native logical put calls are not Cloudflare billed SQL rows; native file byte snapshots are not GB-month measurements.",
+    "Provider relay/tunnel, D1, blob/R2, agent hosting/disk/backup, observability and taxes require their own dated rates and measured usage. Missing rates remain unknown.",
+    "Included allocations are monthly account allocations. The calculator requires prior account usage and does not grant a new allocation to each workload phase."
+  ]
+}

@@ -175,6 +175,11 @@ idempotency and measured costs remain separate
 
 ## Qualify thin Cloudflare membership separately
 
+The [cost measurement guide](../notes/measuring-application-costs.md) adds an
+executable native traffic/storage workload, separately dated pricing inputs and
+a coverage-aware calculator. It preserves unmeasured provider usage as unknown
+and does not infer savings from descriptor bytes.
+
 The [revised membership target](../notes/thin-membership-administration.md)
 has a separate gate because the two-layout application fixture pregrants its
 devices. The membership gate consumes the built public SDK and engine packages,
