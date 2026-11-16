@@ -1,7 +1,10 @@
 # Keep application traffic between peers
 
 The peer application has one durable write owner: Chronolog. Tendriller serves
-the initial page, authenticates participant administration and introduces peers.
+the initial page and authenticates participant administration. A reachable
+resident peer accepts a bounded HTTPS introduction directly; deployment places
+that endpoint in the initial page configuration. Tendriller also provides an
+explicit rendezvous when both endpoints already participate in the same attempt.
 After introduction, an authenticated WebRTC data channel carries the application
 history, inclusion and closure evidence, detached envelopes and transient signals.
 The page's normal operation has no hosted application socket or health poll.
@@ -20,7 +23,8 @@ runtime scenario; new reports must identify the actual peers and selected route.
 | --- | --- | --- |
 | HTML, modules, Worker and WASM assets | Tendriller publication | Initial load or an explicit publication update |
 | Account authentication and participant approval | Tendriller with the portable membership administrator | Enrollment, roster inspection, approval, revocation and key rotation |
-| Peer introduction | Tendriller rendezvous | One bounded offer and answer per connection attempt |
+| Cold peer introduction | Resident-owned HTTPS offer endpoint | None; the initial page already declares the endpoint |
+| Coordinated peer introduction | Optional Tendriller rendezvous | One bounded offer and answer when both endpoints participate |
 | ICE, reliable data channel and flow control | Chronolog WebRTC transport | No application payload relay through the page host |
 | Peer identity, reader grants and signed records | Chronolog authenticated peer link | Independent of the introduction service |
 | Durable proposals, retry, SQL, events and proofs | Chronolog replica | No hosted application-state command or replay queue |
@@ -39,12 +43,35 @@ application activity.
 
 ## Introduce once, authenticate over the data channel
 
+For a cold connection to a resident peer, `createHttpWebRtcSignaling` sends one
+complete offer to its declared HTTPS endpoint and receives one complete answer.
+The resident starts its listener independently of browser visits. This needs no
+host poll, persistent host socket, or fixture that secretly starts the other
+half of a rendezvous. The initial deployment configuration includes the endpoint
+and any coarse introduction admission headers. Production endpoints require
+HTTPS; the transport permits plain HTTP only for loopback qualification.
+
+`createWebRtcOfferHandler` mounts on that resident endpoint. It requires an
+explicit `authorize(request, signal)` callback and exact allowed page origins.
+Origin checks restrict browser calls; they do not authenticate native clients.
+The handler bounds JSON bodies to 128 KiB and each fully gathered SDP to 64 KiB,
+limits pending introductions and active connections, and applies a negotiation
+deadline. It sends the answer before waiting for the channel and authenticated
+peer, so the browser can complete ICE. Completion of the HTTP response retires
+signaling without ending the established RTC connection.
+
 The public Tendriller peer client opens `peers.rendezvous(channel, peerId)` for a
 specific application channel and fresh connection attempt. Its `ready` promise
 assigns an offerer or answerer role and a session identifier. Its message stream
 carries only `{ type: 'offer' | 'answer', sdp }` descriptions. Each side sends one
 fully gathered description, bounded to 64 KiB. The service closes its sockets
 after that pair has been exchanged.
+
+This optional rendezvous requires both peers to join the same attempt. A resident
+behind an unreachable address cannot discover a new browser merely because a
+channel exists on the page host. Supply an explicit reachability arrangement or
+use a reachable resident introduction endpoint; no hidden relay or polling loop
+is implied by this API.
 
 Treat the rendezvous session and participant identifier as routing information.
 The Chronolog peer handshake still verifies the remote signing key and current
@@ -69,22 +96,21 @@ writer for the same local durable store.
 
 ## Compose the public APIs
 
-The page-owned [introduction recipe](../snippets/introduce-peer-worker.mjs) is a
-small public composition. Bundle it with `@chronolog/transport-webrtc` and the
-actual deployment assets. It accepts the selected runtime's public `peers`
-client, waits for its assigned role and gives signaling to `negotiateWebRtc`.
-It closes the rendezvous if pairing fails before negotiation begins. It adds
-no reconnect loop, durable queue or application identity.
+The page-owned [resident connection recipe](../snippets/connect-resident-worker.mjs)
+composes `createHttpWebRtcSignaling` and `negotiateWebRtc`. Bundle it with
+`@chronolog/transport-webrtc` and the actual deployment assets. It reads the
+explicit endpoint supplied by the caller and closes signaling on negotiation
+failure. It adds no reconnect loop, durable queue or application identity.
 
 After opening the exclusive replica Worker, a deployment can use:
 
 ```js
-import { introducePeerWorker } from './introduce-peer-worker.mjs';
+import { connectResidentWorker } from './connect-resident-worker.mjs';
 
 const connectionLifetime = new AbortController();
-const session = await introducePeerWorker({
-  peers: tendril.peers,
-  channel: groupConnectionChannel,
+const session = await connectResidentWorker({
+  endpoint: deployment.residentIntroductionUrl,
+  headers: deployment.introductionHeaders,
   configuration: rtcConfiguration,
   signal: connectionLifetime.signal,
   handoff(channel) {
@@ -99,12 +125,11 @@ const session = await introducePeerWorker({
 
 The message shape is chosen by the deployment. Transfer inside `handoff`
 synchronously, without awaiting, attaching a listener or wrapping the channel
-first. An asynchronous callback cannot safely transfer it later. The default
-endpoint ID is fresh for this attempt and is unrelated to the durable signing
-identity. Both endpoints must use the intended same introduction channel.
+first. An asynchronous callback cannot safely transfer it later. Introduction
+admission does not authorize a group read or change the durable signing identity.
 
 In the receiving Worker, use public `frameRtcDataChannel(channel)` from
-`@chronolog/transport-webrtc`. Feed that framed connection to
+`@chronolog/transport-webrtc`, and await its bounded `ready` handshake. Feed that framed connection to
 `openAuthenticatedPeerLink` from `@chronolog/agent-service/peer-link`, then attach
 the authenticated link to the replica's portable transport. Use the persisted
 signing identity and active reader grant, and verify the remote identity against
@@ -112,11 +137,50 @@ the current membership snapshot. Neither the recipe nor the rendezvous grants
 access. Install `createChronologApplicationBackend` through the same selected
 `tendril.application` interface after the actual replica is ready.
 
-For a native peer, `openWebRtcConnection` uses the same signaling interface with
-`createPeerConnection: configuration => createNativePeerConnection(configuration)`.
-Import the factory from `@chronolog/transport-webrtc/native`; keep that native
-entrypoint out of browser bundles. The native peer's authenticated protocol and
-resident services consume the same framed connection and signed history.
+The [native resident task](../snippets/serve-resident-webrtc.mjs) supplies a real
+HTTPS listener through `AgentApplication.tasks`. Its `createResidentWebRtcTask`
+accepts the existing native application context, explicit endpoint/listen/TLS
+configuration, introduction authorization, page origins and RTC configuration.
+It creates native peer connections through `@chronolog/transport-webrtc/native`
+and passes framed connections to `context.connectPeer`. The daemon's existing
+context performs the current group/read-grant handshake and owns replication.
+Keep the native module out of browser bundles.
+
+Compose the task when loading a trusted native application module:
+
+```js
+import { createResidentWebRtcTask } from './serve-resident-webrtc.mjs';
+
+export function createAgent(context) {
+  return {
+    tasks: [createResidentWebRtcTask({
+      context,
+      endpoint: deployment.residentIntroductionUrl,
+      listen: { host: '0.0.0.0', port: 8443 },
+      tls: deployment.residentTls,
+      allowedOrigins: deployment.pageOrigins,
+      authorize: authorizeIntroduction,
+      configuration: deployment.rtc,
+      onError: reportConnectionError,
+    })],
+  };
+}
+```
+
+Here `deployment`, `authorizeIntroduction` and error reporting are supplied by
+the trusted native module. Load TLS key/certificate bytes on that resident and
+keep the private key out of page configuration. Authorization must independently
+check the configured admission credential and honor cancellation. Returning
+`true` unconditionally exposes an introduction service to every caller that can
+reach it. An admitted caller still cannot read history without a current reader
+grant. The task's shutdown closes its listener and its peer lifetimes; ordinary
+HTTP introduction completion does neither to the application session.
+
+When both peers explicitly coordinate through the page host, the separate
+[Tendriller introduction recipe](../snippets/introduce-peer-worker.mjs) accepts
+`peers`, `channel` and a fresh optional endpoint ID, waits for the assigned role,
+then calls the same transport negotiation and Worker handoff. Both peers must
+join the intended channel. Its routing identifier is unrelated to a signing key.
 
 ## Keep an established session independent
 
@@ -132,8 +196,9 @@ waits. Host independence cannot make an unavailable finality authority available
 Do not silently substitute the hosted backend or issue a new operation identity.
 
 If the RTC connection fails, preserve pending proposals and report the connection
-state. A new connection attempt obtains a new rendezvous session and performs
-the authenticated handshake again. No hidden HTTP or Cloudflare payload relay
+state. A new connection attempt makes a fresh direct offer or obtains a new
+coordinated rendezvous session, then performs the authenticated handshake again.
+No hidden HTTP or Cloudflare payload relay
 is a fallback. Configure an explicit alternative route only when its provider,
 authorization, byte accounting and availability policy are acceptable.
 

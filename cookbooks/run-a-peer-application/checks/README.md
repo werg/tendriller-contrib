@@ -268,11 +268,46 @@ It does not infer a direct ICE route, real participant authentication, provider
 cost or a deployed-network success rate. Preserve the raw report alongside the
 summary and the actual source/artifact pairing.
 
+The [first actual RTC run](../notes/webrtc-qualification-43976651713.md) preserves
+five passing assertions, the raw report and its validated summary. It exercised
+the loopback offer/answer fixture; it does not qualify later public HTTP endpoint
+or resident-task code under a newer source identity.
+
 Record the exact source heads, public bundle digest, native engine/WASM identity,
 browser version and per-scenario outcome. A screenshot or fixture-only browser
 run must not be promoted to that evidence. Network routing, real provider
 idempotency and measured costs remain separate
 [qualification work](../notes/implementation-and-qualification.md).
+
+## Qualify the standing native HTTPS service
+
+The [resident task recipe](../snippets/serve-resident-webrtc.mjs) starts a real
+HTTPS offer listener through the daemon's existing resident-task lifecycle. The
+paired Chronolog gate bundles that exact supplied recipe through public RTC
+exports and connects an independently keyed native client to the actual
+`context.connectPeer` implementation:
+
+```sh
+# Run from the exact Chronolog checkout.
+node --import tsx tools/test-resident-webrtc.ts \
+  --contrib /exact/tendriller-contrib-checkout \
+  --output /new/resident-https-evidence
+```
+
+The gate verifies TLS using the generated loopback certificate; it does not
+disable certificate checks. It exercises path/origin/admission refusal, a
+caller admitted to HTTPS but denied application history by its missing reader
+grant, an authorized cold RTC connection, original signed records after the
+introduction closes, task shutdown, immediate cancellation before listening and
+occupied-port startup failure. Both peer data and original finality come from
+the real native implementation. This is native/native evidence; browser Worker
+handoff remains the separate browser gate.
+
+Preserve `report.json`, its exact source and recipe/bundle digests, and the
+bundle inventory. The default route must not rely on a fixture starting a native
+Tendriller rendezvous behind the scenes. Public DNS, certificate provisioning,
+network reachability, TURN and deployment admission policy remain outside the
+loopback test.
 
 ## Qualify thin Cloudflare membership separately
 
@@ -286,6 +321,9 @@ has a separate gate because the two-layout application fixture pregrants its
 devices. The membership gate consumes the built public SDK and engine packages,
 runs their default membership provider in the real workerd test harness, and
 connects an actual Chromium/OPFS device to a separate native SQL peer.
+The current `chronolog-thin-membership/v2` runner uses a direct native HTTP
+offer/answer endpoint and Worker-owned RTC for application history, while
+participant operations continue through the packaged Cloudflare administrator.
 
 ```sh
 npm run test:peer-membership -- \
@@ -315,6 +353,11 @@ Encoded descriptor/control traffic and detached application bytes have separate
 counters. Equal candidate counts with substantially different SQL payload sizes
 must still deliver zero application envelope bytes to the administrator. Keep
 the observed byte report, source/artifact identities and per-stage outcomes.
+The v2 RTC peer counters measure logical frame payloads, excluding transport
+headers and credits. Native introduction JSON request/response bytes, description
+counts and SDP bytes remain separately named counters. Do not compare them with
+the HTTP application-stream byte boundaries of the historical v1 reports below
+as though they measured the same transport.
 The initial complete gate passed in
 [CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
 seven runtime assertions plus the public-package/bundle check in actual workerd

@@ -1,8 +1,9 @@
 import { negotiateWebRtc } from '@chronolog/transport-webrtc';
 
 /**
- * Page-owned composition of the public Tendriller introduction service and
- * Chronolog transport. Call only after the exclusive replica Worker is ready.
+ * Explicit coordinated Tendriller introduction; both endpoints must join the
+ * same attempt. For cold contact with a resident, use connect-resident-worker.
+ * Call only after the exclusive replica Worker is ready.
  * handoff must transfer the untouched RTCDataChannel synchronously; the Worker
  * then frames and authenticates it under its current application membership.
  */
