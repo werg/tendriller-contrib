@@ -13,32 +13,67 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Discover capabilities and design around them
 
-Use capability discovery when choosing an input or adapting a page to an unfamiliar device. Do not turn discovery into a permission tour. The person wants to complete a task, not approve every sensor a browser might expose.
+Use capability discovery when a page can accept information in several ways: a repair report may use a camera, an uploaded image, or a typed description. The person wants to finish that report. Discovery should reveal the best available route without turning first use into a tour of permission prompts.
 
-## Observe before asking
+Start with an interaction that works without optional access, then offer relevant enhancements. A device explorer can deliberately show a wider inventory, but a task page should surface only capabilities that change its next useful action. A missing sensor should disable that route, not the whole task.
 
-A no-prompt probe may report API presence, secure-context requirements, and known local state. It cannot establish hardware presence, chooser success, permission, operating-system policy, model availability, or reliable operation. Report “available to try” separately from “working.” Avoid stale browser support tables as authority; capability and a tested operation are stronger evidence on the actual device.
+## Model four different questions
 
-Choose a progressive path: first a usable text/file interaction, then relevant optional inputs. Ask for only the permission that the next action requires, from the required user gesture. Explain the purpose in task language. A denial or cancellation should not trigger repeated automatic prompts.
+| Question | What an observation can establish | What remains unknown |
+| --- | --- | --- |
+| Is an API present? | The browser exposes a relevant entry point. | Hardware, permission, context restrictions, and useful output. |
+| What permission is known? | A queryable permission state at that moment. | Whether an operation will succeed or continue working. |
+| Can the requested resource start? | A particular device/chooser operation succeeded. | Format suitability, measurement quality, or future availability. |
+| Does it serve this task? | A reviewed sample is usable for the chosen purpose. | General support across devices or environments. |
 
-## Adapt the interface
+The [public browser API](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md) exposes `tendril.capabilities()` for no-prompt observation and separate sensor lifecycle operations. Its report does not replace a real operation. Device capabilities also differ from installed service workflows: inspect the service descriptor before relying on a trusted server capability. A camera does not imply a private-record policy exists.
 
-Keep capability checks separate from permission requests and active resource handles. Observe failure at startup and during use: devices can be removed, streams can end, and a foreground page can lose access. Surface useful status and a Stop action without assuming a fixed controls panel.
+## Design the first-use journey
 
-Select alternatives by outcome. If taking a photo fails, file upload may still provide evidence. If a sensor cannot measure progress, a manual checkpoint may finish the task. Do not disable the whole application because an optional input is absent.
+For a repair report, show **Describe the issue**, **Choose an image**, and optional **Take a photo**. Beside the camera action, say what the photo will help establish and that it can be reviewed before sending. Do not ask for microphone or location simply because they may be useful someday.
+
+After a person chooses the camera, show a request-in-progress state without moving keyboard focus unexpectedly. If a chooser is cancelled, return to the same intact draft. If access is denied, explain the available file/text route and provide a deliberate retry action. Do not repeatedly prompt on rerender, reconnect, or a timer. If the hardware starts but the frame is unusable, offer camera selection, another attempt, or the fallback rather than reporting “supported” as success.
+
+Let the person remember a preferred input route where appropriate, while keeping that preference separate from active-use consent. On the next visit, a preference may emphasize the photo button; it must not start capture. Explain changes in task language: “This camera is no longer available. Your note is still saved in this tab.” Avoid raw exception strings as the only recovery guidance.
+
+## Use states that support a next action
+
+A page-owned state model might distinguish `unknown`, `available-to-try`, `requesting`, `active`, `interrupted`, and `unavailable`, with a separate reason and observation timestamp. These are example application labels, not core enum values. Preserve permission state separately; an unavailable device is not necessarily a denied permission.
+
+| State visible to the person | Useful next action |
+| --- | --- |
+| Availability not checked | Use the basic route or run a no-prompt check. |
+| Available to try | Start the specific input from a deliberate gesture. |
+| Waiting for selection or permission | Cancel locally and keep the draft; do not duplicate requests. |
+| Active | Complete the input, switch source, or stop. |
+| Interrupted | Preserve any candidate and offer restart or an equivalent fallback. |
+| Unavailable here | Explain the limitation and keep a task-completing route prominent. |
+
+Keep active resource handles separate from this UI state. A remembered permission or requested state must never drive the active indicator. Observe actual tracks, watches, connections, and engine state; a resource can end after successful startup. Stop and release owned resources on cancellation, route exit, and the selected inactive-page policy. The runtime's sensor reporting is best effort, so authored adapters must also own their cleanup.
 
 ## Keep observations current across interruptions
 
-A permission query is asynchronous. An older query can finish after a newer
-result, an identity change, or a cached-page restoration. Tag refreshes with a
-generation and discard responses from superseded generations. Detach listeners
-while the page is suspended, then reattach and request a fresh no-prompt report
-on a persisted `pageshow`; a restored JavaScript realm does not rerun startup.
-Keep the page's active-use indicator and Stop affordance synchronized with the
-actual tracked resources, rather than a remembered permission or requested state.
-Reobserving must never restart a camera, microphone, geolocation watch, or lock
-without the person's chosen active-task behavior.
+Capability queries are asynchronous. Tag each refresh with a page-owned generation and discard results from superseded refreshes, identity changes, or disposed views. Otherwise a slow “available” result can overwrite a newer failure and invite an operation that cannot work.
 
-## Check
+Handle restoration of an existing page as well as fresh startup. On a persisted `pageshow`, reattach needed listeners and request a fresh no-prompt report; a restored JavaScript realm does not rerun startup. Detach listeners while suspended according to the page lifecycle. Refresh after a relevant failure or deliberate retry, rather than polling every capability continuously. Reobserving availability must not restart a camera, microphone, geolocation watch, or wake lock.
 
-Exercise absent API, denied permission, cancelled chooser, no physical device, unsupported data format, interrupted resource, and successful start/stop. Verify the initial page load requests no optional permission. Test a keyboard-only route through fallback and recovery. Record observed device/browser conditions where claiming exercised behavior; do not promote method existence into broad support.
+If a person changes input route, preserve the report/question and explicitly handle an in-progress candidate. Switching from camera to file should not discard a typed explanation. Decide whether an already captured candidate can be kept for review after the live device stops; resource shutdown and draft deletion are separate operations.
+
+## Choose useful fallbacks
+
+Match the alternative to the information needed. A file upload can replace live camera capture when appearance matters. A typed serial number may replace OCR. A manual “Arrived” checkpoint may replace uncertain location when the task only needs self-reported progress. If the fallback cannot establish the same fact, label that difference: a manually entered temperature is a person's report, not an instrument reading.
+
+Use accessible control labels, visible focus, and text status so keyboard and assistive-technology users can finish the same task. Do not rely on a hover tooltip, vibration, or an icon to explain an unavailable route. Repeated state announcements should be limited to meaningful changes. Keep cancellation and basic input available while optional engine/model preparation runs.
+
+Share diagnostics only when they help resolve a problem. Browser/device details and permission observations can reveal information about the person; avoid storing a comprehensive capability fingerprint in ordinary task records. Record the capability and failure relevant to the chosen route with a bounded lifetime.
+
+## Acceptance scenarios
+
+- Load and reload the page. No optional permission request or resource start occurs; the basic task is usable immediately.
+- Remove the API, cancel a chooser, deny permission, and start without hardware. Each state offers a clear fallback and preserves existing work.
+- Start successfully, then unplug the device or end its stream. The active indicator changes and a captured candidate remains reviewable if the chosen policy retains it.
+- Resolve an old query after a newer failure or identity change. The old response cannot replace current state.
+- Restore from browser history, switch routes, and retry with keyboard only. No duplicate listeners, silent capture restart, or lost draft appears.
+- Provide an incompatible file or sensor format. The page distinguishes acquisition success from usable evidence and explains what to change.
+
+Record actual browser/device conditions before claiming exercised support. Method presence and a mocked result remain narrower evidence than a successful task on the person's device.
