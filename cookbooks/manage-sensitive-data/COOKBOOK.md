@@ -6,7 +6,7 @@ group: "Keep work dependable"
 tags: ["privacy", "retention", "redaction"]
 choices: ["Minimum necessary data and reader boundaries", "Original evidence versus reviewed redacted derivatives", "Local removal versus reference removal versus actual retention"]
 related: ["collect-private-responses", "separate-evidence-interpretation", "choose-data-model"]
-sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -35,7 +35,7 @@ Provide a review step for sensitive uploads or disclosures: what will leave this
 | Export or diagnostic bundle | Who receives the file, and what hidden context does it contain? | Including credentials, private paths, or raw failed records. |
 | Retained history/reference | What keeps the underlying content available? | Claiming that removing one visible row erased every copy. |
 
-Use a trusted application policy when ordinary core access rules cannot enforce the required reader separation. The default workflow registry is empty; [public protocol discovery](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PROTOCOL.md) does not install a private-record capability. Verify the selected implementation and actual host authorization with distinct identities.
+Use a trusted application policy when ordinary core access rules cannot enforce the required reader separation. The default workflow registry is empty; [public protocol discovery](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/PROTOCOL.md) does not install a private-record capability. Verify the selected implementation and actual host authorization with distinct identities.
 
 ## Minimize before storing or sharing
 

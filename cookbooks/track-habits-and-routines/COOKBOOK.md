@@ -8,7 +8,7 @@ choices: ["Calendar-based occurrences or elapsed intervals", "Observed, skipped,
 capabilities: []
 evidence: "explained"
 related: ["guide-explicit-checkpoints", "choose-interruptions", "plan-time-and-deadlines", "resume-across-sessions", "localize-an-interaction"]
-sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/contract/v3.json", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PUSH_NOTIFICATIONS.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/contract/v3.json", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/PUSH_NOTIFICATIONS.md", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md"]
 ---
 
 # Track routines without misleading progress
@@ -59,9 +59,9 @@ When two devices edit the same occurrence, choose a revision or conflict policy.
 
 Offer reminders after the routine itself is useful. Explain the chosen time, device/audience, quiet behavior, and how to pause or stop. A reminder is an invitation to act, not evidence that action occurred. Keep notification text discreet where it might appear on a locked screen.
 
-Tendriller's [public timer contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) distinguishes interval repeats from local clock-time repeats and exposes time zone and missed-run policy. Inspect the actual next occurrence and page lifetime before promising a schedule. The owner must claim the page. An application field containing a date does not create a service timer by itself; more elaborate recurrence rules need an explicit additional scheduling policy.
+Tendriller's [public timer contract](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) distinguishes interval repeats from local clock-time repeats and exposes time zone and missed-run policy. Inspect the actual next occurrence and page lifetime before promising a schedule. The owner must claim the page. An application field containing a date does not create a service timer by itself; more elaborate recurrence rules need an explicit additional scheduling policy.
 
-Use the [browser timer API](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md#durable-timers) once for each reviewed reminder choice. For example, with an initialized public `runtime`, this asks for a weekday equipment-check reminder in the site's zone:
+Use the [browser timer API](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md#durable-timers) once for each reviewed reminder choice. For example, with an initialized public `runtime`, this asks for a weekday equipment-check reminder in the site's zone:
 
 ```js
 const result = await runtime.timers.create({
@@ -79,9 +79,9 @@ Core retains timer-domain decisions such as `unclaimed`, `lifetime_required`, `q
 
 Read `timers.list()` for current timer revisions and next occurrences, and `timers.history()` for runs. An accepted creation receipt may arrive after the timer already fired or was removed; it should not restore an obsolete scheduled indicator. When a scope binds `timer.write`, retain the reviewed `scope` and `expected_generations` in the timer operation's context. Agent/HTTP callers supply their stable CID and guards explicitly and retry the unchanged command.
 
-The [durability contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/DURABILITY.md) persists timer occurrences and bounded notification intents, while delivery remains at least once. Use stable run identity when processing repeated notices; do not credit a duplicate notification as another completed routine. Provider acceptance is not a human read receipt or a device-display guarantee.
+The [durability contract](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/DURABILITY.md) persists timer occurrences and bounded notification intents, while delivery remains at least once. Use stable run identity when processing repeated notices; do not credit a duplicate notification as another completed routine. Provider acceptance is not a human read receipt or a device-display guarantee.
 
-For push, verify service readiness and have each eligible owner device opt in through the [public notification flow](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PUSH_NOTIFICATIONS.md). Keep agent credentials private. Do not make foreground browser timers carry a promise that must survive a closed tab. Show unavailable, failed, or cancelled delivery separately from the routine's task state.
+For push, verify service readiness and have each eligible owner device opt in through the [public notification flow](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/PUSH_NOTIFICATIONS.md). Keep agent credentials private. Do not make foreground browser timers carry a promise that must survive a closed tab. Show unavailable, failed, or cancelled delivery separately from the routine's task state.
 
 ## Handle exceptions and changes humanely
 

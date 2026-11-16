@@ -8,7 +8,7 @@ choices: ["No-prompt observation versus a relevant permission request", "API pre
 capabilities: []
 evidence: "explained"
 related: ["capture-reviewed-evidence", "choose-voice-interaction", "connect-instrument", "complete-accessible-interactions"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md"]
 ---
 
 # Discover capabilities and design around them
@@ -26,7 +26,7 @@ Start with an interaction that works without optional access, then offer relevan
 | Can the requested resource start? | A particular device/chooser operation succeeded. | Format suitability, measurement quality, or future availability. |
 | Does it serve this task? | A reviewed sample is usable for the chosen purpose. | General support across devices or environments. |
 
-The [public browser API](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md) exposes `tendril.capabilities()` for no-prompt observation and separate sensor lifecycle operations. Its report does not replace a real operation. Device capabilities also differ from installed service workflows: inspect the service descriptor before relying on a trusted server capability. A camera does not imply a private-record policy exists.
+The [public browser API](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md) exposes `tendril.capabilities()` for no-prompt observation and separate sensor lifecycle operations. Its report does not replace a real operation. Device capabilities also differ from installed service workflows: inspect the service descriptor before relying on a trusted server capability. A camera does not imply a private-record policy exists.
 
 ## Design the first-use journey
 
@@ -55,7 +55,7 @@ Use `tendril.sensors.status()` for one coherent `{active, pending}` snapshot. `t
 
 `active` describes observed resources and registered watches/listeners; for a one-shot location read, a recent successful fix can appear there. `pending` includes wrapped media acquisitions and one-shot location reads awaiting a native result. An unanswered one-shot read remains pending until a result or Stop; invoking it alone is not active location use. A registered location watch or motion listener still does not establish permission or a usable measurement. Keep the task's candidate quality and permission observations separate from these status fields.
 
-For a page-wide **Stop sensors** action, use core's [sensor cancellation boundary](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md): `tendril.sensors.stopAll()` stops tracked resources and immediately rejects pending wrapped camera/microphone/screen requests with `AbortError`. A browser-owned permission chooser may remain open; core stops any stream it grants afterward, including known captured track and stream clones. Pending one-shot location callbacks are abandoned without claiming the operating system cancelled its acquisition. A later deliberate acquisition is a new attempt.
+For a page-wide **Stop sensors** action, use core's [sensor cancellation boundary](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md): `tendril.sensors.stopAll()` stops tracked resources and immediately rejects pending wrapped camera/microphone/screen requests with `AbortError`. A browser-owned permission chooser may remain open; core stops any stream it grants afterward, including known captured track and stream clones. Pending one-shot location callbacks are abandoned without claiming the operating system cancelled its acquisition. A later deliberate acquisition is a new attempt.
 
 Keep a task's draft identity and cancellation UI in the application, but do not rebuild that global acquisition-race protection in every page. Handle the aborted promise as a cancelled attempt without losing the draft. Stop all sensors only when that is the intended scope: cancelling one of several independent inputs should release that input's owned resources. Optional adapters and resources created outside the tracked browser APIs still need their own cleanup; instrumentation is not a security boundary or a way to dismiss native browser UI.
 

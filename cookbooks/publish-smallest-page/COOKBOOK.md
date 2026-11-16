@@ -41,7 +41,7 @@ Errors should explain what can be done now. Connection loss can leave a request 
 
 ## Establish the actual delivery loop
 
-The public headless browser API supplies state, events, streams, durable commands, captures, and publication lifecycle. It does not choose the page's DOM, navigation, or conversation layout. Use the current [public core entry](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/agent.md) for exact operations and service limits.
+The public headless browser API supplies state, events, streams, durable commands, captures, and publication lifecycle. It does not choose the page's DOM, navigation, or conversation layout. Use the current [public core entry](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/agent.md) for exact operations and service limits.
 
 Before creating a page, inspect the service contract and effective capabilities. Create with the intended owner's verified identity and save the returned administrative handle in private host storage. Give the person the user-facing page URL. The human owner must open the page visibly and sign in with the intended identity to claim it; an agent token does not perform that step for them. Explain any remaining claim step and the page's lifetime.
 
