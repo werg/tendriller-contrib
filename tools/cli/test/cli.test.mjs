@@ -90,7 +90,7 @@ test("asset sync refuses a symbolic link out of the page directory", () => {
   const dir = tmp(), outside = tmp();
   writeFileSync(join(dir, "tendril.json"), JSON.stringify({components:["chart"]}));
   symlinkSync(outside, join(dir, "assets"), "dir");
-  assert.throws(() => syncAssets(dir), /symbolic link/);
+  assert.throws(() => syncAssets(dir), /symlink/);
   assert.equal(existsSync(join(outside, "components", "chart.js")), false);
 });
 test("asset sync rejects nested and dangling lock symlinks", () => {
