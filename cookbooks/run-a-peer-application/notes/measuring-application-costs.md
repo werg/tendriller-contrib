@@ -12,6 +12,13 @@ The [2026-11-16 native before/after evidence](membership-cost-review-2026-11-16.
 records the executed workload, exact raw reports and the measured reduction in
 administrator writes from atomic page ingestion.
 
+The author-time finality provider also retains signed closure markers and can
+advance its frontier during a bounded idle period after new receipts. Record its
+signed future-admission window, cutoff lag, closure interval and certificate
+polling cadence with each new measurement.
+The earlier before/after reports predate those markers and do not measure that
+additional retained history or idle traffic.
+
 ## Run the native measurement
 
 In an exact Chronolog checkout with its pinned dependencies and native engine:

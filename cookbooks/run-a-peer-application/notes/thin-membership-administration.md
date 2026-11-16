@@ -9,6 +9,12 @@ administrator. The actual Worker runs in a local workerd harness with synthetic
 authenticated accounts. Deployed Cloudflare authentication, public-network routes,
 provider cost and operational recovery remain separate qualification work.
 
+The measurements below describe the earlier receipt-order implementation. The
+current follow-up keeps application execution in deterministic signed author-time
+order and gives the native provider only inclusion and closed-frontier duties.
+Signed closure markers now accompany receipt descriptors; fresh artifact-bound
+qualification is required for that change. Historical reports remain unchanged.
+
 ## Put membership administration on Cloudflare by default
 
 The portable administrator owns the root membership identity, durable enrollment
@@ -21,8 +27,8 @@ more than one of them in the same process.
 
 | Participant | Retains and verifies | Executes or authorizes |
 | --- | --- | --- |
-| Cloudflare membership administrator | Signed descriptor history, ordering evidence, small capability/epoch records and durable membership decisions | Enrollment, grants, revocations and key distribution under the group policy |
-| Native application authority and full replica | Descriptor history, ordering evidence and required detached application envelopes | Coordinated ordering, application SQL/events and designated resident services |
+| Cloudflare membership administrator | Signed descriptor history, inclusion/closure evidence, small capability/epoch records and durable membership decisions | Enrollment, grants, revocations and key distribution at proved author-time boundaries |
+| Native finality provider and full replica | Descriptor history, inclusion/closure evidence and required detached application envelopes | Inclusion and closed-frontier certificates; canonical application replay and designated resident services |
 | Authorized browser full replica | The same required application history and its own durable device operations | Local application execution, coherent reads and authorized signed changes |
 | Relay or payload source | The explicitly configured bytes and transport state | Transport and exact content retrieval; no implied membership or finality authority |
 
@@ -43,7 +49,7 @@ from that same signed schema key. The native schema owner can create application
 tables without making the Cloudflare root an application writer, group member or
 SQL executor. A fixture-specific local root override is not a valid substitute.
 
-## Order small descriptors and fetch payloads through peers
+## Certify small descriptors and fetch payloads through peers
 
 The implementation replaces opaque, payload-sized log entries with canonical typed descriptors.
 Each application candidate commits its exact signed envelope hash and length,
@@ -222,7 +228,7 @@ The existing deployment issues remain the tracking surface:
   membership metadata cost with full-peer payload transfer, replay and storage;
   publish usage and current pricing separately.
 - [#16](https://github.com/werg/tendriller-contrib/issues/16): rehearse durable
-  administrator identity/roster recovery separately from native ordering and
+  administrator identity/roster recovery separately from native finality and
   payload storage recovery. No implicit role or lineage takeover.
 - [#17](https://github.com/werg/tendriller-contrib/issues/17): qualify live deployed
   enrollment, host-session independence, writer and reader revocation, epoch

@@ -15,8 +15,8 @@ conversion, legacy import, old/new bidirectional mirror, or alternate hidden
 authority.
 
 The follow-up simplification separates portable membership administration from
-native application ordering and execution. Cloudflare is the default
-administrator host; ordered application descriptors commit detached payloads,
+native application inclusion/finality and execution. Cloudflare is the default
+administrator host; certified application descriptors commit detached payloads,
 while small capability and epoch records remain inline. The
 [thin-administration evidence and measured gates](thin-membership-administration.md)
 record a complete passing packaged workerd/native/Chromium run. Earlier passing
@@ -30,7 +30,25 @@ the concrete infrastructure and evidence required outside those gates. The
 [native cost review](membership-cost-review-2026-11-16.md) preserves the actual
 before/after administrator write measurements and their source boundaries.
 
-## Current recorded implementation evidence
+## Author-time finality follow-up
+
+Replicas always execute included proposals in signed author-time order with the
+protocol's deterministic tie-breakers. The replaceable finality provider chooses
+inclusion and certifies a closed author-time frontier. Retained closure markers
+make earlier admission boundaries recoverable; log positions only enumerate
+receipt bytes. Later first-inclusion at or below a closed frontier is late and
+cannot change the final prefix. Previously included exact retries retain their
+original identity and result.
+
+The recorded runs below predate this change. In particular, their scope-reset
+fixture deliberately used receipt order to put a reset before an earlier
+authored edit. With chronological execution, an earlier edit included before
+closure runs before the reset and is then cleared. A stale-generation rejection
+needs an edit that executes after the reset; late-inclusion rejection is a
+separate case. New source/artifact qualification must establish these cases
+without relabeling the historical reports.
+
+## Earlier recorded implementation evidence
 
 [The reviewed implementation's qualification](qualification-review-43957113710.md)
 passed in [browser workflow 43957113710](https://github.com/werg/chronolog-db/actions/runs/43957113710).
@@ -114,7 +132,7 @@ boundaries below remain unchanged.
 | Versioned SQL/platform/emit program and canonical bounds | Chronolog protocol | Existing signed proposal core | Canonical round trips; oversized, malformed and unauthorized steps rejected |
 | Event-only execution profile | Chronolog core | Program and profile binding | Publish, replay, finality and reopen without loading SQL |
 | Mixed SQL/event application | Chronolog materializer | Program and admission | One SQL failure leaves no partial rows or effective events |
-| Native fixed authority | Chronolog records/native runtime | Portable store and coordinated policy | Atomic exact deduplication, prefix commit, restart and conflict refusal |
+| Native fixed finality provider | Chronolog records/native runtime | Portable store and inclusion/closure verifier | Atomic exact deduplication, retained closures, restart and conflict refusal; execution order stays canonical |
 | Durable final event reader | Chronolog core/RPC/client | Durable applied outcomes | Bounded complete transactions; empty-filter progress; no unresolved outcome skip |
 | Revision-scoped coherent reads | Chronolog core/client | Final/local revision identity | SQL and events captured together; finality-only observer update |
 | Projection checkpoint helper | Chronolog optional application layer | Durable reader | State/cursor atomicity, reducer-version invalidation, replay after failed save |
@@ -126,7 +144,7 @@ boundaries below remain unchanged.
 | Framed connection/bootstrap and signals | Tendriller public contract + Chronolog adapter | Portable sync | Bounded queues, explicit expiry/domain, application authorization independent of host access |
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
-| Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained ordering evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
+| Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained inclusion/closure evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
 | Portable thin membership administrator | Chronolog administrator core and Tendriller Cloudflare composition | Durable root identity, inline capability/epoch history and public membership provider | Live device enrollment, exact decision retry/restart and revocation without application payload downloads or application SQL |
 | Membership placement qualification | Public host/peer fixtures and contrib evidence | Independent administrator, native authority and browser replicas | Passing actual workerd/native/fresh-browser gate, encoded-byte counters and exact artifacts; ADMIN map distinguishes the two pregranted layouts and remaining deployed faults/recovery |
 
@@ -146,7 +164,7 @@ The following are separate assertions, not a single generic “P2P works” test
 | P2P-01 | An event-only group publishes and reopens. | Same effective final events; no SQL adapter loaded. | Native and browser public runtime |
 | P2P-02 | A mixed program updates a row, emits, then fails an assertion. | No partial row and no effective domain event; rejection remains auditable. | Actual deterministic engine |
 | P2P-03 | Lose the submission response and restart. | Original proposal, position and accepted/rejected outcome; changed contents under the ID conflict. | Actual durable store and authority |
-| P2P-04 | Reset an application scope before an older pending operation arrives. | Old operation stays rejected; a previously accepted exact retry returns its original receipt. | [Exact built recipe through the native public adapter](qualification-review-43957113710.md#the-captured-generation-acceptance-case-now-runs) |
+| P2P-04 | Include an earlier authored edit and later reset before closure; separately author a stale-generation edit after that reset. | Earlier edit runs before reset; stale later edit rejects atomically; exact retry retains its original receipt. | Exact built recipe through the native public adapter; earlier receipt-order report is historical |
 | P2P-05 | Finality changes without changing query rows. | Pending/final indicators update. | Client subscription and actual UI |
 | P2P-06 | Two peers provisionally claim one task. | One final claim; stable losing-operation rejection; coherent replacement view and retained draft. | Two independent writers and real SQL |
 | P2P-07 | Slow or restart an event consumer. | Bounded memory and no silent event loss; replay from its processed checkpoint. | Durable reader and consumer store |
@@ -224,7 +242,7 @@ Never resume the old history from an unproven stale backup or copy one authority
 key into two active stores. If immediate disk-loss survival is a product promise,
 specify and test a second-durable-copy acknowledgment contract before making it.
 Rehearse the Cloudflare administrator's root identity and roster recovery as a
-separate responsibility from native ordering and payload recovery. Restoring one
+separate responsibility from native finality and payload recovery. Restoring one
 role does not establish the other's continuity.
 
 ### Qualify device and privacy boundaries

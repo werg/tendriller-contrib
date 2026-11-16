@@ -46,7 +46,8 @@ an application that chooses the recipe consume the same built program module.
    same immutable backend ID selected when the host page was created. The page
    awaits `tendril.application.ready()`.
 4. Connect portable synchronization through the selected public framed transport;
-   the resident native authority supplies coordinated order. A preexisting cold
+   the resident native authority supplies inclusion and author-time closure
+   evidence. Every replica derives the same chronological execution order. A preexisting cold
    bootstrap can still use hosting services.
 5. Export `signals`, either an authorized public `EphemeralChannel` instance or
    `null`. Grant/session/sequence/expiry validation belongs to that channel.

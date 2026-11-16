@@ -116,6 +116,6 @@ export function operationLabel(operation) {
   if (operation.status === 'rejected') return `Rejected: ${operation.message || operation.error || 'Review this intent'}`;
   if (operation.status === 'final') return 'Accepted and final';
   if (operation.status === 'provisional') return operation.outcome === 'rejected'
-    ? 'Provisional rejection; awaiting final order' : 'Provisional; awaiting final order';
-  return 'Prepared locally; awaiting ordering';
+    ? 'Provisional rejection; awaiting finality' : 'Provisional; awaiting finality';
+  return 'Prepared locally; awaiting inclusion';
 }

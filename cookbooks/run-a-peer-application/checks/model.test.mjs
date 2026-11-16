@@ -182,7 +182,7 @@ test('an observed absent operation can be reviewed away without discarding unres
 });
 
 test('provisional rejection is distinct from final rejection or unknown submission', () => {
-  assert.match(operationLabel({ status: 'provisional', outcome: 'rejected' }), /awaiting final order/);
+  assert.match(operationLabel({ status: 'provisional', outcome: 'rejected' }), /awaiting finality/);
   assert.match(operationLabel({ status: 'rejected', error: 'already_claimed' }), /Rejected: already_claimed/);
   assert.equal(operationLabel({ status: 'final' }), 'Accepted and final');
   assert.match(operationLabel(null), /No durable submission found/);

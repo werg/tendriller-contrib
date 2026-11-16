@@ -106,6 +106,17 @@ content.
 
 ## Decisive checks
 
+Chronolog executes proposals by signed author time, regardless of the order in
+which the provider receives them. If an earlier authored edit and later reset
+are both included before closure, replay accepts the edit against the old
+generation and then the reset clears it. A delayed arrival alone does not turn
+that edit into a stale-generation rejection. An edit whose canonical position
+is after the reset must carry the current generation or fail atomically. A
+proposal first included after its timestamp is already closed is rejected as
+late by the finality policy before SQL. These are separate acceptance cases.
+
+### Historical receipt-order qualification
+
 The paired core qualification consumes the **built module** through its public
 application adapter, so the test runs these authored programs instead of copying
 their SQL into another fixture. Its acceptance cases are:
@@ -120,7 +131,7 @@ their SQL into another fixture. Its acceptance cases are:
 4. Try to refresh the generation under that original operation ID. Exact intent
    conflict must refuse the change rather than accepting a rewritten retry.
 
-All four cases passed in the native portion of
+All four historical cases passed in the native portion of
 [workflow 43957113710](qualification-review-43957113710.md#the-captured-generation-acceptance-case-now-runs).
 The separate raw application report preserves the exact built module digest,
 original proposal IDs, final generation `1`, three effective events,

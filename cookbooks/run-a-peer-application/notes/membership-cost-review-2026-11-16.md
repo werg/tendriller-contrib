@@ -6,6 +6,10 @@ reduced logical administrator bytes written by **73.85% in this workload** while
 retaining exactly the same 35,812 value bytes. This is a measured implementation
 improvement; it is not a Cloudflare price or hosted/peer savings result.
 
+These runs predate the author-time finality change and its retained closure
+markers. Their exact results remain historical evidence for page batching;
+current provider closure and idle polling costs require a new pinned run.
+
 ## Reproducible inputs
 
 | Input | Exact identity |

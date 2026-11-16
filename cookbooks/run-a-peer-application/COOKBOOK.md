@@ -16,9 +16,10 @@ sources: ["https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a
 Use this approach when an application already has a native agent peer running
 whenever new shared work needs to become final. A browser keeps a local replica,
 queries its own SQL, derives views from accepted events, and authors changes. The
-resident agent retains the same history, orders proposals under the selected
-coordinated policy, and runs deterministic service loops while an LLM is idle,
-thinking, or restarting.
+resident agent retains the same history, certifies included proposals and a closed
+author-time frontier under the selected finality policy, and runs service loops
+while an LLM is idle, thinking, or restarting. Every replica computes the same
+application order from signed author time and deterministic tie-breakers.
 
 A hosted application backend remains a useful choice when no resident machine is
 available. Select one backend for an application's writes. The page should not
@@ -33,7 +34,7 @@ scenario is not evidence that it passed; recorded checks name their actual
 artifacts and limits.
 
 The implementation places **portable membership administration on
-Cloudflare by default**, separately from native application ordering, execution
+Cloudflare by default**, separately from native inclusion/finality, execution
 and payload storage. Small signed descriptors and inline roster/epoch records
 let that administrator follow membership without downloading application
 payloads or loading the application SQL engine. Full peers retrieve detached
@@ -75,7 +76,7 @@ reconstruct the same final task and conversation history after reconnecting.
 
 An event-only conversation can use the same history and reader contract without
 loading a SQL engine. The task-board variant uses a mixed SQL/event execution
-profile. A client that cannot execute that profile must not label an ordering
+profile. A client that cannot execute that profile must not label an inclusion
 certificate as proof that the SQL succeeded.
 
 ## Put each kind of traffic in its intended place
@@ -102,13 +103,20 @@ view decision and never permission to prune the canonical history.
 
 ## Make the authority boundary explicit
 
-One native authority key and history owner select the order for a coordinated
-group. In the revised descriptor format, the authority commits the exact envelope
-hash/length and routing metadata, operation deduplication, positions, and its
-rolling prefix before acknowledging order. Full peers retain and fetch the
-detached application envelope. Certificates and ordered-entry evidence can
-travel through other authorized peers. A relay forwards data; it does not
-acquire SQL, membership, or finality authority.
+The finality provider decides which proposals are included and which author-time
+frontier is closed. In the native profile one fixed authority key certifies those
+decisions. Every replica sorts included proposals by their immutable signed
+author time and deterministic tie-breakers; neither receipt position nor arrival
+order chooses the winner of a SQL conflict.
+
+The authority retains exact envelope hashes, lengths and routing metadata,
+deduplication identities, and an authenticated receipt prefix. Signed closure
+markers bind a closed timestamp to the preceding included prefix. A newly
+included proposal at or below an already closed timestamp is rejected as late;
+an exact retry of an earlier included proposal retains its original result. Full
+peers fetch and verify detached application envelopes. Receipt and closure
+evidence can travel through other authorized peers. A relay forwards data; it
+does not acquire SQL, membership, or finality authority.
 
 The Cloudflare membership root is a separate role. Signed genesis selects the
 application schema administrator independently, so native application setup does
@@ -122,14 +130,15 @@ Keep these facts distinct in both the interface and operations:
 | Status | What it establishes |
 | --- | --- |
 | Stored locally | This device durably prepared its original proposal. |
-| Ordered | The authority committed a position; the SQL outcome may still be unresolved locally. |
-| Applied final | The complete verified prefix was applied under the pinned profile. |
+| Included | The provider committed receipt evidence; the SQL outcome may still be unresolved locally. |
+| Frontier closed | Complete evidence fixes the included set through a signed author-time cutoff. |
+| Applied final | The replica applied the closed canonical prefix under the pinned execution profile. |
 | Replicated or backed up | An additional stated location has acknowledged the bytes. |
 | Worker completed | A separately recorded effect/result reached its declared completion condition. |
 
 A disconnected authority pauses new coordinated finality. Existing reads, proof
 exchange, and durable pending proposals remain useful. Do not silently switch to
-another agent, the hosted backend, or the peer chronological policy during an
+another agent, the hosted backend, or a different finality policy during an
 outage. A restored old disk cannot prove continuity by consulting only its own
 restored state. Recovery needs established continuity or an explicit new lineage.
 
@@ -149,8 +158,12 @@ lost response, reload, or membership change.
 
 For a claim, assert availability and update the row in the same program as its
 event. For a dependent second action, either batch it with the first or wait for
-the first action's final result. Total order by itself does not discover causal
-dependencies submitted through different paths.
+the first action's final result and author the dependent change with a later
+timestamp. Total order by itself does not discover causal dependencies submitted
+through different paths. If an earlier authored edit and a later reset are both
+included before closure, replay applies the edit first and the reset clears it,
+even when the reset arrived first. A stale-generation assertion fails when the
+edit executes after the reset; receipt order alone cannot cause that rejection.
 
 A page can show a provisional claim while finality is pending, but it should label
 that state. If another claim wins, replace the whole affected view from a coherent
@@ -163,7 +176,7 @@ affect durable behavior must enter the history as explicit recorded inputs.
 
 The clean pre-release API needs no legacy command conversion or old-data mirror.
 If an application uses reset generations, its generation check, mutation, and
-exact retry result must still live in the selected authority's transaction. A new
+exact retry result must still live in the replica's deterministic transaction. A new
 API does not justify refreshing a stale guard or splitting authoritative checks
 between Cloudflare and a native peer.
 
