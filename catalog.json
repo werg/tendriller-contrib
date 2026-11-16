@@ -92,6 +92,36 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/ask-about-evidence/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Bind questions and replies to specific sources and distinguish observation from interpretation. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "build-correctable-forms",
+      "title": "Build forms people can complete and correct",
+      "summary": "Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "forms",
+        "validation",
+        "drafts"
+      ],
+      "choices": [
+        "Single page or purposeful branching steps",
+        "Local draft, authorized saved draft, or submitted snapshot",
+        "Client feedback and authoritative acceptance"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "recover-outdated-work",
+        "complete-accessible-interactions",
+        "choose-data-model"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"
+      ],
+      "path": "cookbooks/build-correctable-forms/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/build-correctable-forms/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "capture-rendered-evidence",
       "title": "Capture rendered evidence",
       "summary": "Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out.",
@@ -340,6 +370,35 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/compare-options/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "complete-accessible-interactions",
+      "title": "Make the complete interaction accessible",
+      "summary": "Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "accessibility",
+        "interaction",
+        "recovery"
+      ],
+      "choices": [
+        "Native controls or justified custom interaction",
+        "Status announcements versus deliberate focus changes",
+        "Equivalent task outcomes across input and display needs"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "adapt-without-losing-work",
+        "discover-capabilities",
+        "build-correctable-forms"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md"
+      ],
+      "path": "cookbooks/complete-accessible-interactions/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/complete-accessible-interactions/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "connect-instrument",
       "title": "Connect an instrument and interpret its protocol",
       "summary": "Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface.",
@@ -579,6 +638,37 @@
       ],
       "path": "cookbooks/guide-explicit-checkpoints/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/guide-explicit-checkpoints/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate task definition from progress, and choose intentional completion, resume, and replanning behavior. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "guide-practice-and-feedback",
+      "title": "Guide practice with useful feedback",
+      "summary": "Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "learning",
+        "feedback",
+        "progress"
+      ],
+      "choices": [
+        "Answer keys, rubric feedback, or human review",
+        "Hints and retries versus independent attempts",
+        "Practice history and an explicit return policy"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guide-explicit-checkpoints",
+        "choose-interruptions",
+        "resume-across-sessions",
+        "complete-accessible-interactions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md"
+      ],
+      "path": "cookbooks/guide-practice-and-feedback/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/guide-practice-and-feedback/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "import-for-review",

@@ -29,12 +29,18 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Observe long-running work and enable intervention](cookbooks/observe-long-running-process/COOKBOOK.md) — Separate freshness, progress, failures, and intervention from the agent conversation that may come and go.
 - [Review an exact proposal before acting](cookbooks/review-exact-proposal/COOKBOOK.md) — Bind approval to immutable content and an explicit version, expiry, and execution policy.
 
+### Design everyday interactions
+
+- [Build forms people can complete and correct](cookbooks/build-correctable-forms/COOKBOOK.md) — Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.
+- [Make the complete interaction accessible](cookbooks/complete-accessible-interactions/COOKBOOK.md) — Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.
+
 ### Guide and coordinate work
 
 - [Choose when to interrupt](cookbooks/choose-interruptions/COOKBOOK.md) — Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point.
 - [Collect private responses and publish a reviewed aggregate](cookbooks/collect-private-responses/COOKBOOK.md) — Keep answers and assignments private while giving a facilitator an explicit, versioned path to shared results.
 - [Coordinate views and attention across devices](cookbooks/coordinate-devices/COOKBOOK.md) — Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct.
 - [Guide a task with explicit checkpoints](cookbooks/guide-explicit-checkpoints/COOKBOOK.md) — Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.
+- [Guide practice with useful feedback](cookbooks/guide-practice-and-feedback/COOKBOOK.md) — Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery.
 - [Join or transfer a page across devices](cookbooks/join-across-devices/COOKBOOK.md) — Choose role-aware links and a usable transfer method without turning device purpose into authority.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 
