@@ -14,7 +14,7 @@
  * y breaks the line; invalid x values are ignored. No string/boolean coercion.
  * Points sort by x, retaining the newest maxPoints per series (default 500,
  * range 2..10000). At most 24 uniquely named series may be shown at once.
- * Options: title, xLabel, yLabel, xFormat(value), yFormat(value), maxPoints.
+ * Options: title, xLabel, yLabel, xFormat(value), yFormat(value), maxPoints, theme.\n * theme: 'auto' (system preference, default), 'light', or 'dark'; may change\n * on update(series, {theme}) for a manual UI toggle. Series colors and dashes\n * are derived from id, not input order, and can be overridden with --tc-N.
  * Optional emaAlpha in (0,1] weights the current sample: EMA = alpha*y +
  * (1-alpha)*previous. It runs in ascending x order, in original y units, resets
  * at gaps, and is recomputed from the bounded retained window. A faint raw line
@@ -43,6 +43,12 @@
   const supported = () => typeof document.createElementNS === 'function';
   const svgNS = 'http://www.w3.org/2000/svg';
   const palette = ['#087c55', '#2768c5', '#a24e16', '#8145ba', '#b12e69', '#157b8a'];
+  // Stable per-series identity: reordered or temporarily hidden series keep styling.
+  const hashId = id => {
+    let h = 2166136261;
+    for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619) >>> 0;
+    return h;
+  };
   const dashes = ['', '8 3', '2 3', '8 3 2 3'];
   let serial = 0;
   // Convex interpolation stays finite even at the limits of floating point.
@@ -72,12 +78,13 @@
     const maxPoints = options.maxPoints === undefined ? 500 : options.maxPoints;
     if (!Number.isInteger(maxPoints) || maxPoints < 2 || maxPoints > 10000) throw new RangeError('maxPoints must be an integer from 2 to 10000');
     let settings = { title: 'Measurements', xLabel: 'X', yLabel: 'Value', xFormat: format, yFormat: format,
-      emaAlpha: null, yScale: 'linear', xDomain: null, crosshair: false, onCursor: null };
+      emaAlpha: null, yScale: 'linear', xDomain: null, crosshair: false, onCursor: null, theme: 'auto' };
     settings = configured(options); // Validate before creating any DOM.
     let series = [], prepared = [], xs = [], destroyed = false, frame = null, cursorX = null, geometry = null, overlay = null;
     const clipId = `tendril-chart-${Date.now().toString(36)}-${++serial}`;
     const root = el('figure'); root.dataset.tendrilChart = '';
     root.style.cssText = 'margin:0;min-width:0;font:inherit;overflow-wrap:anywhere';
+    root.dataset.tcTheme = settings.theme;
     const style = el('style', `
       [data-tendril-chart] svg{display:block;width:100%;height:260px;overflow:hidden}
       [data-tendril-chart] svg text{font:12px system-ui,sans-serif;fill:currentColor}
@@ -99,7 +106,8 @@
       [data-tendril-chart] table{border-collapse:collapse;font:inherit;font-size:.9em;width:100%}
       [data-tendril-chart] th,[data-tendril-chart] td{text-align:left;padding:6px 12px;border-bottom:1px solid #8884}
       [data-tendril-chart] caption{text-align:left;padding:4px 0}
-      @media(prefers-color-scheme:dark){[data-tendril-chart]{--tc-0:#84e4b7;--tc-1:#7ec8ff;--tc-2:#ffb480;--tc-3:#c6a6ff;--tc-4:#f998bb;--tc-5:#70d6e4}}
+      [data-tendril-chart][data-tc-theme="dark"]{--tc-0:#84e4b7;--tc-1:#7ec8ff;--tc-2:#ffb480;--tc-3:#c6a6ff;--tc-4:#f998bb;--tc-5:#70d6e4}
+      @media(prefers-color-scheme:dark){[data-tendril-chart][data-tc-theme="auto"]{--tc-0:#84e4b7;--tc-1:#7ec8ff;--tc-2:#ffb480;--tc-3:#c6a6ff;--tc-4:#f998bb;--tc-5:#70d6e4}}
     `);
     const caption = el('figcaption'), heading = el('strong'), summary = el('p'); summary.className = 'tc-summary';
     caption.append(heading, summary);
@@ -125,6 +133,10 @@
       for (const name of ['xFormat', 'yFormat']) {
         if (next[name] !== undefined && typeof next[name] !== 'function') throw new TypeError(`${name} must be a function`);
         if (next[name] !== undefined) updated[name] = next[name];
+      }
+      if (next.theme !== undefined) {
+        if (!["auto", "light", "dark"].includes(next.theme)) throw new TypeError('theme must be auto, light or dark');
+        updated.theme = next.theme;
       }
       if (next.emaAlpha !== undefined) {
         if (next.emaAlpha !== null && (!numeric(next.emaAlpha) || next.emaAlpha <= 0 || next.emaAlpha > 1)) throw new RangeError('emaAlpha must be null or a number greater than 0 and at most 1');
@@ -153,8 +165,11 @@
       try { return String(formatter(value)); }
       catch { return format(value); }
     };
-    const color = index => `var(--tc-${index % palette.length},${palette[index % palette.length]})`;
-    const dash = index => dashes[Math.floor(index / palette.length) % dashes.length];
+    const color = id => {
+      const slot = hashId(id) % palette.length;
+      return `var(--tc-${slot},${palette[slot]})`;
+    };
+    const dash = id => dashes[Math.floor(hashId(id) / palette.length) % dashes.length];
     function stats() {
       let samples = 0, min = Infinity, max = -Infinity;
       for (const group of series) for (const point of group.points) if (point.y !== null) {
@@ -198,7 +213,7 @@
         if (selected !== null && point?.value !== null && point?.value !== undefined && geometry
           && selected >= geometry.minX && selected <= geometry.maxX) {
           overlay.append(svgEl('circle', { cx: geometry.x(selected), cy: geometry.y(point.value), r: 4,
-            fill: color(index), stroke: 'var(--tc-cursor-outline,Canvas)', 'stroke-width': 1.5, 'data-cursor-series': group.id }));
+            fill: color(group.id), stroke: 'var(--tc-cursor-outline,Canvas)', 'stroke-width': 1.5, 'data-cursor-series': group.id }));
         }
       }
       inspector.hidden = !settings.crosshair;
@@ -257,6 +272,7 @@
       if (destroyed) return stats();
       const result = stats();
       prepared = prepare();
+      root.dataset.tcTheme = settings.theme;
       heading.textContent = settings.title;
       let description = result.samples ? `${result.samples} samples across ${result.series} series · min ${text(settings.yFormat, result.min)} · max ${text(settings.yFormat, result.max)}` : 'Waiting for numeric samples.';
       if (settings.emaAlpha !== null) description += ` · EMA α=${settings.emaAlpha}; faint line shows raw values`;
@@ -266,9 +282,9 @@
       const width = Math.max(320, Math.min(1200, host.getBoundingClientRect().width || 640)), height = 260;
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       svg.replaceChildren(); legend.replaceChildren();
-      for (const [index] of prepared.entries()) {
+      for (const group of prepared) {
         const entry = el('li'), swatch = svgEl('svg', { viewBox: '0 0 28 10', 'aria-hidden': true });
-        swatch.append(svgEl('line', { x1: 0, x2: 28, y1: 5, y2: 5, stroke: color(index), 'stroke-width': 3, 'stroke-dasharray': dash(index) }));
+        swatch.append(svgEl('line', { x1: 0, x2: 28, y1: 5, y2: 5, stroke: color(group.id), 'stroke-width': 3, 'stroke-dasharray': dash(group.id) }));
         entry.append(swatch, el('span')); legend.append(entry);
       }
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -280,7 +296,7 @@
       else if (!Number.isFinite(minX)) { minX = 0; maxX = 1; }
       const hasValues = Number.isFinite(minY), transform = value => settings.yScale === 'log' ? Math.log10(value) : value;
       const xScale = scale(minX, maxX), yScale = hasValues ? scale(transform(minY), transform(maxY)) : () => 0.5;
-      const left = 76, right = width - 20, top = 24, bottom = height - 54;
+      const left = 76, right = width - 20, top = 48, bottom = height - 54;
       const x = value => left + Math.max(0, Math.min(1, xScale(value))) * (right - left);
       const unitY = value => Math.max(0, Math.min(1, yScale(transform(value))));
       const pixelY = value => bottom - value * (bottom - top), y = value => pixelY(unitY(value));
@@ -299,7 +315,7 @@
       }
       if (!hasValues) svg.append(svgEl('text', { x: (left + right) / 2, y: height / 2, 'text-anchor': 'middle' },
         settings.yScale === 'log' ? 'Waiting for positive samples' : 'Waiting for numeric samples'));
-      svg.append(svgEl('text', { x: left, y: 14 }, settings.yLabel + (settings.yScale === 'log' ? ' (log)' : '')));
+      svg.append(svgEl('text', { x: left, y: 20 }, settings.yLabel + (settings.yScale === 'log' ? ' (log)' : '')));
       const ticks = width < 500 || minX === maxX ? [minX] : [minX, (minX / 2 + maxX / 2)];
       if (minX !== maxX) ticks.push(maxX);
       for (const value of ticks) svg.append(svgEl('text', { x: x(value), y: bottom + 23, 'text-anchor': value === minX && minX !== maxX ? 'start' : value === maxX && minX !== maxX ? 'end' : 'middle' }, text(settings.xFormat, value)));
@@ -327,13 +343,13 @@
           }
           previous = current;
         }
-        paths.append(svgEl('path', { d: commands.join(' '), class: className, 'data-series': group.id, stroke: color(index), 'stroke-dasharray': dash(index) }));
+        paths.append(svgEl('path', { d: commands.join(' '), class: className, 'data-series': group.id, stroke: color(group.id), 'stroke-dasharray': dash(group.id) }));
         // Isolated samples remain visible, including samples either side of gaps.
         group.points.forEach((point, indexInGroup) => {
           if (point[field] !== null && point.x >= minX && point.x <= maxX
             && (!group.points[indexInGroup - 1] || group.points[indexInGroup - 1][field] === null)
             && (!group.points[indexInGroup + 1] || group.points[indexInGroup + 1][field] === null))
-            paths.append(svgEl('circle', { cx: x(point.x), cy: y(point[field]), r: 3, fill: color(index),
+            paths.append(svgEl('circle', { cx: x(point.x), cy: y(point[field]), r: 3, fill: color(group.id),
               opacity: className === 'tc-raw' ? 0.25 : 1, 'data-series': group.id }));
         });
       }

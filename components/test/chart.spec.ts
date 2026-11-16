@@ -63,13 +63,38 @@ test('chart renders empty, constant and extreme numeric ranges with safe labels'
   await expect(page.locator('.tc-legend')).toContainText('<script>bad()</script>');
   await page.evaluate(() => (window as any).chart.update([{ id: 'sensor', points: [{ x: 1, y: 2 }, { x: 2, y: 2 }] }]));
   const constant = await page.locator('path.tc-series').getAttribute('d');
-  expect(constant).toBe('M76.00,115.00 L340.00,115.00');
+  expect(constant).toBe('M76.00,127.00 L340.00,127.00');
   await page.evaluate(() => (window as any).chart.update([{ id: 'sensor', points: [
     { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE }, { x: Number.MAX_VALUE, y: Number.MAX_VALUE },
   ] }]));
   const svg = await page.locator('[data-tendril-chart] > svg').evaluate(node => node.outerHTML);
   expect(svg).not.toMatch(/NaN|Infinity/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+});
+
+test('stable series ids preserve palette slots across reordering and explicit theme overrides system preference', async ({ page }) => {
+  await load(page,'chart');
+  await page.evaluate(() => {
+    const w=window as any; w.chart=w.tendrilSnippets.chart.mount('#app',{theme:'light',yLabel:'Very long reading'});
+    const points=[{x:1,y:2},{x:2,y:4}];
+    w.chart.update([{id:'alpha',points},{id:'beta',points}]);
+  });
+  const before = await page.locator('path.tc-series').evaluateAll(paths => paths.map(p=>({id:p.getAttribute('data-series'),color:p.getAttribute('stroke')})));
+  const byId=new Map(before.map(({id,color})=>[id,color]));
+  await page.evaluate(() => (window as any).chart.update([
+    {id:'beta',points:[{x:1,y:3}]},{id:'alpha',points:[{x:1,y:2}]},
+  ],{theme:'dark'}));
+  const after=await page.locator('path.tc-series').evaluateAll(paths => paths.map(p=>({id:p.getAttribute('data-series'),color:p.getAttribute('stroke')})));
+  for (const {id,color} of after) expect(color).toBe(byId.get(id));
+  await expect(page.locator('[data-tendril-chart]')).toHaveAttribute('data-tc-theme','dark');
+  const positions=await page.locator('[data-tendril-chart] > svg text').evaluateAll(nodes => {
+    const label=nodes.find(n=>n.textContent==='Very long reading')!;
+    const tick=nodes.find(n=>n.getAttribute('text-anchor')==='end')!;
+    return {labelBottom:label.getBBox().y+label.getBBox().height,tickTop:tick.getBBox().y};
+  });
+  expect(positions.labelBottom).toBeLessThan(positions.tickTop);
+  await page.evaluate(() => (window as any).chart.update([], {theme:'auto'}));
+  await expect(page.locator('[data-tendril-chart]')).toHaveAttribute('data-tc-theme','auto');
 });
 
 test('chart rejects invalid updates without losing the current view and releases its mount', async ({ page }) => {

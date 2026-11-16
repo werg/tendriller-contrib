@@ -42,7 +42,7 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `bluetooth.js` | Web Bluetooth: connect by service, read, write, notify | Chromium on desktop and Android; not iOS | `d = await bluetooth.connect({services: ["heart_rate"]})` |
 | `list.js` | Shared list (shopping, packing) stored in state as records keyed by id; add/tick/edit/remove; offline via `tendril.state` | All | `list.mount("#list", {path: "shopping"})` |
 | `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
-| `chart.js` | Bounded numeric series with axes, gaps, legends and an accessible values table; no chart library or CDN | All current browsers | `chart.mount("#plot", {xLabel:"Step"}).update([{id:"run",points:[{x:1,y:0.8}]}])` |
+| `chart.js` | Bounded numeric series with stable ID-derived colors, manual light/dark/auto theme, separated y-axis label, axes, gaps, legends and an accessible values table; no chart library or CDN | All current browsers | `chart.mount("#plot", {xLabel:"Step"}).update([{id:"run",points:[{x:1,y:0.8}]}])` |
 | `stream-view.js` | Coalesced rendering and explicit atomic checkpoints of a cursor plus its materialized view | All current browsers; persistence requires browser storage | `streamView.batch(render).schedule()`; `streamView.checkpoint('metrics',{key:'chart-v1'})` |
 | `input-kit.js` | User-triggered photo, audio, location, motion, and file controls with one event contract | Depends on input | `inputs.mount("#inputs", {modalities:["photo","location"]})` |
 | `playground.js` | Live capability gallery and working controls on this device | All | `playground.mount("#explore")` |
@@ -57,7 +57,7 @@ require a user gesture where the browser mandates one.
 
 ## Charts for streams or shared state
 
-Load `assets/components/chart.js` and give the chart numeric `{x, y}` points. The
+Load `assets/components/chart.js` and give the chart numeric `{x, y}` points. Series colors/dashes depend on `id`, not order. Mount with `{theme:'auto'|'light'|'dark'}` or change via `update(series,{theme:'dark'})` for a manual toggle; CSS `--tc-0` through `--tc-5` still override palette slots. The
 chart does not assume a particular stream name, training framework, or data shape:
 the page selects fields from stream records or shared state.
 
