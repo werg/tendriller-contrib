@@ -1238,6 +1238,64 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-measurement-experiment/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "run-reviewed-batch-actions",
+      "title": "Review and execute a batch with clear partial outcomes",
+      "summary": "Freeze the selected work, preview per-item effects, and expose bounded execution, cancellation, retries, and uncertain outcomes without hiding partial completion.",
+      "group": "Decide and act",
+      "tags": [
+        "batch",
+        "review",
+        "partial-results"
+      ],
+      "choices": [
+        "Exact selected snapshot versus changing query results",
+        "Atomic transaction versus independent per-item outcomes",
+        "Retry original item intent versus a newly reviewed batch"
+      ],
+      "related": [
+        "review-exact-proposal",
+        "recover-outdated-work",
+        "undo-and-revise-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/run-reviewed-batch-actions/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-reviewed-batch-actions/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Freeze the selected work, preview per-item effects, and expose bounded execution, cancellation, retries, and uncertain outcomes without hiding partial completion. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "schedule-shared-resources",
+      "title": "Reserve shared resources without double booking",
+      "summary": "Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "scheduling",
+        "resources",
+        "concurrency"
+      ],
+      "choices": [
+        "Advisory availability versus authoritative reservation",
+        "Exclusive resources versus capacity and tentative holds",
+        "Local-time intent versus exact instants and recurring exceptions"
+      ],
+      "related": [
+        "review-exact-proposal",
+        "reconcile-concurrent-edits",
+        "plan-time-and-deadlines"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/schedule-shared-resources/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/schedule-shared-resources/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "search-and-filter-collections",
       "title": "Search and filter a growing collection",
       "summary": "Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.",
@@ -1413,6 +1471,35 @@
       ],
       "path": "cookbooks/turn-records-into-signals/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/turn-records-into-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Project fields, preserve units, and bound flattening without silently changing the meaning of a source record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "undo-and-revise-work",
+      "title": "Undo and revise work without changing its meaning",
+      "summary": "Choose local undo, revision history, guarded reversal, or explicit compensation according to what changed and who may have acted on it.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "undo",
+        "history",
+        "concurrency"
+      ],
+      "choices": [
+        "Local edit history versus accepted shared revisions",
+        "Guarded inverse versus restore or compensation",
+        "Reversible UI changes versus irreversible external effects"
+      ],
+      "related": [
+        "reconcile-concurrent-edits",
+        "review-exact-proposal",
+        "recover-outdated-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/undo-and-revise-work/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/undo-and-revise-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose local undo, revision history, guarded reversal, or explicit compensation according to what changed and who may have acted on it. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "work-offline-and-reconnect",

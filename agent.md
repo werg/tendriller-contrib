@@ -29,12 +29,14 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Explore assumptions with what-if scenarios](cookbooks/explore-what-if-scenarios/COOKBOOK.md) — Build a bounded model with an inspectable baseline, comparable scenarios, sensitivity checks, and explicit uncertainty.
 - [Observe long-running work and enable intervention](cookbooks/observe-long-running-process/COOKBOOK.md) — Separate freshness, progress, failures, and intervention from the agent conversation that may come and go.
 - [Review an exact proposal before acting](cookbooks/review-exact-proposal/COOKBOOK.md) — Bind approval to immutable content and an explicit version, expiry, and execution policy.
+- [Review and execute a batch with clear partial outcomes](cookbooks/run-reviewed-batch-actions/COOKBOOK.md) — Freeze the selected work, preview per-item effects, and expose bounded execution, cancellation, retries, and uncertain outcomes without hiding partial completion.
 
 ### Design everyday interactions
 
 - [Build forms people can complete and correct](cookbooks/build-correctable-forms/COOKBOOK.md) — Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.
 - [Make the complete interaction accessible](cookbooks/complete-accessible-interactions/COOKBOOK.md) — Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.
 - [Search and filter a growing collection](cookbooks/search-and-filter-collections/COOKBOOK.md) — Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.
+- [Undo and revise work without changing its meaning](cookbooks/undo-and-revise-work/COOKBOOK.md) — Choose local undo, revision history, guarded reversal, or explicit compensation according to what changed and who may have acted on it.
 - [Write and review a document across revisions](cookbooks/write-with-versioned-feedback/COOKBOOK.md) — Keep drafts, anchored feedback, suggested changes, reviewer decisions, and publication tied to the document versions they concern.
 
 ### Guide and coordinate work
@@ -48,6 +50,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Join or transfer a page across devices](cookbooks/join-across-devices/COOKBOOK.md) — Choose role-aware links and a usable transfer method without turning device purpose into authority.
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
+- [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
 ### Keep work dependable
