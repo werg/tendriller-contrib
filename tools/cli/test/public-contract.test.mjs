@@ -111,6 +111,22 @@ test("supported mutations match the current public service routes", async () => 
   assert.deepEqual(requests.at(-1).body, { keep: false });
 });
 
+test("push notification commands expose readiness and preserve delivery targeting", async () => {
+  const status = await cli(["notifications"]);
+  assert.equal(status.code, 0, status.stderr);
+  assert.equal(requests.at(-1).method, "GET");
+  assert.equal(requests.at(-1).path, "/api/t/abcdefghijkl/notify");
+  assert.equal(requests.at(-1).authorization, "Bearer tk_private");
+  const notification = await cli(["notify", "Decision needed", "Please approve this job",
+    "--url", "/page/", "--device", "d_example", "--tag", "approval-42"]);
+  assert.equal(notification.code, 0, notification.stderr);
+  assert.deepEqual(requests.at(-1), {
+    method: "POST", path: "/api/t/abcdefghijkl/notify", authorization: "Bearer tk_private",
+    body: { title: "Decision needed", body: "Please approve this job",
+      url: "/page/", device: "d_example", tag: "approval-42" },
+  });
+});
+
 test("durable work commands preserve targets, revisions and explicit publication review", async () => {
   for (const [args, method, path, body] of [
     [["devices", "purpose", "d_example", "speaker"], "PATCH", "/devices/d_example", { purpose: "speaker" }],
