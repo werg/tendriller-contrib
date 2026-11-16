@@ -6,7 +6,7 @@ group: "Decide and act"
 tags: ["batch", "review", "partial-results"]
 choices: ["Exact selected snapshot versus changing query results", "Atomic transaction versus independent per-item outcomes", "Retry original item intent versus a newly reviewed batch"]
 related: ["review-exact-proposal", "recover-outdated-work", "undo-and-revise-work"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md"]
+sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/PROTOCOL.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -40,7 +40,29 @@ A dry run validates under the conditions it observed; it does not reserve author
 
 ## Choose atomic or partial semantics honestly
 
-An atomic batch means every covered mutation commits together or none does at the actual authority boundary. A browser loop issuing individual writes cannot supply that guarantee. Use a deliberately installed trusted operation where the public host contract, policy, and quotas support it, or an external system's real transaction when that is authoritative. Core's default registry installs no domain batch policy.
+An atomic batch means every covered mutation commits together or none does at the actual authority boundary. For shared-state changes, use core's [conditional `state.apply` operation](https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/BROWSER_API.md). It checks all supplied conditions against one authoritative snapshot and applies every operation in one transaction. It also persists the command and its accepted or state-conflict receipt. A page does not need a custom transaction implementation for this guarantee.
+
+For example, after `observed = await tendril.state.snapshot()`, freeze a bounded list of existing `selectedIds` for review. Retain each exact record from `observed.state.items`. Once the person confirms archiving those records, submit:
+
+```js
+const result = await tendril.state.apply(
+  selectedIds.map(id => ({
+    op: "set", path: ["items", id, "status"], value: "archived",
+  })),
+  {
+    conditions: selectedIds.map(id => ({
+      path: ["items", id], equals: observed.state.items[id],
+    })),
+    expected_generations: Object.fromEntries(
+      observed.scopes.map(scope => [scope.id, scope.generation]),
+    ),
+  },
+);
+```
+
+This example requires a nonempty selection of existing JSON records within the service's condition and payload limits. It guards every observed scope conservatively; a task can select its relevant scope dependencies. A changed selected record rejects the entire batch, while an unrelated record can change without failing these value conditions. Use `expected_revision: observed.rev` instead when any intervening state mutation must invalidate review. Show `queued`, `accepted`, and `rejected` distinctly; the conditional batch does not optimistically remove rows. Optional conditions provide concurrency control for cooperating writers, not permission or approval enforcement against other authorized operations.
+
+For protected domain transitions, private records, or effects in an external system, the trusted operation must enforce those additional rules. A shared-state transaction does not atomically rename files, publish assets, create timers, or execute an external action. Use the authority that owns those effects and state its actual boundary.
 
 Independent per-item execution is often more practical. Define whether an item failure stops the batch, skips dependent work, or allows independent items to continue. Give every item its own immutable intent and result identity while retaining a parent batch identity for navigation. A parent receipt saying “started” does not mean every child succeeded.
 
@@ -58,7 +80,7 @@ Use accessible status summaries without announcing every result at high volume. 
 
 ## Recover without duplicating effects
 
-Persist enough state to reconstruct the exact selection, parameters, original command identities, and receipts under an appropriate privacy policy. On reload, reauthorize before showing private details, then reconcile outstanding intents. Do not restart the entire batch because the browser lost its progress counter.
+Retain the review selection and explanatory progress under an appropriate privacy policy. Core already persists an admitted shared-state batch's operations, conditions, identity, and generations; do not build a second mutation outbox or submit a new `state.apply` merely because its promise returned `queued`. On reload, reauthorize before showing private details and reconcile core receipts with the original selection. External integrations still need their own durable progress and supported receipt mechanism. Do not restart an entire batch because the browser lost its progress counter.
 
 A lost reply after an effect is an uncertain outcome, not an ordinary failure. Query the authoritative result or use the external system's supported idempotency mechanism before retrying. For Tendriller durable operations, preserve their original command and generation context through retry; runtime-owned capture identities follow their own documented retry path. Never attach current generations to an old payload solely to make it pass.
 
@@ -76,6 +98,8 @@ If reversal is supported, preview it as another guarded operation with its own c
 | --- | --- |
 | New rows arrive after selection | They are excluded from the captured batch unless deliberately reviewed. |
 | One selected record changes before execution | Its stale operation rejects or follows the explicit conflict policy. |
+| One condition fails in a core atomic state batch | None of the selected rows change; the proposal and conflict remain reviewable. |
+| An accepted batch reply is lost, then the page reloads | Core replays the original command and receipt without admitting the batch twice. |
 | One item fails in an independent batch | Other outcomes remain visible and follow the stated continue/stop policy. |
 | A claimed atomic batch hits quota midway | The real transaction commits none; a client loop cannot claim this result. |
 | Stop is requested with work in flight | Not-started, accepted, completed, and uncertain items remain distinct. |

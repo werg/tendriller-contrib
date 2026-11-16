@@ -8,7 +8,7 @@ choices: ["Current value versus ordered history", "Authority, privacy, and recor
 capabilities: []
 evidence: "explained"
 related: ["recover-outdated-work", "collect-private-responses", "reconcile-concurrent-edits", "export-and-restore-work"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs", "https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/PROTOCOL.md"]
 ---
 
 # Choose the right home for application data
@@ -35,7 +35,7 @@ These are example choices, not a common inspection schema. If a task needs no or
 
 | Mechanism | Good fit | What it does not establish |
 | --- | --- | --- |
-| Shared state | Current agreed value, selected range, public task progress. | Complete history, privacy between readers, or automatic conflict resolution. |
+| Shared state | Current agreed values and atomic, conditional batches over them. | Complete history, privacy between readers, or automatic conflict resolution. |
 | Events | Something happened and a consumer needs to react. | That the consumer handled it, or that repeated delivery is new intent. |
 | Streams | Ordered observations with retention and cursors. | Infinite history, exact external execution, or acknowledgement from a callback. |
 | Local draft | Unsent typing, sketch, or temporary view choice. | Cross-device durability or current authorization for cached private data. |
@@ -50,9 +50,19 @@ For each kind of information, record its writer, readers, authoritative owner, o
 
 Display persistence at the level the person cares about: “Draft on this device,” “Submission queued,” “Accepted,” and “Awaiting review” have different meanings. Do not show a global green “Saved” indicator while a selected photo is only in memory or its semantic submission was rejected. Associate failures with their object, preserve the draft, and offer a useful next action.
 
-A submitted snapshot must remain separate from later typing. When acknowledgement arrives, clear only the accepted snapshot. An interpretation can change without rewriting its original evidence; link it to the exact evidence revision and show superseded conclusions. If two fields must change together, either use an operation whose public contract provides the transaction or model a visible intermediate state. Two sequential browser writes are not an atomic operation.
+A submitted snapshot must remain separate from later typing. When acknowledgement arrives, clear only the accepted snapshot. An interpretation can change without rewriting its original evidence; link it to the exact evidence revision and show superseded conclusions. For two or more shared-state changes that must commit together, use core's `state.apply(ops, options)` batch. If the effects span another authority, use its actual transaction or model an explicit intermediate state.
 
 Choose display state separately from domain state. Changing a chart filter or opening a section should not overwrite an agreed decision. For collaboration, distinguish a personal filter from a deliberately shared selection. Announce save and conflict transitions accessibly without repeatedly stealing focus; retain labels and error text when a form rerenders.
+
+## Use core's concurrency primitives directly
+
+The [browser state API](https://github.com/werg/tendriller/blob/7151fb731041eb5cfd7039b0eb6a45d68b0ac6d4/docs/BROWSER_API.md) separates a useful local view from an authoritative review snapshot. `state.get()` includes pending ordinary writes; `state.revision` alone does not make that view a coherent server snapshot. Use `await state.snapshot()` to obtain matching `{state, rev, scopes}` while connected. Keep that observation with the draft being reviewed; a later save must not silently substitute newer values or scope generations.
+
+`set`, `delete`, `patch`, and `apply` accept `conditions` and `expected_revision`. Conditions check exact JSON values or presence against one server snapshot before any batch mutation. Guard an item's value when unrelated items may change independently. Use the global revision when any intervening shared-state write must require review, including a value that changed and later returned to its original value. All supplied conditions are checked together, and their read paths participate in scope-generation protection alongside write paths. Capture relevant `expected_generations` from the reviewed snapshot or the task's reviewed scope context.
+
+Missing and null have different meanings. Arrays are whole values, and an explicit path cannot silently replace an existing array, scalar, or null ancestor with an object. Use literal array paths for keys containing dots. Deliberately replacing a parent is an explicit `set`; a merge `patch` follows its documented replacement and null-deletion semantics. These are core semantics to design around, not separate rules each page should reimplement.
+
+A conditional write stays pending until accepted; it does not claim optimistic ownership or approval. A conflict leaves every covered value unchanged and returns an actionable result. The same command's accepted or state-conflict receipt survives retries. Keep the user's proposed change for a new decision instead of automatically upgrading its guards. These optional concurrency checks do not restrict another authorized writer's operations or enforce arbitrary domain policy; additional permission and business rules still belong at a trusted boundary.
 
 ## Preserve identity through history and retention
 

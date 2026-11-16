@@ -6,7 +6,7 @@ group: "Design everyday interactions"
 tags: ["undo", "history", "concurrency"]
 choices: ["Local edit history versus accepted shared revisions", "Guarded inverse versus restore or compensation", "Reversible UI changes versus irreversible external effects"]
 related: ["reconcile-concurrent-edits", "review-exact-proposal", "recover-outdated-work"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/1492d58501ef5b6f111b5330dc08fc381c84eefe/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -24,7 +24,7 @@ Use this when people need to correct mistakes, explore alternatives, or understa
 | Published evidence or decision | A new revision that preserves the earlier record. | Correct or supersede the interpretation without rewriting what was reviewed. |
 | External effect | Domain-specific compensation when supported. | Perform another action; the original effect still happened. |
 
-Tendriller has no default application-wide undo policy. Its command, revision, and generation mechanisms help implement deliberate changes, but reading this guide does not install history or compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
+Tendriller has no default application-wide undo policy. Core's atomic conditional state writes supply the concurrency primitive; the application chooses which inverse is meaningful and retains the required history. Reading this guide installs neither history nor compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
 
 ## Make correction part of the normal journey
 
@@ -44,11 +44,35 @@ For shared records, retain stable object identity and the exact before/after rev
 
 ## Reverse accepted work against current truth
 
-A proposed inverse must be reviewed under current authority and task context. For example, undoing a rename from “A” to “B” should check that the object still has the reviewed resulting revision or value before restoring “A.” If someone renamed it to “C,” the original inverse is stale. Use a trusted transactional operation when checking and applying must be atomic; a browser read followed by an unguarded write cannot enforce that policy.
+A proposed inverse must be reviewed under current authority and task context. For example, undoing a rename from “A” to “B” should check that the object still has the reviewed resulting value before restoring “A.” If someone renamed it to “C,” the inverse is stale. Use core's `conditions` with `state.set` or `state.apply`: the authority checks the predicate and applies the whole batch atomically. No custom trusted transaction is needed merely to make that comparison safe.
+
+Read a coherent current view with `await tendril.state.snapshot()`. A failed/offline read leaves the local history available but cannot establish current authority. `state.get()` may include optimistic ordinary writes, so do not pair it with `state.revision` to manufacture a base. Show the inverse and any intervening changes before offering an accepted shared reversal.
+
+For a history entry from the current task, assume `entry` retains its stable `itemId` and boolean `before`/`after` completion values. Items have an explicit deletion flag. Capture `reviewed` and its generations when preparing the Undo action, then retain these values until the person responds:
+
+```js
+const reviewed = await tendril.state.snapshot();
+const expected_generations = Object.fromEntries(
+  reviewed.scopes.map(scope => [scope.id, scope.generation]),
+);
+const result = await tendril.state.set(
+  ["items", entry.itemId, "done"], entry.before,
+  {expected_generations, conditions: [
+    {path: ["items", entry.itemId, "done"], equals: entry.after},
+    {path: ["items", entry.itemId, "deleted"], equals: false},
+  ]},
+);
+```
+
+The equality predicate retains the original resulting value; it does not adopt whatever is current during a retry. A different current completion conflicts. An unrelated note can still change. If changing away and back must also invalidate Undo, guard an application revision advanced by every cooperating edit, or use `expected_revision` with the original accepted global revision. The global guard is stricter and also rejects unrelated page changes. A revision from the new review protects that review interval, not the entire period since the original action. These are distinct correction policies.
+
+For restoring a truly absent record, `exists:false` can guard its stable ID before an explicit whole-record `set`. A tombstone is present: use `equals` on its reviewed value or revision instead. Missing and null are distinct. Conditions on the object and its task-generation protect against reusing a history entry for a different lifecycle; an old-task history entry needs a deliberate restore-as-new review, not silently refreshed guards.
 
 An arithmetic inverse may also be wrong. Subtracting a previous increment can be valid for an explicitly additive domain but not for a field that someone has subsequently set to a chosen total. Reversing a deletion may require preserving identity, references, ordering, and permissions; recreating a visually similar row is not necessarily the same object.
 
-Give each accepted reversal its own new command identity and capture its current guards deliberately. Preserve that reversal's identity on transport retry. Keep the original operation's receipt available. For a shared file, restoration still needs the current path revision; for a publication, rollback changes the publication-head revision. Restoring earlier bytes does not reset those concurrency histories.
+Each new browser write creates its own reversal command; automatic delivery retries retain that command's original predicates and generations. Keep the original operation's receipt available. A conditional inverse does not change the optimistic shared view: show “Undo pending” until `accepted`, retain it through `queued`, and offer comparison on `rejected`. Observe `state_result` for a terminal result after queuing. Do not invoke Undo again to retry delivery. A durable `state_conflict` remains rejected even if the predicate later becomes true; a fresh reviewed inverse is new intent. See the [browser API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md).
+
+These predicates are optional cooperative guards. They do not authorize reversal of someone else's work or prevent another authorized writer from omitting them. Enforced role rules, approval revocation, and external compensation still need their actual authorized operations. For a shared file, restoration needs the current path revision; publication rollback changes the publication-head revision. Restoring earlier bytes does not reset those concurrency histories.
 
 A Redo after an accepted reversal is also new reviewed work, not permission to replay the original command with new meaning. Recheck current authority, generation, referenced evidence, and any external conditions.
 
@@ -73,7 +97,10 @@ If an action cannot be undone, make that clear at its review point and provide a
 | Undo and redo within an unsent draft | The expected edit unit changes and unrelated fields remain intact. |
 | New typing after a local undo | Redo follows the documented branch policy rather than overwriting new work. |
 | Another person edits before shared undo | A guarded conflict is shown; their update is preserved. |
+| The resulting value changes away and back | A value guard and a revision guard exhibit the deliberately chosen different policies. |
 | Reversal reply is lost | Retry reconciles the same reversal command without applying a second inverse. |
+| The inverse is queued or rejected and its predicate later becomes true | Pending UI does not claim success; a stored rejection stays terminal until the person reviews new intent. |
+| A task resets after the Undo offer is prepared | Original generations remain attached and the old inverse cannot alter the new task. |
 | Deleted item is restored | Identity, references, ordering, and permissions follow the reviewed restoration policy. |
 | Evidence is corrected after approval | Earlier approval remains tied to its original evidence and requires reassessment when appropriate. |
 | Some batch items can no longer be reversed | Outcomes identify reversible, conflicted, and irreversible items explicitly. |
