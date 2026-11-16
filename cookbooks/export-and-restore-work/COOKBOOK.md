@@ -6,7 +6,7 @@ group: "Keep work dependable"
 tags: ["export", "restore", "provenance"]
 choices: ["Readable report versus restorable data versus portable page", "Complete evidence versus explicitly bounded export", "New copy versus guarded restore into existing work"]
 related: ["import-for-review", "publish-coherent-updates", "choose-data-model"]
-sources: ["https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/tools/CLI.md"]
+sources: ["https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/tools/CLI.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -52,7 +52,7 @@ A new copy should create a new application task identity where appropriate while
 
 Preview the changes per affected object and count creates, updates, conflicts, skips, and missing dependencies. For evidence and annotations, preserve the exact source revision relationship even if destination names differ. If the destination changed during review, show the conflict and require a fresh reviewed command rather than silently refreshing its guards.
 
-A portable page restore has core-specific guarantees. Publication, imported shared-file heads, and restored state must obey the current guarded operation and atomic publication contract. Capture the destination head and relevant file revisions before asynchronous transfer; a publication version number alone is not a concurrency guard. Use the current public tooling and [protocol](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md), not a browser loop that claims equivalent atomicity.
+A portable page restore has core-specific guarantees. Publication, imported shared-file heads, and restored state must obey the current guarded operation and atomic publication contract. Capture the destination head and relevant file revisions before asynchronous transfer; a publication version number alone is not a concurrency guard. Use the current public tooling and [protocol](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md), not a browser loop that claims equivalent atomicity.
 
 ## Reestablish authority and live services
 

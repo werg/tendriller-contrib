@@ -8,7 +8,7 @@ choices: ["Rendered appearance or source/data export", "DOM reconstruction or br
 capabilities: []
 evidence: "explained"
 related: ["capture-reviewed-evidence", "publish-coherent-updates"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/screenshot.js", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/screenshot.js", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md"]
 ---
 
 # Capture rendered evidence
@@ -66,7 +66,7 @@ Cancel and source replacement must invalidate late callbacks. Release media trac
 
 Read `tendril.sensors.status()` and subscribe through `tendril.sensors.on(listener)` to distinguish its `pending` acquisitions from `active` resources. The listener receives the same `{active, pending}` snapshot shape; keep the sensor Stop action available while either array is nonempty, rather than waiting for the screen/camera chooser to produce a live stream.
 
-When cancelling the page's sensor session, call core's [sensor stop boundary](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md), `tendril.sensors.stopAll()`. Pending wrapped screen/camera requests reject immediately with `AbortError`, and core stops any stream granted after that cancellation. The browser may still show its native chooser. Use the application attempt ID to prevent an already-produced render or candidate from entering a new task; core owns the tracked acquisition race, while the page owns the capture's meaning. If other independent inputs must continue, scope cancellation to the owned capture rather than using a page-wide stop. Rehearse the pending-only and late-grant cases against the actual browser without adding a second global sensor lifecycle.
+When cancelling the page's sensor session, call core's [sensor stop boundary](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md), `tendril.sensors.stopAll()`. Pending wrapped screen/camera requests reject immediately with `AbortError`, and core stops any stream granted after that cancellation. The browser may still show its native chooser. Use the application attempt ID to prevent an already-produced render or candidate from entering a new task; core owns the tracked acquisition race, while the page owns the capture's meaning. If other independent inputs must continue, scope cancellation to the owned capture rather than using a page-wide stop. Rehearse the pending-only and late-grant cases against the actual browser without adding a second global sensor lifecycle.
 
 Use [reviewed capture](../capture-reviewed-evidence/COOKBOOK.md) to persist bytes and semantic context together. Keep a new note separate from a pending report, so a late rejection cannot overwrite it. A blank or failed render should produce an error and retained context, not a successful empty report. If a third-party renderer is deliberately bundled, retain its exact dependency identity and notices; copied application code remains editable source.
 

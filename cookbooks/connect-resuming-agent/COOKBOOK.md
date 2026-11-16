@@ -34,7 +34,7 @@ Offer explicit cancellation or supersession only if the application has a define
 
 Tendriller no longer offers HTTP long polling. `GET /events?after=<cursor>` is a nonblocking replay read, and `wait` (including `wait=0`) is rejected. Receive asynchronous wakes through the agent WebSocket, an authenticated webhook or an MCP Events subscription, then read the pending batch and acknowledge only after the work succeeds. The core `tendril-wait.mjs` and CLI `tendril wait` now use WebSockets; the shell long-poll helper was removed.
 
-Specific host products change. Read [core's bridge reference](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
+Specific host products change. Read [core's bridge reference](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
 
 Choose persistence deliberately. A short task may use a host-managed wait that must be rearmed; an ongoing task may justify a persistent service with a named owner, private installation path, restart policy, and teardown procedure. Do not claim a page is continuously monitored merely because its collector continues reporting measurements.
 

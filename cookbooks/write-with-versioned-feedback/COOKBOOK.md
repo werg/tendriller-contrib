@@ -8,7 +8,7 @@ choices: ["Plain text and snapshots or a richer collaborative editor", "Version-
 capabilities: []
 evidence: "explained"
 related: ["adapt-without-losing-work", "reconcile-concurrent-edits", "review-exact-proposal", "separate-evidence-interpretation"]
-sources: ["https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/agent.md"]
+sources: ["https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/agent.md"]
 ---
 
 # Write and review a document across revisions
