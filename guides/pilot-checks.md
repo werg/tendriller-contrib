@@ -9,6 +9,23 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 | Reviewed capture | Compact inline file form and fullscreen canvas with a separate review | Reviewed snapshot, discard, missing context, runtime capture identity, retry after reload, delayed rejection, new drafts, saveable evidence when durable storage is unavailable, and lost upload-completion replay without resending bytes. | 10 |
 | Private responses | Facilitator console, minimal participant form, and shared projection | Capability absence, intentional aggregate publication, exact retries, deliberate conflict review, draft identity across reload, fresh authorization on cached-page restoration, and immediate clearing after denied access or late responses. | 15 |
 
+## Most recent cross-repository verification
+
+[GitHub integration run 43871914704](https://github.com/werg/tendriller-contrib/actions/runs/43871914704)
+passed **33 browser scenarios** and **three actual-host scenarios** on the
+contrib PR source `b5e438d6192d2d8791f54078f80764686632f0de`, paired with
+core source `c248ceeabfd210538f445d5f889f7cc166f081b1` (the reserved
+`0.3.0-rc.6` candidate). The run built the public core artifacts from that
+exact checkout, exercised all seven independent page specimens in Chromium,
+and used the packaged SDK/engine for the three fresh-storage trusted-host
+scenarios. Every corresponding CI step completed successfully.
+
+This run is **source-paired integration evidence**, not proof that a separately
+downloaded release archive or a live Cloudflare deployment was exercised.
+Core's own release checks and published release assets must be verified
+separately. Earlier immutable scenario records and their source pairings below
+remain useful as historical checkpoints; they are not silently relabeled.
+
 ## Recorded target checks
 
 All **33 browser scenarios** and **three actual-host scenarios** passed in
