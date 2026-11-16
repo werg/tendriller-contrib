@@ -264,7 +264,7 @@
         "private records",
         "transactions"
       ],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "review-exact-proposal",
         "choose-data-model",
@@ -948,7 +948,7 @@
       "capabilities": [
         "explicit trusted extension"
       ],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "recover-outdated-work",
         "observe-long-running-process"

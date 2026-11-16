@@ -1,0 +1,22 @@
+const api=window.tendril,$=s=>document.querySelector(s),prefix=`inline-evidence:${api.identity.page}:${api.device.id}`,pending=new Map();
+let candidate=null,revision=0;
+const draftKey=prefix+':draft',recordsKey=prefix+':submissions';
+try{$('#question').value=localStorage.getItem(draftKey)||'';for(const row of JSON.parse(localStorage.getItem(recordsKey)||'[]'))if(row&&typeof row.cid==='string'&&typeof row.text==='string')pending.set(row.cid,row);}catch{}
+const save=()=>{try{localStorage.setItem(draftKey,$('#question').value);localStorage.setItem(recordsKey,JSON.stringify([...pending.values()].slice(-12)));}catch{$('#status').textContent='Local draft storage is unavailable.';}};
+function show(){
+ $('#receipts').replaceChildren(...[...pending.values()].map(row=>{const article=document.createElement('article');article.className='receipt';article.dataset.status=row.status;article.dataset.cid=row.cid;const heading=document.createElement('strong');heading.textContent=row.status;const text=document.createElement('p');text.textContent=row.text;const message=document.createElement('p');message.textContent=row.message||'';article.append(heading,text,message);
+ if(['queued','rejected'].includes(row.status)){const retry=document.createElement('button');retry.type='button';retry.textContent='Retry original capture';retry.addEventListener('click',()=>api.retryCapture(row.cid).then(outcome).catch(error=>{$('#status').textContent=error.message;}));const discard=document.createElement('button');discard.type='button';discard.textContent='Discard pending capture';discard.addEventListener('click',async()=>{await api.discardCapture(row.cid);row.status='discarded';save();show();});article.append(retry,discard);}return article;}));
+}
+function discardCandidate(){if(candidate)URL.revokeObjectURL(candidate.url);candidate=null;$('#file').value='';$('#image').removeAttribute('src');$('#review').hidden=true;}
+$('#file').addEventListener('change',()=>{const file=$('#file').files[0];if(!file)return;discardCandidate();candidate={file,url:URL.createObjectURL(file)};$('#image').src=candidate.url;$('#filename').textContent=file.name;$('#review').hidden=false;$('#status').textContent='Review the image. Retake by choosing another file, or discard.';});
+$('#discard').addEventListener('click',discardCandidate);$('#question').addEventListener('input',()=>{revision++;save();});
+function outcome(result){const row=pending.get(result.capture_id);if(!row)return;row.status=result.status;row.message=result.message||result.error||'';
+ if(result.status==='accepted'&&revision===row.draftRevision&&$('#question').value===row.text){$('#question').value='';revision++;}
+ save();show();$('#status').textContent=result.status==='accepted'?'Accepted by the service; agent action is separate.':result.status==='queued'?'Queued on this device. Original context is retained.':'Rejected. Submitted evidence and your current draft remain separate.';
+}
+$('#form').addEventListener('submit',async event=>{event.preventDefault();const text=$('#question').value.trim();if(!text&&!candidate){$('#status').textContent='Add a question or select evidence.';return;}
+ const context=api.scopes.capture('evidence'),cid=crypto.randomUUID(),file=candidate?.file,row={cid,text,draftRevision:revision,status:'sending',context,name:file?.name||'question.txt'};pending.set(cid,row);save();show();discardCandidate();
+ try{const blob=file||new Blob([text],{type:'text/plain'});outcome(await api.uploadEvent(blob,{cid,name:row.name,data:{kind:'reviewed_evidence',question:'inspection-1',text},dataPath:['evidence'],...context}));}catch(error){row.status='error';row.message=error.message;save();show();$('#status').textContent='Submission could not start; the question remains a draft.';}
+});
+api.on('upload_event',outcome);api.on('capture_queue',rows=>{for(const capture of rows){if(!pending.has(capture.capture_id))pending.set(capture.capture_id,{cid:capture.capture_id,text:String(capture.data.text||''),draftRevision:-1,status:capture.status,context:{scope:capture.scope,expected_generations:capture.expected_generations},message:capture.message||capture.error||''});}show();});
+api.on('connect',()=>{$('#status').textContent='Ready. Review evidence before sending.';});show();if(api.connected)$('#status').textContent='Ready. Review evidence before sending.';addEventListener('pagehide',()=>{if(candidate)URL.revokeObjectURL(candidate.url);save();});

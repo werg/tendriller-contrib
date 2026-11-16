@@ -6,7 +6,7 @@ group: "Guide and coordinate work"
 tags: ["privacy", "collaboration", "transactions"]
 choices: ["Public poll or authorized private records", "Revisioned answers or append-only revisions", "Reviewed aggregate and atomic round reset"]
 capabilities: ["explicit trusted extension", "private records", "transactions"]
-evidence: "explained"
+evidence: "exercised"
 related: ["review-exact-proposal", "choose-data-model", "coordinate-devices"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"]
 ---
@@ -50,7 +50,7 @@ Keep application vocabulary and record shapes in the selected extension. The hos
 
 ## Adaptation and checks
 
-A facilitator working console can combine prompt editing, private review, assignment controls, and a separate publish step. A minimal participant form can show one assigned prompt and its own submission receipt. A shared projection can display only reviewed counts or themes. They have different DOM, navigation, and data access; none requires a universal sessions schema.
+The [facilitator console specimen](checks/facilitator/index.html) combines authorized private review with a separate aggregate publication step. The [minimal participant form](checks/participant/index.html) shows one assigned prompt and its own submission receipt. The [shared projection](checks/display/index.html) reads only reviewed shared state and contains no private-read operation. They have different DOM, navigation, and data access; none requires a universal sessions schema.
 
 The reference and its [checks](checks/) are application-specific examples, not an installed product catalog. Service tests must create fresh identities and records and exercise actual host transactions. The browser checks are only evidence of interaction behavior.
 
@@ -63,4 +63,4 @@ The reference and its [checks](checks/) are application-specific examples, not a
 - Reset while a participant is offline. Their old queued work remains associated with the old generation and is rejected on reconnect.
 - Request old archive/media as an unauthorized identity. Privacy still holds after active records are reset.
 
-**Evidence:** extracted privacy and concurrency reasoning is explained. The implementation/check result records identify which target host was actually exercised. This guide does not claim an anonymous protocol, end-to-end encryption, or exactly-once external actions.
+**Evidence:** the text-only private policy and proposal reference were exercised against the actual packaged public host with fresh identities and storage. The [record](checks/evidence.json) identifies exact artifacts and scope. Browser specimens have separate fixture evidence and do not establish server privacy. This guide does not claim an anonymous protocol, end-to-end encryption, or exactly-once external actions.

@@ -14,9 +14,7 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 `npm run check` validates reading metadata/links, generated discovery, complete source
 accounting, and deterministic snippets. It does not launch a service or install core.
 
-`npm run test:pilots` consumes explicitly supplied built public core tools/runtime and
-browser automation artifacts. Its runner documents required environment variables and
-rejects missing inputs. It does not import sibling private source, complete missing page
+`npm run test:pilots -- --tools /path/to/core/dist/tools --playwright /path/to/playwright/index.mjs` consumes explicitly supplied built public core tools/runtime and browser automation artifacts. Add `--browser /path/to/chromium` to select an installed browser. The runner rejects missing inputs. It does not import sibling private source, complete missing page
 assets, or install the retired component graph. The exact tested artifact hashes and
 results are recorded when the checks run.
 
@@ -31,3 +29,7 @@ The private-response reference is text-only. Private media requires separately r
 storage and authorization; no browser screenshot establishes that guarantee. Live hardware,
 real microphone accuracy, and production deployment are separate observations and are not
 claimed by deterministic or fixture checks.
+
+## Current local evidence
+
+The deterministic/editorial suite passes ten cases. The actual-host reference suite passed three scenarios against the exact hashes in its [record](../cookbooks/collect-private-responses/checks/evidence.json). Local browser launch is blocked before assertions: the workspace Chromium cannot create its required Unix socket (`EPERM`). No fixture/browser pass is claimed from that attempt. The separate GitHub integration workflow builds the exact declared public core ref and runs the browser and actual-host checks; its uploaded report records the observed runtime and browser identity.
