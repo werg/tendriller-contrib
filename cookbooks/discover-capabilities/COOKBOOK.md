@@ -8,7 +8,7 @@ choices: ["No-prompt observation versus a relevant permission request", "API pre
 capabilities: []
 evidence: "explained"
 related: ["capture-reviewed-evidence", "choose-voice-interaction", "connect-instrument", "complete-accessible-interactions"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md"]
 ---
 
 # Discover capabilities and design around them
@@ -26,7 +26,7 @@ Start with an interaction that works without optional access, then offer relevan
 | Can the requested resource start? | A particular device/chooser operation succeeded. | Format suitability, measurement quality, or future availability. |
 | Does it serve this task? | A reviewed sample is usable for the chosen purpose. | General support across devices or environments. |
 
-The [public browser API](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md) exposes `tendril.capabilities()` for no-prompt observation and separate sensor lifecycle operations. Its report does not replace a real operation. Device capabilities also differ from installed service workflows: inspect the service descriptor before relying on a trusted server capability. A camera does not imply a private-record policy exists.
+The [public browser API](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md) exposes `tendril.capabilities()` for no-prompt observation and separate sensor lifecycle operations. Its report does not replace a real operation. Device capabilities also differ from installed service workflows: inspect the service descriptor before relying on a trusted server capability. A camera does not imply a private-record policy exists.
 
 ## Design the first-use journey
 
@@ -55,7 +55,7 @@ Use `tendril.sensors.status()` for one coherent `{active, pending}` snapshot. `t
 
 `active` describes observed resources and registered watches/listeners; for a one-shot location read, a recent successful fix can appear there. `pending` includes wrapped media acquisitions and one-shot location reads awaiting a native result. An unanswered one-shot read remains pending until a result or Stop; invoking it alone is not active location use. A registered location watch or motion listener still does not establish permission or a usable measurement. Keep the task's candidate quality and permission observations separate from these status fields.
 
-For a page-wide **Stop sensors** action, use core's [sensor cancellation boundary](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md): `tendril.sensors.stopAll()` stops tracked resources and immediately rejects pending wrapped camera/microphone/screen requests with `AbortError`. A browser-owned permission chooser may remain open; core stops any stream it grants afterward, including known captured track and stream clones. Pending one-shot location callbacks are abandoned without claiming the operating system cancelled its acquisition. A later deliberate acquisition is a new attempt.
+For a page-wide **Stop sensors** action, use core's [sensor cancellation boundary](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md): `tendril.sensors.stopAll()` stops tracked resources and immediately rejects pending wrapped camera/microphone/screen requests with `AbortError`. A browser-owned permission chooser may remain open; core stops any stream it grants afterward, including known captured track and stream clones. Pending one-shot location callbacks are abandoned without claiming the operating system cancelled its acquisition. A later deliberate acquisition is a new attempt.
 
 Keep a task's draft identity and cancellation UI in the application, but do not rebuild that global acquisition-race protection in every page. Handle the aborted promise as a cancelled attempt without losing the draft. Stop all sensors only when that is the intended scope: cancelling one of several independent inputs should release that input's owned resources. Optional adapters and resources created outside the tracked browser APIs still need their own cleanup; instrumentation is not a security boundary or a way to dismiss native browser UI.
 
@@ -79,7 +79,7 @@ Share diagnostics only when they help resolve a problem. Browser/device details 
 
 - Load and reload the page. No optional permission request or resource start occurs; the basic task is usable immediately.
 - Remove the API, cancel a chooser, deny permission, and start without hardware. Each state offers a clear fallback and preserves existing work.
-- Leave a media or one-shot location request unanswered. Its kind remains in `pending`, Stop stays available, and a request alone is not displayed as a successful acquisition.
+- Leave a media or one-shot location request unanswered. Its kind remains in `pending`, Stop stays available, and a request alone is not displayed as a successful acquisition. Another active sensor does not hide the pending request.
 - Abandon a pending attempt, then grant its permission. Any late resource is immediately released, the active indicator stays off, and no candidate appears in the new task.
 - Start successfully, then unplug the device or end its stream. The active indicator changes and a captured candidate remains reviewable if the chosen policy retains it.
 - Resolve an old query after a newer failure or identity change. The old response cannot replace current state.

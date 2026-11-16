@@ -8,7 +8,7 @@ choices: ["Answer keys, rubric feedback, or human review", "Hints and retries ve
 capabilities: []
 evidence: "explained"
 related: ["guide-explicit-checkpoints", "choose-interruptions", "resume-across-sessions", "complete-accessible-interactions"]
-sources: ["https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/PUSH_NOTIFICATIONS.md"]
+sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PUSH_NOTIFICATIONS.md"]
 ---
 
 # Guide practice with useful feedback
@@ -62,7 +62,7 @@ If an agent evaluates a response, present the feedback as that evaluator's judgm
 
 A simple review queue can prioritize items the person skipped, corrected, or chose to revisit. A more elaborate spacing algorithm may be worthwhile if its assumptions, adjustments, and evidence are understood. Keep an explicit “Review now” path and show why an item is due. Do not claim a universal optimal interval from an arbitrary example schedule.
 
-Keep practice recommendations separate from reminder delivery. A saved review date does not schedule anything by itself. For an actual reminder, select the deployed timer/notification capability, display its configured next occurrence, and follow the [public durability contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/DURABILITY.md). Provider acceptance is not proof that the person saw a notification. A reminder firing also does not mean practice happened.
+Keep practice recommendations separate from reminder delivery. A saved review date does not schedule anything by itself. For an actual reminder, select the deployed timer/notification capability, display its configured next occurrence, and follow the [public durability contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/DURABILITY.md). Provider acceptance is not proof that the person saw a notification. A reminder firing also does not mean practice happened.
 
 Let the person pause reminders and return without a backlog of guilt-inducing alerts. Preserve completed attempts and explain whether resuming creates a new session or continues an interrupted one. Changes to the question set should not silently invalidate earlier work.
 

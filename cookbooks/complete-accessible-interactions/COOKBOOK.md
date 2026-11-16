@@ -8,7 +8,7 @@ choices: ["Native controls or justified custom interaction", "Status announcemen
 capabilities: []
 evidence: "explained"
 related: ["adapt-without-losing-work", "discover-capabilities", "build-correctable-forms"]
-sources: ["https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md"]
+sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/CAPTURES.md"]
 ---
 
 # Make the complete interaction accessible
@@ -35,7 +35,7 @@ The baseline should complete the same task. “Please use another device” is n
 
 Use native controls for their intended actions and ordinary headings, lists, and form structure to explain the page. A control's accessible name should identify the action and, when necessary, its target: “Remove photo of upper hinge” is clearer than several unrelated buttons all called “Remove.” Keep visible instructions near the point of use; placeholders disappear during editing and are poor substitutes for persistent labels.
 
-W3C's [forms guidance](https://www.w3.org/WAI/tutorials/forms/) explains labels, grouped controls, instructions, and accessible feedback. Apply those semantics to the authored page rather than assuming the headless runtime supplies a complete interface. The [public browser contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md) leaves conversation presentation and domain interaction to the page.
+W3C's [forms guidance](https://www.w3.org/WAI/tutorials/forms/) explains labels, grouped controls, instructions, and accessible feedback. Apply those semantics to the authored page rather than assuming the headless runtime supplies a complete interface. The [public browser contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md) leaves conversation presentation and domain interaction to the page.
 
 Keep custom interactions small and justified. A reorderable list may expose Move up/Move down and a position announcement. A freehand drawing can offer a description or file route for the underlying communication task. W3C's [keyboard explanation](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html) distinguishes path-dependent drawing from ordinary actions that should have keyboard operation.
 

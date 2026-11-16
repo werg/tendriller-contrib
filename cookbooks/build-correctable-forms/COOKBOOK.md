@@ -8,7 +8,7 @@ choices: ["Single page or purposeful branching steps", "Local draft, authorized 
 capabilities: []
 evidence: "explained"
 related: ["capture-reviewed-evidence", "recover-outdated-work", "complete-accessible-interactions", "choose-data-model"]
-sources: ["https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/CAPTURES.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md"]
 ---
 
 # Build forms people can complete and correct
@@ -60,7 +60,7 @@ Present the exact outgoing request in readable terms: item names, quantities, un
 
 Submitting creates an immutable application snapshot with a stable request identity and relevant task/form revision. New typing belongs to another editable draft. If media is included, distinguish each attachment's capture/acceptance status from overall form readiness. Several independent accepted uploads do not make a multi-field application transaction atomic.
 
-Use the public command interface for the semantic submission and [reviewed capture](../capture-reviewed-evidence/COOKBOOK.md) for media. For protected work, keep the captured generation and original command identity on retry. The [public capture contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/CAPTURES.md) distinguishes accepted, queued, and rejected outcomes. An accepted request still may await human or agent processing; call it completed only when that separate result exists.
+Use the public command interface for the semantic submission and [reviewed capture](../capture-reviewed-evidence/COOKBOOK.md) for media. For protected work, keep the captured generation and original command identity on retry. The [public capture contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/CAPTURES.md) distinguishes accepted, queued, and rejected outcomes. An accepted request still may await human or agent processing; call it completed only when that separate result exists.
 
 ## Make correction a first-class outcome
 

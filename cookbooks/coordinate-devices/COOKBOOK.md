@@ -43,7 +43,7 @@ A three-device workshop uses the same distinctions: participant input, facilitat
 
 The server authorizes reads and mutations. A label such as “facilitator” or “projector” cannot establish those rights. A targeted reply may still be shared data; routing is not private storage. A shared projection should fetch only intentionally public information, never obtain private responses and hide them with CSS. Re-read current device/role state after the public runtime reports a change and invalidate in-flight private views when authority changes.
 
-Keep administrative handles and private agent credentials out of page links, device labels, QR codes, and shared state. Use the [public browser contract](https://github.com/werg/tendriller/blob/367c756a382781effb947acb6a8c6ae43f5a91f1/docs/BROWSER_API.md) for actual device and receipt semantics instead of inventing authority in application events.
+Keep administrative handles and private agent credentials out of page links, device labels, QR codes, and shared state. Use the [public browser contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md) for actual device and receipt semantics instead of inventing authority in application events.
 
 ## Route content to a task, not merely a screen
 
