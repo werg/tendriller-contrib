@@ -15,9 +15,9 @@ async function workspace(t){const dir=await mkdtemp(join(tmpdir(),'contrib-insta
 
 test('installable tools run outside both repositories and every starter resolves its complete asset set',async t=>{
  const dir=await workspace(t),installed=join(dir,'installed');await mkdir(installed);
- await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.1.tgz'),'-C',installed]);
+ await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.2.tgz'),'-C',installed]);
  const npmPrefix=join(dir,'npm-install');
- await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.1.tgz')],{cwd:dir});
+ await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.2.tgz')],{cwd:dir});
  const cli=join(npmPrefix,'node_modules/@tendriller/contrib/tools/cli/bin/tendril.mjs');
  const {stdout}=await run(process.execPath,[cli,'recipes'],{cwd:dir});
  const recipes=JSON.parse(stdout).recipes;
@@ -62,6 +62,6 @@ test('standalone preview embeds the production runtime, public fixture transport
 
 test('release manifest identifies exact bytes and workflows never depend on Node tools',async()=>{
  const manifest=JSON.parse(await readFile(join(dist,'manifest.json'),'utf8'));assert.equal(manifest.requires.contract,2);
- for(const artifact of manifest.artifacts){assert.equal(digest(await readFile(join(dist,artifact.file))),artifact.sha256);assert.match(artifact.url,/\/releases\/download\/v0\.2\.0-rc\.1\//);}
+ for(const artifact of manifest.artifacts){assert.equal(digest(await readFile(join(dist,artifact.file))),artifact.sha256);assert.ok(new URL(artifact.url).pathname.includes(`/releases/download/v${manifest.version}/`));}
  const workflow=await readFile(join(dist,'workflows/index.mjs'),'utf8');assert.doesNotMatch(workflow,/(?:from|import)\s*\(?["'](?:node:|ws|playwright)|tools\//);
 });
