@@ -75,7 +75,7 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
 
 ## Device notifications while the page is closed
 
-Deploy core `0.2.0-rc.3` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
+Deploy core `0.2.0-rc.4` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
 
 ```sh
 tendril --tendril kitchen notifications
