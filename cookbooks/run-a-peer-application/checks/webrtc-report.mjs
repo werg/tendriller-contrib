@@ -82,6 +82,7 @@ export function validateWebRtcReport(report) {
     originalOperations: { browser: outcomes.browser, retry: outcomes.retry, native: outcomes.native },
     qualification: 'Actual browser/native RTC, converged signed history, intact detached payload and original final operations after the fixture host stops.',
     limits: ['The report validator checks declared observations; it does not execute the scenario or authenticate the report.',
+      'Peer byte counters measure logical frame payloads; they exclude RTC packet headers, credit messages and IP/UDP/DTLS/SCTP overhead.',
       'This fixture report does not establish packaged Tendriller page-host quiescence, deployed authentication, Internet reachability, provider costs or mixed SQL application behavior.',
       'No direct ICE route is inferred from the use of WebRTC; preserve actual selected-candidate evidence separately.'] };
 }

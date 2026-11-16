@@ -140,6 +140,11 @@ unsupported-network evidence from
 
 Measure native CPU, disk, network and browser memory/replay over the same window.
 Record the sampling method and distinguish a process peak from a per-role peak.
+The current browser/native RTC gates report logical authenticated peer frame
+payload bytes, excluding RTC packet headers and credit messages as well as
+IP/UDP/DTLS/SCTP overhead. The packaged-host application gate counts SDP JSON
+envelopes separately. Preserve those exact boundaries when comparing results;
+they are not total network bytes or a provider egress meter.
 Record stored data at several timestamps so retained-byte usage has a time
 integral; keep the original samples and the integration rule. Record history
 growth and the newest independently recoverable backup position/time. A backup

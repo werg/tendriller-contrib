@@ -180,6 +180,29 @@ exiting nonzero. A passing build does not imply that a runtime scenario ran.
 Preserve the new raw RTC report under its exact source/artifact pairing; older
 WSS and relay reports below remain historical evidence for those routes.
 
+Successful runtime invocations validate the current `chronolog-application-pilot/v2`
+report before accepting it. Required observations include both independent RTC
+replicas, the packaged runtime and host digests, the exact introduction recipe
+and bundle, zero application requests, retired introduction sockets, warm work
+while the host listener is stopped, matching signed history/capability/finality
+state, and unchanged original accepted/rejected operations after reconnect.
+Native session history spans the full run; page reloads restart browser session
+history, so their session counts need not match.
+
+To validate an existing raw run and preserve its SHA-256 with a derived summary:
+
+```sh
+node cookbooks/run-a-peer-application/checks/application-report.mjs \
+  --report /new/peer-application-evidence/report.json \
+  --output /new/peer-application-summary.json
+```
+
+The validator checks recorded observations, not report authenticity. Its tests
+use synthetic inputs and do not qualify browser execution. Peer byte counters
+measure logical authenticated frame payloads; RTC packet headers, credit
+messages and IP/UDP/DTLS/SCTP overhead are excluded. Host SDP JSON envelopes are
+counted separately, and these byte counters are not provider billing exports.
+
 Qualification covers these observations:
 
 | Scenario | Page observation |
