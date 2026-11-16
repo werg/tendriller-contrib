@@ -1,0 +1,19 @@
+name: Temporary Contract 3 source snapshot
+on:
+  push:
+    branches: [feat/unified-blob-store-contract3]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive branch source
+        run: git archive --format=zip -o branch-source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: contrib-source
+          path: branch-source.zip
+          retention-days: 1
