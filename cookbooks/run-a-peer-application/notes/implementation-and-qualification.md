@@ -56,6 +56,33 @@ also passed the existing independent browser adaptations and three actual-host
 privacy checks. Neither older contrib workflow runs the new cross-repository
 thin-membership scenario; that evidence belongs to the Chronolog run above.
 
+### Focused specimen review after that pairing
+
+The recorded `a3797d5` pages and unaltered reports remain the browser baseline.
+A later review found and fixed three page-level recovery gaps through the same
+public interfaces:
+
+- Accepted JSON on an authorized topic can still violate the page's application
+  vocabulary. The reducer now skips and counts unsupported/malformed message or
+  job records, preserving later valid content; it validates handler/version and
+  original job/task identity. SQL schema and captured-revision errors still fail
+  the coherent read. The reducer's version marker changes for adaptations that
+  cache its shape; this specimen itself rebuilds from captured history.
+- A reference saved before failed durable preparation could occupy one of the
+  100 review slots forever. A passive **Check original status** action reuses the
+  original operation ID and resumes its subscription. An observed missing
+  operation can be reviewed away; active, unresolved, queued and provisional
+  operations remain protected. Removing a local reference does not cancel work.
+- Trimming message content previously prevented completion from recognizing the
+  original whitespace-bearing editor draft. Submission now captures payload
+  content and the exact editor snapshot separately, clearing only the unchanged
+  original and preserving later typing.
+
+Focused deterministic checks reproduce those cases; the collection now passes
+24 tests and still has 56 reading entries. These results establish page/model
+behavior, not a repeated SQL, Cloudflare or browser qualification. The core and
+deployed acceptance boundaries below are unchanged.
+
 ## Work ownership and dependencies
 
 | Work item | Owner | Depends on | Acceptance evidence |

@@ -221,12 +221,14 @@ Actual deployed authentication, public-network routes and provider costs remain 
 ## Review changes after the recorded browser pairing
 
 The preserved browser reports remain attached to contrib `a3797d5` and their
-recorded core/artifact pins. A subsequent specimen review added reducer-version
-invalidation, per-event domain validation and a bounded omission count so one
+recorded core/artifact pins. A subsequent specimen review updated the reducer's
+version marker, per-event domain validation and a bounded omission count so one
 accepted malformed payload cannot make the whole board unreadable. Focused Node
 checks exercise malformed/future payloads followed by valid records, handler and
 job identity validation, and the distinction from a failing SQL/revision read.
 Those checks do not relabel the earlier browser run or claim a new browser result.
+This specimen has no persistent projection cache; an adaptation that adds one
+must bind its checkpoint to the reducer version before reusing cached state.
 The same focused review covers normalization versus the original editor snapshot,
 observed-missing reference removal at the review-list limit, and refusal to
 discard unresolved, actively submitted, queued or provisional operations. The
