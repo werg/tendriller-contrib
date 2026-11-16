@@ -32,7 +32,7 @@ Offer explicit cancellation or supersession only if the application has a define
 | Authenticated webhook or routine | Server wake notice routes to a known host session. | Authentication, delivery retries, and whether it starts a new session instead. |
 | No idle wake | Scheduled queue checks. | The schedule remains active and the person knows the expected delay. |
 
-Specific host products change. Read [core's bridge reference](https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
+Specific host products change. Read [core's bridge reference](https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
 
 Choose persistence deliberately. A short task may use a host-managed wait that must be rearmed; an ongoing task may justify a persistent service with a named owner, private installation path, restart policy, and teardown procedure. Do not claim a page is continuously monitored merely because its collector continues reporting measurements.
 

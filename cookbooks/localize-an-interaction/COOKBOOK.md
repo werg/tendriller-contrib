@@ -8,7 +8,7 @@ choices: ["Language, formatting locale, and time zone as separate choices", "Can
 capabilities: []
 evidence: "explained"
 related: ["build-correctable-forms", "complete-accessible-interactions", "adapt-without-losing-work", "choose-data-model"]
-sources: ["https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/0c7b2d8e6b625609403bcf797d943f136d740a51/docs/CAPTURES.md"]
+sources: ["https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/CAPTURES.md"]
 ---
 
 # Localize language, numbers, and direction coherently
