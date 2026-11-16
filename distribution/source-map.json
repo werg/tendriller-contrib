@@ -66,7 +66,6 @@
   "snippets/chart.js": "components/chart.js",
   "snippets/ptt.js": "components/ptt.js",
   "snippets/bluetooth.js": "components/bluetooth.js",
-  "snippets/wakeword.js": "components/wakeword.js",
   "snippets/objects.js": "components/objects.js",
   "snippets/stream-view.js": "components/stream-view.js",
   "snippets/overlay.js": "components/overlay.js",

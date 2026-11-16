@@ -1,7 +1,7 @@
 {
   "format": "tendriller-components",
   "version": 1,
-  "release": "0.2.0-rc.1",
+  "release": "0.2.0-rc.3",
   "components": [
     {
       "id": "bluetooth",
@@ -311,18 +311,6 @@
       },
       "files": [
         "wakelock.js"
-      ],
-      "dependencies": []
-    },
-    {
-      "id": "wakeword",
-      "status": "supported",
-      "maintainer": "werg",
-      "requires": {
-        "contract": 2
-      },
-      "files": [
-        "wakeword.js"
       ],
       "dependencies": []
     }

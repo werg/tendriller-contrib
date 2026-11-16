@@ -14,8 +14,8 @@ dependencies are needed:
 
 ```sh
 umask 077
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.1/manifest.json -o manifest.json
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.1/tendriller-tools-0.2.0-rc.1.tgz -o tools.tgz
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/manifest.json -o manifest.json
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendriller-tools-0.2.0-rc.3.tgz -o tools.tgz
 # Verify tools.tgz against the manifest before extracting.
 mkdir tendriller-tools
 tar -xzf tools.tgz -C tendriller-tools

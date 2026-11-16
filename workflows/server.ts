@@ -151,5 +151,5 @@ function saveAssignment(h: WorkflowHost, body: Json, previous?: Json): Json {
   h.emit({ type: 'assignment_changed', assignment_id: id, revision: record.revision }); return record;
 }
 for (const [name, operation] of Object.entries(operations)) operation.schema = schemas[name as keyof typeof schemas];
-export const sessions: WorkflowModule = Object.freeze({ id: 'sessions', interfaceVersion: '1', schemaVersion: '1', implementationVersion: '0.2.0-rc.1', operations: Object.freeze(operations) });
+export const sessions: WorkflowModule = Object.freeze({ id: 'sessions', interfaceVersion: '1', schemaVersion: '1', implementationVersion: '0.2.0-rc.3', operations: Object.freeze(operations) });
 export default [sessions];

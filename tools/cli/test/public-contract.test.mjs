@@ -13,7 +13,7 @@ let server, origin, configDir;
 before(async () => {
   configDir = mkdtempSync(join(tmpdir(), "tendril-public-cli-"));
   server = createServer(async (req, res) => {
-    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:2,core_release:"0.2.0-rc.1",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
+    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:2,core_release:"0.2.0-rc.5",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
     let body = "";
     for await (const part of req) body += part;
     requests.push({ method: req.method, path: req.url, authorization: req.headers.authorization, body: body ? JSON.parse(body) : null });
@@ -109,6 +109,22 @@ test("supported mutations match the current public service routes", async () => 
   assert.deepEqual(requests.at(-1).body, { keep: true });
   assert.equal((await cli(["blobs", "expire", blob])).code, 0);
   assert.deepEqual(requests.at(-1).body, { keep: false });
+});
+
+test("push notification commands expose readiness and preserve delivery targeting", async () => {
+  const status = await cli(["notifications"]);
+  assert.equal(status.code, 0, status.stderr);
+  assert.equal(requests.at(-1).method, "GET");
+  assert.equal(requests.at(-1).path, "/api/t/abcdefghijkl/notify");
+  assert.equal(requests.at(-1).authorization, "Bearer tk_private");
+  const notification = await cli(["notify", "Decision needed", "Please approve this job",
+    "--url", "/page/", "--device", "d_example", "--tag", "approval-42"]);
+  assert.equal(notification.code, 0, notification.stderr);
+  assert.deepEqual(requests.at(-1), {
+    method: "POST", path: "/api/t/abcdefghijkl/notify", authorization: "Bearer tk_private",
+    body: { title: "Decision needed", body: "Please approve this job",
+      url: "/page/", device: "d_example", tag: "approval-42" },
+  });
 });
 
 test("durable work commands preserve targets, revisions and explicit publication review", async () => {

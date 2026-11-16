@@ -29,7 +29,7 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `probe.js` | JSON summary of what this browser and device support | All | eval: `return await tendrilSnippets.probe.run()` |
 | `ptt.js` | Push-to-talk with an explicit command callback or ordinary `utterance` event | SpeechRecognition, or an injected `transcribe(blob)` engine | `ptt.mount("#talk")` |
 | `vad.js` | Voice activity detection (energy + hangover), optional audio clip per utterance | All with WebAudio | `vad.start({record: true, onStop: (blob, ms) => …})` |
-| `wakeword.js` | Opt-in wake phrase with ready/command tones, visible status, and a follow-up command window | Where SpeechRecognition works; background and locked-screen use is unreliable | `wakeword.mount("#handsfree", {phrases: ["hey kitchen"]})` |
+| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
 | `pose.js` | Experimental pose engine adapter + joint angle rep counter | Explicit engine, files and model assets required | `pose.start(video, {engine,files,model,onResult})`, `pose.repCounter({joint: "left_knee"})` |
 | `objects.js` | Experimental object detector adapter, boxes in frame units | Explicit engine, files and model assets required | `await objects.detect(img,{engine,files,model})` |
 | `text.js` | Experimental OCR using TextDetector or an injected worker factory | Depends on the selected engine and its declared assets | `await text.recognize(video)` |
@@ -249,22 +249,27 @@ server retention may still report a gap. For whole-table current values, use
 
 ## Hands-free voice
 
-Load `wakeword.js` and call `tendrilSnippets.wakeword.mount('#handsfree', {phrases:['hey kitchen']})`.
-The owner taps **Start hands-free** once. A low tone means recognition is listening;
-after the wake phrase a higher tone means it is ready for the command. They may say
-the phrase and command together, or pause and speak within eight seconds. The
-button shows whether listening is active and can stop it. An `onCommand(text)` callback
-may implement local actions; otherwise commands are sent as
-`{type:'utterance',text,via:'wakeword'}` with `wake:true`. These are **page events**, so
-the agent must keep its listener armed, handle the event and answer through `A/say`.
-The [voice coach recipe](../recipes/voice-coach/index.html) is a complete example.
-It also includes an optional Keep screen on control using `wakelock.js`.
+Hands-free wake phrases belong exclusively to the **standard Tendriller control**,
+which is embedded on every page. Open Talk → Hands-free wake phrase → Start, or use
+Settings and history → Hands-free wake phrase to choose the phrase and privacy
+mode. Set the speech language under Display and sound. The built-in microphone
+indicator stays visible while active and has a Stop button. Listening never
+starts without an explicit tap, nor resumes automatically after a page reload or
+backgrounding.
 
-This uses the browser's SpeechRecognition service, which may send audio to a browser
-vendor. It is available only in some browsers and does not provide a reliable
-screen-off/background assistant. For that, use an OS-level voice integration or a
-native companion; the page still works as the interactive front end. The built-in
-conversation microphone and typing are fallbacks.
+On-device recognition is the default where supported. If a browser lacks the local
+language pack, the menu can check/install one; it never silently switches to a
+remote speech provider. Browser-managed recognition (which may process audio on a
+vendor server) requires an explicit privacy choice. Spoken commands use the
+**ordinary conversation instruction path**, with the same permissions, delivery
+receipts, and offline recovery as typed or push-to-talk messages. They do not
+produce custom page events. See [hands-free setup and technical limits](https://github.com/werg/tendriller/blob/master/docs/HANDS_FREE.md).
+
+The [voice coach](../recipes/voice-coach/index.html) and
+[hands-free task guide](../recipes/hands-free-guide/index.html) use the standard
+control. Optional screen wake lock and input components are separate features.
+There is no second wake-word component in contrib and no per-page speech listener.
+
 ## Considerate adaptive interfaces
 
 Give every `ui.js` block a stable unique `id`. A title, status, label, or neighboring
