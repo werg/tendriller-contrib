@@ -212,8 +212,9 @@ The [recorded RTC application run](../notes/rtc-application-qualification-2026-1
 passed all twelve task/chat checks with the packaged host, two browser replicas
 and a native authority. It preserves the raw application/v2 report and strict
 summary alongside a later current-source browser/resident quick gate. The thin
-membership failure, later application-step failure and pending thin rerun are
-stated separately.
+membership rerun has since passed; the later application's correctly rejected
+closed-timestamp fixture case still requires a corrected complete run. These
+outcomes remain separately stated under their exact source pairings.
 
 Qualification covers these observations:
 
@@ -382,6 +383,13 @@ RTC observations for all three introductions, retired signaling and complete
 separate administrator/application counters. The small
 [membership report validator](membership-report.mjs) checks those recorded
 observations; its synthetic tests are not an enrollment qualification.
+The [recorded RTC membership run](../notes/rtc-membership-qualification-43981821658.md)
+passed all ten checks at the `c3a7fd40` source and preserves its exact raw report,
+checked summary and artifact digests. Its three introductions cover enrollment,
+reconnect after writer revocation and a newly keyed reader after administrator
+restart; Worker replacement is a separate durable recovery assertion. The
+application step in the same workflow failed its closed-timestamp fixture case,
+so the membership pass does not imply a combined workflow pass.
 The initial complete gate passed in
 [CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
 seven runtime assertions plus the public-package/bundle check in actual workerd

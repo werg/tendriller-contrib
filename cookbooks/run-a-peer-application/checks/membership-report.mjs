@@ -26,7 +26,7 @@ export function validateMembershipReport(report) {
   assert.equal(rtc.browser.channelOwner, 'DedicatedWorker', 'The exclusive Worker must own the channel');
   assert.equal(rtc.native?.transport, 'webrtc', 'The native peer must use RTC');
   assert.equal(rtc.native.nativeImplementation, 'werift', 'The tested native RTC implementation is required');
-  assert.equal(rtc.native.accepted, 3, 'Enrollment, Worker replacement and the remaining authorized reader must each authenticate');
+  assert.equal(rtc.native.accepted, 3, 'Enrollment, reconnect after writer revocation and the restored administrator\'s new reader must each authenticate');
   assert(Array.isArray(rtc.browser.introductions) && rtc.browser.introductions.length === 3, 'All three actual browser introductions are required');
   for (const introduction of rtc.browser.introductions) {
     assert.equal(introduction.requests, 1, 'Each connection uses one direct introduction POST');
