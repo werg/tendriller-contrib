@@ -7,11 +7,15 @@
 <progress id="progress" max="3" value="0" aria-label="Completed steps"></progress><p id="count" class="muted"></p>
 <section class="card" aria-labelledby="step-title"><h2 id="step-title"></h2><p id="step-text"></p><div class="actions"><button id="back">Previous</button><button id="read">Read this step</button><button id="done" class="primary">Done, next step</button></div><p id="status" role="status" aria-live="polite"></p></section>
 <label><input id="auto-read" type="checkbox"> Read each step aloud</label>
-<details><summary>Hands-free and screen settings</summary><p>Say “Hey guide, next”, “repeat”, “back”, or “stop”. Buttons work when speech is unavailable. Hands-free uses the browser's speech service and can pause if the screen locks.</p><div id="handsfree"></div><div id="screen"></div><button id="stop-speaking">Stop speaking</button></details>
+<details><summary>Hands-free and screen settings</summary>
+<p>Hands-free listening lives in the standard Tendriller control. Open its Settings and history tab, select <strong>Hands-free wake phrase</strong>, and configure “Hey guide”. In Talk, tap Start hands-free, then say “Hey guide, next” or “Hey guide, repeat”. Your agent receives the spoken command and updates the shared guide. Buttons below work without speech recognition.</p>
+<p>To stop listening, use the Stop button in the control’s microphone indicator. Spoken commands require your agent to be connected; use the guide buttons for immediate local actions.</p>
+<p id="handsfree-role" class="muted" role="status"></p>
+<div id="screen"></div><button id="stop-speaking">Stop speaking</button></details>
 <details><summary>All steps and checkpoints</summary><ol id="steps"></ol><button id="export">Export progress</button></details>
 <details><summary>Show the agent what you are working on</summary><p>Review a photo or voice note before sending it. Evidence is linked to the step where you captured it.</p><div id="evidence"></div></details>
 <p class="muted">Your progress stays with this page. Open Share and devices to continue on another device; Settings and history keeps your saved work.</p>
-<div id="session-tools"></div></main><script src="assets/workflows/session-archive.js"></script><script src="assets/components/input-kit.js"></script><script src="assets/components/wakeword.js"></script><script src="assets/components/wakelock.js"></script><script>
+<div id="session-tools"></div></main><script src="assets/workflows/session-archive.js"></script><script src="assets/components/input-kit.js"></script><script src="assets/components/wakelock.js"></script><script>
 (() => {
   const $ = id => document.getElementById(id);
   const example = { id:'first-guide',title:'Make room for your next idea',description:'Try this short guide, or ask your agent to replace it with your own task.',steps:[
@@ -54,20 +58,18 @@
   $('done').onclick=()=>void complete().catch(error=>status(error.message)); $('back').onclick=back; $('read').onclick=read;
   $('stop-speaking').onclick=()=>tendril.tts?.stop();
   $('export').onclick=()=>{const blob=new Blob([JSON.stringify({guide:spec(),progress:progress()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='guide-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  let handsfree,evidence,inputRole;
+  let evidence,inputRole;
   function syncInputs(){
     const role=tendril.device.role;if(inputRole===role)return;inputRole=role;
-    handsfree?.stop();evidence?.stop();handsfree=null;evidence=null;$('handsfree').replaceChildren();$('evidence').replaceChildren();
-  if(role!=='display') {
-    handsfree=tendrilSnippets.wakeword.mount('#handsfree',{phrases:['hey guide'],onCommand:async text=>{
-      const command=text.trim().toLowerCase();
-      if(/^(next|done|next step)$/.test(command))await complete(); else if(/^(repeat|read|read step)$/.test(command))read(); else if(/^(back|previous)$/.test(command))back();
-      else if(/^(stop|pause)$/.test(command)){handsfree?.stop();tendril.tts?.stop();} else {const result=await workflow.send('guide', {type:'input',modality:'voice',text,context:{guide_id:spec().id,step_id:active()?.id}});if(result.error)throw Error(result.message||result.error.message||'Could not send');}
-    }});
-    evidence=tendrilSnippets.inputs.mount('#evidence',{modalities:['photo','audio'],block:'guide-evidence',command:()=>workflow.scope('guide'),context:()=>({guide_id:spec().id,step_id:active()?.id})});
-  } else { $('handsfree').textContent='This is a display. Use your controller device to change steps.'; $('evidence').textContent='Capture evidence on your phone.'; }
+    $('handsfree-role').textContent=role==='display'?'This is a display. Use your controller device to change steps.':'';
+    evidence?.stop();evidence=null;$('evidence').replaceChildren();
+    if(role!=='display') {
+      evidence=tendrilSnippets.inputs.mount('#evidence',{modalities:['photo','audio'],block:'guide-evidence',command:()=>workflow.scope('guide'),context:()=>({guide_id:spec().id,step_id:active()?.id})});
+    } else {
+      $('evidence').textContent='Capture evidence on your phone.';
+    }
   }
-  TendrilSessionArchive.mount('#session-tools',{scope:'guide',title:'guide run',guard:()=>evidence?.busy()?'Finish or discard your evidence capture before starting again.':null,afterArchive:()=>{handsfree?.stop();tendril.tts?.stop();render();}});
+  TendrilSessionArchive.mount('#session-tools',{scope:'guide',title:'guide run',guard:()=>evidence?.busy()?'Finish or discard your evidence capture before starting again.':null,afterArchive:()=>{tendril.tts?.stop();render();}});
   tendrilSnippets.wakelock.button('#screen',{fullscreenButton:false});
   tendril.state.on((_state,_ops,by)=>{render();if(by==='rejected')status('A shared checkpoint could not sync. The guide has restored the latest accepted progress.');}); tendril.on('scopes',render); tendril.on('role',render); render();
 })();

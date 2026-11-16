@@ -26,7 +26,7 @@ host listener armed and acknowledge its host bridge after responding.
 | **Multi-device workshop** | Set each device’s purpose, publish an annotated shared step, move audio focus, and wait for completion receipts. |
 | **Hardware experiment** | Interpret a bounded trace with its source and units, connect interventions to changes, and return a report. |
 | **Facilitated group session** | Read private answers through the response API, then publish only an intentional aggregate or summary. |
-| Voice coach | Listen to the uploaded note, then give a short spoken suggestion. |
+| Voice coach | Configure hands-free speech in the standard control; record and send longer voice notes for the agent. |
 | Motion companion | Reflect the duration and estimated steps; ask what the person noticed. |
 | Photo inspector | Describe a captured object, then invite a follow-up question. |
 | Collaborative canvas | Ask for a sketch by writing `state.canvas.prompt`; discuss the uploaded drawing. |

@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 
-export const DEFAULT_SERVER = "http://localhost:8787";
+export const DEFAULT_SERVER = "https://tendriller.dev";
 
 export function configDir(env = process.env) {
   if (env.TENDRIL_CONFIG_DIR) return env.TENDRIL_CONFIG_DIR;

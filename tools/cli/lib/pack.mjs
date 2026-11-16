@@ -1,4 +1,4 @@
-import { verifyAssets } from "./assets.mjs";
+import { verifyAssets, syncAssets } from "./assets.mjs";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, lstatSync } from "node:fs";
 import { join, basename, extname, relative, sep } from "node:path";
@@ -51,6 +51,7 @@ export function pack(target, { as, merge = false, message } = {}) {
   if (stats.isSymbolicLink()) throw new Error("Refusing publication source symlink");
   let files;
   if (stats.isDirectory()) {
+    if (readdirSync(target).includes('tendril.json')) syncAssets(target);
     verifyAssets(target);
     const paths = listFiles(target);
     if (!paths.length) throw new Error(`nothing to upload in ${target}`);

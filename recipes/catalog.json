@@ -76,7 +76,7 @@
       "kind": "workflow",
       "permissions": [
         "Buttons work without a microphone.",
-        "Voice recognition, camera, recording and keeping the screen awake are optional and enabled on the device."
+        "Built-in hands-free recognition, camera, recording and screen wake lock are opt-in on each device."
       ],
       "request": "Guide me through a small task one step at a time. Keep stable checkpoints, offer spoken instructions and let me review evidence before sending it.",
       "preview": {
@@ -179,7 +179,7 @@
     {
       "id": "voice-coach",
       "title": "Voice coach",
-      "description": "Optional wake phrase and audible cues for hands-free requests; send longer voice notes too.",
+      "description": "Use the standard hands-free control for spoken commands; capture longer voice notes when needed.",
       "modalities": [
         "audio",
         "voice",
