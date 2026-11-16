@@ -18,6 +18,9 @@ test('installable tools run outside both repositories and every starter resolves
  await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.3.tgz'),'-C',installed]);
  const npmPrefix=join(dir,'npm-install');
  await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.3.tgz')],{cwd:dir});
+ assert.match(await readFile(join(installed,'tools/cli/README.md'),'utf8'),/tendril CLI/);
+ const standalone=await readFile(join(dist,'tendril.mjs'));
+ assert.ok(standalone.length>10000);
  const cli=join(npmPrefix,'node_modules/@tendriller/contrib/tools/cli/bin/tendril.mjs');
  const {stdout}=await run(process.execPath,[cli,'recipes'],{cwd:dir});
  const recipes=JSON.parse(stdout).recipes;

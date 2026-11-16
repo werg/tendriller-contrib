@@ -29,7 +29,6 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `probe.js` | JSON summary of what this browser and device support | All | eval: `return await tendrilSnippets.probe.run()` |
 | `ptt.js` | Push-to-talk with an explicit command callback or ordinary `utterance` event | SpeechRecognition, or an injected `transcribe(blob)` engine | `ptt.mount("#talk")` |
 | `vad.js` | Voice activity detection (energy + hangover), optional audio clip per utterance | All with WebAudio | `vad.start({record: true, onStop: (blob, ms) => …})` |
-| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
 | `pose.js` | Experimental pose engine adapter + joint angle rep counter | Explicit engine, files and model assets required | `pose.start(video, {engine,files,model,onResult})`, `pose.repCounter({joint: "left_knee"})` |
 | `objects.js` | Experimental object detector adapter, boxes in frame units | Explicit engine, files and model assets required | `await objects.detect(img,{engine,files,model})` |
 | `text.js` | Experimental OCR using TextDetector or an injected worker factory | Depends on the selected engine and its declared assets | `await text.recognize(video)` |
@@ -41,7 +40,8 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `serial.js` | Web Serial line reader/writer, `request()` for command/reply | Chromium desktop only | `p = await serial.connect({onLine}); await p.request("STATUS")` |
 | `bluetooth.js` | Web Bluetooth: connect by service, read, write, notify | Chromium on desktop and Android; not iOS | `d = await bluetooth.connect({services: ["heart_rate"]})` |
 | `list.js` | Shared list (shopping, packing) stored in state as records keyed by id; add/tick/edit/remove; offline via `tendril.state` | All | `list.mount("#list", {path: "shopping"})` |
-| `chart.js` | Bounded numeric series with axes, gaps, legends and an accessible values table; no chart library or CDN | All current browsers | `chart.mount("#plot", {xLabel:"Step"}).update([{id:"run",points:[{x:1,y:0.8}]}])` |
+| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
+| `chart.js` | Bounded numeric series with stable ID-derived colors, manual light/dark/auto theme, separated y-axis label, axes, gaps, legends and an accessible values table; no chart library or CDN | All current browsers | `chart.mount("#plot", {xLabel:"Step"}).update([{id:"run",points:[{x:1,y:0.8}]}])` |
 | `stream-view.js` | Coalesced rendering and explicit atomic checkpoints of a cursor plus its materialized view | All current browsers; persistence requires browser storage | `streamView.batch(render).schedule()`; `streamView.checkpoint('metrics',{key:'chart-v1'})` |
 | `input-kit.js` | User-triggered photo, audio, location, motion, and file controls with one event contract | Depends on input | `inputs.mount("#inputs", {modalities:["photo","location"]})` |
 | `playground.js` | Live capability gallery and working controls on this device | All | `playground.mount("#explore")` |
@@ -56,7 +56,7 @@ require a user gesture where the browser mandates one.
 
 ## Charts for streams or shared state
 
-Load `assets/components/chart.js` and give the chart numeric `{x, y}` points. The
+Load `assets/components/chart.js` and give the chart numeric `{x, y}` points. Series colors/dashes depend on `id`, not order. Mount with `{theme:'auto'|'light'|'dark'}` or change via `update(series,{theme:'dark'})` for a manual toggle; CSS `--tc-0` through `--tc-5` still override palette slots. The
 chart does not assume a particular stream name, training framework, or data shape:
 the page selects fields from stream records or shared state.
 
@@ -253,8 +253,8 @@ which is embedded on every page. Open Talk → Hands-free wake phrase → Start,
 Settings and history → Hands-free wake phrase to choose the phrase and privacy
 mode. Set the speech language under Display and sound. The built-in microphone
 indicator stays visible while active and has a Stop button. Listening never
-starts without an explicit tap, nor resumes
-automatically after a page reload or backgrounding.
+starts without an explicit tap, nor resumes automatically after a page reload or
+backgrounding.
 
 On-device recognition is the default where supported. If a browser lacks the local
 language pack, the menu can check/install one; it never silently switches to a

@@ -2,6 +2,18 @@
 
 Optional receivers and bridges for the core event protocol. Select an exact release and verify its manifest before installing a downloaded helper.
 
+## Check network access before attaching a receiver
+
+```sh
+curl -fsS https://tendriller.dev/api/service
+# Local development: curl -fsS http://localhost:8787/api/service
+```
+
+A successful descriptor advertises contract 2. DNS, TLS, proxy and firewall
+failures at this step are not missing listeners. After creation, inspect the
+authenticated `GET A` response for `agent_delivery.mode` and run two
+end-to-end delivery probes. Network reachability alone does not arm a watcher.
+
 ## Attach a host receiver
 
 The bundled local bridges need Node.js 22.15 or newer and use `A/events/socket`: a hibernating WebSocket that carries count-only wake notices. They read `GET A/events?after=<acknowledged cursor>&wait=0` on each wake and reconnect. A custom host without WebSockets can use `GET A/events?after=<cursor>&wait=300`, then reconnect after each response. The host must still resume the correct agent conversation.
@@ -93,7 +105,7 @@ The command keeps a hibernating WebSocket open and reconnects after a disconnect
 
 ### Claude Code, Claude Duet and Claude Code on the web
 
-On hosts that expose `Monitor`, it runs a command in the background and turns each line it prints into a notification that resumes **that same session**, also between turns. Run Tendriller's watch helper under it. The helper holds the hibernating agent socket, prints one `{"t":"wake","seq":N}` line per wake and nothing else, so there is no polling and the Durable Object stays asleep while the page is idle. It reads the token from your private file, so the token never appears in a tool call, a command line or a notification. In Claude Duet and other claude.ai sandboxes, do the network check at the top of this guide first; nothing below works until `tendriller.dev` is allowed.
+On hosts that expose `Monitor`, it runs a command in the background and turns each line it prints into a notification that resumes **that same session**, also between turns. Run Tendriller's watch helper under it. The helper holds the hibernating agent socket, prints one timestamped `{"t":"wake","seq":N,"at":"..."}` line per new wake (deduplicated on reconnect), so there is no polling and the Durable Object stays asleep while the page is idle. It reads the token from your private file, so the token never appears in a tool call, a command line or a notification. In Claude Duet and other claude.ai sandboxes, do the network check at the top of this guide first; nothing below works until `tendriller.dev` is allowed.
 
 **Choose the receiver for the intended lifetime.** Claude Code's documented `Monitor` deadline defaults to five minutes and is capped at 30 minutes in an interactive session (ten minutes in a one-prompt `-p` run). Request `timeout_ms: 1800000` for a working-session watch; follow the effective host deadline even if a tool schema advertises a larger value. At expiry Claude must take another turn to re-arm it: about two turns per idle hour at the cap, potentially with multiple model requests per turn. [Each request carries the conversation context](https://code.claude.com/docs/en/costs#why-usage-climbs-in-a-long-session); model, context length, cache state and plan affect its cost. A short re-arm instruction does not make a long context cheap. Prefer the [bundled Claude Code channel](#attach-a-host-receiver) for longer-lived pages when available. The channel has no `Monitor` watch deadline and avoids these periodic re-arm turns; real messages and other host background activity can still consume tokens. Both approaches require an open session.
 
@@ -105,7 +117,7 @@ On hosts that expose `Monitor`, it runs a command in the background and turns ea
    mkdir -p $D && curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-watch.mjs -o $D/tendril-watch.mjs
    ```
 
-3. Call `Monitor` with `command: "node $D/tendril-watch.mjs $D/<id>.json"` (paths written out in full), a description that names the page, and `timeout_ms: 1800000` (30 minutes). The helper connects with `after=<cursor>`, so the server wakes you at once if anything arrived while you were not listening. It reconnects after a dropped socket and resumes from the separate handled checkpoint. If the socket is refused five times in a row (a revoked token, a deleted page or blocked network access), it prints one line starting `tendril-watch: stopped` and exits.
+3. Call `Monitor` with `command: "node $D/tendril-watch.mjs $D/<id>.json"` (paths written out in full), a description that names the page, and `timeout_ms: 1800000` (30 minutes). The helper connects with `after=<cursor>`, so the server wakes you at once if anything arrived while you were not listening. It reconnects after a dropped socket and resumes from the separate handled checkpoint. It sends a JSON heartbeat every 25 seconds and requires a pong within 12 seconds. On startup it writes `connected, listening` to stderr; close code, reason and gap duration are logged there with timestamps. Quick reconnects do not notify the agent; sustained gaps emit `watch_warning`. If the socket is refused five times in a row (revoked token, deleted page or blocked network), it prints one line starting `tendril-watch: stopped` and exits.
 4. On each wake line, read `GET A/events?after=<cursor>&wait=0` from a shell command. Handle every event in that batch as described below, including any `A/say` replies, then save its returned cursor in the private file. Repeat the read using that cursor until the returned `events` array is empty; a single response may contain only the first 100 events. Save a cursor only after its batch is handled successfully. The watch stays armed for later events.
 5. When `Monitor` reports that the watch expired or stopped, arm it again with the same call. Account for the context-processing cost above; repeated idle re-arming is a reason to move a persistent page to the channel.
 
@@ -179,5 +191,5 @@ including when `events` is empty because the batch contained only probes.
 Keep a host wake receiver armed: invoking this command alone does not keep a
 conversation listening. Run it after a wake in the intended conversation, since
 automatic probe receipts alone cannot prove that a host resumed that conversation.
-The installed CLI exposes the same loop as `tendril pending` and `tendril ack`;
+The event helper omits the long `agent_reminder` from repeated `pending` output (the source API still provides it). The installed CLI exposes the same loop as `tendril pending` and `tendril ack`;
 see [the CLI guide](https://github.com/werg/tendriller-contrib/blob/main/tools/cli/README.md) for checkpoints and limits.

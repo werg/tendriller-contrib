@@ -11,6 +11,7 @@ import { validateRecordOptions } from './stream-sources/records.mjs';
 // Preserve the existing helper imports while adapters own their implementations.
 export { recordFor } from './stream-sources/records.mjs';
 export { readFileBatch } from './stream-sources/file.mjs';
+export { readLatestFile } from './stream-sources/latest.mjs';
 export { cpuSnapshot, sampleHost } from './stream-sources/host.mjs';
 export { sshArguments } from './stream-sources/ssh.mjs';
 
@@ -35,15 +36,17 @@ export function validateConfig(input, base = process.cwd()) {
     if (!['durable', 'ephemeral'].includes(source.durability)) throw Error('Every source must declare its stream durability.');
     if (policies.has(source.stream) && policies.get(source.stream) !== source.durability) throw Error('Sources sharing a stream must agree on durability.');
     policies.set(source.stream, source.durability);
-    if (!['host', 'jsonl', 'log', 'ssh', 'command'].includes(source.type)) throw Error('Source type must be host, jsonl, log, ssh or command.');
+    if (!['host', 'jsonl', 'log', 'latest', 'ssh', 'command'].includes(source.type)) throw Error('Source type must be host, jsonl, log, ssh or command.');
     const interval_ms = source.interval_ms ?? (source.type === 'host' ? 5000 : 1000);
     if (!Number.isInteger(interval_ms) || interval_ms < 500 || interval_ms > 3_600_000) throw Error('interval_ms must be 500–3600000.');
     if (source.run !== undefined && (typeof source.run !== 'string' || source.run.length > 200)) throw Error('run must be a string of at most 200 characters.');
     validateRecordOptions(source);
     const out = { ...source, interval_ms };
-    if (source.type === 'jsonl' || source.type === 'log') {
+    if (['jsonl', 'log', 'latest'].includes(source.type)) {
       if (typeof source.path !== 'string' || !source.path) throw Error('File sources need a path.');
       if (source.durability !== 'durable') throw Error('File sources require durable streams so checkpointing cannot silently skip records.');
+      if (source.type === 'latest' && source.format !== undefined && !['json','text'].includes(source.format))
+        throw Error('Latest file format must be json or text.');
       out.path = resolve(base, source.path);
     }
     if (source.type === 'ssh') sshArguments(source); // Validate before starting any process.

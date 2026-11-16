@@ -17,7 +17,7 @@ tar -xzf tools.tgz -C tendriller-tools
 node tendriller-tools/tools/cli/bin/tendril.mjs --help
 ```
 
-The same release includes standalone `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
+The same release includes standalone `tendril.mjs` (lightweight CLI with vendoring; no full tools archive), `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
 
 For device notifications while the published page is closed, use `tendril notifications` to inspect opted-in owner devices and quota, then `tendril notify "Decision needed" "Please review"`. Deploy core `0.2.0-rc.5` or newer first; its `GET A/notify` endpoint is required. The owner must enable notifications in the built-in page control; see the [core Web Push runbook](https://github.com/werg/tendriller/blob/master/docs/PUSH_NOTIFICATIONS.md). These CLI commands use the authenticated agent API and do not need a live page tab.
 
@@ -28,7 +28,7 @@ node tendriller-tools/tools/cli/bin/tendril.mjs scaffold field-notebook ./notebo
 node tendriller-tools/tools/preview/bin/tendril-preview.mjs ./notebook --fixture ./notebook/scenario.json
 ```
 
-Scaffolding writes `tendril.json`, copies the complete declared component dependency graph into `assets/`, and records exact hashes in `tendril.assets.json`. Lazy siblings resolve relative to the selected component script, so changing a service deployment cannot replace a page's component implementation.
+Scaffolding writes `tendril.json`, copies the complete declared component dependency graph into `assets/`, and records exact hashes in `tendril.assets.json`. Hand-built pages can run `tendril assets sync <dir>`; `tendril push <dir>` performs the same safe sync before publication. Lazy siblings resolve relative to the selected component script, so changing a service deployment cannot replace a page's component implementation.
 
 A workflow recipe declares its required module interface. On the service, an authenticated controller explicitly activates its scope before publishing initial protected state:
 

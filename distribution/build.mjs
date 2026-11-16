@@ -51,7 +51,7 @@ const tools = join(dist,'tools'); mkdirSync(tools,{recursive:true});
 for (const directory of ['components','recipes','examples','docs','workflows']) if (existsSync(join(root,directory))) {
   for (const file of files(join(root,directory))) if (!file.endsWith('.ts') && !file.startsWith('server/')) copy(join(root,directory,file),join(tools,directory,file));
 }
-for (const name of ['README.md','PROVENANCE.md','core.lock.json']) if (existsSync(join(root,name))) copy(join(root,name),join(tools,name));
+for (const name of ['README.md','PROVENANCE.md','core.lock.json','tools/cli/README.md']) if (existsSync(join(root,name))) copy(join(root,name),join(tools,name));
 const bins = {};
 for (const group of ['cli','collector','preview','bridges']) for (const file of readdirSync(join(root,'tools',group,'bin')).filter(name=>name.endsWith('.mjs'))) {
   const path = `tools/${group}/bin/${file}`;
@@ -60,6 +60,17 @@ for (const group of ['cli','collector','preview','bridges']) for (const file of 
   bins[basename(file,'.mjs')] = path;
   if (group !== 'cli') copy(join(tools,path),join(dist,file));
 }
+// The standalone CLI deliberately excludes the 24 MB fixture preview runtime.
+// It still embeds the exact component/recipe resources needed for assets sync and push.
+const standalonePreviewStub={name:'standalone-cli-preview',setup(builder){
+  builder.onResolve({filter:/preview\/lib\/preview\.mjs$/},()=>({path:'preview',namespace:'standalone-preview'}));
+  builder.onLoad({filter:/.*/,namespace:'standalone-preview'},()=>({
+    loader:'js',
+    contents:`export async function preview(){return {ok:false,error:"preview_not_bundled",message:"Standalone CLI does not bundle headless preview; download tendril-preview.mjs from the same release."}}`,
+  }));
+}};
+await bundle({...bundling,plugins:[...bundling.plugins,standalonePreviewStub],
+  entryPoints:[join(root,'tools/cli/bin/tendril.mjs')],outfile:join(dist,'tendril.mjs')});
 copy(join(root,'tools/bridges/scripts/tendril-wait.sh'),join(dist,'tendril-wait.sh'));
 for(const entry of ['examples/training-dashboard/setup.mjs','examples/first-page/run.mjs']) await bundle({...bundling,entryPoints:[join(root,entry)],outfile:join(tools,entry)});
 writeFileSync(join(tools,'package.json'),JSON.stringify({name:pkg.name,version:pkg.version,type:'module',bin:bins,engines:pkg.engines,description:pkg.description},null,2)+'\n');

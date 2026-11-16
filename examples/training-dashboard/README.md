@@ -94,6 +94,7 @@ Provision the collector, then publish the downloaded dashboard files:
 ```sh
 node tendril-stream.mjs init --page ~/.config/tendril/training-chat.json \
   --streams streams.json --out private/collector.json
+tendril assets sync ./dashboard   # optional: push also vendors declared components
 tendril --tendril training-chat push ./dashboard
 ```
 
