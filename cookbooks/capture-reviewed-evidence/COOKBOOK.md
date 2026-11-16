@@ -1,0 +1,66 @@
+---
+id: "capture-reviewed-evidence"
+title: "Capture, review, and send evidence"
+summary: "Design permission, review, durable submission, and recovery around evidence the person actually intends to send."
+group: "Collect evidence"
+tags: ["capture", "privacy", "drafts"]
+choices: ["File or typed fallback versus a live sensor", "Inline review versus a separate capture route", "Local draft lifetime and late rejection behavior"]
+capabilities: ["captures", "durable commands"]
+evidence: "explained"
+related: ["discover-capabilities", "annotate-a-frame", "recover-outdated-work"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"]
+---
+
+# Capture, review, and send evidence
+
+Use this when a camera, microphone, file, sketch, or location adds evidence to a task. First ask what the agent needs to know and whether typed input or a file is enough. Opening a sensor, capturing a candidate, uploading bytes, and sending a command are separate decisions. A single button may coordinate them, but the person still needs an intelligible opportunity to review or discard sensitive material.
+
+## Choose the capture flow
+
+| Choice | Start here | Change it when |
+| --- | --- | --- |
+| Input | A user-selected file or explicit capture gesture. | Continuous sensing is central to the task and its cadence, stop path, and budget are agreed. |
+| Review | Preview the candidate with retake, discard, and send actions. | An informed user explicitly chooses automatic bounded collection; still show active use and stop. |
+| Context | Bind evidence to a stable question, frame, or task revision at capture time. | The task intentionally permits rebinding, through a new user-reviewed command. |
+| Persistence | Keep the draft and candidate locally until an authoritative outcome. | Local persistence is unsuitable for sensitive data; explain the interruption tradeoff and use authorized server draft storage if needed. |
+| Layout | An inline form for occasional evidence. | A focused capture/review route or fullscreen canvas reduces mistakes for the task. |
+
+Permission must be requested by the relevant user gesture. API presence does not prove permission, hardware, device support, or successful capture. A denial is a normal branch with a file or text fallback. Stop tracks, animation loops, object URLs, listeners, and device connections when the flow ends; merely hiding the preview is not stopping capture.
+
+## Preserve the meaning of pending work
+
+**Platform invariant:** a protected submission keeps its original command ID and captured concurrency generation across retry. If the task changed while upload was pending, do not silently bind the old evidence to the new question. Explain the rejection and let the person compose a new submission deliberately.
+
+**Conditional requirement:** use the current public capture/blob interface for durable bytes and the public command interface for submission. Do not expose raw device handles or private transport. Use the exact current core contract for operations and byte limits; this guide intentionally specifies behavior rather than preserving an obsolete capture wire format.
+
+**Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
+
+## Adapt the plan
+
+1. Inspect the task and choose the least demanding input that provides useful evidence. Name the permission and active-use disclosure.
+2. Keep candidate evidence separate from submitted evidence. Give candidates stable local IDs and attach the task/question revision before asynchronous work.
+3. Record a reviewed snapshot of text, media, and context when Send is chosen. Do not read mutable form values again during retries.
+4. Persist the work through the platform's current durable API, observing queued, accepted, and rejected outcomes. Upload success alone does not mean the agent received or acted on the evidence.
+5. If a durable operation fails transiently, retry the same command and original context. If rejected as stale or unauthorized, preserve the draft for explicit review instead of relabeling it as new work.
+6. Correlate the agent's reply to the submitted evidence ID. If the person retakes a photo, an old reply must not appear as a judgment of the new photo.
+7. Stop device use on cancel, completion, route changes, and background transitions according to the chosen policy. A stopped flow never resumes listening silently after reload.
+8. Keep original bytes and interpreted conclusions distinct. Annotation coordinates belong to a specific frame and transform, not whichever preview is currently visible.
+
+## Different applications, same guarantees
+
+The [inline specimen](checks/inline/index.html) uses an ordinary file input, text area, local review, and explicit send. The [fullscreen sketch specimen](checks/fullscreen/index.html) uses a canvas capture route and a separate review step. Neither mounts a shared input component or assumes a universal event vocabulary. Both retain an immutable submitted snapshot and distinguish pending outcomes from new drafts.
+
+These specimens use deterministic fixture transport for UI failure cases. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
+
+## Verify the flow
+
+- Deny permission or remove the device. The page remains useful through text/file input and explains what is unavailable.
+- Retake and discard. Discarded evidence is not subsequently submitted by a pending callback.
+- Send, then type new text before acceptance. Acceptance clears only the submitted snapshot.
+- Disconnect after acceptance but before its acknowledgement. Retrying produces the original result, not duplicate evidence.
+- Reset the task while upload is pending. The old command is rejected with its original context; the page offers deliberate review.
+- Delay a rejection until after a second draft exists. Both pieces of work remain recoverable without one overwriting the other.
+- Reload mid-flight. Restore the current-system pending record or visibly explain why a nonpersistent draft could not survive.
+- Leave capture or background the page. The visible active-use state and actual tracks agree; restarting requires the chosen gesture.
+
+Use [image annotation](../annotate-a-frame/COOKBOOK.md) for coordinate identity and [recovery](../recover-outdated-work/COOKBOOK.md) for command outcomes. Avoid assuming a photo is needed when a short description answers the question.
