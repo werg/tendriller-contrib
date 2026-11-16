@@ -4,7 +4,8 @@ Find an approach for what you want to build, understand the consequential choice
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
 
-Start with the [browsable index](index.html), [agent reading index](agent.md), or
+Start with the [hosted cookbook gallery](https://tendriller-cookbooks.pages.dev/),
+[browsable source index](index.html), [agent reading index](agent.md), or
 [plain reading catalog](catalog.json). The canonical guide is
 `cookbooks/<stable-id>/COOKBOOK.md`; a guide can stand alone with only an ID, title,
 and summary as metadata. Reading it installs nothing.
