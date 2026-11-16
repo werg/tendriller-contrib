@@ -8,7 +8,7 @@ choices: ["Current value versus ordered history", "Authority, privacy, and recor
 capabilities: []
 evidence: "explained"
 related: ["recover-outdated-work", "collect-private-responses", "reconcile-concurrent-edits", "export-and-restore-work"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md"]
 ---
 
 # Choose the right home for application data
@@ -56,7 +56,7 @@ Choose display state separately from domain state. Changing a chart filter or op
 
 ## Use core's concurrency primitives directly
 
-The [browser state API](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md) separates a useful local view from an authoritative review snapshot. `state.get()` includes pending ordinary writes; `state.revision` alone does not make that view a coherent server snapshot. Use `await state.snapshot()` to obtain matching `{state, rev, scopes}` while connected. Keep that observation with the draft being reviewed; a later save must not silently substitute newer values or scope generations.
+The [browser state API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) separates a useful local view from an authoritative review snapshot. `state.get()` includes pending ordinary writes; `state.revision` alone does not make that view a coherent server snapshot. Use `await state.snapshot()` to obtain matching `{state, rev, scopes}` while connected. Keep that observation with the draft being reviewed; a later save must not silently substitute newer values or scope generations.
 
 `set`, `delete`, `patch`, and `apply` accept `conditions` and `expected_revision`. Conditions check exact JSON values or presence against one server snapshot before any batch mutation. Guard an item's value when unrelated items may change independently. Use the global revision when any intervening shared-state write must require review, including a value that changed and later returned to its original value. All supplied conditions are checked together, and their read paths participate in scope-generation protection alongside write paths. Capture relevant `expected_generations` from the reviewed snapshot or the task's reviewed scope context.
 
@@ -72,7 +72,7 @@ Keep immutable content identity separate from mutable names. An annotation or ap
 
 Unreferenced uploads have bounded expiry whether a page or agent created them. Inspect returned retention reasons and expiry instead of treating an upload as an archive. A live shared-file head, retained file history, publication, pin, or icon can retain an object; an arbitrary ID inside shared state is not itself a retention root. Equal digests can share physical bytes while their handles retain separate metadata and lifetime decisions. Explain what a delete action removes, what referenced material remains, and whether restoration is possible.
 
-Private policy belongs in a deliberately installed trusted extension when ordinary access rules are insufficient. Read the [public core entry](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/agent.md) and verify the deployed capability; reading this guide installs nothing. Minimize cached private content and reauthorize before restoring it after identity changes.
+Private policy belongs in a deliberately installed trusted extension when ordinary access rules are insufficient. Read the [public core entry](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/agent.md) and verify the deployed capability; reading this guide installs nothing. Minimize cached private content and reauthorize before restoring it after identity changes.
 
 ## Verify the model through user outcomes
 
