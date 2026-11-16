@@ -34,6 +34,8 @@ A stream's cursor belongs to a particular consumer/materialized view. An agent's
 
 Keep immutable content identity separate from the names that point to it. An annotation or approved document should name the exact bytes or file revision it reviewed; a mutable path alone can later resolve to different content. A named-file update and a publication switch have different authoritative revisions. A task generation protects application meaning across either operation; it does not replace their revision guards.
 
+Choose byte retention deliberately. Unreferenced uploads have a bounded expiry whether a page or an agent created them; inspect the returned retention reasons and expiry instead of treating an upload as an archive. A live shared-file head, retained file history, publication, pin, or icon can keep an object. An arbitrary ID inside shared state is not itself a retention root. Equal digests can share physical bytes while their handles retain separate metadata and lifetime decisions.
+
 Private policy belongs in an explicit trusted extension when the platform's ordinary access model is insufficient. Reading a cookbook does not install one. A browser hiding fields cannot enforce different readers.
 
 ## Verify

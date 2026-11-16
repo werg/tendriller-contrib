@@ -7,6 +7,8 @@ extraction came from [werg/tendriller at 7f2dd1035bb075c0637f625316b7ae7f77c1099
 
 The [complete conversion inventory](guides/source-inventory.json) records a target
 responsibility or deletion decision for every tracked file in the contrib baseline.
+A [separate storage-source supplement](guides/storage-source-delta.md) accounts for
+the 13 changed paths on the previously unmerged storage branch.
 The generated [source map](distribution/source-map.json) records only the origins
 that the current cookbooks actually cite. Historical links are evidence, not
 supported products or an obligation to preserve old APIs and state.

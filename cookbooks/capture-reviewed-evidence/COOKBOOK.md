@@ -41,7 +41,7 @@ For the current browser API, `uploadEvent` creates a new durable operation and r
 
 The runtime coordinates the immutable upload and the later semantic capture command. A completed upload receipt means the service verified those bytes. The capture's accepted result means its original task context was admitted. Neither says the agent has completed its work. Keep queued, uploaded, accepted, and rejected meanings distinct even when the interface shows only one concise status at a time.
 
-Use the returned immutable content identity when later analysis or annotations must refer to the reviewed bytes. A mutable shared-file path can point to a newer object; a display URL alone does not grant authority or permanent retention. Do not infer participant-private media from an upload or a retained reference. The [private-response guide](../collect-private-responses/COOKBOOK.md) deliberately keeps that separate boundary explicit.
+Use the returned immutable content identity when later analysis or annotations must refer to the reviewed bytes. A mutable shared-file path can point to a newer object; a display URL alone does not grant authority or permanent retention. An accepted application event also does not automatically retain the bytes forever. If the task needs an archive, choose and verify the appropriate retained reference or pin; copying a blob ID into application JSON is insufficient. Do not infer participant-private media from an upload or a retained reference. The [private-response guide](../collect-private-responses/COOKBOOK.md) deliberately keeps that separate boundary explicit.
 
 ## Adapt the plan
 

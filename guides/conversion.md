@@ -4,7 +4,8 @@ The reviewed current contrib baseline is
 [`6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce`](https://github.com/werg/tendriller-contrib/tree/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce).
 Its 237 tracked files are each classified in [the exact-file inventory](source-inventory.json).
 The plan's earlier baseline included `wakeword`, already removed before this branch;
-its reasoning is accounted for separately. There is no promise of a successor API
+its reasoning is accounted for separately. The [storage follow-up supplement](storage-source-delta.md) separately accounts for
+13 paths changed on the unmerged storage branch. There is no promise of a successor API
 for each removed implementation.
 
 ## All component families

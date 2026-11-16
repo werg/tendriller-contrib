@@ -29,7 +29,7 @@ A shared-file write compares the previous revision of that path. A publication c
 
 Enumerate, hash, and review the exact source snapshot before transfer. Reject missing files, duplicate or noncanonical paths, and a missing entry. If local bytes change during a resumable operation, choose a new operation after review. A saved upload receipt for an earlier digest cannot stand in for the newly edited file. An intentional merge still ends in one explicit complete manifest; do not silently discover extra files while committing it.
 
-Retained byte objects can have several reasons to remain available, such as an active file reference or a retained publication. Removing one name or pin is not proof that all references were removed, and retaining bytes grants no new read authority. Follow the current core retention and access contract rather than deriving lifetime from a UI label.
+Retained byte objects can have several reasons to remain available, such as an active file reference or a retained publication. Unreferenced page and agent uploads expire; their returned metadata states that expiry. Removing one name or pin is not proof that all references were removed, and retaining bytes grants no new read authority. Follow the current core retention and access contract rather than deriving lifetime from a UI label.
 
 ## Adapt update behavior
 
