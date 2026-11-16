@@ -52,7 +52,7 @@ Distinguish “In this tab,” “Saved on this device,” and “Saved to your 
 
 Choose retention and audience for sensitive fields. A draft shared across devices must obey current access policy before display. Do not put private intake responses into public/shared state merely to simplify autosave. The [data-model guide](../choose-data-model/COOKBOOK.md) distinguishes storage homes and authority.
 
-For concurrent draft edits, use a revision check or explicit conflict policy. Show which saved version is newer and offer comparison or a copy, rather than silently applying the last response. Reopening a draft after a form-definition change should map known stable fields, flag incompatible values, and preserve unmapped input for review. Do not turn a new required field into a claim that an old submitted request was invalid when accepted.
+For concurrent shared-state draft edits, take a coherent `state.snapshot()` and use core's conditional `set` or `apply` against the reviewed record value or revision. Multi-field changes can commit in one batch; its original guards survive offline delivery. Show pending separately from accepted and retain the proposed values when a conflict asks for comparison. Use the [concurrent editing guide](../reconcile-concurrent-edits/COOKBOOK.md) to choose field conditions versus a global revision. Reopening a draft after a form-definition change should map known stable fields, flag incompatible values, and preserve unmapped input for review. Do not turn a new required field into a claim that an old submitted request was invalid when accepted.
 
 ## Review a coherent submission
 

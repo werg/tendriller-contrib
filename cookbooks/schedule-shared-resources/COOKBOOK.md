@@ -84,7 +84,7 @@ Distinguish selecting, checking availability, held, awaiting approval, submittin
 
 A confirmation receipt should name the reservation identity, resource, exact interval/timezone, quantity, current status, and allowed change/cancel actions. Avoid exposing another person's private booking details when only occupancy is needed. Notifications should carry the minimum useful information and their own delivery state; confirmation does not depend on a person reading a notification unless the policy explicitly requires it.
 
-Changing a reservation requires checking the new interval and releasing/replacing the old one under a defined transaction or external policy. In the fixed-slot model, guard old occupancy with `equals: reservationId`, guard newly acquired slots with `exists:false`, and release and acquire within one `state.apply` batch. Shared old/new slots remain owned rather than being required absent. Do not cancel the old slot first and then discover the new slot was unavailable unless that risk is an explicit reviewed behavior. Cancellation is another guarded operation with its own receipt and race with completion, check-in, or other lifecycle events.
+Changing a reservation requires checking the new interval and releasing/replacing the old one under a defined transaction or external policy. In the fixed-slot model, guard the whole reviewed reservation with `{path:["reservations", reservationId], equals:reviewedReservation}` (or its reviewed global state revision), guard old occupancy with `equals: reservationId`, and guard newly acquired slots with `exists:false`. Update the reservation and release/acquire its occupancy within one `state.apply` batch. Shared old/new slots remain owned rather than being required absent. The record guard matters: if another editor extended the booking during review, checking only the previously known slots could leave the newly added slot orphaned. Cancellation needs the same reviewed-record guard while releasing its complete known occupancy. Do not cancel the old slot first and then discover the new slot was unavailable unless that risk is an explicit reviewed behavior.
 
 ## Recover from races without losing the proposal
 
@@ -105,5 +105,6 @@ For offline use, allow a local proposed booking if useful, but label it as uncon
 | A time falls in a seasonal clock ambiguity | The interface requires a clear valid interpretation before confirmation. |
 | A recurring series has one conflict | Atomic or partial behavior matches the preview, with per-occurrence outcomes. |
 | Change races with another booking | The old and new occupancy follow the real transaction policy without a hidden gap or double booking. |
+| One editor extends a reservation while another moves or cancels its older snapshot | The whole-record guard rejects the stale operation; no newly added slot remains occupied outside the accepted reservation. |
 
 Only actual trusted-host or external-service concurrency checks can establish the booking guarantee. A fixture calendar can exercise the user experience but cannot prove exclusivity.

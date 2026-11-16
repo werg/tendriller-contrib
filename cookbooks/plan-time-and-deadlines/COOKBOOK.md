@@ -63,6 +63,8 @@ The runtime owns and persists the command ID and retries the exact command after
 
 Use `runtime.timers.list()` to read the current schedule and lifetime, and `history()` for occurrences and delivery. An accepted receipt describes the original command: the timer may already have fired, advanced, or been removed when a delayed reply arrives. Refresh the list before presenting a recovered receipt as current scheduling status.
 
+Core also retains valid commands rejected with `quota`, `lifetime_required`, `unclaimed`, `timer_conflict`, `not_found`, `already_fired`, or a semantic `bad_request`. Their exact retries return the original decision, even after a slot opens or the page lifetime changes. Error details describe that earlier decision, including its observed revision or expiration. Refresh the schedule, address the cause, and review a new intent before calling the browser method again; the runtime then creates its new CID. Current authorization, malformed-command, generation, transport, and receipt-storage failures have different [receipt boundaries](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/DURABILITY.md#timer-mutation-receipts). Keep unresolved `queued` work visible until the runtime resolves it.
+
 Omit `repeat` for a one-shot timer with the intended `due_at`; interval recurrence uses `every_minutes`. Calendar days use Sunday as zero. The public contract does not advertise arbitrary cron expressions, monthly recurrences, or holiday calendars; choose an additional explicit policy when those are needed.
 
 Core's calendar policy skips nonexistent spring-transition wall times and uses the first occurrence of a repeated autumn wall time once on that date. An explicit first `due_at` overrides the initially computed occurrence; the calendar rule controls later runs. Preview upcoming occurrences when the rule could surprise the person, and explain this behavior instead of implying all local-time intentions have the same interpretation.
@@ -113,6 +115,7 @@ Use distinct states for no deadline, scheduled, overdue, completed late, cancell
 | A repeat is missed during service unavailability. | The selected `fire_once` or `skip` policy and history explain the result. |
 | Task saving succeeds but reminder creation fails. | The UI reports both outcomes and offers a deliberate scheduling recovery. |
 | A creation commits but its reply is lost, then the page reloads. | The persisted pending command keeps its CID and exact body; replay returns one timer, and the UI refreshes the current schedule. |
+| A timer-slot or lifetime rejection is lost, then capacity or lifetime improves. | The original CID recovers the original rejection; only a newly reviewed command can schedule the reminder. |
 | A queued cancellation is shown while offline. | It is labelled awaiting service; local mute works, and the UI does not claim the server timer stopped. |
 | A deadline is moved after a push request was accepted. | Current task state is authoritative and any stale notice is understandable. |
 | Two editors submit changes from the same timer revision. | One revision wins; the stale command is rejected without changing the winner or cancelling its pending notifications. |

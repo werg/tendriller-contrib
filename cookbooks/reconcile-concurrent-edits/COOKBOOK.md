@@ -62,6 +62,8 @@ const result = await tendril.state.set(
 
 The example guards all observed scopes conservatively; a task can select only its dependencies. If the record was removed before editing, offer recovery before constructing a save. A supplier-only change can coexist with this quantity edit. A changed quantity, deletion, or reset rejects the old intent. `accepted` confirms the mutation, `queued` means the original command remains durable awaiting a result, and `rejected` needs review. Listen for `state_result` after a queued promise; do not call Save again merely to deliver the same pending work. The [browser API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md) describes snapshot availability and receipt fields.
 
+Admitted results carry `cid`. Rebuild per-item pending indicators after reload from `state.pending()` and follow `state_queue`; each entry includes the original normalized operations and predicates. A later `state_result` carries those same operations, so its `["items",itemId,...]` path identifies the edited record even after navigation. This uses core's existing durable outbox, not another page delivery queue. Empty unconditional work returns `unchanged` without a CID or server receipt; handle that separately from a saved edit.
+
 Fields can participate in a joint constraint: quantity and total price, for example. Check every input used in the calculation and write both outputs with one conditional `apply`. These optional cooperative guards do not enforce business rules against an authorized client that omits them. A mandatory pricing, access, or ownership rule belongs in an authorized trusted operation; generic compare-and-set itself needs no custom server policy.
 
 ## Separate identity, order, and visibility

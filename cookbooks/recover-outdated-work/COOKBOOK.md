@@ -38,7 +38,11 @@ Let the person filter unresolved work and inspect failure details without losing
 
 Queued means the client has pending work, not that the server accepted it. Accepted means the server committed the command under its contract, not that an agent or external service completed every resulting effect. Rejected can arrive immediately or later after reconnect. A page should preserve enough context to explain each state.
 
-**Platform invariant:** record the operation identity and relevant generations before sending protected work, and retain both for every retry. High-level capture owns its command IDs in the runtime; page-owned correlation IDs remain ordinary data. Reading the newest generation and attaching it to an old payload changes its meaning. After stale rejection, a person or agent may deliberately compose a new command from reviewed current state, with a new ID and context.
+**Platform invariant:** core records the operation identity and relevant generations before sending a browser durable command, and retains both for every retry. High-level capture, state writes, and timer mutations own their command IDs in the runtime; page-owned correlation IDs remain ordinary data. Agent/SDK callers must retain the original explicit command envelope. Reading the newest generation and attaching it to an old payload changes its meaning. After stale rejection, a person or agent may deliberately compose a new command from reviewed current state, with a new ID and context.
+
+For shared-state work, use core's `conditions` or `expected_revision` to check and mutate atomically. For timer edits/removal, retain the reviewed `expected_revision`. Do not implement a browser read-then-write substitute or automatically replace a failed guard with a newer value. State conflicts and classified timer domain rejections retain their original decision receipts; a later change that would permit the operation does not turn an exact retry into new intent. Current access checks, malformed commands, and failures to store a receipt have distinct limits documented in the [core durability contract](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/DURABILITY.md).
+
+Use [core's inspectable pending commands](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md), including `state.pending()` and `timers.pending()`, to rebuild the page's pending-work view after reload. Their queue events and result events retain original operations or timer settings and command IDs. Keep human-readable draft context, but do not introduce another mutation outbox solely to discover what core is already delivering. A local storage failure before durable admission must stay an explicit failure to save; it cannot be described as successfully queued work.
 
 ## Distinguish transfer from application acceptance
 
@@ -65,7 +69,7 @@ If a resume record represents specific bytes, changing those bytes creates new w
 
 Snapshot submitted text, evidence, and task identity. New typing belongs to a new draft while the original snapshot is pending. Clear only the submitted snapshot that was accepted; a delayed acceptance must not erase later typing. A delayed rejection should preserve rejected work without replacing the current draft. Recovery can offer comparison, copy, discard, or explicit resubmission according to the task.
 
-Choose local persistence according to sensitivity and durability needs. An atomic record containing the complete pending command avoids partial recovery. Validate current-system persisted data; corrupt or unavailable storage should have visible behavior. No old-system migration is part of this design.
+Choose local draft persistence according to sensitivity and durability needs. Core owns persistence of its admitted commands; a deliberately selected external integration needs equivalent support from its actual authority or client. Validate current-system persisted application data; corrupt or unavailable storage should have visible behavior. No old-system migration is part of this design.
 
 ## Verify
 

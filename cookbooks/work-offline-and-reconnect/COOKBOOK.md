@@ -44,7 +44,9 @@ Read exact behavior in the [reviewed browser contract](https://github.com/werg/t
 
 Snapshot each submitted intent separately from the editable draft. Preserve application identity, evidence identity, original task generations, and the original command context supplied by the runtime. Show a readable outbox entry such as “Observation queued on this phone” with its timestamp and task. Keep administrative credentials out of local application records.
 
-Use documented results and lifecycle events for the specific operation. Ordinary events and state writes expose accepted/queued/rejected outcomes; capture work has its own documented queue and retry/discard controls. Do not assume that one queue-management method applies to every command type. Cancelling a local preview does not undo accepted work.
+Use documented results and lifecycle events for the specific operation. Ordinary events, actual state commands, and timer mutations distinguish accepted, queued, and rejected work. An empty unconditional state change returns `unchanged` without implying a service receipt. Capture work has its own queue and retry/discard controls; those controls do not apply to every command type. Cancelling a local preview does not undo accepted work.
+
+Use the [core browser queues](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md) to restore submitted work: `state.pending()` and `timers.pending()` expose the original durable commands, while `state_queue`/`timer_queue` and `state_result`/`timer_result` report changes and correlated outcomes. Keep the page's editable drafts and selection context separate, but do not duplicate core's mutation queue. A queued conditional state claim must not appear accepted, and a queued timer cancellation has not stopped the server schedule. The original operations, settings, checks, and generations survive a reload without being refreshed to current values.
 
 Bound draft bytes, attachment count, and pending items. When storage fails or a budget is reached, preserve the last coherent draft and explain what cannot be retained. Offer a reviewed export or a smaller submission only when appropriate for the data. Never silently evict the oldest unsent observation to make room for a new one unless that is an explicit, visible policy.
 
@@ -55,7 +57,7 @@ A connectivity indicator should report transport separately from service authori
 1. Establish the current page identity, reader authority, service capabilities, and task context. Reauthorize before restoring sensitive projections when required.
 2. Reconcile original pending commands using their captured identities and generations. Runtime retry must preserve their original meaning; do not attach a newly fetched generation to an old payload.
 3. Show accepted, rejected, and uncertain outcomes per item. A stale rejection should offer comparison with current task state and an explicit new submission action.
-4. Refresh current shared state and replay retained streams with visible gap handling. A local optimistic view does not overrule newer authoritative state.
+4. Use `state.snapshot()` for a coherent accepted state/revision/scope observation when connected, and replay retained streams with visible gap handling. The snapshot does not flush pending work or replace the optimistic view. Use `timers.list()` for the current schedule; an old accepted timer receipt may describe a timer that later advanced or was removed.
 5. Apply a new publication only under the page's draft-aware policy. Offline readiness for the previous version must not be relabeled as readiness for the update.
 6. Reestablish optional sensors or voice through intentional local action. Reconnection does not authorize restarting hardware or speech.
 
@@ -72,6 +74,8 @@ For conflicts, keep both the original snapshot and current draft. Explain whethe
 | Stream publish occurs offline | It rejects under the public contract; the application does not pretend it joined the runtime outbox. |
 | Task resets while an observation is queued | Original intent remains stale and can only be resubmitted through deliberate current review. |
 | Connection returns after a new draft is typed | Older receipts cannot erase or overwrite the new draft. |
+| Two conditional row edits survive a reload | Core's pending commands and original-operation receipts identify each row; the page does not reconstruct or resubmit commands from visible values. |
+| A timer result was saved but removing its queue entry failed | Reload settles that saved outcome locally, without issuing another timer mutation. |
 | Access changes while private restoration is pending | Late callbacks cannot repaint content from the previous authority context. |
 
 This guide proposes an offline experience. Actual offline readiness, storage behavior, service rejection, and device capability need separate checks in the chosen adaptation.

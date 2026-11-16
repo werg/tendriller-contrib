@@ -31,7 +31,7 @@ Show a concise summary with counts of eligible, unchanged, conflicted, unsupport
 | --- | --- | --- |
 | Selection | Explicit stable item IDs captured at review. | A deliberate dynamic policy is itself the action and has a separate trusted contract. |
 | Validation | Preview all selected items within a bounded size. | Very large workloads need chunked review with explicit unreviewed scope. |
-| Execution | Independent per-item operations with visible receipts. | A real trusted transaction is required and can fit its resource limits. |
+| Execution | Independent per-item operations with visible receipts. | One authoritative atomic batch is required and can fit its resource limits. |
 | Ordering | Preserve a declared order or independence. | Later items depend on earlier results and must stop when prerequisites fail. |
 | Concurrency | A small bounded number of independent requests. | The external service's documented capacity and ordering justify another choice. |
 | Retry | Reconcile and retry the original failed/uncertain intent. | Changed inputs require a fresh review and new intent. |
@@ -60,7 +60,7 @@ const result = await tendril.state.apply(
 );
 ```
 
-This example requires a nonempty selection of existing JSON records within the service's condition and payload limits. It guards every observed scope conservatively; a task can select its relevant scope dependencies. A changed selected record rejects the entire batch, while an unrelated record can change without failing these value conditions. Use `expected_revision: observed.rev` instead when any intervening state mutation must invalidate review. Show `queued`, `accepted`, and `rejected` distinctly; the conditional batch does not optimistically remove rows. Optional conditions provide concurrency control for cooperating writers, not permission or approval enforcement against other authorized operations.
+This example requires a nonempty selection of existing non-null object records within the service's condition and payload limits; its `status` path cannot traverse an array or scalar. It guards every observed scope conservatively; a task can select its relevant scope dependencies. A changed selected record rejects the entire batch, while an unrelated record can change without failing these value conditions. Use `expected_revision: observed.rev` instead when any intervening state mutation must invalidate review. Show `queued`, `accepted`, and `rejected` distinctly; the conditional batch does not optimistically remove rows. Optional conditions provide concurrency control for cooperating writers, not permission or approval enforcement against other authorized operations.
 
 For protected domain transitions, private records, or effects in an external system, the trusted operation must enforce those additional rules. A shared-state transaction does not atomically rename files, publish assets, create timers, or execute an external action. Use the authority that owns those effects and state its actual boundary.
 
@@ -80,7 +80,7 @@ Use accessible status summaries without announcing every result at high volume. 
 
 ## Recover without duplicating effects
 
-Retain the review selection and explanatory progress under an appropriate privacy policy. Core already persists an admitted shared-state batch's operations, conditions, identity, and generations; do not build a second mutation outbox or submit a new `state.apply` merely because its promise returned `queued`. On reload, reauthorize before showing private details and reconcile core receipts with the original selection. External integrations still need their own durable progress and supported receipt mechanism. Do not restart an entire batch because the browser lost its progress counter.
+Retain the review selection and explanatory progress under an appropriate privacy policy. Core already persists an admitted shared-state batch's operations, conditions, identity, and generations; use `state.pending()` and `state_queue` to restore outstanding work, then correlate `state_result.cid` and its original `ops` with the reviewed rows. Do not build a second mutation outbox or submit a new `state.apply` merely because its promise returned `queued`. Those APIs expose pending commands and terminal events, not an application history of completed batches. Keep a bounded outcome report when completed per-item history must survive a later reload. Reauthorize before restoring private details. External integrations still need their own durable progress and supported receipt mechanism. Do not restart an entire batch because the browser lost its progress counter.
 
 A lost reply after an effect is an uncertain outcome, not an ordinary failure. Query the authoritative result or use the external system's supported idempotency mechanism before retrying. For Tendriller durable operations, preserve their original command and generation context through retry; runtime-owned capture identities follow their own documented retry path. Never attach current generations to an old payload solely to make it pass.
 

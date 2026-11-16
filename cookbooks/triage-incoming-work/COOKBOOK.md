@@ -8,7 +8,7 @@ choices: ["Shared inbox or an authoritative claim policy", "Priority, due time, 
 capabilities: []
 evidence: "explained"
 related: ["search-and-filter-collections", "reconcile-concurrent-edits", "observe-long-running-process"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md"]
+sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/1492d58501ef5b6f111b5330dc08fc381c84eefe/docs/PROTOCOL.md"]
 ---
 
 # Triage an incoming queue without losing work
@@ -47,11 +47,38 @@ Use stable item IDs and explicit record revisions or appropriate protected opera
 
 ## Choose ownership and concurrency policy
 
-For one reviewer, a simple accepted owner field may suffice. For a team, decide whether assignment means a suggestion, an accepted responsibility, or exclusive processing. If exclusion matters, implement an atomic claim, expiry/release policy, and checks at the authority that accepts work. A disabled button in another browser is not a lock.
+For one reviewer, a simple accepted owner field may suffice. For a team, decide whether assignment means a suggestion, accepted responsibility, or an enforced processing right. Core's conditional `state.apply` provides atomic claims among cooperating authorized writers. It evaluates the current claim and item status together, then records both changes in one transaction. A disabled button in another browser is not that check.
+
+Start a review with `await tendril.state.snapshot()` to obtain matching `{state,rev,scopes}`. This is a connected read; a cached `state.get()` remains useful for offline browsing but includes ordinary optimistic work and cannot establish current claim availability. For this example, ready items have `status:"ready"`; a missing `claims[itemId]` means unclaimed. `reviewerId` is the application's collaboration identity, not a credential or permission grant:
+
+```js
+const reviewed = await tendril.state.snapshot();
+const claim = {id: crypto.randomUUID(), reviewer: reviewerId};
+const result = await tendril.state.apply([
+  {op: "set", path: ["claims", itemId], value: claim},
+  {op: "set", path: ["items", itemId, "status"], value: "in_progress"},
+], {
+  expected_generations: Object.fromEntries(
+    reviewed.scopes.map(scope => [scope.id, scope.generation]),
+  ),
+  conditions: [
+    {path: ["claims", itemId], exists: false},
+    {path: ["items", itemId, "status"], equals: "ready"},
+  ],
+});
+```
+
+Show the reviewed item before invoking the command. A concurrent ready-item claim produces one acceptance and one `state_conflict`; unrelated changes to another item need not conflict. `exists:false` differs from `equals:null`: choose one representation and use its actual predicate. If the entire reviewed queue revision matters, add `expected_revision:reviewed.rev`, understanding that any shared-state write, including an unrelated item, can reject it. A distinct claim ID lets a later release require `equals` on the exact current claim, preventing an old release from removing a subsequently reacquired claim.
+
+Conditions and generations are captured before delivery and retained across reload. Conditional claims do not appear as accepted ownership in the optimistic shared view. Show “Claim pending” for `queued`, “Claim accepted” for `accepted`, and a reviewable conflict for `rejected`. Admitted results carry `cid`; use `state.pending()` and `state_queue` to rebuild this device's pending cards after reload. For this model, a pending command concerns an item when an operation's normalized path starts with `["claims",itemId]`; `state_result` carries the same original operations and CID. No application delivery queue is needed. Keep private response drafts separately from those shared operations. The [browser API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md) defines these inspection and receipt surfaces.
+
+A stored conflict stays rejected even after the winner releases the item. Read current state and offer a fresh Claim decision; do not refresh the old predicate or allocate another command merely to retry delivery. Scope resets similarly invalidate old claim intent, including dependencies read through conditions.
+
+These are optional cooperative guards, not access controls. An authorized writer can omit them. If only particular people may claim, only a holder may resolve, or expiry must be enforced using server time, put those domain checks in the authorized operation that enforces that policy. Core already supplies atomic compare-and-set; the additional trusted policy is for mandatory rights and transition rules. A shared claim field or device identity cannot confer those rights.
 
 Tendriller's [named event consumers](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md) coordinate host processing of an event log. They do not automatically implement human ticket ownership or make a page's arbitrary `assigned_to` field exclusive. Select or implement the application policy deliberately and keep its claim identity separate from the agent's handled-event checkpoint.
 
-When two people claim the same item, the losing request should see the current authoritative owner and retain any private draft. If a holder disappears, a documented timeout or explicit release allows recovery. Do not silently steal responsibility based only on a last-seen timestamp. A new owner needs the task context and unresolved work, while private drafts require an explicit authorized transfer path.
+When two people claim the same item, fetch current authorized state after the conflict to show the owner; the error receipt itself does not contain current field values. Retain any private draft. If a holder disappears, a documented timeout policy or explicit release allows recovery. A browser's timeout cannot enforce expiry against other writers, and last-seen time is not consent to steal responsibility. A new owner needs task context and unresolved work, while private drafts require an explicit authorized transfer path.
 
 ## Handle duplicates without losing evidence
 
@@ -81,7 +108,10 @@ Measure useful outcomes such as unresolved age or time to an acknowledged dispos
 
 | Scenario | Expected observation |
 | --- | --- |
-| Two reviewers claim the same item. | The authoritative policy produces a clear winner/conflict; local drafts survive. |
+| Two reviewers submit the same ready/unclaimed predicates. | One whole claim/status batch is accepted and the other conflicts; neither leaves half a transition. |
+| The claim is queued and the browser reloads. | `state.pending()` identifies its original CID and item; the UI stays pending until its correlated result. |
+| The original losing command is delivered after the claim is released. | Its stored conflict is replayed; it cannot unexpectedly acquire ownership later. |
+| A stale release follows a new claim by the same reviewer. | The distinct claim ID prevents removal of the newer responsibility. |
 | The same intake delivery is retried. | One intended item remains with the original receipt. |
 | Two similar reports include distinct evidence. | Duplicate review preserves unique facts and can be corrected. |
 | A reviewer snoozes or filters an item. | It remains unresolved and discoverable under the declared scope. |

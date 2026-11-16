@@ -53,7 +53,7 @@ General feedback can target a section or the whole revision without a text range
 
 ## Treat suggested changes as proposals
 
-An agent suggestion should include the target revision/anchor, proposed replacement or change, and the reason. A person can preview the resulting diff before accepting. Applying a suggestion creates a new document revision; it does not rewrite the reviewed snapshot. If the base text changed, require a deliberate merge or regenerate a suggestion against the new context.
+An agent suggestion should include the target revision/anchor, proposed replacement or change, and the reason. A person can preview the resulting diff before accepting. Applying a suggestion creates a new document revision; it does not rewrite the reviewed snapshot. For shared-state document records, use core's conditional `state.apply` to check the reviewed content and update the document plus feedback status in one transaction. Shared-file documents use their own path revision guard. If the base text changed, retain the suggestion for a deliberate merge or regenerate it against the new context; do not weaken a rejected guard automatically. See [concurrent editing](../reconcile-concurrent-edits/COOKBOOK.md) for a concrete snapshot-and-condition flow.
 
 Distinguish “applied” from “resolved.” Applying one wording change may not address the reviewer's underlying concern. A reviewer can confirm resolution, or the owner can close it under an explicit policy with an explanation. Do not imply that every reviewer approved the final document merely because their comments were marked resolved.
 

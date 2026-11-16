@@ -8,7 +8,7 @@ choices: ["Informational handoff or accepted responsibility transfer", "Whole ta
 capabilities: []
 evidence: "explained"
 related: ["coordinate-devices", "resume-across-sessions", "guide-explicit-checkpoints", "triage-incoming-work"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md"]
+sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/1492d58501ef5b6f111b5330dc08fc381c84eefe/docs/PROTOCOL.md"]
 ---
 
 # Hand off responsibility with a clear acceptance
@@ -53,11 +53,42 @@ A display label such as “on duty” or an assignment in shared state does not 
 
 ## Decide what acceptance must make atomic
 
-For a low-stakes planning list, an acknowledged owner-field update may be sufficient. For a queue where exactly one person should own a task, the acceptance policy needs an authoritative check of the offer revision, recipient, task state, and current owner, followed by a coherent ownership change. Two independent browser writes do not create that transaction.
+For a planning list, the acceptance should mark the exact offer accepted and change the named task's owner together. Core's conditional `state.apply` supplies this atomic state change; no custom trusted transaction is needed just to compare an offer and update several paths. Use `state.snapshot()` while connected to prepare the receiver's review from a matching state, revision, and scope set. Keep that reviewed version until the receiver responds; a fresh read at submission must not silently substitute a changed brief.
 
-If the public operations do not provide the needed application transaction, deliberately implement and verify an appropriate trusted policy or simplify the responsibility model. An advisory “someone is accepting” presence indicator can reduce collisions but is not exclusion. Do not reuse an agent event-consumer lease as a human assignment without defining a separate application meaning.
+For this cooperative planning model, an offer has `status`, `taskId`, `to`, `taskRevision`, and its reviewed brief/scope fields. Task edits advance an application revision. The page first validates that the offer awaits acceptance, belongs to the displayed recipient, and still concerns the displayed task; these UI checks guide the person. The conditions close races after that review:
 
-Capture acceptance intent before asynchronous work. A lost reply should be reconciled through the original operation identity and authoritative offer state, not by creating another transfer. An old acceptance arriving after a withdrawal or task reset must be rejected or routed for explicit review. Fetching the latest state and silently stamping it onto the old acceptance would change the decision the receiver made.
+```js
+const reviewed = await tendril.state.snapshot();
+const offer = reviewed.state.offers[offerId];
+const task = reviewed.state.tasks[offer.taskId];
+if (offer.status !== "offered" || task.revision !== offer.taskRevision) {
+  throw new Error("Review the changed handoff before accepting it");
+}
+
+// After the receiver reviews this exact offer:
+const result = await tendril.state.apply([
+  {op: "set", path: ["offers", offerId, "status"], value: "accepted"},
+  {op: "set", path: ["tasks", offer.taskId, "owner"], value: offer.to},
+  {op: "set", path: ["tasks", offer.taskId, "revision"], value: task.revision + 1},
+], {
+  expected_generations: Object.fromEntries(
+    reviewed.scopes.map(scope => [scope.id, scope.generation]),
+  ),
+  conditions: [
+    {path: ["offers", offerId], equals: offer},
+    {path: ["tasks", offer.taskId, "revision"], equals: offer.taskRevision},
+    {path: ["tasks", offer.taskId, "owner"], equals: task.owner},
+  ],
+});
+```
+
+Guarding the whole offer binds all its reviewed fields, including recipient and brief identity; object key order does not matter. Missing or withdrawn offers cannot match it. `exists:false` is useful when creating a previously unused offer ID, while an existing null field needs `equals:null`. Use `expected_revision:reviewed.rev` instead of selective comparisons when every shared-state change should invalidate the review; it also catches unrelated writes and change-and-change-back. Per-task revisions require participating edits to advance them consistently.
+
+This example gives cooperating authorized writers atomic consistency. It does not make `offer.to` a credential or prevent an otherwise authorized writer from omitting predicates. Mandatory recipient eligibility, access provisioning, approval rules, and server-time expiry belong in an authorized trusted operation. An expiration field compared with `equals` only proves the field is unchanged; it does not compare the current server clock. An advisory “someone is accepting” indication can reduce collisions but is not permission or a lease. Do not reuse an agent event-consumer lease as a human assignment.
+
+Capture acceptance intent before asynchronous work. Core retains the original predicates and generations on delivery retries. A lost reply is reconciled through the same command; a stored `state_conflict` remains rejected even if an offer later looks acceptable again. A withdrawn or reset offer needs a new deliberate review, not freshly stamped guards on the old command.
+
+Show “Acceptance pending” while `queued`; the conditional operation does not change optimistic ownership. Only `accepted` confirms the whole transfer. Admitted results carry `cid`, and `state_result` includes that CID, original operations, and context. After reload, use `state.pending()` and `state_queue` to recover this device's unsettled handoffs: here an operation beginning `["offers",offerId]` identifies the offer. Keep the sender's accepted responsibility visible while that command remains pending. A late outcome updates its original offer, not whichever task the receiver has opened since. The [browser API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md) provides these surfaces without an application outbox.
 
 ## Handle partial, changed, and uncertain work
 
@@ -80,12 +111,15 @@ Use readable summaries, keyboard-operable decisions, clear focus after a respons
 | Scenario | Expected observation |
 | --- | --- |
 | The receiver opens or reads the handoff. | Responsibility remains governed by explicit acceptance, not inferred from presentation. |
-| Two eligible people accept simultaneously. | The declared atomic policy selects one valid transfer or returns an explicit conflict. |
+| Two people conditionally accept the same offer simultaneously. | One complete offer/owner/revision transition succeeds; the competing batch conflicts without partial ownership. |
 | A recipient lacks access to essential evidence. | The dependency is visible; no secret is copied to bypass authorization. |
 | The task or offer changes while a response is pending. | The old response cannot accept a different scope. |
 | The receiver declines or the offer expires. | Existing responsibility and the fallback action remain visible. |
 | Only part of a packet is accepted. | Accepted and unassigned responsibilities are reported separately. |
 | An external request has an uncertain outcome. | The receiver reconciles its original identity before repeating an effect. |
 | The acceptance reply is lost and retried. | One transfer and its original outcome remain, without duplicated assignments. |
+| A queued acceptance survives reload. | Its original offer and CID are inspectable through `state.pending()`; ownership stays unconfirmed until its receipt. |
+| A withdrawn offer is recreated after an old acceptance was rejected. | Delivery of the old command retains its rejection; a newly reviewed offer produces new intent. |
+| An offer's deadline passes without changing its fields. | A value condition is not misrepresented as server-time expiry enforcement. |
 
 This guide is explained application design. Actual exclusive ownership, private context, and atomic transfer claims require service-boundary checks of the chosen implementation.

@@ -772,7 +772,7 @@
       "sources": [
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md"
+        "https://github.com/werg/tendriller/blob/1492d58501ef5b6f111b5330dc08fc381c84eefe/docs/PROTOCOL.md"
       ],
       "path": "cookbooks/hand-off-responsibility/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/hand-off-responsibility/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Transfer task context and unresolved work through an explicit offer and acceptance without confusing assignment, access, or completion. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
@@ -1560,7 +1560,8 @@
       "sources": [
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md"
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/1492d58501ef5b6f111b5330dc08fc381c84eefe/docs/PROTOCOL.md"
       ],
       "path": "cookbooks/triage-incoming-work/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/triage-incoming-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
