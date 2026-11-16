@@ -1,106 +1,45 @@
-import './check-core-lock.mjs';
-import { build } from 'esbuild';
-import { bundledNotices } from './notices.mjs';
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, copyFileSync, rmSync, existsSync } from 'node:fs';
-import { join, dirname, relative, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from 'node:fs';
+import { resolve, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { assets, manifest as runtimeManifest } from '../tools/preview/lib/preview-bundle.mjs';
-import { guessType } from '../tools/cli/lib/pack.mjs';
-import { catalog as recipeCatalog } from '../tools/cli/lib/assets.mjs';
-
-const root = fileURLToPath(new URL('../', import.meta.url)), dist = join(root, 'dist');
-const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-const hash = value => createHash('sha256').update(value).digest('hex');
-function files(directory, prefix = '') {
-  return readdirSync(directory, { withFileTypes: true }).filter(entry => !entry.name.startsWith('.') && !['test','node_modules'].includes(entry.name))
-    .flatMap(entry => entry.isDirectory() ? files(join(directory, entry.name), prefix + entry.name + '/') : [prefix + entry.name]).sort();
+import { fileURLToPath } from 'node:url';
+import { readCookbooks, readingCatalog, walk } from './catalog.mjs';
+import { gallery } from './gallery.mjs';
+const root = fileURLToPath(new URL('../', import.meta.url));
+const check = process.argv.includes('--check');
+const entries = readCookbooks(root);
+const catalog = readingCatalog(entries);
+const groups = [...new Set(entries.map(e=>e.group || 'Other approaches'))].sort();
+const index = groups.map(group=>`### ${group}\n\n`+entries.filter(e=>(e.group||'Other approaches')===group).map(e=>`- [${e.title}](${e.path}) — ${e.summary}`).join('\n')).join('\n\n');
+const readme = readFileSync(resolve(root,'README.md'),'utf8').replace(/<!-- cookbook-index:start -->[\s\S]*?<!-- cookbook-index:end -->/, `<!-- cookbook-index:start -->\n${index}\n<!-- cookbook-index:end -->`);
+const agent = '# Tendriller cookbook reading index\n\nInspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.\n\n'+index+'\n\nSee [evidence](guides/evidence.md), [contribution guidance](guides/contributing.md), and [core public entry](https://github.com/werg/tendriller/blob/master/agent.md).\n';
+const sourceMap = {format:'tendriller-cookbook-origins',cookbooks:entries.map(e=>({id:e.id,sources:e.sources||[]}))};
+const outputs = new Map([
+ ['catalog.json',JSON.stringify(catalog,null,2)+'\n'],['index.html',gallery(entries)],['README.md',readme],['agent.md',agent],
+ ['llms.txt','# Tendriller cookbooks\n\n> Adaptable reasoning for page-owned applications. No UI package or install graph.\n\n- [Agent reading index](agent.md)\n- [Catalog](catalog.json)\n- [Usage](guides/using-cookbooks.md)\n- [Evidence](guides/evidence.md)\n- [Core public contract](https://github.com/werg/tendriller/blob/master/agent.md)\n'],
+ ['distribution/source-map.json',JSON.stringify(sourceMap,null,2)+'\n'],
+]);
+for(const [path,content] of outputs){if(check){if(readFileSync(resolve(root,path),'utf8')!==content)throw Error(`Generated file is stale: ${path}; run npm run build`);}else writeFileSync(resolve(root,path),content);}
+if(!check){
+ const dist=resolve(root,'dist'),site=resolve(dist,'static');rmSync(dist,{recursive:true,force:true});mkdirSync(site,{recursive:true});
+ for(const path of ['cookbooks','guides','README.md','PROVENANCE.md','catalog.json','index.html','agent.md','llms.txt'])cpSync(resolve(root,path),resolve(site,path),{recursive:true});
+ mkdirSync(resolve(site, 'distribution'), { recursive: true });
+ cpSync(resolve(root, 'distribution/source-map.json'), resolve(site, 'distribution/source-map.json'));
+ let commit = null, dirty = true;
+ try {
+  commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().length > 0;
+ } catch {}
+ const sourceCommit = process.env.SOURCE_COMMIT || commit;
+ if (sourceCommit && !/^[a-f0-9]{40}$/.test(sourceCommit)) throw Error('SOURCE_COMMIT must be a full Git commit SHA');
+ const sourceBase = sourceCommit && !dirty ? `https://github.com/werg/tendriller-contrib/blob/${sourceCommit}` : undefined;
+ // Current discovery follows main; a clean exported snapshot names its exact source.
+ writeFileSync(resolve(site, 'catalog.json'), JSON.stringify(readingCatalog(entries, sourceBase), null, 2) + '\n');
+ writeFileSync(resolve(site, 'index.html'), gallery(entries, sourceBase));
+ const pkg=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8'));
+ const file= `tendriller-cookbooks-${pkg.version}.tgz`;
+ execFileSync('tar',['--sort=name','--mtime=@0','--owner=0','--group=0','--numeric-owner','-czf',resolve(dist,file),'-C',site,'.']);
+ const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+ writeFileSync(resolve(dist,'manifest.json'),JSON.stringify({format:'tendriller-cookbook-snapshot',version:pkg.version,source_commit:sourceCommit,source_dirty:dirty,cookbooks:entries.length,artifacts:[{file,sha256:digest(readFileSync(resolve(dist,file)))}],files:walk(site).map(path=>({path:relative(site,path).replaceAll('\\','/'),sha256:digest(readFileSync(path))}))},null,2)+'\n');
 }
-function copy(source, destination) { mkdirSync(dirname(destination), { recursive: true }); cpSync(source, destination, { recursive: true }); }
-function archive(directory, name) {
-  execFileSync('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-czf', join(dist, name), '-C', directory, '.']);
-}
-mkdirSync(join(root, 'components/vendor'), { recursive: true });
-for (const [source, target] of [
-  ['qrcode-generator/dist/qrcode.js', 'qrcode.js'], ['qrcode-generator/README.md', 'qrcode-LICENSE'],
-  ['html-to-image/dist/html-to-image.js', 'html-to-image.js'], ['html-to-image/LICENSE', 'html-to-image-LICENSE'],
-]) copy(join(root, 'node_modules', source), join(root, 'components/vendor', target));
-rmSync(dist, { recursive: true, force: true }); mkdirSync(dist, { recursive: true });
-const sourceCommit = process.env.SOURCE_COMMIT || (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], {cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim(); } catch { return null; } })();
-const release = { format: 'tendriller-contrib', version: pkg.version, source_commit: sourceCommit, requires: { contract: 3 }, core: JSON.parse(readFileSync(join(root,'core.lock.json'),'utf8')), runtime: { id: runtimeManifest.id, version: runtimeManifest.version }, maintainer: 'werg' };
-const notices = new Map();
-async function bundle(options) {
-  const result = await build({ ...options, write: false, metafile: true });
-  const notice = bundledNotices(result.metafile.inputs, root);
-  if (notice) notices.set(basename(options.outfile), notice);
-  writeFileSync(options.outfile, result.outputFiles[0].text + (notice ? '\n/* Third-party notices retained from distributed dependencies.\n' + notice.replaceAll('*/', '* /') + '\n*/\n' : ''));
-  return result;
-}
-const previewPlugin = { name: 'released-preview-runtime', setup(builder) {
-  builder.onLoad({ filter: /[/\\]preview-bundle\.mjs$/ }, () => ({ loader:'js', resolveDir:root,
-    contents: `import * as support from '@tendriller/runtime/preview-support'; export const implementation=support; export const manifest=${JSON.stringify(runtimeManifest)}; export const assets=${JSON.stringify(assets)};` }));
-} };
-const resources = {};
-for(const directory of ['components','recipes','examples']) for(const file of files(join(root,directory))) resources[directory+'/'+file]=readFileSync(join(root,directory,file)).toString('base64');
-for(const path of ['package.json','core.lock.json','workflows/browser.js','workflows/session-archive.js']) if(existsSync(join(root,path)))resources[path]=readFileSync(join(root,path)).toString('base64');
-const resourcesPlugin={name:'embedded-release-resources',setup(builder){builder.onLoad({filter:/[/\\]resources\.mjs$/},()=>({loader:'js',contents:`const files=${JSON.stringify(resources)};export const hasResource=path=>Object.hasOwn(files,path);export const readResource=path=>{if(!hasResource(path))throw Error('No such release resource: '+path);return Buffer.from(files[path],'base64')};export const resourceFiles=prefix=>Object.keys(files).filter(path=>path.startsWith(prefix+'/')).sort();`}))}};
-const bundling = { bundle:true, platform:'node', format:'esm', target:'node22', logLevel:'warning', external:['bufferutil','utf-8-validate'],
-  banner:{js:`import {createRequire as bundleRequire} from 'node:module'; const require=bundleRequire(import.meta.url);`}, plugins:[previewPlugin,resourcesPlugin] };
-const tools = join(dist,'tools'); mkdirSync(tools,{recursive:true});
-for (const directory of ['components','recipes','examples','docs','workflows']) if (existsSync(join(root,directory))) {
-  for (const file of files(join(root,directory))) if (!file.endsWith('.ts') && !file.startsWith('server/')) copy(join(root,directory,file),join(tools,directory,file));
-}
-for (const name of ['README.md','PROVENANCE.md','core.lock.json','tools/cli/README.md']) if (existsSync(join(root,name))) copy(join(root,name),join(tools,name));
-const bins = {};
-for (const group of ['cli','collector','preview','bridges']) for (const file of readdirSync(join(root,'tools',group,'bin')).filter(name=>name.endsWith('.mjs'))) {
-  const path = `tools/${group}/bin/${file}`;
-  mkdirSync(dirname(join(tools,path)),{recursive:true});
-  await bundle({...bundling,entryPoints:[join(root,path)],outfile:join(tools,path)});
-  bins[basename(file,'.mjs')] = path;
-  if (group !== 'cli') copy(join(tools,path),join(dist,file));
-}
-// The standalone CLI deliberately excludes the 24 MB fixture preview runtime.
-// It still embeds the exact component/recipe resources needed for assets sync and push.
-const standalonePreviewStub={name:'standalone-cli-preview',setup(builder){
-  builder.onResolve({filter:/preview\/lib\/preview\.mjs$/},()=>({path:'preview',namespace:'standalone-preview'}));
-  builder.onLoad({filter:/.*/,namespace:'standalone-preview'},()=>({
-    loader:'js',
-    contents:`export async function preview(){return {ok:false,error:"preview_not_bundled",message:"Standalone CLI does not bundle headless preview; download tendril-preview.mjs from the same release."}}`,
-  }));
-}};
-await bundle({...bundling,plugins:[...bundling.plugins,standalonePreviewStub],
-  entryPoints:[join(root,'tools/cli/bin/tendril.mjs')],outfile:join(dist,'tendril.mjs')});
-copy(join(root,'tools/bridges/scripts/tendril-wait.sh'),join(dist,'tendril-wait.sh'));
-for(const entry of ['examples/training-dashboard/setup.mjs','examples/first-page/run.mjs']) await bundle({...bundling,entryPoints:[join(root,entry)],outfile:join(tools,entry)});
-writeFileSync(join(tools,'package.json'),JSON.stringify({name:pkg.name,version:pkg.version,type:'module',bin:bins,engines:pkg.engines,description:pkg.description},null,2)+'\n');
-writeFileSync(join(tools,'THIRD_PARTY_NOTICES.txt'), [...new Set(notices.values())].join('\n\n'));
-archive(tools,`tendriller-tools-${pkg.version}.tgz`);
-const staticDir=join(dist,'static');mkdirSync(staticDir,{recursive:true});
-copy(join(root,'PROVENANCE.md'),join(staticDir,'PROVENANCE.md'));
-for (const directory of ['components','recipes','examples','docs']) for(const file of files(join(root,directory))) copy(join(root,directory,file),join(staticDir,directory,file));
-if(existsSync(join(root,'workflows/browser.js')))copy(join(root,'workflows/browser.js'),join(staticDir,'workflows/browser.js'));
-if(existsSync(join(root,'workflows/session-archive.js')))copy(join(root,'workflows/session-archive.js'),join(staticDir,'workflows/session-archive.js'));
-for(const entry of ['examples/training-dashboard/setup.mjs','examples/first-page/run.mjs']) await bundle({...bundling,entryPoints:[join(root,entry)],outfile:join(staticDir,entry)});
-const galleryBuild=await build({entryPoints:[join(root,'distribution/gallery.ts')],bundle:true,platform:'node',format:'esm',write:false});
-const gallery=await import('data:text/javascript;base64,'+Buffer.from(galleryBuild.outputFiles[0].text).toString('base64'));
-writeFileSync(join(staticDir,'index.html'),await gallery.starterGallery(process.env.CONTRIB_SOURCE_BASE || `https://github.com/werg/tendriller-contrib/blob/v${pkg.version}`).text());
-const catalogFiles=files(staticDir).map(path=>{const bytes=readFileSync(join(staticDir,path));return{path,sha256:hash(bytes),size:bytes.length,type:guessType(path)};});
-const catalog={...release,format:'tendriller-catalog',components:JSON.parse(readFileSync(join(root,'components/catalog.json'),'utf8')).components,recipes:recipeCatalog().recipes,files:catalogFiles};
-writeFileSync(join(dist,'catalog.json'),JSON.stringify(catalog,null,2)+'\n');
-writeFileSync(join(staticDir,'catalog.json'),JSON.stringify(catalog,null,2)+'\n');
-archive(staticDir,`tendriller-static-${pkg.version}.tgz`);
-const workflowDir=join(dist,'workflows');mkdirSync(workflowDir,{recursive:true});
-const workflowEntry=['workflows/server.ts'].map(path=>join(root,path)).find(existsSync);
-if(workflowEntry){
- const result=await build({entryPoints:[workflowEntry],outfile:join(workflowDir,'index.mjs'),bundle:true,platform:'neutral',format:'esm',target:'es2022',metafile:true});
- if(Object.keys(result.metafile.inputs).some(path=>/(?:^|\/)tools\/|node_modules\/(?:ws|playwright|@modelcontextprotocol)/.test(path)))throw Error('Trusted workflow artifact imported tool dependencies.');
- writeFileSync(join(workflowDir,'package.json'),JSON.stringify({name:'@tendriller/workflows',version:pkg.version,type:'module',exports:{'.':'./index.mjs'},tendriller:{contract:3,interfaces:{sessions:{interface_version:'1',schema_version:'1'}}}},null,2)+'\n');
- writeFileSync(join(workflowDir,'manifest.json'),JSON.stringify({...release,format:'tendriller-workflows',interfaces:{sessions:{interface_version:'1',schema_version:'1'}},files:[{path:'index.mjs',sha256:hash(readFileSync(join(workflowDir,'index.mjs')))}]},null,2)+'\n');
- copy(join(root,'PROVENANCE.md'),join(workflowDir,'PROVENANCE.md'));
- archive(workflowDir,`tendriller-workflows-${pkg.version}.tgz`);
-}
-writeFileSync(join(dist,'THIRD_PARTY_NOTICES.txt'), [...new Set(notices.values())].join('\n\n'));
-const artifacts=readdirSync(dist).filter(file=>!readdirSync(dist,{withFileTypes:true}).find(entry=>entry.name===file).isDirectory()&&file!=='manifest.json').sort().map(file=>{const bytes=readFileSync(join(dist,file));return{file,url:`https://github.com/werg/tendriller-contrib/releases/download/v${pkg.version}/${file}`,sha256:hash(bytes),size:bytes.length,type:guessType(file)};});
-writeFileSync(join(dist,'manifest.json'),JSON.stringify({...release,artifacts},null,2)+'\n');
-console.log(`Built ${artifacts.length} contrib release assets against core ${runtimeManifest.id}`);
+console.log(`${check?'Verified':'Built'} ${entries.length} cookbook reading entries${check?'':' and a content-only snapshot'}.`);

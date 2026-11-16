@@ -1,64 +1,18 @@
 {
-  "name": "@tendriller/contrib",
-  "version": "0.3.0-rc.1",
+  "name": "@tendriller/cookbooks",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Optional first-party tools, components, workflows and examples for Tendriller",
+  "description": "Adaptable decision guides and verification specimens for Tendriller pages",
   "repository": "https://github.com/werg/tendriller-contrib",
-  "engines": {
-    "node": ">=22.15.0"
-  },
-  "bin": {
-    "tendril": "tools/cli/bin/tendril.mjs",
-    "tendril-stream": "tools/collector/bin/tendril-stream.mjs",
-    "tendril-preview": "tools/preview/bin/tendril-preview.mjs",
-    "tendril-watch": "tools/bridges/bin/tendril-watch.mjs",
-    "tendril-wait": "tools/bridges/bin/tendril-wait.mjs",
-    "tendril-events": "tools/bridges/bin/tendril-events.mjs"
-  },
-  "exports": {
-    "./collector": "./tools/collector/lib/stream-collector.mjs",
-    "./preview": "./tools/preview/lib/preview.mjs",
-    "./assets": "./tools/cli/lib/assets.mjs"
-  },
-  "files": [
-    "tools",
-    "components",
-    "workflows",
-    "recipes",
-    "examples",
-    "docs",
-    "distribution/requirements.json",
-    "vendor",
-    "README.md",
-    "PROVENANCE.md",
-    "core.lock.json"
-  ],
+  "engines": { "node": ">=22.15.0" },
+  "files": ["cookbooks", "guides", "catalog.json", "index.html", "agent.md", "llms.txt", "README.md", "PROVENANCE.md"],
   "scripts": {
     "build": "node distribution/build.mjs",
-    "check:boundaries": "node distribution/check-boundaries.mjs",
-    "test": "node --test tools/*/test/*.test.mjs recipes/test/*.test.mjs workflows/test/*.test.mjs distribution/test/*.test.mjs",
-    "test:components": "playwright test --config components/test/playwright.config.ts",
-    "test:preview": "playwright test --config tools/preview/test/preview.playwright.config.ts",
-    "check": "npm run check:boundaries && npm run build && npm test",
-    "core:install": "node distribution/install-core.mjs",
-    "test:distribution": "node --test distribution/test/installed.test.mjs",
-    "test:portable": "playwright test --config test/portable/playwright.config.ts",
-    "test:e2e": "playwright test --config test/e2e/playwright.config.ts",
-    "capture:recipes": "node distribution/capture-recipes.mjs"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "1.32.2",
-    "@tendriller/core": "file:vendor/core/tendriller-sdk-0.3.0-rc.1.tgz",
-    "@tendriller/runtime": "file:vendor/core/tendriller-runtime-0.3.0-rc.1.tgz",
-    "ws": "8.21.0"
-  },
-  "devDependencies": {
-    "@playwright/test": "1.65.0",
-    "axe-core": "4.10.3",
-    "esbuild": "0.28.2",
-    "html-to-image": "1.11.13",
-    "qrcode-generator": "2.0.4",
-    "typescript": "7.0.2"
+    "check:generated": "node distribution/build.mjs --check",
+    "check:content": "node distribution/check.mjs",
+    "test": "node --test test/*.test.mjs cookbooks/*/checks/*.test.mjs",
+    "check": "npm run check:generated && npm run check:content && npm test",
+    "test:pilots": "node test/pilot-browser.mjs"
   }
 }

@@ -1,105 +1,105 @@
-# Tendriller contrib
+# Tendriller cookbooks
 
-Optional first-party tools, browser components, trusted workflows and complete example pages for [Tendriller core](https://github.com/werg/tendriller).
+Find an approach for what you want to build, understand the consequential choices,
+and adapt it to the person and task. This collection contributes reasoning—not a
+component library, complete starter catalog, or application schema.
 
-This is the **contract 3** pre-release redesign. It supports one recorded core/contrib pairing. No old URL, payload, queue or package format is translated.
+Start with the [browsable index](index.html), [agent reading index](agent.md), or
+[plain reading catalog](catalog.json). The canonical guide is
+`cookbooks/<stable-id>/COOKBOOK.md`; a guide can stand alone with only an ID, title,
+and summary as metadata. Reading it installs nothing.
 
-## Install a release
+Your page owns its HTML, CSS, JavaScript, state vocabulary, and interaction model.
+Copied snippets become editable application source. Core owns the public runtime,
+service guarantees, and optional [publishing, preview, bridge, and collector tools](https://github.com/werg/tendriller/tree/master/tools).
+The default core installs no application workflow. Deliberately selected trusted
+references live beside the cookbook that explains their policy.
 
-Download the immutable tool archive and `manifest.json` from the same [release](https://github.com/werg/tendriller-contrib/releases). Verify the archive's SHA-256 against that manifest, then unpack it. The archive contains bundled Node executables and the exact runtime, components and recipe resources they use; no npm install or core checkout is required.
+## Use the collection
 
-```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.3.0-rc.1/manifest.json -o manifest.json
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.3.0-rc.1/tendriller-tools-0.3.0-rc.1.tgz -o tools.tgz
-# Verify tools.tgz against the manifest before extracting.
-mkdir tendriller-tools
-tar -xzf tools.tgz -C tendriller-tools
-node tendriller-tools/tools/cli/bin/tendril.mjs --help
-```
+Read [the adaptation loop](guides/using-cookbooks.md), choose only relevant guides,
+and write a short plan explaining important choices and an alternative you rejected.
+Preserve the referenced platform guarantees, then verify the failure cases that
+matter for the implementation. Example markup, paths, parameters, and layouts are
+choices. Publication integrity describes the actual final files, not source-snippet
+byte equality.
 
-The same release includes standalone `tendril.mjs` (lightweight CLI with vendoring; no full tools archive), `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
+## Browse by outcome
 
-For device notifications while the published page is closed, use `tendril notifications` to inspect opted-in owner devices and quota, then `tendril notify "Decision needed" "Please review"`. Deploy core `0.3.0-rc.1` or newer first; its `GET A/notify` endpoint is required. The owner must enable notifications in the built-in page control; see the [core Web Push runbook](https://github.com/werg/tendriller/blob/master/docs/PUSH_NOTIFICATIONS.md). These CLI commands use the authenticated agent API and do not need a live page tab.
+<!-- cookbook-index:start -->
+### Choose inputs and algorithms
 
-## Create a page
+- [Choose a voice interaction](cookbooks/choose-voice-interaction/COOKBOOK.md) — Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.
+- [Connect an instrument and interpret its protocol](cookbooks/connect-instrument/COOKBOOK.md) — Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface.
+- [Detect meaningful changes cheaply](cookbooks/detect-meaningful-changes/COOKBOOK.md) — Choose baseline, hysteresis, debounce, and cooldown according to the cost of false triggers and missed events.
+- [Discover capabilities and design around them](cookbooks/discover-capabilities/COOKBOOK.md) — Distinguish API presence from usable permission and offer a task-completing alternative before requesting access.
+- [Follow location changes and route progress](cookbooks/follow-location-progress/COOKBOOK.md) — Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops.
+- [Turn noisy motion into useful events](cookbooks/interpret-motion/COOKBOOK.md) — Calibrate simple motion heuristics and describe their uncertainty before treating an event as progress.
+- [Notice meaningful visual changes](cookbooks/notice-visual-changes/COOKBOOK.md) — Choose reference frames, thresholds, and sampling budgets for a task where a changed scene matters.
+- [Add local perception with an explicit engine](cookbooks/select-local-perception/COOKBOOK.md) — Choose model assets, confidence rules, coordinate conventions, and evaluation for optional pose, object, or text recognition.
 
-```sh
-node tendriller-tools/tools/cli/bin/tendril.mjs scaffold field-notebook ./notebook
-node tendriller-tools/tools/preview/bin/tendril-preview.mjs ./notebook --fixture ./notebook/scenario.json
-```
+### Collect evidence
 
-Scaffolding writes `tendril.json`, copies the complete declared component dependency graph into `assets/`, and records exact hashes in `tendril.assets.json`. Hand-built pages can run `tendril assets sync <dir>`; `tendril push <dir>` performs the same safe sync before publication. Lazy siblings resolve relative to the selected component script, so changing a service deployment cannot replace a page's component implementation.
+- [Annotate a particular image or frame](cookbooks/annotate-a-frame/COOKBOOK.md) — Keep coordinates, identity, and transforms coherent when evidence is resized or replaced.
+- [Ask a question about reviewed evidence](cookbooks/ask-about-evidence/COOKBOOK.md) — Bind questions and replies to specific sources and distinguish observation from interpretation.
+- [Capture rendered evidence](cookbooks/capture-rendered-evidence/COOKBOOK.md) — Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out.
+- [Capture, review, and send evidence](cookbooks/capture-reviewed-evidence/COOKBOOK.md) — Design permission, review, durable submission, and recovery around evidence the person actually intends to send.
+- [Collect and discuss a sketch](cookbooks/collect-sketch/COOKBOOK.md) — Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context.
+- [Import information for review](cookbooks/import-for-review/COOKBOOK.md) — Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.
+- [Keep evidence and interpretation separate](cookbooks/separate-evidence-interpretation/COOKBOOK.md) — Preserve original observations while allowing conclusions, labels, and explanations to evolve.
 
-A workflow recipe declares its required module interface. On the service, an authenticated controller explicitly activates its scope before publishing initial protected state:
+### Decide and act
 
-```sh
-tendril workflow sessions activate '{"scope":"notebook"}'
-tendril scopes list
-# Supply the returned authoritative generation when making a protected write.
-tendril state set notebook.title '"Field notes"' --scope sessions:notebook --generations '{"sessions:notebook":"<generation>"}'
-tendril push ./notebook
-```
+- [Build a comparison and decision workspace](cookbooks/compare-options/COOKBOOK.md) — Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score.
+- [Observe long-running work and enable intervention](cookbooks/observe-long-running-process/COOKBOOK.md) — Separate freshness, progress, failures, and intervention from the agent conversation that may come and go.
+- [Review an exact proposal before acting](cookbooks/review-exact-proposal/COOKBOOK.md) — Bind approval to immutable content and an explicit version, expiry, and execution policy.
 
-The server's publication manifest locks actual file hashes and runtime URLs. The page asset lock complements it by identifying the selected contrib release and source artifacts.
+### Guide and coordinate work
 
-## Ownership
+- [Choose when to interrupt](cookbooks/choose-interruptions/COOKBOOK.md) — Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point.
+- [Collect private responses and publish a reviewed aggregate](cookbooks/collect-private-responses/COOKBOOK.md) — Keep answers and assignments private while giving a facilitator an explicit, versioned path to shared results.
+- [Coordinate views and attention across devices](cookbooks/coordinate-devices/COOKBOOK.md) — Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct.
+- [Guide a task with explicit checkpoints](cookbooks/guide-explicit-checkpoints/COOKBOOK.md) — Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.
+- [Join or transfer a page across devices](cookbooks/join-across-devices/COOKBOOK.md) — Choose role-aware links and a usable transfer method without turning device purpose into authority.
+- [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 
-| Directory | Owns |
-| --- | --- |
-| `tools/cli/` | General CLI, page packing, scaffolding, service checks and resource resolution |
-| `tools/collector/` | Source adapters, transforms, spool management and machine producers |
-| `tools/bridges/` | Host-specific wake delivery, event acknowledgement, watch and wait commands |
-| `tools/preview/` | Fixture transport adapter using the released production browser runtime |
-| `components/` | Optional browser components and explicit dependency graph |
-| `workflows/` | Session workflow schemas, clients, browser UI and trusted Worker implementation |
-| `recipes/`, `examples/` | Application models, layouts, scenarios and setup |
-| `distribution/` | Artifact builds, integrity manifests, catalog and installed-artifact tests |
+### Keep work dependable
 
-The trusted workflow artifact contains only a Worker-compatible module. CLI, preview, `ws`, MCP host bridges, and components never become dependencies of the deployed core engine.
+- [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
+- [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
+- [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.
+- [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
+- [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.
+- [Publish coherent page updates](cookbooks/publish-coherent-updates/COOKBOOK.md) — Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.
+- [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
+- [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
+- [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
+- [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 
-## Contract and generations
+### Make sense of information
 
-The public service descriptor is `GET /api/service`. Tools check contract and required workflow interface/schema revisions before provisioning or writing. A new collector or chart release can use an existing workflow interface without requiring a service deployment.
+- [Present live measurements honestly](cookbooks/present-live-measurements/COOKBOOK.md) — Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs.
+- [Run a bounded measurement experiment](cookbooks/run-measurement-experiment/COOKBOOK.md) — Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record.
+- [Turn messy records into useful signals](cookbooks/turn-records-into-signals/COOKBOOK.md) — Project fields, preserve units, and bound flattening without silently changing the meaning of a source record.
+<!-- cookbook-index:end -->
 
-Application event data is opaque. A field named `session`, an event type that resembles a recipe, or a state key named `experiment` cannot activate a workflow. Protected commands carry `cid`, explicit `scope` where needed, and `expected_generations` outside `data`. Browser adapters capture these through `tendril.scopes.capture()`; durable commands retain their original capture when reconnected.
+## Contribute and verify
 
-The `sessions` workflow is explicitly invoked at `POST /workflows/sessions/<operation>`. Its browser adapter lives in the page's declared assets. Its module activation, private responses, assignment permissions, archive/reset and generation rotation are enforced by the server, not by fixture preview.
-
-## Preview
-
-Preview embeds the exact released core runtime and imports the public `@tendriller/runtime/preview-support` primitives. Sensor fixture events use the supported `fixture_event` transport boundary, enabled only by preview configuration. Unsupported service operations return `preview_unsupported`. Preview does not substitute for real service authorization or transaction tests.
-
-The standalone preview starts without downloading executable code. Screenshot and headless scenario automation require Playwright to be installed locally. Optional neural engines are not downloaded automatically. Experimental `pose`, `objects` and `text` adapters require explicitly declared engine/model assets and are excluded from the supported default component catalog.
-
-## Develop and verify
+See [contribution guidance](guides/contributing.md), [evidence levels](guides/evidence.md),
+and the [source conversion inventory](guides/conversion.md). Useful failures and
+rejected alternatives are valuable contributions.
 
 ```sh
 npm ci
 npm run check
-npx playwright install chromium
-npm run test:components
-npm run test:preview
-npm run test:portable
+npm run build
 ```
 
-`core.lock.json` records the exact public SDK/runtime archives, release URLs and SHA-256 hashes. Copies in `vendor/core/` make initial development and builds independent of a sibling core checkout. `npm run core:install` refreshes only the locked artifacts after verifying their hashes. Updating the supported pairing requires updating both this lock and the ordinary npm lockfile.
+The ordinary check is local and content-focused: metadata, reading links, generated
+output, source accounting, and deterministic snippet checks. It needs no service or
+contrib/core release synchronization. `dist/` contains a content-only site snapshot
+and an archive manifest. [Pilot verification](guides/pilot-checks.md) explains the
+separate browser and actual-host checks using explicitly supplied public core artifacts.
 
-`npm run build` produces the tool archive, standalone commands, static component/example/catalog bundle, separate trusted workflow archive, and a manifest. Installed-artifact tests unpack into a fresh directory, scaffold every starter, verify dependency hashes, start the standalone preview, and compare its runtime bytes with the released core manifest.
-
-Create `release/v<package-version>` at the exact source commit to publish a release candidate. Branch creation and subsequent pushes run the full Node/browser gate before CI creates the matching version tag and GitHub pre-release at that tested commit. The release job downloads the public SDK/runtime URLs in `core.lock.json` and verifies their hashes before building, so the pinned core release must already be published. Existing version tags and published releases use the same gate. Manual dispatch publishes only when selected on a matching release branch or version tag.
-
-The publisher requires the ref, package version, manifest version and exact source commit to agree. Existing tags must resolve to that commit, including annotated tags. Publication is serialized and idempotent: it verifies all existing asset bytes, uploads only missing files and publishes the manifest last. A mismatched tag or asset stops publication; use a new version instead of moving a tag or replacing published bytes.
-
-See [source provenance](PROVENANCE.md), [CLI commands](tools/cli/README.md), [collector documentation](docs/COLLECTOR.md), and [host integrations](docs/AGENT_HOSTS.md).
-
-## Authenticated service tests
-
-`npm run test:e2e` targets an explicitly started core deployment with the pinned
-`sessions` artifact and test identity fixtures. Set `TENDRILLER_E2E_SERVICE`,
-`TENDRILLER_E2E_OWNER`, `TENDRILLER_E2E_OWNER_TOKEN` and
-`TENDRILLER_E2E_OTHER_TOKEN` for the fixture host. The defaults match the documented
-local test deployment. The suite publishes complete contrib assets through the
-public API, activates scopes explicitly, and exercises approvals, participant
-privacy and retained drafts against real authorization. It does not import or
-start another repository's source. Core's artifact composition tests separately
-exercise the same trusted module archive through its transaction host.
+[Source provenance and terms](PROVENANCE.md) remain explicit. This refactor grants
+no new license and makes no compatibility promise for retired product surfaces.

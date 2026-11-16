@@ -1,0 +1,9 @@
+# Tendriller cookbooks
+
+> Adaptable reasoning for page-owned applications. No UI package or install graph.
+
+- [Agent reading index](agent.md)
+- [Catalog](catalog.json)
+- [Usage](guides/using-cookbooks.md)
+- [Evidence](guides/evidence.md)
+- [Core public contract](https://github.com/werg/tendriller/blob/master/agent.md)

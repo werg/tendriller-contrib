@@ -1,0 +1,40 @@
+{
+  "evidence": "exercised",
+  "date": "2026-11-16T13:02:52.729Z",
+  "host": "real built Worker",
+  "source_commit": "b5e438d6192d2d8791f54078f80764686632f0de",
+  "core_commit": "c248ceeabfd210538f445d5f889f7cc166f081b1",
+  "sdk_sha256": "895ad9b6abae3ad5bda62bfbf5157a3e4ea960fc82847d6506b4477ef5c25d86",
+  "engine_sha256": "50381990628eb5b732be998c0a2ac4cd0f09e3535592f4dcdb061c5c9b4f0e3e",
+  "private_reference_sha256": "6ed68842d49981b8693ac83bc5f760d33de0ea053a8762ddca56eaec20bdfb8d",
+  "approval_reference_sha256": "529a394fe423dad903be710fb62bc1a02ed13b0cdd87b386f85488c725691097",
+  "scenarios": [
+    {
+      "name": "keeps assignments and answers private and publishes only a reviewed summary",
+      "status": "passed"
+    },
+    {
+      "name": "binds approval to exact content and version and keeps execution identity stable",
+      "status": "passed"
+    },
+    {
+      "name": "checks expiry at both the owner response and the first execution claim",
+      "status": "passed"
+    }
+  ],
+  "limits": [
+    "Synthetic test identities and text responses; private media and production deployment are not exercised.",
+    "Synthetic identities bypass production OAuth setup.",
+    "External effect deduplication remains the caller's responsibility."
+  ],
+  "source_head_commit": "b5e438d6192d2d8791f54078f80764686632f0de",
+  "source_tree": "735ba4959af4d61beb90cff1957983e119d9523c",
+  "ci": {
+    "run_id": 43871914704,
+    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43871914704",
+    "artifact_id": 14227749050,
+    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43871914704/artifacts/14227749050",
+    "artifact_sha256": "d836355d5cb67c2e9adf1fa0a078dbc5b1b600cada45fb4422a49ec6229eb666"
+  },
+  "command": "node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts .core-build/dist"
+}
