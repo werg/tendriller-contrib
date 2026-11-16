@@ -3,6 +3,15 @@
 The pilot guides separate shared semantic guarantees from layout choices. Executable
 specimens are evidence for adaptation and failure behavior, not stable page packages.
 
+The new [resident-peer task-board/chat specimen](../cookbooks/run-a-peer-application/checks/README.md)
+has two layouts and focused deterministic page/model checks. It consumes the public
+application-backend boundary, an explicitly supplied public Chronolog bundle, and
+a real deployment bootstrap. These new checks are separate from the historical
+browser results below. Its [qualification matrix](../cookbooks/run-a-peer-application/notes/implementation-and-qualification.md)
+keeps actual SQL/OPFS, native authority, provider effects, network routes, and cost
+measurements at their respective evidence boundaries; none are inferred from a
+read-handle fixture or a screenshot.
+
 | Pilot | Distinct adaptations | Observed browser behavior | Passed scenarios |
 | --- | --- | --- | --- |
 | Measurements | Dense desktop panels/table and a nested mobile instrument | Source/run identity, exact missing values, bounded ingestion, coherent checkpoints, retention gaps, and invalidation of delayed reads or paints after revoked access. | 8 |

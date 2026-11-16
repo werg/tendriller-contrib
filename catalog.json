@@ -208,7 +208,8 @@
         "recover-outdated-work",
         "collect-private-responses",
         "reconcile-concurrent-edits",
-        "export-and-restore-work"
+        "export-and-restore-work",
+        "run-a-peer-application"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md",
@@ -1257,7 +1258,8 @@
       "related": [
         "connect-resuming-agent",
         "coordinate-devices",
-        "recover-outdated-work"
+        "recover-outdated-work",
+        "run-a-peer-application"
       ],
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
@@ -1299,6 +1301,43 @@
       ],
       "path": "cookbooks/review-exact-proposal/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/review-exact-proposal/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Bind approval to immutable content and an explicit version, expiry, and execution policy. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "run-a-peer-application",
+      "title": "Run a shared application with a resident agent",
+      "summary": "Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct.",
+      "group": "Keep work dependable",
+      "tags": [
+        "peers",
+        "events",
+        "sql",
+        "agent",
+        "recovery"
+      ],
+      "choices": [
+        "Native authority or the hosted backend",
+        "Atomic SQL and events or an event-only history",
+        "Final worker intent versus provisional views and transient signals"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "reconcile-concurrent-edits",
+        "recover-outdated-work",
+        "resume-across-sessions",
+        "observe-long-running-process",
+        "manage-sensitive-data",
+        "publish-coherent-updates"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md",
+        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md",
+        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md",
+        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"
+      ],
+      "path": "cookbooks/run-a-peer-application/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "run-measurement-experiment",

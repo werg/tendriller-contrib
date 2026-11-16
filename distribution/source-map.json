@@ -341,6 +341,15 @@
       ]
     },
     {
+      "id": "run-a-peer-application",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md",
+        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md",
+        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md",
+        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"
+      ]
+    },
+    {
       "id": "run-measurement-experiment",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/AGENT.md",

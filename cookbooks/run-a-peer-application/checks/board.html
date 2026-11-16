@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Inspection room</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="board-layout">
+  <header>
+    <p class="eyebrow">Shared inspection</p>
+    <h1>One board. A complete conversation.</h1>
+    <p>Claim a task, discuss the evidence, and follow the agent’s recorded result.</p>
+    <div class="controls"><button type="button" id="refresh">Refresh</button><label><input id="include-pending" type="checkbox"> Include provisional changes</label></div>
+    <p id="status" role="status">Connecting your application…</p>
+    <p id="revision" class="quiet"></p>
+  </header>
+  <main>
+    <section id="task-section" aria-labelledby="task-heading">
+      <p class="eyebrow">Work together</p><h2 id="task-heading">Inspection tasks</h2>
+      <p id="task-empty">No tasks have been added to this inspection.</p>
+      <ul id="tasks" class="task-grid"></ul>
+      <h2>Agent work</h2><ul id="jobs" class="entries"></ul>
+    </section>
+    <section aria-labelledby="conversation-heading">
+      <p class="eyebrow">Keep the context</p><h2 id="conversation-heading">Conversation</h2>
+      <p id="chat-empty">Start with what the other people or the agent need to know.</p>
+      <ol id="conversation" class="entries"></ol>
+      <p id="typing" class="quiet" aria-live="polite"></p>
+      <form id="message-form">
+        <label for="message">Your message</label>
+        <textarea id="message" rows="4" maxlength="8000" disabled></textarea>
+        <p class="quiet">Unsent text stays on this device. Every submitted message has its own receipt.</p>
+        <button id="send" disabled>Send message</button>
+      </form>
+    </section>
+    <section class="receipts" aria-labelledby="receipt-heading">
+      <h2 id="receipt-heading">Your submissions</h2>
+      <p>Review the original intent and its result. Copy a rejected message into the editor to make a new decision.</p>
+      <ol id="operations" class="entries"></ol>
+    </section>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

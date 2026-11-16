@@ -7,7 +7,7 @@ tags: ["data-model", "authority", "retention"]
 choices: ["Current value versus ordered history", "Authority, privacy, and record lifetime", "View checkpoints versus handled-agent-work checkpoints"]
 capabilities: []
 evidence: "explained"
-related: ["recover-outdated-work", "collect-private-responses", "reconcile-concurrent-edits", "export-and-restore-work"]
+related: ["recover-outdated-work", "collect-private-responses", "reconcile-concurrent-edits", "export-and-restore-work", "run-a-peer-application"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"]
 ---
 
@@ -47,6 +47,30 @@ These are example choices, not a common inspection schema. If a task needs no or
 For each kind of information, record its writer, readers, authoritative owner, ordering, lifetime, and failure behavior. A compact design worksheet should also name the unit, schema version when needed, maximum size, and deletion policy. Use stable IDs independent of position and editable labels. Keep application state vocabulary local to the page; familiar names such as `session` do not activate server behavior.
 
 ## Make saving legible
+
+### Select one backend for durable application meaning
+
+For an application with an always-running native agent, the
+[peer application approach](../run-a-peer-application/COOKBOOK.md) puts SQL state,
+conversation, durable events, and worker intent in one Chronolog history. A
+mixed change can assert a condition, update SQL, and publish its effective event
+atomically. An event-only group can omit the SQL engine. The page's selected
+application backend owns writes and the durable proposal outbox; it does not
+submit a second copy through the hosted state or conversation queue.
+
+The hosted backend remains an independent selection for applications that use
+its service availability. Its JSON-state programs and the peer backend's SQL
+programs have explicit capability boundaries. Do not simulate SQL through opaque
+state keys or assume that using one backend authorizes a hot switch to another.
+New pre-release pages can adopt the clean interface directly without a legacy
+conversion path.
+
+For the peer profile, topics filter one group history and are not private
+collections. A revision-scoped read captures the task query and effective events
+together. Keep private agent data elsewhere, expiring presence out of durable
+history, and blobs on an explicit byte-retention path. The SQL revision, event
+scan cursor, consumer processed checkpoint, and backup progress answer different
+questions.
 
 Display persistence at the level the person cares about: “Draft on this device,” “Submission queued,” “Accepted,” and “Awaiting review” have different meanings. Do not show a global green “Saved” indicator while a selected photo is only in memory or its semantic submission was rejected. Associate failures with their object, preserve the draft, and offer a useful next action.
 
