@@ -85,6 +85,12 @@ async function send() {
     save();
   } catch (error) {
     if (!current()) return;
+    if (error.code === 'forbidden' || error.status === 401 || error.status === 403) {
+      authEpoch++;
+      clearSensitive();
+      $('#status').textContent = 'Private response unavailable for the current identity. Reopen after authorization changes.';
+      return;
+    }
     $('#receipt').hidden = false;
     $('#receipt').textContent = `Original response retained: ${sent.body.data.answer}`;
     $('#status').textContent = `Not accepted: ${error.message}. Retry keeps the original command and generation.`;

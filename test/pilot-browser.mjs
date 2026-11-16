@@ -49,7 +49,7 @@ function writeEvidence() {
 }
 async function withPage(directory,fixture,fn,{path='/',mobile=false,beforeOpen=async()=>{}}={}){
  const server=await startServer(resolve(root,directory),undefined,fixture),origin=`http://127.0.0.1:${server.address().port}`;
- const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},serviceWorkers:'block'}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+ const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},serviceWorkers:'block'}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.stack || error.message));
  try{await beforeOpen({server,origin,context,page});await page.goto(origin+path);await page.waitForFunction(()=>window.tendril?.connected);await fn({server,origin,context,page});assert.deepEqual(errors,[],nameFor(directory)+' browser errors');}finally{await context.close();await server.stopPreview();}
 }
 const nameFor=directory=>directory.split('/').slice(-2).join('/');
@@ -160,6 +160,29 @@ try{
  }));
  const denied = { error: { code: 'forbidden', message: 'Current identity is not authorized' } };
  const privateDirectory = 'cookbooks/collect-private-responses/checks/';
+ for (const layout of ['participant', 'facilitator']) {
+  await check(`${layout}: denied mutation clears private content before a role notification`, () => withPage(privateDirectory + layout, {
+   ...privateBase, role: layout === 'participant' ? 'guest' : 'owner', http: [
+    { method: 'POST', path: '/_tendril/workflows/private-responses/mine', json: { assignments: [assignment] } },
+    { method: 'POST', path: '/_tendril/workflows/private-responses/review', json: review },
+    { method: 'POST', path: '/_tendril/workflows/private-responses/submit', status: 403, json: denied },
+    { method: 'POST', path: '/_tendril/workflows/private-responses/publish', status: 403, json: denied },
+   ],
+  }, async ({ page }) => {
+   if (layout === 'participant') {
+    await page.locator('#form').waitFor({ state: 'visible' }); await page.locator('#answer').fill('Secret revoked response'); await page.locator('#submit').click();
+   } else {
+    await page.getByText('Private fixture answer', { exact: true }).waitFor(); await page.locator('#summary').fill('Secret unshared aggregate'); await page.locator('#publish').click();
+   }
+   await page.waitForFunction(() => document.querySelector('#status').textContent.includes('unavailable for the current identity'));
+   if (layout === 'participant') {
+    assert.equal(await page.locator('#form').isVisible(), false); assert.equal(await page.locator('#answer').inputValue(), ''); assert.equal(await page.locator('#receipt').textContent(), '');
+   } else {
+    assert.equal(await page.locator('#answers').textContent(), ''); assert.equal(await page.locator('#round').textContent(), ''); assert.equal(await page.locator('#summary').inputValue(), ''); assert.equal(await page.locator('#published').textContent(), '');
+   }
+  }));
+ }
+
  {
   const release = deferred(), arrived = deferred(), delivered = deferred(); let first = true;
   await check('participant: old authorized read cannot restore private content after revocation', () => withPage(privateDirectory + 'participant', {
@@ -230,4 +253,5 @@ try{
   await page.getByText('Reviewed shared finding',{exact:true}).waitFor();assert.equal(server.mockedHttp.length,0);assert.ok(!server.preview.messages.some(m=>JSON.stringify(m).includes('private-responses')));await page.screenshot({path:resolve(dirname(output),'private-display.png'),fullPage:true});
  }));
  console.log(`Recorded ${results.length} browser scenarios in ${output}`);
+ console.log(readFileSync(output, 'utf8'));
 }finally{writeEvidence();await browser.close();}

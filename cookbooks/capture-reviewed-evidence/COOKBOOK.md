@@ -33,6 +33,8 @@ Permission must be requested by the relevant user gesture. API presence does not
 
 **Conditional requirement:** use the current public capture/blob interface for durable bytes and the public command interface for submission. Do not expose raw device handles or private transport. Use the exact current core contract for operations and byte limits; this guide intentionally specifies behavior rather than preserving an obsolete capture wire format.
 
+For the current browser API, `uploadEvent` creates a new durable operation and returns its runtime-owned `capture_id`. Give the reviewed snapshot a separate page-owned `submission_id` inside `data`; use `capture_queue` to associate that ID with the runtime operation, then correlate `upload_event` results by `capture_id`. Subscribe before reading `captures()` so initialization or reload cannot hide a pending item. Also associate the awaited result with its original snapshot: a local-storage rejection may never enter the queue. Use `retryCapture(capture_id)` for the original operation; calling `uploadEvent` again creates another submission.
+
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
 
 ## Adapt the plan

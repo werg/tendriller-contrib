@@ -44,9 +44,10 @@ Keep application vocabulary and record shapes in the selected extension. The hos
 3. Build the smallest selected trusted implementation. Return only the authorized projection; test that another participant cannot fetch raw records by guessing IDs.
 4. Design the participant form around a clear question, privacy explanation, draft, submit status, and revision conflict. Build the facilitator console independently around review and uncertainty.
 5. Make the shared display read only the intentionally published aggregate. Never connect it to the facilitator's raw-response fetch and merely hide fields.
-6. Bind a submitted answer to the original prompt/version before asynchronous work. On conflict, show what changed and preserve the local draft for review.
-7. Publish an aggregate from an explicit reviewed snapshot. Include denominators, missing responses, and limitations. Avoid exposing individual text through small-group summaries.
-8. If offered, close/archive/reset through one authoritative transaction. Enforce archive privacy and retained media permissions after reset as well as before.
+6. Clear private forms, receipts, summaries, and review panels immediately when identity or authority changes. Invalidate every pending read/write continuation, including failures; a delayed error must not redisplay an answer from the former view. Read a local draft only after the current authorized projection identifies its assignment.
+7. Bind a submitted answer to the original prompt/version before asynchronous work. On conflict, show what changed and preserve the local draft for review.
+8. Publish an aggregate from an explicit reviewed snapshot. Include denominators, missing responses, and limitations. Avoid exposing individual text through small-group summaries.
+9. If offered, close/archive/reset through one authoritative transaction. Enforce archive privacy and retained media permissions after reset as well as before.
 
 ## Adaptation and checks
 

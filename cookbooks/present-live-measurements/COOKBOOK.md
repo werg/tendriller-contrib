@@ -44,7 +44,7 @@ The extracted chart seeded EMA at the oldest retained observation, restarted at 
 4. Give transformations explicit names. Make exact raw values accessible through text, a table, or selection details.
 5. If replay is asynchronous, advance the processing checkpoint only after processing succeeds. A subscription callback returning a promise does not imply an acknowledged consumer.
 6. If caching, atomically save `{modelVersion, cursor, view, historyIncomplete}` under a key that includes page, reader, stream, and interpretation. Validate all fields before restoring.
-7. Authorize the current reader before displaying private cached values. Clear or segregate caches on identity changes. Local storage grants no authority.
+7. Authorize the current reader before displaying private cached values. Clear or segregate caches on identity changes. Stop subscriptions and clear sensitive DOM immediately, then check the new identity. Guard pending authorization, stream callbacks, and scheduled paints with the same view generation so an older success cannot restore a revoked view. Local storage grants no authority.
 8. On corrupt or incompatible cache, rebuild both model and cursor; never restore only the cursor. Preserve a known history gap across reloads.
 9. Expose stale data, unavailable storage, and incomplete retention as distinct states. Keep the last coherent checkpoint when a save fails.
 

@@ -35,6 +35,7 @@ async function load(epoch = authEpoch) {
     $('#status').textContent = 'Authorized private view. Review the aggregate before publishing.';
   } catch (error) {
     if (!valid()) return;
+    authEpoch++;
     clearSensitive();
     $('#status').textContent = `Private review unavailable: ${error.message}`;
   }
@@ -62,6 +63,12 @@ async function publish() {
     await load(epoch);
   } catch (error) {
     if (epoch !== authEpoch) return;
+    if (error.code === 'forbidden' || error.status === 401 || error.status === 403) {
+      authEpoch++;
+      clearSensitive();
+      $('#status').textContent = 'Private review unavailable for the current identity. Refresh to reauthorize.';
+      return;
+    }
     $('#status').textContent = `Publication not accepted: ${error.message}. The original reviewed revision is retained.`;
     $('#retry').hidden = false;
   }
