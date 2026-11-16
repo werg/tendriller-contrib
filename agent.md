@@ -35,6 +35,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 
 - [Build forms people can complete and correct](cookbooks/build-correctable-forms/COOKBOOK.md) — Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.
 - [Make the complete interaction accessible](cookbooks/complete-accessible-interactions/COOKBOOK.md) — Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.
+- [Localize language, numbers, and direction coherently](cookbooks/localize-an-interaction/COOKBOOK.md) — Keep language, locale, time zone, source values, plural messages, and bidirectional layout consistent without losing drafts or changing meaning.
 - [Search and filter a growing collection](cookbooks/search-and-filter-collections/COOKBOOK.md) — Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.
 - [Undo and revise work without changing its meaning](cookbooks/undo-and-revise-work/COOKBOOK.md) — Choose local undo, revision history, guarded reversal, or explicit compensation according to what changed and who may have acted on it.
 - [Write and review a document across revisions](cookbooks/write-with-versioned-feedback/COOKBOOK.md) — Keep drafts, anchored feedback, suggested changes, reviewer decisions, and publication tied to the document versions they concern.
@@ -44,6 +45,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Choose when to interrupt](cookbooks/choose-interruptions/COOKBOOK.md) — Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point.
 - [Collect private responses and publish a reviewed aggregate](cookbooks/collect-private-responses/COOKBOOK.md) — Keep answers and assignments private while giving a facilitator an explicit, versioned path to shared results.
 - [Coordinate views and attention across devices](cookbooks/coordinate-devices/COOKBOOK.md) — Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct.
+- [Complete a field inspection with reviewable evidence](cookbooks/document-a-field-inspection/COOKBOOK.md) — Combine a versioned checklist, measurements, annotated evidence, exceptions, offline draft recovery, and a reviewed handover report.
 - [Guide a task with explicit checkpoints](cookbooks/guide-explicit-checkpoints/COOKBOOK.md) — Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.
 - [Guide practice with useful feedback](cookbooks/guide-practice-and-feedback/COOKBOOK.md) — Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery.
 - [Hand off responsibility with a clear acceptance](cookbooks/hand-off-responsibility/COOKBOOK.md) — Transfer task context and unresolved work through an explicit offer and acceptance without confusing assignment, access, or completion.
@@ -51,6 +53,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
+- [Track routines without misleading progress](cookbooks/track-habits-and-routines/COOKBOOK.md) — Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
 ### Keep work dependable

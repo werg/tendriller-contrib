@@ -552,6 +552,38 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/discover-capabilities/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish API presence from usable permission and offer a task-completing alternative before requesting access. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "document-a-field-inspection",
+      "title": "Complete a field inspection with reviewable evidence",
+      "summary": "Combine a versioned checklist, measurements, annotated evidence, exceptions, offline draft recovery, and a reviewed handover report.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "inspection",
+        "evidence",
+        "handover"
+      ],
+      "choices": [
+        "Required observations and justified not-applicable outcomes",
+        "Offline draft capture versus authoritative completion",
+        "Working notes, reviewed report, and later amendments"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guide-explicit-checkpoints",
+        "capture-reviewed-evidence",
+        "annotate-a-frame",
+        "follow-location-progress",
+        "import-for-review"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md"
+      ],
+      "path": "cookbooks/document-a-field-inspection/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/document-a-field-inspection/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Combine a versioned checklist, measurements, annotated evidence, exceptions, offline draft recovery, and a reviewed handover report. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "explore-what-if-scenarios",
       "title": "Explore assumptions with what-if scenarios",
       "summary": "Build a bounded model with an inspectable baseline, comparable scenarios, sensitivity checks, and explicit uncertainty.",
@@ -871,6 +903,36 @@
       ],
       "path": "cookbooks/keep-task-active/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/keep-task-active/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose foreground wake lock and interruption behavior without promising background execution. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "localize-an-interaction",
+      "title": "Localize language, numbers, and direction coherently",
+      "summary": "Keep language, locale, time zone, source values, plural messages, and bidirectional layout consistent without losing drafts or changing meaning.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "localization",
+        "formatting",
+        "accessibility"
+      ],
+      "choices": [
+        "Language, formatting locale, and time zone as separate choices",
+        "Canonical source values versus localized display and input",
+        "Reviewed translations, fallback messages, and direction"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "build-correctable-forms",
+        "complete-accessible-interactions",
+        "adapt-without-losing-work",
+        "choose-data-model"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/CAPTURES.md"
+      ],
+      "path": "cookbooks/localize-an-interaction/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/localize-an-interaction/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep language, locale, time zone, source values, plural messages, and bidirectional layout consistent without losing drafts or changing meaning. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "manage-sensitive-data",
@@ -1412,6 +1474,37 @@
       ],
       "path": "cookbooks/test-adaptive-page/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/test-adaptive-page/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "track-habits-and-routines",
+      "title": "Track routines without misleading progress",
+      "summary": "Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "routines",
+        "scheduling",
+        "progress"
+      ],
+      "choices": [
+        "Calendar-based occurrences or elapsed intervals",
+        "Observed, skipped, unknown, and corrected outcomes",
+        "Optional reminders with honest delivery state"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guide-explicit-checkpoints",
+        "choose-interruptions",
+        "resume-across-sessions",
+        "localize-an-interaction"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md"
+      ],
+      "path": "cookbooks/track-habits-and-routines/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/track-habits-and-routines/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "triage-incoming-work",
