@@ -29,6 +29,10 @@ bundle and complete supplied deployment assets. Its manifest records content
 digests. Build into an empty directory, publish the entire graph, and select
 either `board.html` or `compact.html` as the page entry. The tool does not fill in
 missing runtime modules or replace a failed deployment with fixture state.
+It also copies `scoped-state.mjs`, the optional
+[captured-generation reset recipe](../notes/scoped-json-state.md). The task/chat
+pages do not import that extra schema automatically; the paired native check and
+an application that chooses the recipe consume the same built program module.
 
 `deployment/bootstrap.mjs` has this explicit responsibility:
 

@@ -167,6 +167,12 @@ exact retry result must still live in the selected authority's transaction. A ne
 API does not justify refreshing a stale guard or splitting authoritative checks
 between Cloudflare and a native peer.
 
+The [scoped JSON reset recipe](notes/scoped-json-state.md) makes that rule concrete
+with ordinary SQL: capture an exact scope/generation, assert it in the authored
+write, and rotate monotonically in a separate atomic reset. Its executable
+builders share the public application bundle and the core's original operation
+identity; an older rejected edit is reviewed instead of silently upgraded.
+
 ## Read events without skipping processing
 
 Use the durable event reader for work that must observe every effective event.
