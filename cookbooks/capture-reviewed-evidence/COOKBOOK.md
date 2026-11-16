@@ -8,7 +8,7 @@ choices: ["File or typed fallback versus a live sensor", "Inline review versus a
 capabilities: ["captures", "durable commands"]
 evidence: "exercised"
 related: ["discover-capabilities", "annotate-a-frame", "recover-outdated-work"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs"]
 ---
 
 # Capture, review, and send evidence
@@ -37,6 +37,12 @@ For the current browser API, `uploadEvent` creates a new durable operation and r
 
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
 
+## Separate verified bytes from accepted evidence
+
+The runtime coordinates the immutable upload and the later semantic capture command. A completed upload receipt means the service verified those bytes. The capture's accepted result means its original task context was admitted. Neither says the agent has completed its work. Keep queued, uploaded, accepted, and rejected meanings distinct even when the interface shows only one concise status at a time.
+
+Use the returned immutable content identity when later analysis or annotations must refer to the reviewed bytes. A mutable shared-file path can point to a newer object; a display URL alone does not grant authority or permanent retention. Do not infer participant-private media from an upload or a retained reference. The [private-response guide](../collect-private-responses/COOKBOOK.md) deliberately keeps that separate boundary explicit.
+
 ## Adapt the plan
 
 1. Inspect the task and choose the least demanding input that provides useful evidence. Name the permission and active-use disclosure.
@@ -52,7 +58,7 @@ For the current browser API, `uploadEvent` creates a new durable operation and r
 
 The [inline specimen](checks/inline/index.html) uses an ordinary file input, text area, local review, and explicit send. The [fullscreen sketch specimen](checks/fullscreen/index.html) uses a canvas capture route and a separate review step. Neither mounts a shared input component or assumes a universal event vocabulary. Both retain an immutable submitted snapshot and distinguish pending outcomes from new drafts.
 
-Nine browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance is pending. The [pilot record](../../guides/pilot-evidence.json) names exact source and public artifacts. These checks use deterministic fixture transport for UI failure cases. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
+Nine browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance is pending. The [pilot record](../../guides/pilot-evidence.json) names exact source and public artifacts. These recorded checks use deterministic fixture transport for UI failure cases and name their exact core baseline; repeat them when the underlying upload contract changes. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
 
 ## Verify the flow
 

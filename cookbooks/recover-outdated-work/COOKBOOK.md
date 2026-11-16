@@ -8,7 +8,7 @@ choices: ["Queued, accepted, rejected, and completed are distinct", "Retry origi
 capabilities: []
 evidence: "explained"
 related: ["capture-reviewed-evidence", "review-exact-proposal", "connect-resuming-agent"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs"]
 ---
 
 # Recover from queued, repeated, and outdated work
@@ -19,7 +19,15 @@ Use this whenever a command can outlive the current connection or task revision.
 
 Queued means the client has pending work, not that the server accepted it. Accepted means the server committed the command under its contract, not that an agent or external service completed every resulting effect. Rejected can arrive immediately or later after reconnect. A page should preserve enough context to explain each state.
 
-**Platform invariant:** capture the command ID and relevant generations before starting protected work, and retain both for every retry. Reading the newest generation and attaching it to an old payload changes its meaning. After stale rejection, a person or agent may deliberately compose a new command from reviewed current state, with a new ID and context.
+**Platform invariant:** record the operation identity and relevant generations before sending protected work, and retain both for every retry. High-level capture owns its command IDs in the runtime; page-owned correlation IDs remain ordinary data. Reading the newest generation and attaching it to an old payload changes its meaning. After stale rejection, a person or agent may deliberately compose a new command from reviewed current state, with a new ID and context.
+
+## Distinguish transfer from application acceptance
+
+A byte upload has its own durable session and receipt. Completing that transfer does not mean a capture event, shared-file write, or publication switch was accepted. Preserve each operation's original identity across its own retries and show the application outcome that the person cares about. A successfully uploaded object may remain unattached when the later semantic command is rejected.
+
+For a shared file, preserve the reviewed path revision. For a publication, preserve the reviewed publication-head revision. Preserve any relevant task generations as well. A reference conflict asks for a fresh review; it is not a transient upload error and must not trigger an automatic overwrite with newly fetched guards.
+
+If a resume record represents specific bytes, changing those bytes creates new work. Keep the earlier result or failure available for reconciliation. The user may intentionally resubmit the edited content, but reusing the old command identity for it breaks receipt meaning.
 
 ## Keep drafts separate
 
