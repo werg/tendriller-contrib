@@ -42,7 +42,7 @@ Decide what happens to animation, live values, timers, hover states, and selecti
 
 1. Ask what the person wants to show and offer **Capture this chart**, with data export as a separate useful option.
 2. Show the selected area and current chart/run revision. Let the person include a legend or relevant controls deliberately.
-3. Establish readiness and capture the chosen representation. Keep **Cancel** available while resources load or a source chooser is open.
+3. Establish readiness and capture the chosen representation. Let the person abandon the application attempt while resources load. A browser-owned source chooser may require its own cancellation and can temporarily prevent interaction with the page.
 4. Present the candidate before upload. Show its size, method, source time/state, and any known omissions in plain language.
 5. Allow retake, crop, redaction, a short description, and optional region annotation. Keep the original candidate separate from derived edits when further correction is expected.
 6. Review the exact outgoing bytes and metadata, then submit through the durable evidence flow.
@@ -63,6 +63,8 @@ Retain source identity for follow-up where needed, but do not assume an uploaded
 Create a page-owned attempt ID before capture starts and bind it to the chosen page/data revision. If the task changes while rendering is pending, show the candidate as an earlier-state capture or ask for a retake. Do not label a late image as evidence for the new decision.
 
 Cancel and source replacement must invalidate late callbacks. Release media tracks, rendering resources, buffers, listeners, and object URLs when no longer needed. Discarding a local candidate stops it from being submitted later, but discarding a queue entry is not an undo of an already accepted server request.
+
+If an abandoned chooser or permission request later succeeds, stop the newly acquired tracks immediately instead of only dropping its result. Application cancellation does not guarantee the browser closed its own chooser. Rehearse that late-grant race so a cancelled report cannot leave screen capture active or insert a candidate into a different attempt.
 
 Use [reviewed capture](../capture-reviewed-evidence/COOKBOOK.md) to persist bytes and semantic context together. Keep a new note separate from a pending report, so a late rejection cannot overwrite it. A blank or failed render should produce an error and retained context, not a successful empty report. If a third-party renderer is deliberately bundled, retain its exact dependency identity and notices; copied application code remains editable source.
 

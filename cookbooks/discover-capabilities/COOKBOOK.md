@@ -44,12 +44,14 @@ A page-owned state model might distinguish `unknown`, `available-to-try`, `reque
 | --- | --- |
 | Availability not checked | Use the basic route or run a no-prompt check. |
 | Available to try | Start the specific input from a deliberate gesture. |
-| Waiting for selection or permission | Cancel locally and keep the draft; do not duplicate requests. |
+| Waiting for selection or permission | Abandon the local attempt and keep the draft; the browser's chooser may still need its own cancellation. |
 | Active | Complete the input, switch source, or stop. |
 | Interrupted | Preserve any candidate and offer restart or an equivalent fallback. |
 | Unavailable here | Explain the limitation and keep a task-completing route prominent. |
 
 Keep active resource handles separate from this UI state. A remembered permission or requested state must never drive the active indicator. Observe actual tracks, watches, connections, and engine state; a resource can end after successful startup. Stop and release owned resources on cancellation, route exit, and the selected inactive-page policy. The runtime's sensor reporting is best effort, so authored adapters must also own their cleanup.
+
+An application-level Cancel invalidates the attempt; it does not necessarily dismiss a browser-owned permission prompt or chooser. Avoid creating a duplicate request while the first is unresolved. If an abandoned request later succeeds, immediately stop its tracks or release its acquired device resources before ignoring the result. Merely suppressing the callback's UI update can leave a resource active.
 
 ## Keep observations current across interruptions
 
@@ -71,6 +73,7 @@ Share diagnostics only when they help resolve a problem. Browser/device details 
 
 - Load and reload the page. No optional permission request or resource start occurs; the basic task is usable immediately.
 - Remove the API, cancel a chooser, deny permission, and start without hardware. Each state offers a clear fallback and preserves existing work.
+- Abandon a pending attempt, then grant its permission. Any late resource is immediately released, the active indicator stays off, and no candidate appears in the new task.
 - Start successfully, then unplug the device or end its stream. The active indicator changes and a captured candidate remains reviewable if the chosen policy retains it.
 - Resolve an old query after a newer failure or identity change. The old response cannot replace current state.
 - Restore from browser history, switch routes, and retry with keyboard only. No duplicate listeners, silent capture restart, or lost draft appears.
