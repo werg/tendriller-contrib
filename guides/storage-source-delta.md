@@ -53,12 +53,13 @@ production logic: target shared-file records distinguish changed bytes and prese
 accepted receipt replay. That exact redundant assertion is not copied solely to match
 source layout; its disposition is explicit in the inventory.
 
-The merge preserves the concurrent default branch as an ancestor while retaining
-the tested target architecture. Only source-accounting documentation changes from
-the previously verified feature tree. Executable code, specimens, and assertions
-remain those exercised at contrib `38ff221447431822f248db3134be5deb3c5bf2a5` against
-the published `0.3.0-rc.2` artifacts; the [recorded proof](pilot-checks.md) keeps its
-original exact identities.
+The reconciliation at `b843f49c5115d8699d4925b78107bc4bf265e92b` preserved the concurrent
+default branch as an ancestor while retaining the tested target architecture. That
+merge changed only source-accounting documentation. Its executable code, specimens,
+and assertions were those exercised at contrib `38ff221447431822f248db3134be5deb3c5bf2a5`
+against the published `0.3.0-rc.2` artifacts. This inventory retains that review's
+exact identities; the [pilot verification record](pilot-checks.md) identifies later
+accepted source and artifact pairs separately.
 
 ## Knowledge retained here
 
