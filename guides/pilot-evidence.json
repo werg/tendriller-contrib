@@ -1,162 +1,167 @@
 {
-  "date": "2026-11-16T11:17:47.009Z",
-  "source_commit": "1ade2ae0fb220e7ec9417536092dae0bd6eb08ed",
-  "core_commit": "dc4997e2d728d790ede4d893613342fd51f80898",
+  "date": "2026-11-16T11:53:07.794Z",
+  "source_commit": "4224d473e2a1dd77f20bd30add81fceb3577d24c",
+  "core_commit": "d59b9864510bd32c7f0ac7f76b5e537b96e44285",
   "tool_package": "@tendriller/tools",
   "tool_version": "0.3.0-rc.1",
-  "runtime": "f503831b47078541ce866544c2b511c85489c07d3cdcf148ce34cfc1c8f02c50",
-  "preview_bundle_sha256": "667593e8245b450cf73718a1cbff2fed623b009a85da8f0e1dcdc45543a7a39f",
+  "runtime": "4115d256b8af5fff970bfea5e610f772e3c551727842b3ec8a66c5d37b23f855",
+  "preview_bundle_sha256": "7a8d8f9ca6b32edb528ac54e72165618762a7ecd5f0e8041bbcb6400c5ca4a32",
   "browser": "158.0.8127.18",
   "scenarios": [
     {
       "name": "desktop: source/run identity, exact values, burst ingestion and checkpoint",
       "status": "passed",
-      "duration_ms": 464
+      "duration_ms": 667
     },
     {
       "name": "desktop: retained-history gap survives reload and corrupt checkpoint rebuild",
       "status": "passed",
-      "duration_ms": 266
+      "duration_ms": 378
     },
     {
       "name": "desktop: current authorization clears private cached readings",
       "status": "passed",
-      "duration_ms": 176
+      "duration_ms": 280
     },
     {
       "name": "desktop: delayed earlier authorization cannot restore a revoked cache",
       "status": "passed",
-      "duration_ms": 194
+      "duration_ms": 276
     },
     {
       "name": "mobile: source/run identity, exact values, burst ingestion and checkpoint",
       "status": "passed",
-      "duration_ms": 215
+      "duration_ms": 291
     },
     {
       "name": "mobile: retained-history gap survives reload and corrupt checkpoint rebuild",
       "status": "passed",
-      "duration_ms": 245
+      "duration_ms": 293
     },
     {
       "name": "mobile: current authorization clears private cached readings",
       "status": "passed",
-      "duration_ms": 202
+      "duration_ms": 248
     },
     {
       "name": "mobile: delayed earlier authorization cannot restore a revoked cache",
       "status": "passed",
-      "duration_ms": 181
+      "duration_ms": 265
     },
     {
       "name": "inline: missing task context preserves the unsent draft",
       "status": "passed",
-      "duration_ms": 170
+      "duration_ms": 219
     },
     {
       "name": "inline: unavailable durable storage retains a saveable original snapshot",
       "status": "passed",
-      "duration_ms": 178
+      "duration_ms": 220
     },
     {
       "name": "inline: reviewed snapshot acceptance preserves later typing",
       "status": "passed",
-      "duration_ms": 277
+      "duration_ms": 364
     },
     {
       "name": "inline: delayed stale rejection preserves original context and current draft",
       "status": "passed",
-      "duration_ms": 288
+      "duration_ms": 384
     },
     {
       "name": "fullscreen: missing task context preserves the unsent draft",
       "status": "passed",
-      "duration_ms": 198
+      "duration_ms": 232
     },
     {
       "name": "fullscreen: unavailable durable storage retains a saveable original snapshot",
       "status": "passed",
-      "duration_ms": 269
+      "duration_ms": 330
     },
     {
       "name": "fullscreen: reviewed snapshot acceptance preserves later typing",
       "status": "passed",
-      "duration_ms": 411
+      "duration_ms": 502
     },
     {
       "name": "fullscreen: delayed stale rejection preserves original context and current draft",
       "status": "passed",
-      "duration_ms": 399
+      "duration_ms": 511
+    },
+    {
+      "name": "inline: lost upload completion resumes the original session after reload without resending bytes",
+      "status": "passed",
+      "duration_ms": 331
     },
     {
       "name": "inline: discarded candidate never becomes a submitted image",
       "status": "passed",
-      "duration_ms": 193
+      "duration_ms": 225
     },
     {
       "name": "participant: explicit capability absence stays usable and makes no private request",
       "status": "passed",
-      "duration_ms": 107
+      "duration_ms": 153
     },
     {
       "name": "participant: fixture acceptance preserves new draft and only reads authorized projection",
       "status": "passed",
-      "duration_ms": 232
+      "duration_ms": 272
     },
     {
       "name": "participant: conflict retry retains original command without replacing a newer draft",
       "status": "passed",
-      "duration_ms": 243
+      "duration_ms": 304
     },
     {
       "name": "participant: reload keeps the original retry while later typing keeps a distinct draft revision",
       "status": "passed",
-      "duration_ms": 282
+      "duration_ms": 334
     },
     {
       "name": "facilitator: deliberate aggregate is a revisioned operation separate from private answers",
       "status": "passed",
-      "duration_ms": 218
+      "duration_ms": 272
     },
     {
       "name": "facilitator: a conflicted original can be replaced only after deliberate fresh review",
       "status": "passed",
-      "duration_ms": 325
+      "duration_ms": 341
     },
     {
       "name": "participant: denied mutation clears private content before a role notification",
       "status": "passed",
-      "duration_ms": 202
+      "duration_ms": 222
     },
     {
       "name": "facilitator: denied mutation clears private content before a role notification",
       "status": "passed",
-      "duration_ms": 208
+      "duration_ms": 234
     },
     {
       "name": "participant: old authorized read cannot restore private content after revocation",
       "status": "passed",
-      "duration_ms": 172
+      "duration_ms": 213
     },
     {
       "name": "participant: a delayed rejection cannot redisplay a revoked private answer",
       "status": "passed",
-      "duration_ms": 228
+      "duration_ms": 244
     },
     {
       "name": "facilitator: delayed review cannot restore a revoked private view",
       "status": "passed",
-      "duration_ms": 231
+      "duration_ms": 269
     },
     {
       "name": "facilitator: delayed publish cannot restore a revoked private view",
       "status": "passed",
-      "duration_ms": 221
+      "duration_ms": 280
     },
     {
       "name": "shared projection: reads only reviewed shared state with no private operation",
       "status": "passed",
-      "duration_ms": 156
+      "duration_ms": 204
     }
   ],
   "limits": [
@@ -165,11 +170,14 @@
     "Private policy authority is covered by the separate public-engine host checks.",
     "Service workers are blocked in these browser scenarios for deterministic HTTP interception; offline publication is checked separately in core."
   ],
+  "source_head_commit": "4655e0b6f7d46f2c44626d8f6e0b16cc0f8a2309",
+  "source_tree": "548be9e3a456b87bcd793c3abe436d88f8a72ceb",
   "ci": {
-    "run_id": 43856375056,
-    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43856375056",
-    "artifact_id": 14220853772,
-    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43856375056/artifacts/14220853772"
+    "run_id": 43861462530,
+    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43861462530",
+    "artifact_id": 14223696049,
+    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43861462530/artifacts/14223696049",
+    "artifact_sha256": "6843f1a80582115fd69d1dd1db282db6dde5f3939d30f4cadf55056786e8dfc4"
   },
   "command": "node test/pilot-browser.mjs --tools .core-build/dist/tools --playwright .core-build/node_modules/playwright/index.mjs"
 }

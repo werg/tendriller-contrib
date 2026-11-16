@@ -1,11 +1,11 @@
 {
   "evidence": "exercised",
-  "date": "2026-11-16T11:17:59.016Z",
+  "date": "2026-11-16T11:53:19.376Z",
   "host": "real built Worker",
-  "source_commit": "1ade2ae0fb220e7ec9417536092dae0bd6eb08ed",
-  "core_commit": "dc4997e2d728d790ede4d893613342fd51f80898",
-  "sdk_sha256": "51b50538587c7eaa718a69b8179b34f30e9d59e7216cb171565847456c410f61",
-  "engine_sha256": "ee3f896ec8729c164d064a8abaa236e2ab4eeb665ff7a13bcb210a3ae271ccab",
+  "source_commit": "4224d473e2a1dd77f20bd30add81fceb3577d24c",
+  "core_commit": "d59b9864510bd32c7f0ac7f76b5e537b96e44285",
+  "sdk_sha256": "8da40ba0feceaac8b2f3e521c3d3d9336569486dec7e6efd73a29227918cd195",
+  "engine_sha256": "aed3e22277c330e6047a7fc507828e7d52388ce515b202d718b78d16f4b3feb6",
   "private_reference_sha256": "6ed68842d49981b8693ac83bc5f760d33de0ea053a8762ddca56eaec20bdfb8d",
   "approval_reference_sha256": "529a394fe423dad903be710fb62bc1a02ed13b0cdd87b386f85488c725691097",
   "scenarios": [
@@ -27,11 +27,14 @@
     "Synthetic identities bypass production OAuth setup.",
     "External effect deduplication remains the caller's responsibility."
   ],
+  "source_head_commit": "4655e0b6f7d46f2c44626d8f6e0b16cc0f8a2309",
+  "source_tree": "548be9e3a456b87bcd793c3abe436d88f8a72ceb",
   "ci": {
-    "run_id": 43856375056,
-    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43856375056",
-    "artifact_id": 14220853772,
-    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43856375056/artifacts/14220853772"
+    "run_id": 43861462530,
+    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43861462530",
+    "artifact_id": 14223696049,
+    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43861462530/artifacts/14223696049",
+    "artifact_sha256": "6843f1a80582115fd69d1dd1db282db6dde5f3939d30f4cadf55056786e8dfc4"
   },
   "command": "node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts .core-build/dist"
 }

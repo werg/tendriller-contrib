@@ -6,28 +6,40 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 | Pilot | Distinct adaptations | Observed browser behavior | Passed scenarios |
 | --- | --- | --- | --- |
 | Measurements | Dense desktop panels/table and a nested mobile instrument | Source/run identity, exact missing values, bounded ingestion, coherent checkpoints, retention gaps, and invalidation of delayed reads or paints after revoked access. | 8 |
-| Reviewed capture | Compact inline file form and fullscreen canvas with a separate review | Reviewed snapshot, discard, missing context, runtime capture identity, retry after reload, delayed rejection, new drafts, and saveable evidence when durable storage is unavailable. | 9 |
+| Reviewed capture | Compact inline file form and fullscreen canvas with a separate review | Reviewed snapshot, discard, missing context, runtime capture identity, retry after reload, delayed rejection, new drafts, saveable evidence when durable storage is unavailable, and lost upload-completion replay without resending bytes. | 10 |
 | Private responses | Facilitator console, minimal participant form, and shared projection | Capability absence, intentional aggregate publication, exact retries, deliberate conflict review, draft identity across reload, and immediate clearing after denied access or late responses. | 13 |
 
 ## Recorded target checks
 
-All **30 browser scenarios** and **three actual-host scenarios** passed in
-[GitHub run 43856375056](https://github.com/werg/tendriller-contrib/actions/runs/43856375056).
-The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43856375056/artifacts/14220853772)
+All **31 browser scenarios** and **three actual-host scenarios** passed in
+[GitHub run 43861462530](https://github.com/werg/tendriller-contrib/actions/runs/43861462530).
+The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43861462530/artifacts/14223696049)
 includes the scenario records and seven adaptation screenshots.
 
-The exact executable/check source was contrib
-`1ade2ae0fb220e7ec9417536092dae0bd6eb08ed`, paired with public core
-`dc4997e2d728d790ede4d893613342fd51f80898` and its `0.3.0-rc.1` artifacts.
+The exact executable/check source was contrib PR head
+`4655e0b6f7d46f2c44626d8f6e0b16cc0f8a2309`, paired with public core
+`d59b9864510bd32c7f0ac7f76b5e537b96e44285` and its `0.3.0-rc.1` artifacts.
+GitHub exercised PR merge commit `4224d473e2a1dd77f20bd30add81fceb3577d24c`;
+its tree `548be9e3a456b87bcd793c3abe436d88f8a72ceb` is identical to that PR head.
 The [browser record](pilot-evidence.json) names the runtime identity, preview bundle
 SHA-256, Chromium version, individual scenarios, and command. The
 [host record](../cookbooks/collect-private-responses/checks/evidence.json) names the
 SDK/engine archive and reference-source digests. Evidence-only documentation updates
 do not change the checked executable snapshot.
 
+The preceding cookbook-only refactor remains separately preserved: its
+[30-browser record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/guides/pilot-evidence.json)
+and [three-host record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/cookbooks/collect-private-responses/checks/evidence.json)
+pair contrib `1ade2ae0fb220e7ec9417536092dae0bd6eb08ed` with core
+`dc4997e2d728d790ede4d893613342fd51f80898`. The current run re-exercises every earlier
+scenario and adds the immutable-upload recovery case against the completed storage
+contract; results from the two artifact pairs are not combined.
+
 The dependency-free editorial/numerical suite also passes **10 tests**. It validates
 all 37 guide entries, generated discovery, local links, and 237 source-accounting
-decisions; five tests exercise numerical/model semantics. Exported snapshot links and
+decisions; five tests exercise numerical/model semantics. The separate
+[storage-source supplement](storage-source-delta.md) accounts for the 13 changed paths
+on the previously unmerged storage branch. Exported snapshot links and
 the clean source identity were checked separately.
 
 ## Run the checks
