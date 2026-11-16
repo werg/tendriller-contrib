@@ -1,0 +1,1112 @@
+{
+  "format": "tendriller-cookbooks",
+  "version": 1,
+  "cookbooks": [
+    {
+      "id": "adapt-without-losing-work",
+      "title": "Adapt an interface without losing work",
+      "summary": "Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.",
+      "group": "Keep work dependable",
+      "tags": [
+        "adaptation",
+        "accessibility",
+        "drafts"
+      ],
+      "choices": [
+        "Ordinary DOM, framework state, or a narrow declarative model",
+        "Logical identity versus task/question identity",
+        "In-place reconciliation or a deliberate disruptive update"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "reconcile-concurrent-edits",
+        "publish-coherent-updates",
+        "capture-reviewed-evidence"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/ui-schema.json",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/adaptive-checkin/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts"
+      ],
+      "path": "cookbooks/adapt-without-losing-work/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/adapt-without-losing-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "annotate-a-frame",
+      "title": "Annotate a particular image or frame",
+      "summary": "Keep coordinates, identity, and transforms coherent when evidence is resized or replaced.",
+      "group": "Collect evidence",
+      "tags": [
+        "images",
+        "coordinates",
+        "identity"
+      ],
+      "choices": [
+        "Normalized coordinates or source pixels",
+        "Paused frame, explicit tracking, or approximate live cue",
+        "Local annotation drafts and shared committed edits"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "reconcile-concurrent-edits"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/overlay.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"
+      ],
+      "path": "cookbooks/annotate-a-frame/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/annotate-a-frame/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep coordinates, identity, and transforms coherent when evidence is resized or replaced. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "ask-about-evidence",
+      "title": "Ask a question about reviewed evidence",
+      "summary": "Bind questions and replies to specific sources and distinguish observation from interpretation.",
+      "group": "Collect evidence",
+      "tags": [
+        "evidence",
+        "reasoning",
+        "correlation"
+      ],
+      "choices": [
+        "Question-led source selection and context",
+        "Observed fact, inference, and unresolved uncertainty",
+        "Stable evidence/reply correlation"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "annotate-a-frame",
+        "separate-evidence-interpretation"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md"
+      ],
+      "path": "cookbooks/ask-about-evidence/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/ask-about-evidence/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Bind questions and replies to specific sources and distinguish observation from interpretation. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "capture-rendered-evidence",
+      "title": "Capture rendered evidence",
+      "summary": "Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out.",
+      "group": "Collect evidence",
+      "tags": [
+        "capture",
+        "rendering",
+        "provenance"
+      ],
+      "choices": [
+        "Rendered appearance or source/data export",
+        "DOM reconstruction or browser/screen capture",
+        "Explicit readiness and reviewed disclosure"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "publish-coherent-updates"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/screenshot.js"
+      ],
+      "path": "cookbooks/capture-rendered-evidence/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/capture-rendered-evidence/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "capture-reviewed-evidence",
+      "title": "Capture, review, and send evidence",
+      "summary": "Design permission, review, durable submission, and recovery around evidence the person actually intends to send.",
+      "group": "Collect evidence",
+      "tags": [
+        "capture",
+        "privacy",
+        "drafts"
+      ],
+      "choices": [
+        "File or typed fallback versus a live sensor",
+        "Inline review versus a separate capture route",
+        "Local draft lifetime and late rejection behavior"
+      ],
+      "capabilities": [
+        "captures",
+        "durable commands"
+      ],
+      "evidence": "explained",
+      "related": [
+        "discover-capabilities",
+        "annotate-a-frame",
+        "recover-outdated-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"
+      ],
+      "path": "cookbooks/capture-reviewed-evidence/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/capture-reviewed-evidence/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Design permission, review, durable submission, and recovery around evidence the person actually intends to send. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "choose-data-model",
+      "title": "Choose state, events, streams, drafts, or private records",
+      "summary": "Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.",
+      "group": "Keep work dependable",
+      "tags": [
+        "data-model",
+        "authority",
+        "retention"
+      ],
+      "choices": [
+        "Current value versus ordered history",
+        "Authority, privacy, and record lifetime",
+        "View checkpoints versus handled-agent-work checkpoints"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "recover-outdated-work",
+        "collect-private-responses",
+        "reconcile-concurrent-edits"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ],
+      "path": "cookbooks/choose-data-model/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-data-model/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "choose-interruptions",
+      "title": "Choose when to interrupt",
+      "summary": "Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "notifications",
+        "attention",
+        "timers"
+      ],
+      "choices": [
+        "Quiet record, agent wake, local cue, timer, or push",
+        "Coalescing, cooldown, and acknowledgement meaning",
+        "Missed-time grace, time zones, and deduplication"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "detect-meaningful-changes",
+        "connect-resuming-agent",
+        "choose-voice-interaction"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md"
+      ],
+      "path": "cookbooks/choose-interruptions/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-interruptions/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "choose-voice-interaction",
+      "title": "Choose a voice interaction",
+      "summary": "Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "voice",
+        "consent",
+        "engines"
+      ],
+      "choices": [
+        "Typed input, push-to-talk, VAD, or wake engine",
+        "Local processing and explicit resource installation",
+        "Review recognized text and control output independently"
+      ],
+      "capabilities": [
+        "optional voice adapter"
+      ],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "discover-capabilities",
+        "coordinate-devices"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ptt.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/vad.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/voice-coach/index.html",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/speech.ts"
+      ],
+      "path": "cookbooks/choose-voice-interaction/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-voice-interaction/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "collect-private-responses",
+      "title": "Collect private responses and publish a reviewed aggregate",
+      "summary": "Keep answers and assignments private while giving a facilitator an explicit, versioned path to shared results.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "privacy",
+        "collaboration",
+        "transactions"
+      ],
+      "choices": [
+        "Public poll or authorized private records",
+        "Revisioned answers or append-only revisions",
+        "Reviewed aggregate and atomic round reset"
+      ],
+      "capabilities": [
+        "explicit trusted extension",
+        "private records",
+        "transactions"
+      ],
+      "evidence": "explained",
+      "related": [
+        "review-exact-proposal",
+        "choose-data-model",
+        "coordinate-devices"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"
+      ],
+      "path": "cookbooks/collect-private-responses/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/collect-private-responses/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep answers and assignments private while giving a facilitator an explicit, versioned path to shared results. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "collect-sketch",
+      "title": "Collect and discuss a sketch",
+      "summary": "Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context.",
+      "group": "Collect evidence",
+      "tags": [
+        "canvas",
+        "drafts",
+        "review"
+      ],
+      "choices": [
+        "Bitmap snapshot or editable stroke/object model",
+        "Local drawing versus live shared editing",
+        "Resize, review, and pending-snapshot continuity"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "annotate-a-frame",
+        "adapt-without-losing-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/collaborative-canvas/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js"
+      ],
+      "path": "cookbooks/collect-sketch/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/collect-sketch/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "compare-options",
+      "title": "Build a comparison and decision workspace",
+      "summary": "Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score.",
+      "group": "Decide and act",
+      "tags": [
+        "comparison",
+        "decisions",
+        "uncertainty"
+      ],
+      "choices": [
+        "Table, small multiples, narrative, or interactive weights",
+        "Hard constraints versus compensating preferences",
+        "Missing evidence and sensitivity to assumptions"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "present-live-measurements",
+        "review-exact-proposal",
+        "import-for-review"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js"
+      ],
+      "path": "cookbooks/compare-options/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/compare-options/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "connect-instrument",
+      "title": "Connect an instrument and interpret its protocol",
+      "summary": "Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "hardware",
+        "protocols",
+        "telemetry"
+      ],
+      "choices": [
+        "Direct device, remote collector, or uploaded/simulated data",
+        "Packet framing and bounded carry buffers",
+        "Read-only access versus explicit physical commands"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "run-measurement-experiment",
+        "ingest-bounded-telemetry",
+        "discover-capabilities"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/serial.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/bluetooth.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/connectors.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/hardware-lab.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/model.mjs"
+      ],
+      "path": "cookbooks/connect-instrument/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-instrument/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "connect-resuming-agent",
+      "title": "Connect an agent that actually resumes",
+      "summary": "Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.",
+      "group": "Keep work dependable",
+      "tags": [
+        "agents",
+        "delivery",
+        "recovery"
+      ],
+      "choices": [
+        "Socket/IPC, wait task, webhook, or scheduled check",
+        "Exact receiver identity and count-only wake notices",
+        "Delivered versus handled checkpoints and rearming"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "recover-outdated-work",
+        "resume-across-sessions",
+        "choose-interruptions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/bridges/test/pending-events.test.mjs"
+      ],
+      "path": "cookbooks/connect-resuming-agent/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-resuming-agent/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "coordinate-devices",
+      "title": "Coordinate views and attention across devices",
+      "summary": "Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "devices",
+        "attention",
+        "handoff"
+      ],
+      "choices": [
+        "Same view or complementary device purposes",
+        "Targeted display versus authorized private access",
+        "Audio focus, freshness, presentation, and completion"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "join-across-devices",
+        "collect-private-responses",
+        "resume-across-sessions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/app.js"
+      ],
+      "path": "cookbooks/coordinate-devices/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/coordinate-devices/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "detect-meaningful-changes",
+      "title": "Detect meaningful changes cheaply",
+      "summary": "Choose baseline, hysteresis, debounce, and cooldown according to the cost of false triggers and missed events.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "heuristics",
+        "hysteresis",
+        "sampling"
+      ],
+      "choices": [
+        "Threshold, hysteresis, debounce, or cooldown",
+        "Fixed or adaptive baseline and first observation",
+        "False-trigger versus missed-event costs"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "notice-visual-changes",
+        "interpret-motion",
+        "follow-location-progress",
+        "choose-interruptions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/glance.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"
+      ],
+      "path": "cookbooks/detect-meaningful-changes/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/detect-meaningful-changes/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose baseline, hysteresis, debounce, and cooldown according to the cost of false triggers and missed events. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "discover-capabilities",
+      "title": "Discover capabilities and design around them",
+      "summary": "Distinguish API presence from usable permission and offer a task-completing alternative before requesting access.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "capabilities",
+        "permissions",
+        "fallbacks"
+      ],
+      "choices": [
+        "No-prompt observation versus a relevant permission request",
+        "API presence, permission, hardware, and actual operation",
+        "Fallbacks that complete the same task"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html"
+      ],
+      "path": "cookbooks/discover-capabilities/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/discover-capabilities/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish API presence from usable permission and offer a task-completing alternative before requesting access. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "follow-location-progress",
+      "title": "Follow location changes and route progress",
+      "summary": "Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "location",
+        "uncertainty",
+        "routes"
+      ],
+      "choices": [
+        "One fix, manual progress, or continuous tracking",
+        "Accuracy filtering and inner/outer arrival radii",
+        "First-fix, skipped-waypoint, and replanning semantics"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "detect-meaningful-changes",
+        "guide-explicit-checkpoints",
+        "choose-interruptions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"
+      ],
+      "path": "cookbooks/follow-location-progress/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/follow-location-progress/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "guide-explicit-checkpoints",
+      "title": "Guide a task with explicit checkpoints",
+      "summary": "Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "guidance",
+        "progress",
+        "replanning"
+      ],
+      "choices": [
+        "Checklist, focused step, or non-linear dependency view",
+        "Manual completion, observed evidence, or reviewed inference",
+        "Resume and replanning across definition revisions"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-voice-interaction",
+        "keep-task-active",
+        "resume-across-sessions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/index.html"
+      ],
+      "path": "cookbooks/guide-explicit-checkpoints/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/guide-explicit-checkpoints/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate task definition from progress, and choose intentional completion, resume, and replanning behavior. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "import-for-review",
+      "title": "Import information for review",
+      "summary": "Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.",
+      "group": "Collect evidence",
+      "tags": [
+        "import",
+        "review",
+        "provenance"
+      ],
+      "choices": [
+        "Manual entry or staged import",
+        "All-or-nothing versus explicit partial acceptance",
+        "Ambiguous mappings, preserved originals, and retry identity"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "turn-records-into-signals",
+        "separate-evidence-interpretation",
+        "review-exact-proposal"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ],
+      "path": "cookbooks/import-for-review/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/import-for-review/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "ingest-bounded-telemetry",
+      "title": "Ingest telemetry with a bounded budget",
+      "summary": "Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.",
+      "group": "Keep work dependable",
+      "tags": [
+        "telemetry",
+        "spool",
+        "retention"
+      ],
+      "choices": [
+        "File tail, snapshot command, or remote source",
+        "Scoped producer identity and stable retry records",
+        "Bounded spool, backpressure, and explicit loss"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "turn-records-into-signals",
+        "present-live-measurements",
+        "observe-long-running-process"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-collector.mjs"
+      ],
+      "path": "cookbooks/ingest-bounded-telemetry/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/ingest-bounded-telemetry/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "interpret-motion",
+      "title": "Turn noisy motion into useful events",
+      "summary": "Calibrate simple motion heuristics and describe their uncertainty before treating an event as progress.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "motion",
+        "calibration",
+        "heuristics"
+      ],
+      "choices": [
+        "Manual marking or heuristic events",
+        "Rising edge/refractory period or low/high hysteresis",
+        "Raw diagnostics, corrections, and summary uncertainty"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "detect-meaningful-changes",
+        "present-live-measurements",
+        "discover-capabilities"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/motion-companion/index.html"
+      ],
+      "path": "cookbooks/interpret-motion/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/interpret-motion/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Calibrate simple motion heuristics and describe their uncertainty before treating an event as progress. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "join-across-devices",
+      "title": "Join or transfer a page across devices",
+      "summary": "Choose role-aware links and a usable transfer method without turning device purpose into authority.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "devices",
+        "links",
+        "roles"
+      ],
+      "choices": [
+        "QR, typed link, or explicit device handoff",
+        "Same page, participant view, or shared projection",
+        "Authentication and draft-transfer policy"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "coordinate-devices",
+        "resume-across-sessions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/qr.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md"
+      ],
+      "path": "cookbooks/join-across-devices/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/join-across-devices/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose role-aware links and a usable transfer method without turning device purpose into authority. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "keep-task-active",
+      "title": "Keep an active task usable",
+      "summary": "Choose foreground wake lock and interruption behavior without promising background execution.",
+      "group": "Keep work dependable",
+      "tags": [
+        "foreground",
+        "lifecycle",
+        "wake-lock"
+      ],
+      "choices": [
+        "Ordinary screen behavior or explicit active-task wake lock",
+        "Requested versus actual lock state",
+        "Reacquisition, task stop, and background limits"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guide-explicit-checkpoints",
+        "resume-across-sessions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/wakelock.js"
+      ],
+      "path": "cookbooks/keep-task-active/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/keep-task-active/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose foreground wake lock and interruption behavior without promising background execution. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "notice-visual-changes",
+      "title": "Notice meaningful visual changes",
+      "summary": "Choose reference frames, thresholds, and sampling budgets for a task where a changed scene matters.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "camera",
+        "heuristics",
+        "budgets"
+      ],
+      "choices": [
+        "Previous, uploaded, or fixed reference frame",
+        "Pixel difference or a selected perception model",
+        "Sampling cadence versus upload cooldown"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "select-local-perception",
+        "choose-interruptions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/glance.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js"
+      ],
+      "path": "cookbooks/notice-visual-changes/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/notice-visual-changes/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose reference frames, thresholds, and sampling budgets for a task where a changed scene matters. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "observe-long-running-process",
+      "title": "Observe long-running work and enable intervention",
+      "summary": "Separate freshness, progress, failures, and intervention from the agent conversation that may come and go.",
+      "group": "Decide and act",
+      "tags": [
+        "processes",
+        "status",
+        "intervention"
+      ],
+      "choices": [
+        "Completion notice or continuous observation",
+        "Observed process states and freshness",
+        "Polling/events, scoped collectors, and deliberate intervention"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "present-live-measurements",
+        "ingest-bounded-telemetry",
+        "review-exact-proposal"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/README.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md"
+      ],
+      "path": "cookbooks/observe-long-running-process/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/observe-long-running-process/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate freshness, progress, failures, and intervention from the agent conversation that may come and go. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "present-live-measurements",
+      "title": "Present live measurements honestly",
+      "summary": "Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs.",
+      "group": "Make sense of information",
+      "tags": [
+        "streams",
+        "visualization",
+        "recovery"
+      ],
+      "choices": [
+        "Latest reading, trend, or run comparison",
+        "Raw values, EMA, or time-aware smoothing",
+        "Replay or an atomic view-and-cursor checkpoint"
+      ],
+      "capabilities": [
+        "streams"
+      ],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "ingest-bounded-telemetry",
+        "recover-outdated-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/README.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs"
+      ],
+      "path": "cookbooks/present-live-measurements/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/present-live-measurements/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "publish-coherent-updates",
+      "title": "Publish coherent page updates",
+      "summary": "Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.",
+      "group": "Keep work dependable",
+      "tags": [
+        "publication",
+        "integrity",
+        "updates"
+      ],
+      "choices": [
+        "Provenance, deliberate dependency, and final publication identity",
+        "Nested relative files and explicit routing assumptions",
+        "Draft-aware publication readiness and update behavior"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "publish-smallest-page",
+        "adapt-without-losing-work",
+        "test-adaptive-page"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/ARTIFACTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/PREVIEW.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/cli/lib/pack.mjs"
+      ],
+      "path": "cookbooks/publish-coherent-updates/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/publish-coherent-updates/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "publish-smallest-page",
+      "title": "Publish the smallest useful page",
+      "summary": "Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "publishing",
+        "plain-files",
+        "first-page"
+      ],
+      "choices": [
+        "One file, modules, or nested pages",
+        "Event/reply interaction or a dashboard without conversation",
+        "Exact authored assets and a verified receiver"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "connect-resuming-agent",
+        "publish-coherent-updates",
+        "test-adaptive-page"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/first-page/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/first-page/run.mjs"
+      ],
+      "path": "cookbooks/publish-smallest-page/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/publish-smallest-page/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "reconcile-concurrent-edits",
+      "title": "Maintain a shared editable collection",
+      "summary": "Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.",
+      "group": "Keep work dependable",
+      "tags": [
+        "concurrency",
+        "drafts",
+        "collections"
+      ],
+      "choices": [
+        "Append-only, field patches, revision guards, or human merge",
+        "Stable identity separate from ordering",
+        "Deletion, optimistic edits, and stale-draft review"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "recover-outdated-work",
+        "adapt-without-losing-work",
+        "choose-data-model"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/list.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ],
+      "path": "cookbooks/reconcile-concurrent-edits/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/reconcile-concurrent-edits/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "recover-outdated-work",
+      "title": "Recover from queued, repeated, and outdated work",
+      "summary": "Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.",
+      "group": "Keep work dependable",
+      "tags": [
+        "commands",
+        "generations",
+        "drafts"
+      ],
+      "choices": [
+        "Queued, accepted, rejected, and completed are distinct",
+        "Retry original context or deliberately compose new work",
+        "Submitted snapshot separate from current draft"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "review-exact-proposal",
+        "connect-resuming-agent"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md"
+      ],
+      "path": "cookbooks/recover-outdated-work/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/recover-outdated-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "resume-across-sessions",
+      "title": "Resume across devices and agent sessions",
+      "summary": "Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.",
+      "group": "Keep work dependable",
+      "tags": [
+        "handoff",
+        "resume",
+        "context"
+      ],
+      "choices": [
+        "Task brief, handled cursor, view checkpoint, or local draft",
+        "Authorized cross-device state versus private unsent work",
+        "Receiver identity and local consent after handoff"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "connect-resuming-agent",
+        "coordinate-devices",
+        "recover-outdated-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/experiences.ts"
+      ],
+      "path": "cookbooks/resume-across-sessions/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/resume-across-sessions/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "review-exact-proposal",
+      "title": "Review an exact proposal before acting",
+      "summary": "Bind approval to immutable content and an explicit version, expiry, and execution policy.",
+      "group": "Decide and act",
+      "tags": [
+        "approval",
+        "versions",
+        "authority"
+      ],
+      "choices": [
+        "Approval or a simpler authorized progress receipt",
+        "Response-time and execution-time expiry",
+        "Downstream idempotency and uncertain outcomes"
+      ],
+      "capabilities": [
+        "explicit trusted extension"
+      ],
+      "evidence": "explained",
+      "related": [
+        "recover-outdated-work",
+        "observe-long-running-process"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs"
+      ],
+      "path": "cookbooks/review-exact-proposal/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/review-exact-proposal/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Bind approval to immutable content and an explicit version, expiry, and execution policy. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "run-measurement-experiment",
+      "title": "Run a bounded measurement experiment",
+      "summary": "Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record.",
+      "group": "Make sense of information",
+      "tags": [
+        "experiments",
+        "aggregation",
+        "provenance"
+      ],
+      "choices": [
+        "Live acquisition, uploaded data, or declared simulation",
+        "Raw retention versus explicit summary buckets",
+        "Intervention records and honest export scope"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "connect-instrument",
+        "present-live-measurements",
+        "ingest-bounded-telemetry"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/model.mjs"
+      ],
+      "path": "cookbooks/run-measurement-experiment/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-measurement-experiment/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "select-local-perception",
+      "title": "Add local perception with an explicit engine",
+      "summary": "Choose model assets, confidence rules, coordinate conventions, and evaluation for optional pose, object, or text recognition.",
+      "group": "Choose inputs and algorithms",
+      "tags": [
+        "perception",
+        "experimental",
+        "models"
+      ],
+      "choices": [
+        "Manual interpretation versus a selected model",
+        "Engine assets, provenance, and processing location",
+        "Confidence, frame identity, and bounded inference"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "annotate-a-frame",
+        "capture-reviewed-evidence",
+        "discover-capabilities"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/pose.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/objects.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/text.js"
+      ],
+      "path": "cookbooks/select-local-perception/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/select-local-perception/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose model assets, confidence rules, coordinate conventions, and evaluation for optional pose, object, or text recognition. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "separate-evidence-interpretation",
+      "title": "Keep evidence and interpretation separate",
+      "summary": "Preserve original observations while allowing conclusions, labels, and explanations to evolve.",
+      "group": "Collect evidence",
+      "tags": [
+        "evidence",
+        "provenance",
+        "notes"
+      ],
+      "choices": [
+        "Append-only note or structured observation record",
+        "Original evidence versus editable interpretation",
+        "Retention, search coverage, and export scope"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "reconcile-concurrent-edits",
+        "ask-about-evidence"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ],
+      "path": "cookbooks/separate-evidence-interpretation/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/separate-evidence-interpretation/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Preserve original observations while allowing conclusions, labels, and explanations to evolve. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "test-adaptive-page",
+      "title": "Test an adaptive page honestly",
+      "summary": "Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.",
+      "group": "Keep work dependable",
+      "tags": [
+        "testing",
+        "fixtures",
+        "evidence"
+      ],
+      "choices": [
+        "Numerical, browser, publication, or actual-service evidence",
+        "Explicit fixture capability and missing-capability cases",
+        "Behavioral freedom without pixel or component identity"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "publish-coherent-updates",
+        "capture-reviewed-evidence",
+        "collect-private-responses"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/PREVIEW.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/test/portable/flows.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/preview/test/preview-http.test.mjs"
+      ],
+      "path": "cookbooks/test-adaptive-page/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/test-adaptive-page/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "turn-records-into-signals",
+      "title": "Turn messy records into useful signals",
+      "summary": "Project fields, preserve units, and bound flattening without silently changing the meaning of a source record.",
+      "group": "Make sense of information",
+      "tags": [
+        "records",
+        "projection",
+        "limits"
+      ],
+      "choices": [
+        "Explicit field projection or bounded flattening",
+        "Missing/null/malformed values and units",
+        "Collision, depth, cardinality, and byte limits"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "ingest-bounded-telemetry",
+        "present-live-measurements",
+        "import-for-review"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-sources/records.mjs"
+      ],
+      "path": "cookbooks/turn-records-into-signals/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/turn-records-into-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Project fields, preserve units, and bound flattening without silently changing the meaning of a source record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    }
+  ]
+}

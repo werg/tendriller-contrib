@@ -8,7 +8,7 @@ choices: ["Explicit field projection or bounded flattening", "Missing/null/malfo
 capabilities: []
 evidence: "explained"
 related: ["ingest-bounded-telemetry", "present-live-measurements", "import-for-review"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-records.mjs"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-sources/records.mjs"]
 ---
 
 # Turn messy records into useful signals

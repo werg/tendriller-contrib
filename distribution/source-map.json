@@ -1,169 +1,288 @@
 {
-  "cli/README.md": "tools/cli/README.md",
-  "cli/bin/hermes-bridge.mjs": "tools/bridges/bin/hermes-bridge.mjs",
-  "cli/bin/claude-channel.mjs": "tools/bridges/bin/claude-channel.mjs",
-  "cli/bin/agent-socket.mjs": "tools/bridges/bin/agent-socket.mjs",
-  "cli/bin/tendril-watch.mjs": "tools/bridges/bin/tendril-watch.mjs",
-  "cli/bin/openclaw-bridge.mjs": "tools/bridges/bin/openclaw-bridge.mjs",
-  "cli/bin/tendril-preview.mjs": "tools/preview/bin/tendril-preview.mjs",
-  "cli/bin/tendril-events.mjs": "tools/bridges/bin/tendril-events.mjs",
-  "cli/bin/tendril-stream.mjs": "tools/collector/bin/tendril-stream.mjs",
-  "cli/bin/tendril.mjs": "tools/cli/bin/tendril.mjs",
-  "cli/bin/tendril-wait.mjs": "tools/bridges/bin/tendril-wait.mjs",
-  "cli/bin/codex-bridge.mjs": "tools/bridges/bin/codex-bridge.mjs",
-  "cli/test/recipes.spec.ts": "tools/preview/test/recipes.spec.ts",
-  "cli/test/preview-runtime.test.mjs": "tools/preview/test/preview-runtime.test.mjs",
-  "cli/test/cli.test.mjs": "tools/cli/test/cli.test.mjs",
-  "cli/test/public-contract.test.mjs": "tools/cli/test/public-contract.test.mjs",
-  "cli/test/preview.spec.ts": "tools/preview/test/preview.spec.ts",
-  "cli/test/stream-sources.test.mjs": "tools/collector/test/stream-sources.test.mjs",
-  "cli/test/live.mjs": "tools/cli/test/live.mjs",
-  "cli/test/tendril-watch.test.mjs": "tools/bridges/test/tendril-watch.test.mjs",
-  "cli/test/preview-streams.spec.ts": "tools/preview/test/preview-streams.spec.ts",
-  "cli/test/pending-events.test.mjs": "tools/bridges/test/pending-events.test.mjs",
-  "cli/test/workshop.spec.ts": "tools/preview/test/workshop.spec.ts",
-  "cli/test/openclaw-bridge.test.mjs": "tools/bridges/test/openclaw-bridge.test.mjs",
-  "cli/test/session-archive.spec.ts": "tools/preview/test/session-archive.spec.ts",
-  "cli/test/codex-bridge.test.mjs": "tools/bridges/test/codex-bridge.test.mjs",
-  "cli/test/notebook.test.mjs": "tools/cli/test/notebook.test.mjs",
-  "cli/test/notebook.spec.ts": "tools/preview/test/notebook.spec.ts",
-  "cli/test/preview.playwright.config.ts": "tools/preview/test/preview.playwright.config.ts",
-  "cli/test/stream-init.test.mjs": "tools/collector/test/stream-init.test.mjs",
-  "cli/test/hermes-bridge.test.mjs": "tools/bridges/test/hermes-bridge.test.mjs",
-  "cli/test/stream-source-options.test.mjs": "tools/collector/test/stream-source-options.test.mjs",
-  "cli/test/stream-collector.test.mjs": "tools/collector/test/stream-collector.test.mjs",
-  "cli/test/training-dashboard.test.mjs": "tools/cli/test/training-dashboard.test.mjs",
-  "cli/test/preview-lifecycle.test.mjs": "tools/preview/test/preview-lifecycle.test.mjs",
-  "cli/test/tendril-wait-socket.test.mjs": "tools/bridges/test/tendril-wait-socket.test.mjs",
-  "cli/test/claude-channel.test.mjs": "tools/bridges/test/claude-channel.test.mjs",
-  "cli/test/preview-streams.test.mjs": "tools/preview/test/preview-streams.test.mjs",
-  "cli/test/wait.test.mjs": "tools/bridges/test/wait.test.mjs",
-  "cli/scripts/tendril-wait.sh": "tools/bridges/scripts/tendril-wait.sh",
-  "cli/lib/pending-events.mjs": "tools/bridges/lib/pending-events.mjs",
-  "cli/lib/stream-spool.mjs": "tools/collector/lib/stream-spool.mjs",
-  "cli/lib/preview-streams.mjs": "tools/preview/lib/preview-streams.mjs",
-  "cli/lib/args.mjs": "tools/cli/lib/args.mjs",
-  "cli/lib/preview-bundle.mjs": "tools/preview/lib/preview-bundle.mjs",
-  "cli/lib/config.mjs": "tools/cli/lib/config.mjs",
-  "cli/lib/stream-collector.mjs": "tools/collector/lib/stream-collector.mjs",
-  "cli/lib/api.mjs": "tools/cli/lib/api.mjs",
-  "cli/lib/preview-runtime.mjs": "tools/preview/lib/preview-runtime.mjs",
-  "cli/lib/qr.mjs": "tools/cli/lib/qr.mjs",
-  "cli/lib/pack.mjs": "tools/cli/lib/pack.mjs",
-  "cli/lib/stream-init.mjs": "tools/collector/lib/stream-init.mjs",
-  "cli/lib/preview.mjs": "tools/preview/lib/preview.mjs",
-  "cli/lib/stream-sources/records.mjs": "tools/collector/lib/stream-sources/records.mjs",
-  "cli/lib/stream-sources/file.mjs": "tools/collector/lib/stream-sources/file.mjs",
-  "cli/lib/stream-sources/index.mjs": "tools/collector/lib/stream-sources/index.mjs",
-  "cli/lib/stream-sources/host.mjs": "tools/collector/lib/stream-sources/host.mjs",
-  "cli/lib/stream-sources/command.mjs": "tools/collector/lib/stream-sources/command.mjs",
-  "cli/lib/stream-sources/ssh.mjs": "tools/collector/lib/stream-sources/ssh.mjs",
-  "snippets/playground.js": "components/playground.js",
-  "snippets/text.js": "components/text.js",
-  "snippets/wakelock.js": "components/wakelock.js",
-  "snippets/pose.js": "components/pose.js",
-  "snippets/vad.js": "components/vad.js",
-  "snippets/chart.js": "components/chart.js",
-  "snippets/ptt.js": "components/ptt.js",
-  "snippets/bluetooth.js": "components/bluetooth.js",
-  "snippets/objects.js": "components/objects.js",
-  "snippets/stream-view.js": "components/stream-view.js",
-  "snippets/overlay.js": "components/overlay.js",
-  "snippets/session-archive.js": "components/session-archive.js",
-  "snippets/list.js": "components/list.js",
-  "snippets/camera.js": "components/camera.js",
-  "snippets/motion.js": "components/motion.js",
-  "snippets/geo.js": "components/geo.js",
-  "snippets/hardware-lab.js": "components/hardware-lab.js",
-  "snippets/ui.js": "components/ui.js",
-  "snippets/screenshot.js": "components/screenshot.js",
-  "snippets/connectors.js": "components/connectors.js",
-  "snippets/qr.js": "components/qr.js",
-  "snippets/glance.js": "components/glance.js",
-  "snippets/input-kit.js": "components/input-kit.js",
-  "snippets/README.md": "components/README.md",
-  "snippets/probe.js": "components/probe.js",
-  "snippets/serial.js": "components/serial.js",
-  "snippets/test/chart.spec.ts": "components/test/chart.spec.ts",
-  "snippets/test/recipes.spec.ts": "components/test/recipes.spec.ts",
-  "snippets/test/stream-view.spec.ts": "components/test/stream-view.spec.ts",
-  "snippets/test/playwright.config.ts": "components/test/playwright.config.ts",
-  "snippets/test/server.mjs": "components/test/server.mjs",
-  "snippets/test/ui.spec.ts": "components/test/ui.spec.ts",
-  "snippets/test/perception.spec.ts": "components/test/perception.spec.ts",
-  "snippets/test/media.spec.ts": "components/test/media.spec.ts",
-  "snippets/test/fake-tendril.js": "components/test/fake-tendril.js",
-  "snippets/test/continuity.spec.ts": "components/test/continuity.spec.ts",
-  "snippets/test/connectors.spec.ts": "components/test/connectors.spec.ts",
-  "snippets/test/device.spec.ts": "components/test/device.spec.ts",
-  "snippets/test/helpers.ts": "components/test/helpers.ts",
-  "recipes/catalog.json": "recipes/catalog.json",
-  "recipes/ui-schema.json": "recipes/ui-schema.json",
-  "recipes/README.md": "recipes/README.md",
-  "recipes/approval-remote/contract.json": "recipes/approval-remote/contract.json",
-  "recipes/approval-remote/index.html": "recipes/approval-remote/index.html",
-  "recipes/approval-remote/scenario.json": "recipes/approval-remote/scenario.json",
-  "recipes/approval-remote/AGENT.md": "recipes/approval-remote/AGENT.md",
-  "recipes/approval-remote/starter.json": "recipes/approval-remote/starter.json",
-  "recipes/motion-companion/index.html": "recipes/motion-companion/index.html",
-  "recipes/motion-companion/scenario.json": "recipes/motion-companion/scenario.json",
-  "recipes/adaptive-checkin/index.html": "recipes/adaptive-checkin/index.html",
-  "recipes/photo-inspector/index.html": "recipes/photo-inspector/index.html",
-  "recipes/photo-inspector/scenario.json": "recipes/photo-inspector/scenario.json",
-  "recipes/photo-inspector/denied.json": "recipes/photo-inspector/denied.json",
-  "recipes/collaborative-canvas/index.html": "recipes/collaborative-canvas/index.html",
-  "recipes/facilitated-session/contract.json": "recipes/facilitated-session/contract.json",
-  "recipes/facilitated-session/assignments.js": "recipes/facilitated-session/assignments.js",
-  "recipes/facilitated-session/index.html": "recipes/facilitated-session/index.html",
-  "recipes/facilitated-session/scenario.json": "recipes/facilitated-session/scenario.json",
-  "recipes/facilitated-session/AGENT.md": "recipes/facilitated-session/AGENT.md",
-  "recipes/facilitated-session/starter.json": "recipes/facilitated-session/starter.json",
-  "recipes/hands-free-guide/contract.json": "recipes/hands-free-guide/contract.json",
-  "recipes/hands-free-guide/index.html": "recipes/hands-free-guide/index.html",
-  "recipes/hands-free-guide/scenario.json": "recipes/hands-free-guide/scenario.json",
-  "recipes/hands-free-guide/AGENT.md": "recipes/hands-free-guide/AGENT.md",
-  "recipes/hands-free-guide/starter.json": "recipes/hands-free-guide/starter.json",
-  "recipes/hardware-experiment/contract.json": "recipes/hardware-experiment/contract.json",
-  "recipes/hardware-experiment/model.mjs": "recipes/hardware-experiment/model.mjs",
-  "recipes/hardware-experiment/index.html": "recipes/hardware-experiment/index.html",
-  "recipes/hardware-experiment/scenario.json": "recipes/hardware-experiment/scenario.json",
-  "recipes/hardware-experiment/AGENT.md": "recipes/hardware-experiment/AGENT.md",
-  "recipes/hardware-experiment/starter.json": "recipes/hardware-experiment/starter.json",
-  "recipes/hardware-experiment/app.js": "recipes/hardware-experiment/app.js",
-  "recipes/hardware-experiment/README.md": "recipes/hardware-experiment/README.md",
-  "recipes/multi-device-workshop/contract.json": "recipes/multi-device-workshop/contract.json",
-  "recipes/multi-device-workshop/index.html": "recipes/multi-device-workshop/index.html",
-  "recipes/multi-device-workshop/scenario.json": "recipes/multi-device-workshop/scenario.json",
-  "recipes/multi-device-workshop/AGENT.md": "recipes/multi-device-workshop/AGENT.md",
-  "recipes/multi-device-workshop/starter.json": "recipes/multi-device-workshop/starter.json",
-  "recipes/multi-device-workshop/app.js": "recipes/multi-device-workshop/app.js",
-  "recipes/multi-device-workshop/README.md": "recipes/multi-device-workshop/README.md",
-  "recipes/previews/field-notebook.png": "recipes/previews/field-notebook.png",
-  "recipes/previews/multi-device-workshop.png": "recipes/previews/multi-device-workshop.png",
-  "recipes/previews/facilitated-session.png": "recipes/previews/facilitated-session.png",
-  "recipes/previews/approval-remote.png": "recipes/previews/approval-remote.png",
-  "recipes/previews/manifest.json": "recipes/previews/manifest.json",
-  "recipes/previews/hands-free-guide.png": "recipes/previews/hands-free-guide.png",
-  "recipes/previews/hardware-experiment.png": "recipes/previews/hardware-experiment.png",
-  "recipes/previews/README.md": "recipes/previews/README.md",
-  "recipes/test/gallery.test.mjs": "recipes/test/gallery.test.mjs",
-  "recipes/test/workflows.test.mjs": "recipes/test/workflows.test.mjs",
-  "recipes/explore-device/index.html": "recipes/explore-device/index.html",
-  "recipes/explore-device/scenario.json": "recipes/explore-device/scenario.json",
-  "recipes/field-notebook/contract.json": "recipes/field-notebook/contract.json",
-  "recipes/field-notebook/model.mjs": "recipes/field-notebook/model.mjs",
-  "recipes/field-notebook/index.html": "recipes/field-notebook/index.html",
-  "recipes/field-notebook/scenario.json": "recipes/field-notebook/scenario.json",
-  "recipes/field-notebook/AGENT.md": "recipes/field-notebook/AGENT.md",
-  "recipes/field-notebook/starter.json": "recipes/field-notebook/starter.json",
-  "recipes/field-notebook/app.js": "recipes/field-notebook/app.js",
-  "recipes/voice-coach/index.html": "recipes/voice-coach/index.html",
-  "recipes/voice-coach/scenario.json": "recipes/voice-coach/scenario.json",
-  "examples/training-dashboard/setup.mjs": "examples/training-dashboard/setup.mjs",
-  "examples/training-dashboard/model.mjs": "examples/training-dashboard/model.mjs",
-  "examples/training-dashboard/index.html": "examples/training-dashboard/index.html",
-  "examples/training-dashboard/app.js": "examples/training-dashboard/app.js",
-  "examples/training-dashboard/README.md": "examples/training-dashboard/README.md",
-  "examples/first-page/index.html": "examples/first-page/index.html",
-  "examples/first-page/run.mjs": "examples/first-page/run.mjs"
+  "format": "tendriller-cookbook-origins",
+  "cookbooks": [
+    {
+      "id": "adapt-without-losing-work",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/ui-schema.json",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/adaptive-checkin/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts"
+      ]
+    },
+    {
+      "id": "annotate-a-frame",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/overlay.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"
+      ]
+    },
+    {
+      "id": "ask-about-evidence",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md"
+      ]
+    },
+    {
+      "id": "capture-rendered-evidence",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/screenshot.js"
+      ]
+    },
+    {
+      "id": "capture-reviewed-evidence",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"
+      ]
+    },
+    {
+      "id": "choose-data-model",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "choose-interruptions",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md"
+      ]
+    },
+    {
+      "id": "choose-voice-interaction",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ptt.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/vad.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/voice-coach/index.html",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/speech.ts"
+      ]
+    },
+    {
+      "id": "collect-private-responses",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"
+      ]
+    },
+    {
+      "id": "collect-sketch",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/collaborative-canvas/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js"
+      ]
+    },
+    {
+      "id": "compare-options",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js"
+      ]
+    },
+    {
+      "id": "connect-instrument",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/serial.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/bluetooth.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/connectors.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/hardware-lab.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/model.mjs"
+      ]
+    },
+    {
+      "id": "connect-resuming-agent",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/bridges/test/pending-events.test.mjs"
+      ]
+    },
+    {
+      "id": "coordinate-devices",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/app.js"
+      ]
+    },
+    {
+      "id": "detect-meaningful-changes",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/glance.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"
+      ]
+    },
+    {
+      "id": "discover-capabilities",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html"
+      ]
+    },
+    {
+      "id": "follow-location-progress",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"
+      ]
+    },
+    {
+      "id": "guide-explicit-checkpoints",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hands-free-guide/index.html"
+      ]
+    },
+    {
+      "id": "import-for-review",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "ingest-bounded-telemetry",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-collector.mjs"
+      ]
+    },
+    {
+      "id": "interpret-motion",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/motion-companion/index.html"
+      ]
+    },
+    {
+      "id": "join-across-devices",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/qr.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md"
+      ]
+    },
+    {
+      "id": "keep-task-active",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/wakelock.js"
+      ]
+    },
+    {
+      "id": "notice-visual-changes",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/glance.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js"
+      ]
+    },
+    {
+      "id": "observe-long-running-process",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/README.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md"
+      ]
+    },
+    {
+      "id": "present-live-measurements",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/README.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs"
+      ]
+    },
+    {
+      "id": "publish-coherent-updates",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/ARTIFACTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/PREVIEW.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/cli/lib/pack.mjs"
+      ]
+    },
+    {
+      "id": "publish-smallest-page",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/first-page/index.html",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/first-page/run.mjs"
+      ]
+    },
+    {
+      "id": "reconcile-concurrent-edits",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/list.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "recover-outdated-work",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md"
+      ]
+    },
+    {
+      "id": "resume-across-sessions",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md",
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/experiences.ts"
+      ]
+    },
+    {
+      "id": "review-exact-proposal",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs"
+      ]
+    },
+    {
+      "id": "run-measurement-experiment",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/model.mjs"
+      ]
+    },
+    {
+      "id": "select-local-perception",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/pose.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/objects.js",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/text.js"
+      ]
+    },
+    {
+      "id": "separate-evidence-interpretation",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "test-adaptive-page",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/PREVIEW.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/test/portable/flows.spec.ts",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/preview/test/preview-http.test.mjs"
+      ]
+    },
+    {
+      "id": "turn-records-into-signals",
+      "sources": [
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
+        "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-sources/records.mjs"
+      ]
+    }
+  ]
 }

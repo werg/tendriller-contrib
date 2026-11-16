@@ -8,7 +8,7 @@ choices: ["Socket/IPC, wait task, webhook, or scheduled check", "Exact receiver 
 capabilities: []
 evidence: "explained"
 related: ["recover-outdated-work", "resume-across-sessions", "choose-interruptions"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/bridges/test/events.test.mjs"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/bridges/test/pending-events.test.mjs"]
 ---
 
 # Connect an agent that actually resumes

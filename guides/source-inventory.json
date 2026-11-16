@@ -1,0 +1,2292 @@
+{
+  "source_repository": "werg/tendriller-contrib",
+  "source_revision": "6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce",
+  "files": [
+    {
+      "source": ".github/workflows/ci.yml",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": ".gitignore",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": "PROVENANCE.md",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": "README.md",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": "components/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/bluetooth.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "connect-instrument"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/camera.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "capture-reviewed-evidence"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/catalog.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/chart.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "present-live-measurements"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/connectors.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "connect-instrument"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/geo.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "follow-location-progress"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/glance.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "notice-visual-changes"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/hardware-lab.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "connect-instrument"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/input-kit.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "capture-reviewed-evidence"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/list.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "reconcile-concurrent-edits"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/motion.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "interpret-motion"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/objects.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/overlay.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "annotate-a-frame"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/playground.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/pose.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/probe.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/ptt.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/qr.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "join-across-devices"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/screenshot.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "capture-rendered-evidence"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/serial.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "connect-instrument"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/stream-view.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "present-live-measurements"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/chart.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/connectors.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/continuity.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/device.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/fake-tendril.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/helpers.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/media.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/perception.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/playwright.config.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/recipes.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/server.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/stream-view.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/test/ui.spec.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/text.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/ui.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/vad.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/vendor/html-to-image-LICENSE",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/vendor/html-to-image.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/vendor/qrcode-LICENSE",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/vendor/qrcode.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "annotate-a-frame",
+        "capture-rendered-evidence",
+        "capture-reviewed-evidence",
+        "choose-voice-interaction",
+        "connect-instrument",
+        "discover-capabilities",
+        "follow-location-progress",
+        "interpret-motion",
+        "join-across-devices",
+        "keep-task-active",
+        "notice-visual-changes",
+        "present-live-measurements",
+        "reconcile-concurrent-edits",
+        "select-local-perception"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "components/wakelock.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "keep-task-active"
+      ],
+      "reason": "Preserve useful decision reasoning; delete mounted UI/component exports and product-shape fixtures."
+    },
+    {
+      "source": "core.lock.json",
+      "action": "delete",
+      "destinations": [],
+      "reason": "Delete the synchronized executable-release pin. Target integration takes explicit public artifacts."
+    },
+    {
+      "source": "distribution/build.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/capture-recipes.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/check-boundaries.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/check-core-lock.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/gallery.ts",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/install-core.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/notices.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/publish-release.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/requirements.json",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/source-map.json",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/test/installed.test.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/test/publish-release.test.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "distribution/test/service.test.mjs",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Generate only cookbook reading catalog/site and content archives; no tools/workflows/components distribution."
+    },
+    {
+      "source": "docs/AGENT_HOSTS.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "connect-resuming-agent",
+        "resume-across-sessions",
+        "choose-interruptions"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "docs/ARTIFACTS.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "publish-coherent-updates"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "docs/COLLECTOR.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "ingest-bounded-telemetry",
+        "turn-records-into-signals"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "docs/EXPERIENCES.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-data-model",
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "docs/INPUTS.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities",
+        "choose-voice-interaction",
+        "connect-instrument"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "docs/PREVIEW.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Decision guidance belongs in cookbooks; operational command reference moves to core."
+    },
+    {
+      "source": "examples/first-page/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "publish-smallest-page"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/first-page/run.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "publish-smallest-page"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/first-page/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "publish-smallest-page"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/app.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/model.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/setup.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "examples/training-dashboard/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "observe-long-running-process"
+      ],
+      "reason": "Keep task reasoning; replace complete downloadable applications with selected independent check specimens."
+    },
+    {
+      "source": "package-lock.json",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": "package.json",
+      "action": "replace",
+      "destinations": [],
+      "reason": "Replace the obsolete product contract with the cookbook collection."
+    },
+    {
+      "source": "recipes/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/adaptive-checkin/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/adaptive-checkin/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/approval-remote/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "review-exact-proposal"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/catalog.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/collaborative-canvas/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-sketch"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/collaborative-canvas/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-sketch"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/explore-device/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/explore-device/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/explore-device/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "discover-capabilities"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/assignments.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/facilitated-session/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/app.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/model.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/field-notebook/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hands-free-guide/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "guide-explicit-checkpoints"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/app.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/model.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/hardware-experiment/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "run-measurement-experiment"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/motion-companion/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "interpret-motion"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/motion-companion/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "interpret-motion"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/motion-companion/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "interpret-motion"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/AGENT.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/app.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/contract.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/starter.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/multi-device-workshop/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "coordinate-devices"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/photo-inspector/denied.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "ask-about-evidence"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/photo-inspector/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "ask-about-evidence"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/photo-inspector/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "ask-about-evidence"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/photo-inspector/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "ask-about-evidence"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/README.md",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/approval-remote.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/facilitated-session.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/field-notebook.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/hands-free-guide.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/hardware-experiment.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/manifest.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/previews/multi-device-workshop.png",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/test/gallery.test.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/test/workflows.test.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/ui-schema.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "adapt-without-losing-work",
+        "ask-about-evidence",
+        "choose-voice-interaction",
+        "collect-private-responses",
+        "collect-sketch",
+        "coordinate-devices",
+        "discover-capabilities",
+        "guide-explicit-checkpoints",
+        "interpret-motion",
+        "review-exact-proposal",
+        "run-measurement-experiment",
+        "separate-evidence-interpretation"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/voice-coach/index.html",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/voice-coach/scenario.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "recipes/voice-coach/tendril.json",
+      "action": "extract-and-delete",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Preserve domain decisions and target failure cases; delete complete starters, schemas, screenshots, and install graphs."
+    },
+    {
+      "source": "test/e2e/approval-remote.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/e2e/experience-followups.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/e2e/feedback-recovery.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/e2e/local-helpers.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/e2e/modalities.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/e2e/playwright.config.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/portable/accessibility.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/portable/flows.spec.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/portable/helpers.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/portable/playwright.config.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "test/publication-cache.ts",
+      "action": "replace",
+      "destinations": [
+        "test-adaptive-page"
+      ],
+      "reason": "Rewrite meaningful behavioral cases for new specimens; retire old workflow/component shape assertions."
+    },
+    {
+      "source": "tools/bridges/bin/agent-socket.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/claude-channel.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/codex-bridge.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/hermes-bridge.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/openclaw-bridge.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/tendril-events.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/tendril-wait.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/bin/tendril-watch.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/lib/pending-events.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/scripts/tendril-wait.sh",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/claude-channel.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/codex-bridge.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/hermes-bridge.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/openclaw-bridge.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/pending-events.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/tendril-wait-socket.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/tendril-watch.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/bridges/test/wait.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/bridges"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/README.md",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/bin/tendril.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/api.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/args.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/assets.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/config.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/pack.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/qr.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/resources.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/lib/service.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/test/cli.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/test/live.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/test/notebook.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/test/public-contract.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/cli/test/training-dashboard.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/cli"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/bin/tendril-stream.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-collector.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-init.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/command.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/file.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/host.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/index.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/latest.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/records.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-sources/ssh.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/lib/stream-spool.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/test/stream-collector.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/test/stream-init.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/test/stream-source-options.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/collector/test/stream-sources.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/collector"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/bin/tendril-preview.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/lib/preview-bundle.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/lib/preview-runtime.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/lib/preview-streams.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/lib/preview.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/notebook.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview-http.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview-lifecycle.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview-runtime.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview-streams.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview-streams.test.mjs",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview.playwright.config.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/preview.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/recipe-fixtures.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/recipes.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/session-archive.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "tools/preview/test/workshop.spec.ts",
+      "action": "move-to-core",
+      "destinations": [
+        "https://github.com/werg/tendriller/tree/master/tools/preview"
+      ],
+      "reason": "Operational software belongs to core. Core removes catalog coupling and rewrites target checks."
+    },
+    {
+      "source": "vendor/core/tendriller-runtime-0.2.0-rc.6.tgz",
+      "action": "delete",
+      "destinations": [],
+      "reason": "Delete the synchronized executable-release pin. Target integration takes explicit public artifacts."
+    },
+    {
+      "source": "vendor/core/tendriller-sdk-0.2.0-rc.6.tgz",
+      "action": "delete",
+      "destinations": [],
+      "reason": "Delete the synchronized executable-release pin. Target integration takes explicit public artifacts."
+    },
+    {
+      "source": "workflows/browser.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/client.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/schema.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/server.ts",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/session-archive.js",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/test/adapters.test.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    },
+    {
+      "source": "workflows/test/sessions.test.mjs",
+      "action": "extract-and-delete",
+      "destinations": [
+        "collect-private-responses",
+        "review-exact-proposal"
+      ],
+      "reason": "Delete six-domain sessions product; deliberately selected cookbook policy references use the public trusted host."
+    }
+  ],
+  "earlier_sources": [
+    {
+      "source_revision": "5e2ec4827ad49de68d0a2c098e4b44c6d5297eac",
+      "source": "components/wakeword.js",
+      "action": "already-deleted",
+      "destinations": [
+        "choose-voice-interaction"
+      ],
+      "reason": "Removed before current branch; preserve engine-selection and consent reasoning without restoring the old API."
+    }
+  ]
+}
