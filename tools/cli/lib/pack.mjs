@@ -41,6 +41,9 @@ function canonical(path) {
   return path;
 }
 function describe(path, source) {
+  const sourceStats = lstatSync(source);
+  if (!sourceStats.isFile() || sourceStats.isSymbolicLink()) throw new Error(`Refusing non-file publication entry: ${path}`);
+  if (sourceStats.size > 5 * 1024 * 1024) throw new Error(`Publication file exceeds the effective upload limit: ${path}`);
   const bytes = readFileSync(source);
   if (bytes.length > 25 * 1024 * 1024) throw new Error(`Publication file exceeds the platform's hard size cap: ${path}`);
   return { path:canonical(path), type:guessType(path), sha256:createHash("sha256").update(bytes).digest("hex"), size:bytes.length, bytes };

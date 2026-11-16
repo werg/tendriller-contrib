@@ -3,7 +3,7 @@
 import { randomUUID, createHash } from "node:crypto";
 import { catalog, scaffold, syncAssets } from "../lib/assets.mjs";
 import { checkService } from "../lib/service.mjs";
-import { readFileSync, writeFileSync, existsSync, statSync, cpSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, statSync, lstatSync, cpSync, mkdirSync } from "node:fs";
 import { basename, resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs, toPath, parseJsonArg, intFlag } from "../lib/args.mjs";
@@ -17,6 +17,14 @@ import { uploadBlob, downloadBlob, blobInfo } from "../lib/blobs.mjs";
 import { putSharedFile, readFileHead, getSharedFile, deleteSharedFile, listSharedFiles, fileHistory } from "../lib/shared-files.mjs";
 import { publishFiles } from "../lib/publications.mjs";
 import { terminalQr } from "../lib/qr.mjs";
+
+const MAX_TRANSFER_BYTES = 5 * 1024 * 1024;
+function readTransferFile(path) {
+  const stats = lstatSync(path);
+  if (!stats.isFile() || stats.isSymbolicLink()) throw new Error("Transfer source must be a regular file, not a symlink");
+  if (stats.size > MAX_TRANSFER_BYTES) throw new Error(`Transfer source exceeds the effective ${MAX_TRANSFER_BYTES} byte limit`);
+  return readFileSync(path);
+}
 
 const HELP = `tendril <command> [args] [--tendril <name>] [--pretty]
 
@@ -218,8 +226,8 @@ const commands = {
     if (verb === "upload" && value && args.length === 2) {
       const name = f.name || basename(value);
       const record = transferRecord(cfg,"blob",value,f["resume-file"]);
-      return out(await uploadBlob(api,readFileSync(value),{type:f.type||guessType(value),name,
-        cid:f.cid,resumeFile:record,maxBytes:5 * 1024 * 1024}));
+      return out(await uploadBlob(api,readTransferFile(value),{type:f.type||guessType(value),name,
+        cid:f.cid,resumeFile:record,maxBytes:MAX_TRANSFER_BYTES}));
     }
     if (verb === "download" && value && target && args.length === 3)
       return out(await downloadBlob(api,value,target,{overwrite:!!f.overwrite}));
@@ -238,7 +246,7 @@ const commands = {
       return out(await getSharedFile(api,path,local,{overwrite:!!f.overwrite}));
     if (verb === "put" && path && local && args.length === 3) {
       const record = transferRecord(cfg,"file",path,f["resume-file"]);
-      return out(await putSharedFile(api,path,readFileSync(local),{localName:basename(local),
+      return out(await putSharedFile(api,path,readTransferFile(local),{localName:basename(local),
         type:f.type || guessType(local),expectedRevision:revisionOf(f),cid:f.cid,
         expectedGenerations:generationsOf(f),scope:f.scope,resumeFile:record,maxBytes:5 * 1024 * 1024}));
     }
