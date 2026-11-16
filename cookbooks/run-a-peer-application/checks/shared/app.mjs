@@ -1,6 +1,6 @@
 import { signals } from './deployment/bootstrap.mjs';
 import { claimTask, postMessage, requestSummary } from './actions.mjs';
-import { operationLabel, readBoard, TOPICS } from './projection.mjs';
+import { mergeOperation, operationLabel, readBoard, TOPICS } from './projection.mjs';
 import { clearSubmittedText, newDrafts, retainReference, validateDrafts } from './drafts.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -145,13 +145,14 @@ async function submit(kind, domainId, submittedText) {
     const result = kind === 'message' ? await postMessage(backend, messageId, submittedText, operationId)
       : kind === 'claim' ? await claimTask(backend, domainId, operationId)
         : await requestSummary(backend, domainId, jobId, operationId);
-    outcomes.set(operationId, result);
+    outcomes.set(operationId, mergeOperation(outcomes.get(operationId), result));
     if (kind === 'message') { saveDrafts(clearSubmittedText(drafts, submittedText)); $('#message').value = drafts.message; }
     paintOperations();
-    status(operationLabel(result), result.status === 'rejected');
+    const observed = outcomes.get(operationId);
+    status(operationLabel(observed), observed.status === 'rejected');
     await refresh();
   } catch (error) {
-    try { const operation = await backend.operations.get(operationId); if (operation) outcomes.set(operationId, operation); }
+    try { const operation = await backend.operations.get(operationId); if (operation) outcomes.set(operationId, mergeOperation(outcomes.get(operationId), operation)); }
     catch { /* Keep the reference; delivery/reconciliation still belongs to the backend. */ }
     paintOperations();
     status(`Submission needs review: ${error.message}. Its original draft and operation reference are retained.`, true);
@@ -177,7 +178,7 @@ async function watchOperation(operationId) {
   try {
     for await (const operation of backend.operations.subscribe({ operationId, signal })) {
       if (!drafts.operations.some(value => value.operationId === operationId)) break;
-      outcomes.set(operationId, operation);
+      outcomes.set(operationId, mergeOperation(outcomes.get(operationId), operation));
       paintOperations();
       // Status-only changes also trigger a coherent replacement, even with equal rows.
       await refresh();

@@ -52,13 +52,6 @@ export function reduceBatch(state, batch) {
     transaction.events.reduce(reduceEvent, next), state);
 }
 
-function sqlValue(value) {
-  if (value === null || typeof value !== 'object' || !('kind' in value)) return value;
-  if (value.kind === 'null') return null;
-  if (value.kind === 'text') return value.value;
-  throw new TypeError('The board query must return text and null values');
-}
-
 export function taskRows(result) {
   if (result.truncated) throw new Error('Task view exceeded its configured row bound');
   const expected = ['id', 'title', 'claimed_by', 'status'];
@@ -67,12 +60,24 @@ export function taskRows(result) {
   }
   return result.rows.map(row => {
     if (row.length !== expected.length) throw new TypeError('Unexpected task row width');
-    const [id, title, claimant, status] = row.map(sqlValue);
+    const [id, title, claimant, status] = row;
     text(id, 128, 'task identity'); text(title, 1000, 'task title');
     if (claimant !== null) text(claimant, 128, 'claimant');
     if (!['open', 'done'].includes(status)) throw new TypeError('Unknown task status');
     return { id, title, claimant, status };
   });
+}
+
+/** A delayed append acknowledgement cannot replace an already observed result. */
+export function mergeOperation(previous, observed) {
+  if (!previous) return observed;
+  if (!observed) return previous;
+  if (previous.operationId !== observed.operationId || previous.proposalId !== observed.proposalId) {
+    throw new Error('An operation reference resolved to different durable intent');
+  }
+  if (['final', 'rejected'].includes(previous.status)) return previous;
+  if (observed.status === 'queued' && previous.status !== 'queued') return previous;
+  return observed;
 }
 
 /** Capture SQL and events from one immutable view. No UI is published half-ready. */

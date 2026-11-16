@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DISPLAY_LIMIT, emptyProjection, operationLabel, readBoard, reduceBatch } from './shared/projection.mjs';
+import { DISPLAY_LIMIT, emptyProjection, mergeOperation, operationLabel, readBoard, reduceBatch } from './shared/projection.mjs';
 import { clearSubmittedText, newDrafts, retainReference, validateDrafts } from './shared/drafts.mjs';
 
 const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${index}`, eventOrdinal: 0, topic: 'conversation', payload: { type: 'message.posted', version: 1, messageId: `message-${index}`, text: `Text ${index}` } });
 const batch = (events, revision = 'view-a', scannedThrough = 'opaque-cursor', hasMore = false) => ({ transactions: [{ proposalId: 'proposal', events }], revision, scannedThrough, hasMore });
-const taskResult = { columns: ['id', 'title', 'claimed_by', 'status'].map(name => ({ name })), rows: [['task-1', 'Review evidence', null, 'open'].map(value => value === null ? { kind: 'null' } : { kind: 'text', value })], truncated: false };
+const taskResult = { columns: ['id', 'title', 'claimed_by', 'status'].map(name => ({ name })), rows: [['task-1', 'Review evidence', null, 'open']], truncated: false };
 
 test('UI projection is bounded while its source history remains untouched', () => {
   const source = Array.from({ length: DISPLAY_LIMIT + 25 }, (_, index) => message(index));
@@ -95,4 +95,18 @@ test('provisional rejection is distinct from final rejection or unknown submissi
   assert.match(operationLabel({ status: 'rejected', error: 'already_claimed' }), /Rejected: already_claimed/);
   assert.equal(operationLabel({ status: 'final' }), 'Accepted and final');
   assert.match(operationLabel(null), /No durable submission found/);
+});
+
+test('delayed submit replies cannot regress an observed final or provisional outcome', () => {
+  const receipt = { operationId: 'one', proposalId: 'signed-one', status: 'queued' };
+  const provisional = { ...receipt, status: 'provisional', outcome: 'accepted' };
+  const final = { ...provisional, status: 'final' };
+  const rejected = { ...receipt, status: 'rejected', outcome: 'rejected' };
+  assert.equal(mergeOperation(provisional, receipt), provisional);
+  assert.equal(mergeOperation(final, receipt), final);
+  assert.equal(mergeOperation(rejected, receipt), rejected);
+  assert.equal(mergeOperation(receipt, provisional), provisional);
+  assert.equal(mergeOperation(provisional, rejected), rejected);
+  assert.equal(mergeOperation(final, null), final);
+  assert.throws(() => mergeOperation(final, { ...receipt, proposalId: 'different' }), /different durable intent/);
 });
