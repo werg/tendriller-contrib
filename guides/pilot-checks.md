@@ -8,24 +8,26 @@ has two layouts and focused deterministic page/model checks. It consumes the pub
 application-backend boundary, an explicitly supplied public Chronolog bundle, and
 a real deployment bootstrap. `npm run test:peer-application` invokes the paired
 Chronolog qualification CLI with explicit runtime/WASM artifacts; it builds both
-complete graphs and records exact digests. The local graph build passed, while
-local Chromium launch was blocked by the environment's socket restriction. The
-actual [paired-core browser run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
-passed both layouts' eight checks with one resident effect dispatch and zero
-host application writes. It also passed the separate default Cloudflare
-membership gate: seven runtime assertions plus the public-package/bundle check,
-using a fresh independently keyed browser, actual workerd and a separate native
-authority. The [preserved reports and exact source pins](../cookbooks/run-a-peer-application/notes/thin-membership-administration.md#recorded-public-artifact-qualification)
-record measured descriptor/control/payload bytes and scope. The application
-layouts use pregranted fixture identities; the thin gate exercises live approval
-and revocation. Neither result establishes deployed network or identity-provider
-behavior.
+complete graphs and records exact digests. Actual qualification runs in CI;
+local Chromium launch is blocked by this workspace's socket restriction.
+The [reviewed pairing in run 43957113710](../cookbooks/run-a-peer-application/notes/qualification-review-43957113710.md)
+passed nine application checks: build, the native captured-generation reset
+recipe and seven browser/runtime assertions across both layouts. It recorded one
+resident effect dispatch and zero host application writes. The separate default
+Cloudflare membership gate passed seven runtime assertions plus its build/import
+check using a fresh independently keyed browser, actual workerd and a separate
+native authority. New raw reports preserve exact source/package hashes and
+descriptor/control/payload measurements. The layouts use pregranted fixture
+identities; the thin gate exercises live approval and revocation. Neither result
+establishes deployed network or identity-provider behavior.
 
-Those reports remain attached to contrib `a3797d5`. Subsequent page review fixes
-have focused Node checks for malformed domain events, coherent-read failure
+The initial [run 43940378818 and unaltered reports](../cookbooks/run-a-peer-application/notes/thin-membership-administration.md#recorded-public-artifact-qualification)
+remain attached to contrib `a3797d5`. The reviewed pairing uses `8449017`, whose
+focused Node checks cover malformed domain events, coherent-read failure
 boundaries, exact editor snapshots and review of an observed missing operation.
-No new full browser result is inferred for those changes. These peer-application
-records are separate from the historical browser results below. The
+The new browser report establishes its recorded scenarios, without adding
+browser claims for every focused model case. These peer-application records
+remain separate from the historical browser results below. The
 [qualification matrix](../cookbooks/run-a-peer-application/notes/implementation-and-qualification.md)
 keeps actual SQL/OPFS, native authority, provider effects, network routes, and cost
 measurements at their respective evidence boundaries; none are inferred from a

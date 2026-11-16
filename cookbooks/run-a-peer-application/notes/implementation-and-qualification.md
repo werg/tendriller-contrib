@@ -26,6 +26,20 @@ enrollment and writer/reader revocation; deployed qualification remains open.
 
 ## Current recorded implementation evidence
 
+[The reviewed implementation's qualification](qualification-review-43957113710.md)
+passed in [browser workflow 43957113710](https://github.com/werg/chronolog-db/actions/runs/43957113710).
+It tested clean Chronolog merge `3780499f18435a8eddfa3dcecf511ca908e57087` for authored
+head `1b5b8f26c0e36c7cff3534d4ae465eaa57154c9c`, public Tendriller source
+`283f210c1fb9dc2c1d27e9bbd9e8813234a40a70`, embedded membership
+`cc18d15ed5b5580b386fb2fc3e986afab935c7de` and contrib `8449017159b2657a2b0d9bde398322dac78ee2d1`.
+New, separate raw reports record nine application checks (build, native scope/reset
+and seven browser/runtime assertions) and seven thin-membership runtime assertions
+plus the build/import audit. The same run passed six actual-WASM tests, SQL-free
+OPFS, SQL/OPFS recovery and the public enrolled bridge. The note preserves exact
+hashes, scope results, byte measurements, supporting quality/chaos results and limits.
+
+### Initial recorded pairing, preserved unchanged
+
 [Chronolog browser run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
 passed on authored head `5cfa04440029c24d4313e7b8e88e593952180adb`, tested clean merge
 `43efd510001c2608bc1e28ee4c7d100cb34c773b`. It consumed Tendriller source
@@ -58,7 +72,7 @@ thin-membership scenario; that evidence belongs to the Chronolog run above.
 
 ### Focused specimen review after that pairing
 
-The recorded `a3797d5` pages and unaltered reports remain the browser baseline.
+The recorded `a3797d5` pages and unaltered reports remain the historical baseline.
 A later review found and fixed three page-level recovery gaps through the same
 public interfaces:
 
@@ -79,9 +93,13 @@ public interfaces:
   original and preserving later typing.
 
 Focused deterministic checks reproduce those cases; the collection now passes
-24 tests and still has 56 reading entries. These results establish page/model
-behavior, not a repeated SQL, Cloudflare or browser qualification. The core and
-deployed acceptance boundaries below are unchanged.
+24 tests and still has 56 reading entries. Those checks establish page/model
+behavior. The separate latest qualification above runs the updated pages through
+the real public runtime without relabeling the original reports or inventing
+browser assertions for every model case. The new
+[scoped JSON reset recipe](scoped-json-state.md) also closes P2P-04 through the
+exact built programs and actual native public adapter. Deployed acceptance
+boundaries below remain unchanged.
 
 ## Work ownership and dependencies
 
@@ -122,7 +140,7 @@ The following are separate assertions, not a single generic “P2P works” test
 | P2P-01 | An event-only group publishes and reopens. | Same effective final events; no SQL adapter loaded. | Native and browser public runtime |
 | P2P-02 | A mixed program updates a row, emits, then fails an assertion. | No partial row and no effective domain event; rejection remains auditable. | Actual deterministic engine |
 | P2P-03 | Lose the submission response and restart. | Original proposal, position and accepted/rejected outcome; changed contents under the ID conflict. | Actual durable store and authority |
-| P2P-04 | Reset an application scope before an older pending operation arrives. | Old operation stays rejected; a previously accepted exact retry returns its original receipt. | Selected authority transaction |
+| P2P-04 | Reset an application scope before an older pending operation arrives. | Old operation stays rejected; a previously accepted exact retry returns its original receipt. | [Exact built recipe through the native public adapter](qualification-review-43957113710.md#the-captured-generation-acceptance-case-now-runs) |
 | P2P-05 | Finality changes without changing query rows. | Pending/final indicators update. | Client subscription and actual UI |
 | P2P-06 | Two peers provisionally claim one task. | One final claim; stable losing-operation rejection; coherent replacement view and retained draft. | Two independent writers and real SQL |
 | P2P-07 | Slow or restart an event consumer. | Bounded memory and no silent event loss; replay from its processed checkpoint. | Durable reader and consumer store |

@@ -209,7 +209,7 @@ Encoded descriptor/control traffic and detached application bytes have separate
 counters. Equal candidate counts with substantially different SQL payload sizes
 must still deliver zero application envelope bytes to the administrator. Keep
 the observed byte report, source/artifact identities and per-stage outcomes.
-The complete gate passed in
+The initial complete gate passed in
 [CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
 seven runtime assertions plus the public-package/bundle check in actual workerd
 and Chromium `158.0.8127.18`. The
@@ -218,6 +218,12 @@ preserves the unaltered report, exact source/artifact hashes, measured bytes and
 each acceptance boundary. The separate two-layout pilot also passed eight
 checks with one effect dispatch and zero host application writes. Its identities
 remain explicitly pregranted, while the thin fixture enrolls a fresh device.
+The [reviewed pairing](../notes/qualification-review-43957113710.md) subsequently
+passed the full workflow with contrib `8449017`, rebuilt public artifacts and
+integrated upstream bases. Its separate raw reports contain nine application
+checks (build, native scope/reset and seven browser/runtime assertions), plus
+the same seven thin runtime assertions and build/import check. They preserve
+new timings and byte counts rather than replacing the initial observations.
 Actual deployed authentication, public-network routes and provider costs remain in issues
 [#14](https://github.com/werg/tendriller-contrib/issues/14) through
 [#17](https://github.com/werg/tendriller-contrib/issues/17).
@@ -230,7 +236,9 @@ version marker, per-event domain validation and a bounded omission count so one
 accepted malformed payload cannot make the whole board unreadable. Focused Node
 checks exercise malformed/future payloads followed by valid records, handler and
 job identity validation, and the distinction from a failing SQL/revision read.
-Those checks do not relabel the earlier browser run or claim a new browser result.
+Those focused checks do not relabel the earlier browser run. The separate
+[review qualification](../notes/qualification-review-43957113710.md) records the
+updated pages' actual public-runtime scenarios and their exact artifact pairing.
 This specimen has no persistent projection cache; an adaptation that adds one
 must bind its checkpoint to the reducer version before reusing cached state.
 The same focused review covers normalization versus the original editor snapshot,

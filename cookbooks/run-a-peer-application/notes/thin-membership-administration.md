@@ -98,10 +98,22 @@ request under that operation ID must fail explicitly. Portability uses the same
 administrator core and identity/history contract in another supported host; it
 does not imply automatic failover or two simultaneously active root stores.
 
+## Latest qualification after review
+
+The [new source/artifact pairing](qualification-review-43957113710.md) passed in
+[workflow 43957113710](https://github.com/werg/chronolog-db/actions/runs/43957113710),
+using public Tendriller source `283f210c`, membership `cc18d15e` and contrib
+`8449017`. It retains seven thin runtime assertions plus the build/import audit,
+zero administrator application-envelope bytes and separately measured full-peer
+traffic. The updated application pilot has nine checks, including the exact built
+scope/reset recipe through the native public adapter. The new note and separate
+raw reports preserve the actual clean tested merge, package hashes, measurements
+and limits. They do not replace the initial evidence below.
+
 ## Recorded public-artifact qualification
 
 [Browser workflow 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
-passed the complete gate. The [unaltered thin-membership report](evidence/2026-11-16-thin-membership.json)
+passed the initial complete gate. The [unaltered thin-membership report](evidence/2026-11-16-thin-membership.json)
 records seven runtime assertions plus the independent package/bundle build check,
 Chromium `158.0.8127.18`, no page errors and `passed: true`. The separate
 [two-layout application report](evidence/2026-11-16-application-pilot.json) in the
@@ -172,7 +184,7 @@ Internet latency and NAT behavior were not measured by this fixture.
 | ADMIN-07 | Withheld, corrupt, duplicated or reordered bodies. | Actual host/browser gate proves missing-body blocking and later authenticated recovery. Separate codec/core tests reject length, digest, type, group and epoch substitution. This run is not a deployed-route corruption/reordering fault campaign; issue #14 retains that work. |
 | ADMIN-08 | Roster changes after large or unavailable application bodies. | Passed activation and authorized key receipt while the browser application frontier is explicitly blocked on detached payloads; thin administration progresses using descriptors/inline controls. |
 | ADMIN-09 | Restart durable host and browser state. | Passed host restart after lost approval response and abrupt browser Worker replacement after accepted/rejected operations, retaining identity, grants and exact receipts. Production storage loss and every enrollment crash boundary remain separate recovery qualifications. |
-| ADMIN-10 | Existing two task-board layouts after the detached-format change. | Eight application checks passed against the same core/runtime pins. These two identities are explicitly pregranted by their application fixture; the fresh-device Cloudflare enrollment check is the separate thin fixture above. |
+| ADMIN-10 | Existing two task-board layouts after the detached-format change. | The initial eight application checks passed against the pins above. The [new pairing](qualification-review-43957113710.md) passes nine checks, adding native scope/reset qualification. The layouts' two identities are explicitly pregranted; fresh-device Cloudflare enrollment remains the separate thin fixture. |
 
 Record encoded transport bytes, not JSON character counts or estimates. The
 report should identify candidate count and envelope size distribution, descriptor

@@ -120,7 +120,12 @@ their SQL into another fixture. Its acceptance cases are:
 4. Try to refresh the generation under that original operation ID. Exact intent
    conflict must refuse the change rather than accepting a rewritten retry.
 
-Keep the command, module digest and observed result with the next qualification
-report. The earlier `a3797d5` application report predates this recipe and is not
-evidence that these new cases ran. No production deployment is needed to exercise
-these SQL/outbox invariants with the actual native materializer.
+All four cases passed in the native portion of
+[workflow 43957113710](qualification-review-43957113710.md#the-captured-generation-acceptance-case-now-runs).
+The separate raw application report preserves the exact built module digest,
+original proposal IDs, final generation `1`, three effective events,
+`assert:scope_generation_changed` rejection and zero extra records on exact retry.
+The helper also refuses a changed generation under the accepted operation ID.
+The earlier `a3797d5` report predates this recipe and remains unchanged. These
+SQL/outbox invariants were exercised with the actual native materializer without
+requiring a production deployment.
