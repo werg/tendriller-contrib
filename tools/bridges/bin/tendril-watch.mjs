@@ -83,7 +83,12 @@ function connect() {
         notify('wake',{seq:message.seq});
       }
     });
-    ws.addEventListener('error', () => {errored=true;});
+    ws.addEventListener('error', () => {
+      errored=true;
+      // A refused WebSocket upgrade may emit only "error" and never "close".
+      // Settle the connection attempt instead of hanging the watcher.
+      if (!opened) done({code:1006,reason:'handshake_error'});
+    });
     ws.addEventListener('close', event => done({
       code:event.code || 1006,
       reason:event.reason || (errored?'socket_error':'peer_closed'),
