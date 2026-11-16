@@ -7,7 +7,7 @@ choices, not installation bundles, required dependencies, or promises that a ser
 has an optional capability enabled.
 
 For every route, inspect the existing page and the current
-[public core contract](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/agent.md).
+[public core contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/agent.md).
 Choose a small first version, record a plausible alternative, and identify which
 results require a real host or device check. Preserve the separation between a
 local draft, a queued command, an accepted service result, and completed outside
