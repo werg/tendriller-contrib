@@ -61,6 +61,7 @@ byte equality.
 - [Build forms people can complete and correct](cookbooks/build-correctable-forms/COOKBOOK.md) — Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.
 - [Make the complete interaction accessible](cookbooks/complete-accessible-interactions/COOKBOOK.md) — Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.
 - [Search and filter a growing collection](cookbooks/search-and-filter-collections/COOKBOOK.md) — Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.
+- [Write and review a document across revisions](cookbooks/write-with-versioned-feedback/COOKBOOK.md) — Keep drafts, anchored feedback, suggested changes, reviewer decisions, and publication tied to the document versions they concern.
 
 ### Guide and coordinate work
 
@@ -69,7 +70,9 @@ byte equality.
 - [Coordinate views and attention across devices](cookbooks/coordinate-devices/COOKBOOK.md) — Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct.
 - [Guide a task with explicit checkpoints](cookbooks/guide-explicit-checkpoints/COOKBOOK.md) — Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.
 - [Guide practice with useful feedback](cookbooks/guide-practice-and-feedback/COOKBOOK.md) — Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery.
+- [Hand off responsibility with a clear acceptance](cookbooks/hand-off-responsibility/COOKBOOK.md) — Transfer task context and unresolved work through an explicit offer and acceptance without confusing assignment, access, or completion.
 - [Join or transfer a page across devices](cookbooks/join-across-devices/COOKBOOK.md) — Choose role-aware links and a usable transfer method without turning device purpose into authority.
+- [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 

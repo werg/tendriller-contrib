@@ -700,6 +700,37 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/guide-practice-and-feedback/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "hand-off-responsibility",
+      "title": "Hand off responsibility with a clear acceptance",
+      "summary": "Transfer task context and unresolved work through an explicit offer and acceptance without confusing assignment, access, or completion.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "handoff",
+        "ownership",
+        "context"
+      ],
+      "choices": [
+        "Informational handoff or accepted responsibility transfer",
+        "Whole task or explicitly scoped partial transfer",
+        "Atomic ownership change or visible coordination limits"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "coordinate-devices",
+        "resume-across-sessions",
+        "guide-explicit-checkpoints",
+        "triage-incoming-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md"
+      ],
+      "path": "cookbooks/hand-off-responsibility/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/hand-off-responsibility/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Transfer task context and unresolved work through an explicit offer and acceptance without confusing assignment, access, or completion. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "import-for-review",
       "title": "Import information for review",
       "summary": "Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.",
@@ -928,6 +959,39 @@
       ],
       "path": "cookbooks/observe-long-running-process/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/observe-long-running-process/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Separate freshness, progress, failures, and intervention from the agent conversation that may come and go. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "plan-time-and-deadlines",
+      "title": "Plan work across time zones and deadlines",
+      "summary": "Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "planning",
+        "time",
+        "deadlines",
+        "reminders"
+      ],
+      "choices": [
+        "Date-only task, absolute instant, or local calendar recurrence",
+        "Task deadline versus reminder and delivery receipt",
+        "Missed-run, daylight-saving, and rescheduling policy"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-interruptions",
+        "guide-explicit-checkpoints",
+        "triage-incoming-work",
+        "review-exact-proposal"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json"
+      ],
+      "path": "cookbooks/plan-time-and-deadlines/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/plan-time-and-deadlines/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "present-live-measurements",
@@ -1378,6 +1442,37 @@
       "evidence": "explained",
       "path": "cookbooks/work-offline-and-reconnect/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/work-offline-and-reconnect/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "write-with-versioned-feedback",
+      "title": "Write and review a document across revisions",
+      "summary": "Keep drafts, anchored feedback, suggested changes, reviewer decisions, and publication tied to the document versions they concern.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "writing",
+        "review",
+        "versions"
+      ],
+      "choices": [
+        "Plain text and snapshots or a richer collaborative editor",
+        "Version-bound comments and explicit re-anchoring",
+        "Accepted edits versus deliberate publication"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "adapt-without-losing-work",
+        "reconcile-concurrent-edits",
+        "review-exact-proposal",
+        "separate-evidence-interpretation"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/agent.md"
+      ],
+      "path": "cookbooks/write-with-versioned-feedback/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/write-with-versioned-feedback/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep drafts, anchored feedback, suggested changes, reviewer decisions, and publication tied to the document versions they concern. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     }
   ]
 }
