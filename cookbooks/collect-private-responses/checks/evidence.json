@@ -1,11 +1,11 @@
 {
   "evidence": "exercised",
-  "date": "2026-11-16T11:59:31.784Z",
+  "date": "2026-11-16T12:06:49.382Z",
   "host": "real built Worker",
-  "source_commit": "5d118c18f1e741ca4d143d8d5d209f439d301ea5",
-  "core_commit": "fbd5f6cced27dab2ac08c2b658a710f369472e20",
-  "sdk_sha256": "8da40ba0feceaac8b2f3e521c3d3d9336569486dec7e6efd73a29227918cd195",
-  "engine_sha256": "aed3e22277c330e6047a7fc507828e7d52388ce515b202d718b78d16f4b3feb6",
+  "source_commit": "9cae769c7492bcb9d7268d4e643d46dc2691f082",
+  "core_commit": "c0aaaecbd01eaaced3aab10706f359125a437a26",
+  "sdk_sha256": "b09cc055e3d4756490acb3b11a92c4258625357e254986f5479d9f30d6c5defd",
+  "engine_sha256": "bde99a9c20bd28c18ab3643dcdbe1b64b9fe1cc86bb99f87ec5cdc7fa6822753",
   "private_reference_sha256": "6ed68842d49981b8693ac83bc5f760d33de0ea053a8762ddca56eaec20bdfb8d",
   "approval_reference_sha256": "529a394fe423dad903be710fb62bc1a02ed13b0cdd87b386f85488c725691097",
   "scenarios": [
@@ -27,14 +27,14 @@
     "Synthetic identities bypass production OAuth setup.",
     "External effect deduplication remains the caller's responsibility."
   ],
-  "source_head_commit": "5d118c18f1e741ca4d143d8d5d209f439d301ea5",
-  "source_tree": "9da814b5c4e57e0fa43ec864fa3d452db5557d0d",
+  "source_head_commit": "0ea40ad8cd18d1032ab6db68e42d907f224430fa",
+  "source_tree": "a7da7d9f5765b29ee32e641cd9e255a4ee53e7cf",
   "ci": {
-    "run_id": 43862403710,
-    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43862403710",
-    "artifact_id": 14223636812,
-    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43862403710/artifacts/14223636812",
-    "artifact_sha256": "3b4a4a430b027a2d9be53a3893049fae49b397f163abc932c1221bb34398890b"
+    "run_id": 43863478301,
+    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43863478301",
+    "artifact_id": 14224985107,
+    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43863478301/artifacts/14224985107",
+    "artifact_sha256": "079705fb629bc2584b2d2ae0e6218726432fcf4c33461cec01dc43f8b3c1d649"
   },
   "command": "node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts .core-build/dist"
 }

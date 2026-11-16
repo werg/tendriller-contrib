@@ -12,15 +12,15 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 ## Recorded target checks
 
 All **31 browser scenarios** and **three actual-host scenarios** passed in
-[GitHub run 43862403710](https://github.com/werg/tendriller-contrib/actions/runs/43862403710).
-The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43862403710/artifacts/14223636812)
+[GitHub run 43863478301](https://github.com/werg/tendriller-contrib/actions/runs/43863478301).
+The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43863478301/artifacts/14224985107)
 includes the scenario records and seven adaptation screenshots.
 
 The exact executable/check source was contrib PR head
-`5d118c18f1e741ca4d143d8d5d209f439d301ea5`, paired with public core
-`fbd5f6cced27dab2ac08c2b658a710f369472e20` and its `0.3.0-rc.1` artifacts.
-GitHub exercised that head directly; its checked tree is
-`9da814b5c4e57e0fa43ec864fa3d452db5557d0d`.
+`0ea40ad8cd18d1032ab6db68e42d907f224430fa`, paired with public core
+`c0aaaecbd01eaaced3aab10706f359125a437a26` and its `0.3.0-rc.2` artifacts.
+GitHub exercised PR merge commit `9cae769c7492bcb9d7268d4e643d46dc2691f082`;
+its tree `a7da7d9f5765b29ee32e641cd9e255a4ee53e7cf` is identical to that PR head.
 The [browser record](pilot-evidence.json) names the runtime identity, preview bundle
 SHA-256, Chromium version, individual scenarios, and command. The
 [host record](../cookbooks/collect-private-responses/checks/evidence.json) names the
@@ -28,11 +28,12 @@ SDK/engine archive and reference-source digests. Evidence-only documentation upd
 do not change the checked executable snapshot.
 
 The immediately preceding storage checkpoint also passed all 31+3 cases against core
-`d59b9864510bd32c7f0ac7f76b5e537b96e44285`. Its
-[browser record](https://github.com/werg/tendriller-contrib/blob/1457644e4f5ee80d6e30cd8dc5fdce4780aadf10/guides/pilot-evidence.json)
-and [host record](https://github.com/werg/tendriller-contrib/blob/1457644e4f5ee80d6e30cd8dc5fdce4780aadf10/cookbooks/collect-private-responses/checks/evidence.json)
-remain unchanged. The final core commit corrects a core browser-test fixture only;
-the runtime, preview, SDK, engine, and reference digests match that checkpoint exactly.
+`fbd5f6cced27dab2ac08c2b658a710f369472e20`. Its
+[browser record](https://github.com/werg/tendriller-contrib/blob/78796e94a7575562bd80a88754e475dd165f1f11/guides/pilot-evidence.json)
+and [host record](https://github.com/werg/tendriller-contrib/blob/78796e94a7575562bd80a88754e475dd165f1f11/cookbooks/collect-private-responses/checks/evidence.json)
+remain unchanged, along with their links to the earlier storage checkpoint. The final
+`0.3.0-rc.2` release identity has its own hashes above. Results remain attached to their
+specific source and artifact pair.
 
 The preceding cookbook-only refactor remains separately preserved: its
 [30-browser record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/guides/pilot-evidence.json)
