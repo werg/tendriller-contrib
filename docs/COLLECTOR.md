@@ -157,7 +157,7 @@ Tendriller request. `ts` may be an epoch-millisecond timestamp. The optional
 envelope `{"ts":...,"type":"metrics","data":{...}}` is also accepted. Explicit
 `source` and `run` values in the input data are preserved, including `null`, empty
 strings, and other JSON values. When a key is absent, the collector supplies its
-configured source `id` or `run` (default `null`). A file containing several runs
+configured source `id`, and optional configured `run` **only if set**. A missing `run` remains absent (instead of injecting `run:null` into every record); explicitly supplied `run:null` is preserved. A file containing several runs
 therefore keeps those run identities. These are application metadata; stream
 authorization and the server-assigned producer identity are unchanged. The
 collector does not parse text logs into chart values; emit numeric metrics explicitly.
@@ -288,7 +288,7 @@ The final serialized record must also fit its output byte limit.
 
 Paths are resolved relative to the configuration file. Source IDs must be unique.
 Configure at most 32 sources. Poll intervals are 500–3,600,000 milliseconds;
-defaults are five seconds for host samples and one second for files and commands. File sources
+defaults are five seconds for host samples and one second for files and commands. File sources (including `latest`)
 require durable streams. The configured durability must agree with the server;
 a mismatch stops the collector with queued records preserved.
 
@@ -431,6 +431,71 @@ replayed. Once a successful durable snapshot enters the spool, its normal upload
 retries preserve the same record ID. Command stderr is never included in records
 or collector status output.
 
+## Latest-value file snapshots
+
+Use `type:"latest"` when an existing process **overwrites or atomically renames
+one JSON file holding the current value** instead of appending JSONL. This
+source polls, checks a bounded content hash against its last *committed*
+checkpoint, and uploads one durable record only when the bytes change.
+File updates never require the producer to call Tendriller.
+
+```json
+{
+  "id": "current-job",
+  "type": "latest",
+  "path": "/work/run/status.json",
+  "format": "json",
+  "stream": "training.current",
+  "durability": "durable",
+  "interval_ms": 5000
+}
+```
+
+Create `training.current` with `max_records:1` for one retained current
+value. A `latest` source also supports `format:"text"` for a plain-text
+file, creating a `snapshot` record with `data.value`. JSON files are
+parsed using the same record options (`fields`, `flatten`, optional `run`)
+as JSONL sources; wrapped `{ts,type,data}` is supported. The default is
+JSON. If no `run` is present in either source configuration or input, it is
+**omitted**, not emitted as null.
+
+An unchanged, empty, missing, malformed or oversized file is handled
+explicitly: unchanged bytes produce no duplicate; an empty file produces
+no new record; missing files report `waiting_for_file`; malformed or oversized
+snapshots generate one `collector_error` per changed content. Input is
+bounded by `max_line_bytes`. The local spool persists each snapshot and its
+content digest atomically before upload; server deduplication still uses the
+normal record ID and retention rules. Because this is a current-value
+snapshot, intermediate overwrites between polls are intentionally not replayed.
+Prefer atomic rename over writing in place to avoid transient partial JSON.
+If the file is regenerated with exactly the same bytes, no new record is
+needed. `max_records:1` gives the browser a stable `streams.latest()` read.
+
+## Remotes without Node.js
+
+**Only the collector machine needs Node.js.** A remote Linux/macOS host can
+expose existing logs through OpenSSH without installing Node there:
+
+```json
+{
+  "id": "remote-log",
+  "type": "ssh",
+  "stream": "training.logs",
+  "durability": "durable",
+  "host": "training-host",
+  "command": ["tail","-n","0","-F","/var/log/training.log"],
+  "format": "log"
+}
+```
+
+Use a preconfigured SSH key and a verified host key (see the SSH section
+below). This is a **live** feed: reconnect gaps cannot recover lines lost
+while SSH was unavailable. For reliable replay, copy/rsync the remote
+retained JSONL to a *local* file and use a `jsonl` source, or mirror a
+remote atomically replaced snapshot and use `latest` on that local path.
+Do not blindly pipe untrusted remote shell syntax into a command; explicit
+SSH arguments and local credentials should be controlled by the operator.
+
 ## SSH sources
 
 The local collector can launch a configured read-only command on another host
@@ -503,6 +568,20 @@ checkpoint. Do not pipe the training process itself through this SSH connection.
   diagnosis. Server 429 and 413 responses retry because rate/storage limits can
   recover. Queue order is preserved; a blocked durable stream can delay others.
 
+### Retention sizing
+
+If your sample frequency is one record every `S` seconds and you want `H`
+hours of history, estimate `ceil(H × 3600 / S)` records. Multiply by a
+measured average input record size for the approximate retained byte use.
+Example: a 2-hour lookback at 10-second intervals requires at least 720
+records, and 400-byte input records total about 288 KiB plus envelopes.
+Choose `max_records` slightly above that count for jitter, and
+`max_age_seconds` around 7200 (plus margin). The service also enforces
+per-stream, page-wide and unclaimed/claimed storage limits; none of these
+settings guarantees that an older observation survives aggregate pressure.
+The same authoritative recipe lives in the served core
+[`STREAMS.md`](https://tendriller.dev/docs/STREAMS.md).
+
 Retention is bounded at both ends. The example retains at most 10,000 records or
 24 hours per durable stream, whichever is reached first. A retry after server
 retention has removed its original ID can be appended again. This is not an
@@ -556,6 +635,7 @@ bounded buffering, upload acknowledgements, and retry timing.
 | --- | --- | --- | --- |
 | Host | Periodic sample | None; each sample observes the current machine | None; CPU interval counters are local sampling state |
 | JSONL/text file | Bounded read | Can reread input while the source file is retained | Proposed file identity, byte offset, boundary fingerprint |
+| Latest-value file | Bounded current JSON/text snapshot | No intermediate overwrite replay; unchanged snapshot deduplicated | Proposed content digest |
 | Local command | Periodic finite command | None; the next invocation is a fresh observation | None |
 | SSH | One live command session | None; reconnect can miss remote output | None |
 
