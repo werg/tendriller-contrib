@@ -41,6 +41,7 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `serial.js` | Web Serial line reader/writer, `request()` for command/reply | Chromium desktop only | `p = await serial.connect({onLine}); await p.request("STATUS")` |
 | `bluetooth.js` | Web Bluetooth: connect by service, read, write, notify | Chromium on desktop and Android; not iOS | `d = await bluetooth.connect({services: ["heart_rate"]})` |
 | `list.js` | Shared list (shopping, packing) stored in state as records keyed by id; add/tick/edit/remove; offline via `tendril.state` | All | `list.mount("#list", {path: "shopping"})` |
+| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
 | `chart.js` | Bounded numeric series with axes, gaps, legends and an accessible values table; no chart library or CDN | All current browsers | `chart.mount("#plot", {xLabel:"Step"}).update([{id:"run",points:[{x:1,y:0.8}]}])` |
 | `stream-view.js` | Coalesced rendering and explicit atomic checkpoints of a cursor plus its materialized view | All current browsers; persistence requires browser storage | `streamView.batch(render).schedule()`; `streamView.checkpoint('metrics',{key:'chart-v1'})` |
 | `input-kit.js` | User-triggered photo, audio, location, motion, and file controls with one event contract | Depends on input | `inputs.mount("#inputs", {modalities:["photo","location"]})` |
@@ -264,8 +265,6 @@ vendor. It is available only in some browsers and does not provide a reliable
 screen-off/background assistant. For that, use an OS-level voice integration or a
 native companion; the page still works as the interactive front end. The built-in
 conversation microphone and typing are fallbacks.
-| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
-
 ## Considerate adaptive interfaces
 
 Give every `ui.js` block a stable unique `id`. A title, status, label, or neighboring

@@ -17,7 +17,7 @@ tar -xzf tools.tgz -C tendriller-tools
 node tendriller-tools/tools/cli/bin/tendril.mjs --help
 ```
 
-The same release includes standalone `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
+The same release includes standalone `tendril.mjs` (CLI and component bundle without the full tools archive), `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
 
 ## Create a page
 
@@ -26,7 +26,7 @@ node tendriller-tools/tools/cli/bin/tendril.mjs scaffold field-notebook ./notebo
 node tendriller-tools/tools/preview/bin/tendril-preview.mjs ./notebook --fixture ./notebook/scenario.json
 ```
 
-Scaffolding writes `tendril.json`, copies the complete declared component dependency graph into `assets/`, and records exact hashes in `tendril.assets.json`. Lazy siblings resolve relative to the selected component script, so changing a service deployment cannot replace a page's component implementation.
+Scaffolding writes `tendril.json`, copies the complete declared component dependency graph into `assets/`, and records exact hashes in `tendril.assets.json`. Hand-built pages can run `tendril assets sync <dir>`; `tendril push <dir>` performs the same safe sync before publication. Lazy siblings resolve relative to the selected component script, so changing a service deployment cannot replace a page's component implementation.
 
 A workflow recipe declares its required module interface. On the service, an authenticated controller explicitly activates its scope before publishing initial protected state:
 
