@@ -224,6 +224,22 @@ event-only variation for a conversation or bounded collection of recorded facts.
 Leave large blob bytes on the existing immutable storage path initially. A
 committed reference is not proof that another durable peer has received the bytes.
 
+The public [Chronolog file/capture metadata recipe](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/examples/blob-metadata.ts)
+demonstrates that boundary with ordinary SQL and emits. Stage immutable bytes
+through the existing host uploader and retain its exact receipt, location and
+retention decision. Commit the file path/version/reference under one stable
+operation ID with an expected-revision SQL guard. A stale competing edit leaves
+no partial metadata or effective file event; retry keeps the original staged
+receipt and signed proposal.
+
+Choose whether the application requires an actual pin receipt or accepts the
+host's stated expiry. The reference records observed upload completion and says
+additional durable copies are unknown. It cannot promise current availability,
+redundancy or backup. An upload whose metadata loses a race remains under the
+explicit host/orphan policy. Reviewed captures use the same mechanism; private
+bytes stay in an authorized store or separate group. This is an application
+schema and staged upload workflow, not another core proposal outbox.
+
 The [qualification matrix](notes/implementation-and-qualification.md) names each
 required failure and its evidence boundary, including actual network and cost
 measurements that a deterministic test cannot establish.

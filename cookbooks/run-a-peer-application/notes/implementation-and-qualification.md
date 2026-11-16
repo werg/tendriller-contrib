@@ -34,6 +34,13 @@ authority.
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
 
+The [file/capture metadata recipe](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/examples/blob-metadata.ts)
+adds an application-owned SQL/emit schema over the existing host uploader. It
+stages exact upload receipts, binds path revisions, and distinguishes completed
+upload/retention evidence from unknown additional copies. Its native integration
+checks final metadata, stale-guard rollback and exact retries. Deployment byte
+availability and backup evidence remain in issue #17; this recipe does not close it.
+
 ## Decisive correctness scenarios
 
 The following are separate assertions, not a single generic “P2P works” test.
