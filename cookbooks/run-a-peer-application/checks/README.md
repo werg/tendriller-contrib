@@ -208,6 +208,13 @@ measure logical authenticated frame payloads; RTC packet headers, credit
 messages and IP/UDP/DTLS/SCTP overhead are excluded. Host SDP JSON envelopes are
 counted separately, and these byte counters are not provider billing exports.
 
+The [recorded RTC application run](../notes/rtc-application-qualification-2026-11-16.md)
+passed all twelve task/chat checks with the packaged host, two browser replicas
+and a native authority. It preserves the raw application/v2 report and strict
+summary alongside a later current-source browser/resident quick gate. The thin
+membership failure, later application-step failure and pending thin rerun are
+stated separately.
+
 Qualification covers these observations:
 
 | Scenario | Page observation |
@@ -281,6 +288,9 @@ or resident-task code under a newer source identity.
 The [subsequent direct-introduction run](../notes/direct-rtc-qualification-43978428041.md)
 separately passed all five Chromium/public-HTTP RTC assertions and six native
 HTTPS resident-task checks under exact clean source and recipe pins.
+The [later deadline-corrected quick run](../notes/rtc-application-qualification-2026-11-16.md#later-public-direct-introduction-and-resident-lifecycle)
+preserves another five browser and six resident passes at the recorded
+`c3a7fd40` source, separately from the earlier task/chat source pairing.
 
 Record the exact source heads, public bundle digest, native engine/WASM identity,
 browser version and per-scenario outcome. A screenshot or fixture-only browser

@@ -1,0 +1,489 @@
+{
+  "format": "peer-application-evidence-summary/v1",
+  "revisions": {
+    "chronolog": {
+      "head": "d3f31d0bb131494b749df3ab6f76d54f09111a5f",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "7291598b566090d7893a209075861d57c29b1217",
+      "dirty": false
+    },
+    "tendrillerRuntime": {
+      "head": "4d63f48c9a0f8e9765fe4d90541d67648fa20340",
+      "dirty": false
+    }
+  },
+  "browser": "158.0.8127.18",
+  "publicArtifacts": {
+    "runtimePackage": {
+      "name": "@tendriller/runtime",
+      "version": "0.3.0-rc.9",
+      "type": "module",
+      "description": "Released Tendriller runtime and public preview primitives",
+      "exports": {
+        "./kernel": {
+          "types": "./kernel.d.mts",
+          "import": "./assets/kernel.mjs"
+        },
+        "./voice": {
+          "types": "./voice.d.mts",
+          "import": "./assets/voice.mjs"
+        },
+        "./preview-support": {
+          "types": "./preview-support.d.mts",
+          "import": "./preview-support.mjs"
+        },
+        "./manifest": "./assets/manifest.json",
+        "./assets/*": "./assets/*",
+        "./preview": {
+          "types": "./preview.d.mts",
+          "import": "./preview.mjs"
+        }
+      },
+      "files": [
+        "assets",
+        "preview-support.mjs",
+        "preview-support.d.mts",
+        "preview.mjs",
+        "preview.d.mts",
+        "kernel.d.mts",
+        "voice.d.mts",
+        "inputs.json",
+        "build-metrics.json"
+      ],
+      "tendriller": {
+        "contract": 3,
+        "runtime": "e9b200c2c1ccf0953d9fc4b1aed9bd83a57a9403977ee29c4b1d7ef849a051dd"
+      }
+    },
+    "kernelSha256": "9f774ff790ba1456f898b78e449daebd312e16266181a9949cb15439415b27d3",
+    "peerIntroductionRecipeSha256": "a609eb75213404f8d9f6b1ace51fc59db5e6a38df263b93357d8d270a2e6e999",
+    "peerIntroductionBundleSha256": "3d94ea607f0983ecb7b96354f864b8b92ff66477c51f8cbd562ccb52e404c15e",
+    "wasmManifestSha256": "eb2d9a21be7803cea662afccbf4af46e936b45ab529a0300bf3ba47c63eb11ad",
+    "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+    "publicModuleSha256": "997058cd67a36137f360284f0ae11c4ba1b373a36380ec27f9359049bd04b841",
+    "scopeModuleSha256": "149bda33913a3afc6e0e06bc1c0e16a2d2c80acfc18d4e97f26ae71c63787aa2",
+    "specimenManifestSha256": "95ba58ec8a67769acdd01bdc8bd6fd67797096d8a455392ef92bf4a5f3538ca5"
+  },
+  "engineSha256": "325f3269817099a9b600b40a97bd081f5d5e5078de0dd79670093468ed4b62b9",
+  "checks": [
+    "both contrib layouts compile from an explicit public application bundle, packaged Tendriller runtime and pinned WASM assets",
+    "the built scope recipe rejects a durably queued stale edit after reset and preserves the original accepted retry without another write",
+    "independent browser identities and OPFS replicas render one shared team-owned task through the actual selected Tendriller backend",
+    "typing traverses authenticated ephemeral frames, expires and leaves no durable event",
+    "with the finality clock held through inclusion, disconnected competing claims resolve by deterministic author order to one acceptance and one SQL rejection",
+    "a failed SQL guard emits no intent; the final winning intent runs the native worker once and records a correlated result that browser scope cannot forge",
+    "a delayed durable append reply preserves newer typing and cannot regress the already observed final receipt",
+    "Worker termination before reply delivery reopens durable identity and original operation; one message survives with its saved draft and original proposal ID",
+    "both layouts rebuild from retained final events without redispatching the worker or writing host application state",
+    "independent replicas receive identical task/chat final events over WebRTC after every host introduction socket has closed",
+    "warm authenticated WebRTC sessions finalize new chat while the host listener is stopped, with increasing RTC bytes and exactly zero host requests or signaling growth",
+    "fresh RTC introduction recovers the same signed history and exact outcomes after interruption, including four 192 KiB programs of sixteen 12 KiB events, with measured bytes and bounded queues"
+  ],
+  "counts": {
+    "effectDispatches": 1,
+    "hostApplicationRequests": 0,
+    "hostApplicationWrites": 0
+  },
+  "topology": {
+    "signaling": [
+      "Chromium",
+      "local TLS bridge with synthetic page session",
+      "packaged workerd SDP rendezvous",
+      "native peer"
+    ],
+    "application": [
+      "Chromium Worker",
+      "WebRTC DataChannel over loopback UDP",
+      "native authenticated Chronolog peer"
+    ]
+  },
+  "measurement": {
+    "queueSampleIntervalMs": 10,
+    "byteBoundary": "Logical authenticated peer frame payload bytes before RTC packet headers; SDP JSON envelopes counted separately",
+    "queueScope": "Sampled native send and receive queues; saturation and worst-case memory are separate transport tests",
+    "restrictedInterfaceEnumeration": false
+  },
+  "excludes": [
+    "RTC packet headers and credit messages",
+    "IP/UDP/DTLS/SCTP packet overhead",
+    "provider billing",
+    "public DNS/NAT",
+    "real identity provider",
+    "home/mobile/corporate network conditions"
+  ],
+  "hostOutage": {
+    "signalingBefore": {
+      "host": {
+        "opened": 6,
+        "sentMessages": 6,
+        "receivedMessages": 18,
+        "sentBytes": 4382,
+        "receivedBytes": 5226,
+        "activeSockets": 0,
+        "available": false
+      },
+      "browsers": [
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 587,
+            "receivedBytes": 568
+          }
+        ],
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 586,
+            "receivedBytes": 568
+          }
+        ]
+      ]
+    },
+    "signalingAfter": {
+      "host": {
+        "opened": 6,
+        "sentMessages": 6,
+        "receivedMessages": 18,
+        "sentBytes": 4382,
+        "receivedBytes": 5226,
+        "activeSockets": 0,
+        "available": false
+      },
+      "browsers": [
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 587,
+            "receivedBytes": 568
+          }
+        ],
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 586,
+            "receivedBytes": 568
+          }
+        ]
+      ]
+    },
+    "rtcBytesBefore": 1183719,
+    "rtcBytesAfter": 1253470,
+    "hostApplicationRequests": 0
+  },
+  "signaling": {
+    "host": {
+      "opened": 8,
+      "sentMessages": 8,
+      "receivedMessages": 24,
+      "sentBytes": 5843,
+      "receivedBytes": 6968,
+      "activeSockets": 0,
+      "available": true
+    },
+    "browsers": [
+      [
+        {
+          "sentMessages": 1,
+          "receivedMessages": 1,
+          "sentBytes": 587,
+          "receivedBytes": 568
+        },
+        {
+          "sentMessages": 1,
+          "receivedMessages": 1,
+          "sentBytes": 586,
+          "receivedBytes": 568
+        }
+      ],
+      [
+        {
+          "sentMessages": 1,
+          "receivedMessages": 1,
+          "sentBytes": 586,
+          "receivedBytes": 568
+        },
+        {
+          "sentMessages": 1,
+          "receivedMessages": 1,
+          "sentBytes": 587,
+          "receivedBytes": 568
+        }
+      ]
+    ]
+  },
+  "sessions": {
+    "native": [
+      {
+        "id": 1,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:37:41.586Z",
+        "readyMs": 289.95391799999925,
+        "authenticatedMs": 301.1402990000006,
+        "closed": true,
+        "sampledPeakQueuedBytes": 0,
+        "sentBytes": 59884,
+        "receivedBytes": 48372,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 887,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 2,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:37:41.591Z",
+        "readyMs": 278.067285000001,
+        "authenticatedMs": 286.0949220000002,
+        "closed": true,
+        "sampledPeakQueuedBytes": 309,
+        "sentBytes": 59027,
+        "receivedBytes": 48413,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 887,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 3,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:37:57.314Z",
+        "readyMs": 567.3950139999979,
+        "authenticatedMs": 587.1894859999993,
+        "closed": true,
+        "sampledPeakQueuedBytes": 730,
+        "sentBytes": 113999,
+        "receivedBytes": 100911,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 888,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 4,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:37:57.317Z",
+        "readyMs": 565.3882280000034,
+        "authenticatedMs": 577.7808050000021,
+        "closed": true,
+        "sampledPeakQueuedBytes": 543,
+        "sentBytes": 149977,
+        "receivedBytes": 133114,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 887,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 5,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:38:40.488Z",
+        "readyMs": 266.37537700000394,
+        "authenticatedMs": 271.330117000005,
+        "closed": true,
+        "sampledPeakQueuedBytes": 704,
+        "sentBytes": 142753,
+        "receivedBytes": 129037,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 888,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 6,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:38:52.957Z",
+        "readyMs": 296.19499099999666,
+        "authenticatedMs": 307.8084319999907,
+        "closed": true,
+        "sampledPeakQueuedBytes": 705,
+        "sentBytes": 135994,
+        "receivedBytes": 131989,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 887,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 7,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:39:19.171Z",
+        "readyMs": 259.36989200000244,
+        "authenticatedMs": 263.0622719999956,
+        "closed": false,
+        "sampledPeakQueuedBytes": 198250,
+        "sentBytes": 974838,
+        "receivedBytes": 146627,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 887,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      },
+      {
+        "id": 8,
+        "route": "webrtc",
+        "startedAt": "2026-11-16T23:39:19.174Z",
+        "readyMs": 258.61431900000025,
+        "authenticatedMs": 261.32110700001067,
+        "closed": false,
+        "sampledPeakQueuedBytes": 198250,
+        "sentBytes": 982138,
+        "receivedBytes": 164839,
+        "nativeSignaling": {
+          "sentBytes": 715,
+          "receivedBytes": 888,
+          "sentDescriptions": 1,
+          "receivedDescriptions": 1,
+          "closed": true
+        }
+      }
+    ],
+    "browsers": [
+      [
+        {
+          "route": "webrtc",
+          "authenticatedMs": 17.369999999995343,
+          "sentBytes": 129037,
+          "receivedBytes": 142753,
+          "queuedBytes": 0
+        },
+        {
+          "route": "webrtc",
+          "authenticatedMs": 260.09499999997206,
+          "sentBytes": 146599,
+          "receivedBytes": 974752,
+          "queuedBytes": 0
+        }
+      ],
+      [
+        {
+          "route": "webrtc",
+          "authenticatedMs": 13.195000000006985,
+          "sentBytes": 131989,
+          "receivedBytes": 135994,
+          "queuedBytes": 0
+        },
+        {
+          "route": "webrtc",
+          "authenticatedMs": 259.070000000007,
+          "sentBytes": 164021,
+          "receivedBytes": 981842,
+          "queuedBytes": 0
+        }
+      ]
+    ]
+  },
+  "sharedState": {
+    "records": 19,
+    "recordDigest": "rauDPJxldt27MjCkm2yEOueUkpEH8k6fZRnxsB14eFo",
+    "capabilityDigest": "gZZjh6LsWdSuAk2X4iwdmMPmXYuw5HI-0b1WyEBSEnY",
+    "finalOrderLength": 18
+  },
+  "finalEventDigest": "70d6dc294b6d1f1d1488af16c96635520cd87868b7cce3cdc44d5dd372fe039e",
+  "originalOperations": {
+    "before": [
+      [
+        {
+          "operationId": "073c0796-bf05-454e-a016-d875f3ce1f7a",
+          "proposalId": "tx_83d5b46189169bb146f65b6da844a58a3193f1086e06e11bda61ca8c97db0607",
+          "status": "final",
+          "outcome": "accepted"
+        },
+        {
+          "operationId": "0a23279c-d87d-4452-b944-cffde3f0fa27",
+          "proposalId": "tx_0feff2bf662838009ffe0808aad95f14132b83179d3f1196fc6923d92539083f",
+          "status": "final",
+          "outcome": "accepted"
+        },
+        {
+          "operationId": "344da231-1530-4afc-b0b9-0233493046d3",
+          "proposalId": "tx_d4e0e307225a0e4599f44948d750fbc7cf4b659537c43943dd1c096eb8f7784e",
+          "status": "final",
+          "outcome": "accepted"
+        }
+      ],
+      [
+        {
+          "operationId": "3507e238-ea19-434c-97d0-7d1d08e00ab0",
+          "proposalId": "tx_da2d4df37c551e4d2998e6e5a5d7c159f6bb3a6d6b3b816a52c47ae41b7bdab6",
+          "status": "rejected",
+          "outcome": "rejected",
+          "error": "assert:task_unavailable",
+          "message": "assert:task_unavailable at program step 0"
+        }
+      ]
+    ],
+    "after": [
+      [
+        {
+          "operationId": "073c0796-bf05-454e-a016-d875f3ce1f7a",
+          "proposalId": "tx_83d5b46189169bb146f65b6da844a58a3193f1086e06e11bda61ca8c97db0607",
+          "status": "final",
+          "outcome": "accepted"
+        },
+        {
+          "operationId": "0a23279c-d87d-4452-b944-cffde3f0fa27",
+          "proposalId": "tx_0feff2bf662838009ffe0808aad95f14132b83179d3f1196fc6923d92539083f",
+          "status": "final",
+          "outcome": "accepted"
+        },
+        {
+          "operationId": "344da231-1530-4afc-b0b9-0233493046d3",
+          "proposalId": "tx_d4e0e307225a0e4599f44948d750fbc7cf4b659537c43943dd1c096eb8f7784e",
+          "status": "final",
+          "outcome": "accepted"
+        }
+      ],
+      [
+        {
+          "operationId": "3507e238-ea19-434c-97d0-7d1d08e00ab0",
+          "proposalId": "tx_da2d4df37c551e4d2998e6e5a5d7c159f6bb3a6d6b3b816a52c47ae41b7bdab6",
+          "status": "rejected",
+          "outcome": "rejected",
+          "error": "assert:task_unavailable",
+          "message": "assert:task_unavailable at program step 0"
+        }
+      ]
+    ]
+  },
+  "catchUp": {
+    "applicationStringBytes": 786432,
+    "eventsPerProposal": 16,
+    "eventBodyBytes": 12288,
+    "elapsedMs": 50015.79443099999,
+    "applicationBytesPerSecond": 15723.673070612396
+  },
+  "qualification": "Two independent browser OPFS applications and a native task worker use RTC through packaged Tendriller introduction, progress with its listener stopped, and retain exact signed history and original outcomes after reconnect.",
+  "limits": [
+    "The validator checks recorded observations; it does not execute the application or authenticate the report.",
+    "Peer byte counters measure logical frame payloads; they exclude RTC packet headers, credit messages and IP/UDP/DTLS/SCTP overhead.",
+    "The local TLS bridge supplies synthetic authenticated host sessions. Production login, Internet NAT, TURN interoperability and provider billing remain unqualified."
+  ],
+  "rawReportSha256": "cc9c89629684b9e4a592a93efafe5a45a0fa2f675e80d55b9ad5bbc13b5dfe49"
+}
