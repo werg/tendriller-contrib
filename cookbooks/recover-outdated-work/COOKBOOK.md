@@ -27,6 +27,19 @@ A byte upload has its own durable session and receipt. Completing that transfer 
 
 For a shared file, preserve the reviewed path revision. For a publication, preserve the reviewed publication-head revision. Preserve any relevant task generations as well. A reference conflict asks for a fresh review; it is not a transient upload error and must not trigger an automatic overwrite with newly fetched guards.
 
+Bind a single-file task through the generic scope registry, using the complete canonical path as one path segment:
+
+```js
+{
+  paths: [["files", "reports/field-notes.txt"]],
+  operations: []
+}
+```
+
+Path and operation bindings select commands independently. Adding `operations: ["file.write"]` also protects writes to every other shared file; it does not narrow the binding to that one path. Keep the file's revision guard and the selected scope generations in the original command. File metadata does not declare its own authoritative scope.
+
+Retiring a scope invalidates commands that captured its old generation. It does not create a permanent access restriction or freeze the file. A newly reviewed deletion uses the current file revision and any remaining active guards through the ordinary file operation. Use the authorization model for access policy, and the scope registry for detecting outdated intent.
+
 If a resume record represents specific bytes, changing those bytes creates new work. Keep the earlier result or failure available for reconciliation. The user may intentionally resubmit the edited content, but reusing the old command identity for it breaks receipt meaning.
 
 ## Keep drafts separate
