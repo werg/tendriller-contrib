@@ -15,6 +15,25 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this whenever a command can outlive the current connection or task revision. Network loss often happens after the server accepted work but before the browser saw its acknowledgement. Retrying should ask for the original result, not silently create a second action or rebind old intent to new state.
 
+## Give pending work a place people can understand
+
+Imagine a person completing an inspection in weak connectivity. They send a note, write the next note, and later discover that the task was reset while the first one was queued. A useful interface keeps both notes, explains which context the first belonged to, and offers a reviewed path forward. An endless spinner or a silent resubmission would lose that meaning.
+
+Use a per-request activity list or a compact outbox when several operations can be pending. Show a readable intent summary, creation time, original task/run, current transport/application state, and the most relevant next action. Keep sensitive payloads hidden until authorized to display them. Request details should expose enough evidence to distinguish a retry from a separate action without showing tokens or internal credentials.
+
+| Observed state | Useful message | Appropriate next action |
+| --- | --- | --- |
+| Persisted locally, not accepted | “Queued on this device.” | Wait or inspect the pending snapshot; cancellation depends on actual queue support. |
+| Accepted, follow-up pending | “Saved; awaiting processing.” | Inspect its receipt rather than sending a duplicate. |
+| Outcome unknown | “Checking whether this request succeeded.” | Reconcile the original command and any external effect. |
+| Rejected as stale | “The task changed before this could be applied.” | Compare with current context and deliberately compose new work. |
+| Rejected by policy or validation | A task-specific reason tied to the submitted snapshot. | Correct a new draft or obtain the required authority. |
+| Completed | An outcome or result linked to the original request. | Continue, inspect, or make a separate revision. |
+
+A Retry button should mean retrying the same immutable intent. A “Use this in the current task” action creates a new reviewed intent with a new identity. Keep those actions visually and semantically distinct. If a retry budget is exhausted, retain a recoverable record and explain the next step instead of silently discarding it.
+
+Let the person filter unresolved work and inspect failure details without losing focus as acknowledgements arrive. Announce meaningful transitions, not every reconnect attempt. A new result must not steal focus from a draft, dismiss an error the user is reading, or scroll an outbox unexpectedly.
+
 ## Name the outcomes
 
 Queued means the client has pending work, not that the server accepted it. Accepted means the server committed the command under its contract, not that an agent or external service completed every resulting effect. Rejected can arrive immediately or later after reconnect. A page should preserve enough context to explain each state.

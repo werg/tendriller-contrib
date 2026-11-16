@@ -15,6 +15,27 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this when a person needs to understand an evolving process. First decide whether they need the latest reading, a trend, a comparison between runs, or evidence for a decision. A numeric readout may answer the question better than a chart. A chart is a presentation choice, never the storage model.
 
+## Help the person arrive, inspect, and decide
+
+For a room-condition monitor, the first decision might be whether a recent temperature rise is real, recent, and large enough to act on. Begin with the selected source/run, an exact latest reading and unit, the observation's age, and the interval available for inspection. An empty chart should distinguish waiting for the first sample, no source selected, permission unavailable, and no records in this interval. These states lead to different actions.
+
+Offer a deliberate path from glance to detail: select a source, inspect a trend, choose an observation, compare raw values, and record or export the evidence behind a decision. A paused display freezes inspection, not necessarily acquisition; label it “View paused” and continue admitted ingestion under the budget. When the person resumes following latest, show whether values arrived or were evicted while the view was paused.
+
+| Feature | Useful default | Tradeoff to disclose |
+| --- | --- | --- |
+| Range selection | A recent interval with visible start/end and retained bounds. | An older selection may be incomplete after retention or display eviction. |
+| Source/run selector | Stable identities with readable labels. | Renaming a label must not merge histories or move an old annotation. |
+| Exact-value inspection | Keyboard-operable table or details alongside the chart. | A nearest-point shortcut differs from comparing at the exact same x. |
+| Auto-follow | Follow newest data until the person intentionally inspects history. | New arrivals should not constantly move their selected point. |
+| Threshold cue | Label the threshold's units and policy, with an acknowledgement action. | A crossing is an application interpretation, not proof of a physical event. |
+| Export | The selected retained interval and its transformation description. | Exporting the view is not exporting the complete source archive. |
+
+Use series names, line patterns, and text as well as color. Keep focus stable when a new sample arrives or a selected point falls outside the retained range; explain that eviction and offer the nearest retained interval without silently changing what was selected. Provide a concise textual trend summary when useful, but make it traceable to actual records rather than turning a noisy curve into a certain conclusion.
+
+Separate unit conversion from smoothing and display scale. A change of source unit or calibration is a semantic boundary: reject incompatible values, split the series, or apply a documented conversion. Do not merely relabel an axis. Keep raw values and conversion metadata available for review. A changed mapping or transform should invalidate an incompatible cache and identify the interpretation used by an export.
+
+For a long session, show the ingestion and retention status independently of whether a canvas is repainting. Pause or slow rendering when appropriate without silently dropping admitted data. Stop subscriptions when leaving the task; guard late callbacks so they cannot repaint a different run or a revoked view. The interaction choices in this section are proposed adaptations; the evidence record below covers only its named specimens and scenarios.
+
 ## Start with meaning and budgets
 
 Name the source, run, units, and x coordinate before choosing a renderer. Source time, arrival time, training step, and distance are different quantities. Two runs with the same metric name must not become one line. Reject nonfinite coordinates; keep missing measurements distinguishable from zero. State whether duplicate x values are revisions or separate observations, and whether late data may change an already displayed interval.
