@@ -15,6 +15,27 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this when a page has several files, lazy imports, nested HTML, or updates while someone is working. A plain single file remains a good option. There is one target runtime baseline; this guide concerns coherent current-system publications, not compatibility with old runtimes or data formats.
 
+## Make an update reviewable to its author and its users
+
+Consider a field page receiving a new question flow while someone is typing a report. The author needs to preview the exact changed files and know whether publication succeeded; the person using the page needs to preserve work and understand when the update takes effect. These are separate perspectives on one publication.
+
+Before publishing, summarize the visible change, the complete file snapshot, the current destination head, and any application state assumptions. Keep a reviewable diff or source snapshot in the author's workflow. A preview should cover the new empty, pending, rejected, and completed states, not only the default screen. If a new interaction assumes a server capability, verify its deployed descriptor and offer an explicit unsupported state.
+
+| Stage | Honest status | Useful recovery action |
+| --- | --- | --- |
+| Preparing | Authored files are being enumerated and checked. | Fix missing assets or an invalid entry before transfer. |
+| Uploading | Exact byte objects are being transferred. | Resume the original upload; do not change its bytes under the same identity. |
+| Awaiting commit | Bytes exist, but the live page has not switched. | Reconcile or retry the original publication command. |
+| Conflict | The reviewed destination changed. | Inspect its new head and deliberately create a fresh reviewed publication. |
+| Published, health pending | The new version is available but not yet verified by an eligible visible tab. | Open it in the intended role and inspect runtime/asset failures. |
+| Update deferred in a tab | That tab still uses its original coherent asset graph. | Preserve its draft and let the person apply when ready. |
+
+A push or an agent connection alone does not mark a publication healthy. Health remains pending until an eligible visible tab loads it under the public lifecycle. Distinguish pending from unhealthy and do not conceal a failed asset load behind a generic “Published” confirmation.
+
+On an active page, use a small update notice with a description and a clear apply/defer choice. Preserve keyboard focus and text selection; do not force a reload merely because an author finished uploading. Decide whether an active capture should be completed, cancelled deliberately, or deferred before switching. Pending commands retain their original meaning regardless of the new UI.
+
+A rollback is also a reviewed publication-head transition. It can restore earlier authored files without reversing application data or external effects. Explain that scope before calling it “Undo update.” Test the resulting page against current authorized data and required capabilities; historical source bytes alone do not prove the old behavior remains suitable.
+
 ## Separate three identities
 
 Cookbook provenance records where reasoning or copied snippets came from; adapted source belongs to the application. A deliberate unchanged executable dependency may need an exact version and integrity lock. A publication identifies the final authored bytes and exact target runtime. Do not confuse provenance with a requirement that a modified snippet match upstream hashes.

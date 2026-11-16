@@ -2,6 +2,7 @@
 
 > Adaptable reasoning for page-owned applications. No UI package or install graph.
 
+- [Application journeys](guides/use-cases.md)
 - [Agent reading index](agent.md)
 - [Catalog](catalog.json)
 - [Usage](guides/using-cookbooks.md)

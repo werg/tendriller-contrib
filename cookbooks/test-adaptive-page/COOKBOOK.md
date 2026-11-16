@@ -15,6 +15,28 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this to decide what a test result actually establishes. A screenshot can reveal clipping or a missing control, but not privacy. A simulated accepted command can exercise the UI, but not prove the server's idempotency. Match the check to the guarantee.
 
+## Plan verification around a user promise
+
+For a reviewed-photo page, the promise might be: “You can inspect what will be sent, keep a new draft while it is pending, and recover if the task changes.” Turn that into observable outcomes before choosing a test runner. The review image must match the submitted bytes, delayed acceptance must not erase new typing, and stale rejection must preserve a recoverable snapshot. A passing screenshot of the initial screen covers none of these transitions.
+
+Write a small acceptance matrix with the starting identity and state, action, injected failure or timing, expected visible outcome, and authoritative record to inspect. Include the happy path and the few failures that could lose work, change intent, leak information, or mislead a decision. Select evidence proportionate to the claim; do not create a huge suite that merely repeats the markup structure.
+
+| User promise | Representative acceptance scenario | Evidence boundary |
+| --- | --- | --- |
+| A draft survives submission | Type new text while the earlier send is awaiting acceptance and rejection. | Browser continuity; service receipts require a separate real-boundary check. |
+| A result is trustworthy | Inspect exact raw values, units, missing data, and a known numerical reference case. | Interpretation and rendering, not originating sensor accuracy. |
+| A workflow is private | Access records using distinct real roles, then revoke access during an outstanding read. | Actual trusted host for authority; browser fixture for late-render suppression. |
+| An update is coherent | Load nested assets, defer with a draft, then apply a complete publication. | Exact publication/runtime files plus live publication behavior when claimed. |
+| A task resumes | Restart after effect success but before acknowledgement and reconcile the same event. | Actual receiver/effect policy, not a simulated connected indicator. |
+
+## Exercise the whole interaction, including access needs
+
+Test fresh arrival, useful empty states, representative work, completion, return, and recovery. A form that works only with prefilled fixtures has no verified onboarding path. Use keyboard-only operation, meaningful labels, visible focus, narrow layouts, and readable error/status text. Check that live updates do not steal focus or read every telemetry sample aloud. Automated accessibility checks can reveal specific defects; task-based inspection remains necessary for whether the interaction makes sense.
+
+Use realistic record sizes and deliberately small resource limits to expose boundaries quickly. Test one representative burst, one full queue, and one retention gap when those are consequential. Do not infer production capacity from a synthetic benchmark without its environment and load assumptions. Review exported data as well as on-screen output so an incomplete view cannot become a falsely complete artifact.
+
+A staged test should leave a recoverable environment. Identify which identities, streams, publications, or private records it creates, use fresh test state, and clean up through normal authorized operations. Do not repurpose a real person's pending work as fixture data. Preserve only the evidence needed to reproduce the result, with credentials and unnecessary private content removed.
+
 ## Choose the smallest meaningful layer
 
 | Concern | Useful check |
@@ -58,3 +80,9 @@ foreground suspension, and stop actions.
 ## Avoid false confidence
 
 Do not run a full deployment for every prose edit; validate metadata, links, and changed reasoning. Do not use a fixture screenshot as evidence that private records cannot leak. Remove tests that only protect the shape of a retired product. Preserve tests of target guarantees and rewrite their setup from fresh target state.
+
+## Record a result that another maintainer can assess
+
+Keep the command, exact authored-file identity, public core artifact/revision, fixture declarations, scenario scope, observed result, and known limits together. A failed scenario should state the expected and actual behavior and the recovery used. Do not erase a failure by weakening the claim to whatever happened to pass.
+
+After a change, rerun the checks that cover the affected guarantee and its integration boundary. Broaden only for a concrete remaining risk or required gate. Prose edits need metadata/link validation and reasoning review; changed arithmetic needs reference cases; changed authority requires actual host checks. Preserve the distinction between a proposed scenario and an executed one, and retain earlier pilot evidence under the exact conditions it established.
