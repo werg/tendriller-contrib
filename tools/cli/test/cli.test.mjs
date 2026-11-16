@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, statSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, statSync, readFileSync, symlinkSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs, toPath, parseJsonArg, intFlag } from "../lib/args.mjs";
 import { pack, listFiles, isText, guessType, shouldSkip } from "../lib/pack.mjs";
-import { syncAssets } from "../lib/assets.mjs";
+import { syncAssets, verifyAssets } from "../lib/assets.mjs";
 import {
   resolveConfig, saveConfig, configDir, cursorPath, checkpointPath, readCursor, writeCursor, idFromApi, slug, serverBase,
 } from "../lib/config.mjs";
@@ -76,12 +76,22 @@ test("pack vendors declared components before publication and refuses modified c
   assert.ok(lock.files.some(file => file.path === "assets/components/chart.js"));
   assert.ok(lock.files.some(file => file.path === "assets/components/stream-view.js"));
   for (const file of lock.files) assert.ok(first.files[file.path], file.path);
+  writeFileSync(join(dir, "tendril.assets.json"), JSON.stringify({...lock, core: []}));
+  assert.throws(() => verifyAssets(dir), /does not match/);
+  assert.doesNotThrow(() => pack(dir));
   writeFileSync(join(dir, "assets/components/chart.js"), "// local edits");
   assert.throws(() => pack(dir), /Modified or unmanaged component/);
   assert.ok(syncAssets(dir, {force:true}).written >= 1);
   assert.doesNotThrow(() => pack(dir));
   writeFileSync(join(dir,"tendril.json"),JSON.stringify({components:["chart"]}));
   assert.equal(pack(dir).files["assets/components/stream-view.js"],undefined);
+});
+test("asset sync refuses a symbolic link out of the page directory", () => {
+  const dir = tmp(), outside = tmp();
+  writeFileSync(join(dir, "tendril.json"), JSON.stringify({components:["chart"]}));
+  symlinkSync(outside, join(dir, "assets"), "dir");
+  assert.throws(() => syncAssets(dir), /symbolic link/);
+  assert.equal(existsSync(join(outside, "components", "chart.js")), false);
 });
 test("pack: single html file becomes index.html; --as overrides", () => {
   const d = tmp();

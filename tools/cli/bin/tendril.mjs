@@ -26,7 +26,8 @@ Create / attach
   rm --yes                     delete the tendril and everything in it
 
 Content
-  push <dir|file> [--message M] [--no-replace] [--as <path>] [--no-wait] [--timeout S]\n  assets sync <dir> [--force]    complete and pin declared component files
+  push <dir|file> [--message M] [--no-replace] [--as <path>] [--no-wait] [--timeout S]
+  assets sync <dir> [--force]    complete and pin declared component files
   files | versions | rollback [version]
   upload <file> [--name N]     store a blob (e.g. an icon) -> {id,url}
   blobs | blobs info <id> | blobs keep <id> | blobs expire <id>

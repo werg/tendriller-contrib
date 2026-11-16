@@ -1,12 +1,25 @@
 import { readResource, hasResource, resourceFiles } from "./resources.mjs";
 // Resolve the complete immutable asset graph at publication time.
-import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, writeFileSync, rmSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, writeFileSync, rmSync, lstatSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = path => JSON.parse(readFileSync(path, 'utf8'));
+function safeManagedPath(directory, path) {
+  if (typeof path !== 'string' || !/^assets\/(?:components|workflows)\/[a-zA-Z0-9_.\/-]+$/.test(path) || path.split('/').includes('..'))
+    throw Error('Invalid managed asset path in lock: '+path);
+  const base = resolve(directory), local = resolve(base, path);
+  if (!local.startsWith(base + '/')) throw Error('Asset escapes page directory: '+path);
+  let current = base;
+  for (const part of path.split('/')) {
+    current = join(current, part);
+    try { if (lstatSync(current).isSymbolicLink()) throw Error('Managed asset path contains a symbolic link: '+path); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  return local;
+}
 export function catalog() {
   const source = JSON.parse(readResource('recipes/catalog.json'));
   return { ...source, release: JSON.parse(readResource('package.json')).version,
@@ -68,14 +81,7 @@ export function syncAssets(directory, { force = false } = {}) {
     throw Error('Invalid page asset lock.');
   const prior = new Map((old?.files || []).map(item => [item.path, item.sha256]));
   const desired = new Set(assets.map(asset => asset.path));
-  const base = resolve(directory) + '/';
-  const localPath = path => {
-    if (typeof path !== 'string' || !/^assets\/(?:components|workflows)\/[a-zA-Z0-9_.\/-]+$/.test(path) || path.split('/').includes('..'))
-      throw Error('Invalid managed asset path in lock: '+path);
-    const local = resolve(directory, path);
-    if (!local.startsWith(base)) throw Error('Asset escapes page directory: '+path);
-    return local;
-  };
+  const localPath = path => safeManagedPath(directory, path);
   // Check every path before modifying any file.
   for (const asset of assets) {
     const path = localPath(asset.path);
@@ -116,12 +122,13 @@ export function verifyAssets(directory) {
   if (lock.format !== 'tendriller-page-assets' || lock.version !== 1 || !Array.isArray(lock.files)) throw Error('Invalid page asset lock.');
   if (existsSync(manifest)) {
     const expected = assetLock(json(manifest));
-    if (JSON.stringify(lock.files) !== JSON.stringify(expected.files) || JSON.stringify(lock.requires) !== JSON.stringify(expected.requires))
+    if (JSON.stringify(lock.files) !== JSON.stringify(expected.files) || JSON.stringify(lock.requires) !== JSON.stringify(expected.requires)
+      || JSON.stringify(lock.core) !== JSON.stringify(expected.core) || lock.contrib !== expected.contrib)
       throw Error('Page asset lock does not match the declaration; run tendril assets sync <dir>.');
   }
   for (const { path, sha256: expected } of lock.files) {
-    const local = resolve(directory, path), base = resolve(directory) + '/';
-    if (!local.startsWith(base) || !existsSync(local) || sha256(readFileSync(local)) !== expected) throw Error(`Pinned page asset '${path}' is missing or has changed. Resolve and lock the asset set before publication.`);
+    const local = safeManagedPath(directory, path);
+    if (!existsSync(local) || sha256(readFileSync(local)) !== expected) throw Error(`Pinned page asset '${path}' is missing or has changed. Resolve and lock the asset set before publication.`);
   }
   return lock;
 }

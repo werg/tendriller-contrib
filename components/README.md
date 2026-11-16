@@ -29,7 +29,6 @@ Sensor permissions are the browser's own prompts and most need a tap: call `open
 | `probe.js` | JSON summary of what this browser and device support | All | eval: `return await tendrilSnippets.probe.run()` |
 | `ptt.js` | Push-to-talk with an explicit command callback or ordinary `utterance` event | SpeechRecognition, or an injected `transcribe(blob)` engine | `ptt.mount("#talk")` |
 | `vad.js` | Voice activity detection (energy + hangover), optional audio clip per utterance | All with WebAudio | `vad.start({record: true, onStop: (blob, ms) => …})` |
-| `ui.js` | Agent-editable UI from shared `state.interface` | All | `ui.mount("#app", {path:"interface"})` |
 | `pose.js` | Experimental pose engine adapter + joint angle rep counter | Explicit engine, files and model assets required | `pose.start(video, {engine,files,model,onResult})`, `pose.repCounter({joint: "left_knee"})` |
 | `objects.js` | Experimental object detector adapter, boxes in frame units | Explicit engine, files and model assets required | `await objects.detect(img,{engine,files,model})` |
 | `text.js` | Experimental OCR using TextDetector or an injected worker factory | Depends on the selected engine and its declared assets | `await text.recognize(video)` |

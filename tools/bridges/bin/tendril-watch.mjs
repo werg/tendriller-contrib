@@ -44,6 +44,7 @@ function connect() {
   return new Promise((resolve) => {
     let cfg;
     try { cfg = load(); } catch (error) { resolve({ fatal: error.message }); return; }
+    lastNotifiedSeq = Math.max(lastNotifiedSeq, cfg.after);
     const url = new URL(`${cfg.api}/events/socket`);
     url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
     // The server sends a catch-up wake at once if waking events newer than the cursor are queued.
