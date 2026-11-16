@@ -21,7 +21,7 @@ Imagine a remote training job that writes numeric records overnight. The operato
 
 Before collecting a large backlog, claim the page and inspect effective stream limits. Choose its ongoing lifetime deliberately; producer activity neither claims a page nor proves that an agent is available. Keep the collector's scoped producer credential apart from the administrative handle. Show its safe source name and allowed streams in status views, never the credential.
 
-During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [core's collector reference](https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback.
+During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [core's collector reference](https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback.
 
 ## Choose acquisition and its failure meaning
 

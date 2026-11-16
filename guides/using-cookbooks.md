@@ -44,13 +44,13 @@ for coordinating a platform fix with its examples and verification.
 
 Start with [the smallest useful page](../cookbooks/publish-smallest-page/COOKBOOK.md)
 and [choosing a data model](../cookbooks/choose-data-model/COOKBOOK.md). Use the
-[core public entry](https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/agent.md) for exact
+[core public entry](https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/agent.md) for exact
 operations, authentication, and current limits.
 
 ## Reviewed core target
 
 The API examples in this expansion were reviewed against
-[Tendriller `62f15021e778`](https://github.com/werg/tendriller/tree/62f15021e77812e58533aa816cd24698aa70cfc8),
+[Tendriller `c5af12a07fd0`](https://github.com/werg/tendriller/tree/c5af12a07fd0b642732dfcaa745df3adf328944f),
 implemented in [core PR #34](https://github.com/werg/tendriller/pull/34). This target
 includes conditional shared-state transactions, coherent state snapshots, durable
 timer commands, sensor cancellation, and durable browser receipt settlement.

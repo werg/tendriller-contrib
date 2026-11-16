@@ -8,7 +8,7 @@ choices: ["Informational handoff or accepted responsibility transfer", "Whole ta
 capabilities: []
 evidence: "explained"
 related: ["coordinate-devices", "resume-across-sessions", "guide-explicit-checkpoints", "triage-incoming-work"]
-sources: ["https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/PROTOCOL.md"]
+sources: ["https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md"]
 ---
 
 # Hand off responsibility with a clear acceptance
@@ -88,7 +88,7 @@ This example gives cooperating authorized writers atomic consistency. It does no
 
 Capture acceptance intent before asynchronous work. Core retains the original predicates and generations on delivery retries. A lost reply is reconciled through the same command; a stored `state_conflict` remains rejected even if an offer later looks acceptable again. A withdrawn or reset offer needs a new deliberate review, not freshly stamped guards on the old command.
 
-Show “Acceptance pending” while `queued`; the conditional operation does not change optimistic ownership. Only `accepted` confirms the whole transfer. Admitted results carry `cid`, and `state_result` includes that CID, original operations, and context. After reload, use `state.pending()` and `state_queue` to recover this device's unsettled handoffs: here an operation beginning `["offers",offerId]` identifies the offer. Keep the sender's accepted responsibility visible while that command remains pending. A late outcome updates its original offer, not whichever task the receiver has opened since. The [browser API](https://github.com/werg/tendriller/blob/62f15021e77812e58533aa816cd24698aa70cfc8/docs/BROWSER_API.md) provides these surfaces without an application outbox.
+Show “Acceptance pending” while `queued`; the conditional operation does not change optimistic ownership. Only `accepted` confirms the whole transfer. Admitted results carry `cid`, and `state_result` includes that CID, original operations, and context. After reload, use `state.pending()` and `state_queue` to recover this device's unsettled handoffs: here an operation beginning `["offers",offerId]` identifies the offer. Keep the sender's accepted responsibility visible while that command remains pending. A late outcome updates its original offer, not whichever task the receiver has opened since. The [browser API](https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md) provides these surfaces without an application outbox.
 
 ## Handle partial, changed, and uncertain work
 
