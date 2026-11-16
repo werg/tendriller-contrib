@@ -29,3 +29,13 @@ grant a new license.
 
 Implementation is checkpointed in small commits and coordinated with
 `werg/tendriller`.
+
+## Event delivery transport
+
+Core owns asynchronous wake delivery through the authenticated agent WebSocket,
+webhook and MCP Events endpoints. HTTP `GET /events` and named consumer reads
+replay retained records immediately; long polling and the former `wait` query
+parameter are not part of the public API. Cookbooks should describe which host
+receiver wakes the intended conversation, then keep delivered and handled
+checkpoints separate. Scheduled checks remain an explicitly delayed fallback,
+not a held HTTP request.

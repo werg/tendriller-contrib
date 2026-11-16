@@ -19,10 +19,12 @@ Use this when a page expects an agent to respond after its current turn ends. A 
 
 | Host capability | Receiver shape | Verify |
 | --- | --- | --- |
-| Session queue or IPC | Persistent socket/poll receiver submits a count-only notice to an exact conversation ID. | Host admission, identity binding, restart, and acknowledgement after effects. |
-| Background task completion | A bounded wait task ends when work is available. | Completion resumes the originating conversation and the agent rearms immediately. |
+| Session queue or IPC | Persistent WebSocket receiver submits a count-only notice to an exact conversation ID. | Host admission, identity binding, restart, and acknowledgement after effects. |
+| Background task completion | A bounded WebSocket wait task ends when work is available. | Completion resumes the originating conversation and the agent rearms immediately. |
 | Authenticated webhook or routine | Server wake notice routes to a known host session. | Authentication, delivery retries, and whether it starts a new session instead. |
 | No idle wake | Scheduled queue checks. | The schedule remains active and the person knows the delay. |
+
+Tendriller no longer offers HTTP long polling. `GET /events?after=<cursor>` is a nonblocking replay read, and `wait` (including `wait=0`) is rejected. Receive asynchronous wakes through the agent WebSocket, an authenticated webhook or an MCP Events subscription, then read the pending batch and acknowledge only after the work succeeds. The core `tendril-wait.mjs` and CLI `tendril wait` now use WebSockets; the shell long-poll helper was removed.
 
 Specific host products change. Read the current core bridge reference and verify the actual installed host; historical host docs are evidence for the delivery pattern, not a current feature-support promise.
 
