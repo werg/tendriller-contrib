@@ -9,49 +9,41 @@ specimens are evidence for adaptation and failure behavior, not stable page pack
 | Reviewed capture | Compact inline file form and fullscreen canvas with a separate review | Reviewed snapshot, discard, missing context, runtime capture identity, retry after reload, delayed rejection, new drafts, saveable evidence when durable storage is unavailable, and lost upload-completion replay without resending bytes. | 10 |
 | Private responses | Facilitator console, minimal participant form, and shared projection | Capability absence, intentional aggregate publication, exact retries, deliberate conflict review, draft identity across reload, fresh authorization on cached-page restoration, and immediate clearing after denied access or late responses. | 15 |
 
-## Most recent cross-repository verification
-
-[GitHub integration run 43871914704](https://github.com/werg/tendriller-contrib/actions/runs/43871914704)
-passed **33 browser scenarios** and **three actual-host scenarios** on the
-contrib PR source `b5e438d6192d2d8791f54078f80764686632f0de`, paired with
-core source `c248ceeabfd210538f445d5f889f7cc166f081b1` (the reserved
-`0.3.0-rc.6` candidate). The run built the public core artifacts from that
-exact checkout, exercised all seven independent page specimens in Chromium,
-and used the packaged SDK/engine for the three fresh-storage trusted-host
-scenarios. Every corresponding CI step completed successfully.
-
-This run is **source-paired integration evidence**, not proof that a separately
-downloaded release archive or a live Cloudflare deployment was exercised.
-Core's own release checks and published release assets must be verified
-separately. Earlier immutable scenario records and their source pairings below
-remain useful as historical checkpoints; they are not silently relabeled.
-
 ## Recorded target checks
 
 All **33 browser scenarios** and **three actual-host scenarios** passed in
-[GitHub run 43869136552](https://github.com/werg/tendriller-contrib/actions/runs/43869136552).
-The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43869136552/artifacts/14227350346)
+[GitHub run 43871914704](https://github.com/werg/tendriller-contrib/actions/runs/43871914704).
+The [uploaded evidence](https://github.com/werg/tendriller-contrib/actions/runs/43871914704/artifacts/14227749050)
 includes the scenario records and seven adaptation screenshots.
 
 The exact executable/check source was contrib PR head
-`335cb89e61f5cfcd931d56fed3e1c840b0bc5c82`, paired with public core
-`f3e55e202bc0b37d581b66b61446f7e1a56c67e1` and its `0.3.0-rc.4` artifacts.
-GitHub exercised PR merge commit `107b852e0a2712e7dcd313a98b75180e8f9ced8a`;
-its tree `32e7971d9340469a6688096679963cfc6600c319` is identical to that PR head.
+`b5e438d6192d2d8791f54078f80764686632f0de`, paired with public core
+`c248ceeabfd210538f445d5f889f7cc166f081b1` and its `0.3.0-rc.6` artifacts.
+GitHub exercised that head directly; its checked tree is
+`735ba4959af4d61beb90cff1957983e119d9523c`.
+
+The run built public core artifacts from that exact checkout, exercised all seven
+independent page specimens in Chromium, and installed the packaged SDK/engine for
+the fresh-storage trusted-host scenarios. This establishes source-paired integration
+evidence. Verifying separately downloaded release archives or a live Cloudflare
+deployment requires separate release and deployment checks.
+
 The [browser record](pilot-evidence.json) names the runtime identity, preview bundle
 SHA-256, Chromium version, individual scenarios, and command. The
 [host record](../cookbooks/collect-private-responses/checks/evidence.json) names the
 SDK/engine archive and reference-source digests. Evidence-only documentation updates
 do not change the checked executable snapshot.
 
-The preceding reviewed `0.3.0-rc.2` checkpoint's
-[browser record](https://github.com/werg/tendriller-contrib/blob/b843f49c5115d8699d4925b78107bc4bf265e92b/guides/pilot-evidence.json)
-and [host record](https://github.com/werg/tendriller-contrib/blob/b843f49c5115d8699d4925b78107bc4bf265e92b/cookbooks/collect-private-responses/checks/evidence.json)
-remain unchanged, with their earlier source and artifact history. The current target
-retains every earlier scenario and adds two participant-restoration cases. Stale-retry
-checks still subscribe before clicking Retry and await the next public rejection for
-the exact capture before checking the two identical commands. Every result remains
-attached to its own source and artifact pair.
+The preceding recorded `0.3.0-rc.4` checkpoint's
+[browser record](https://github.com/werg/tendriller-contrib/blob/0ff8a7a29de4a93bea2e75fb209032160511950b/guides/pilot-evidence.json)
+and [host record](https://github.com/werg/tendriller-contrib/blob/0ff8a7a29de4a93bea2e75fb209032160511950b/cookbooks/collect-private-responses/checks/evidence.json)
+remain unchanged, with their earlier source and artifact history. The successful
+intermediate [rc5 run](https://github.com/werg/tendriller-contrib/actions/runs/43871230786)
+also retains its [exact evidence](https://github.com/werg/tendriller-contrib/actions/runs/43871230786/artifacts/14228690589).
+The 33-scenario browser harness and three host cases are unchanged across these
+candidate pairings. Stale-retry checks still subscribe before clicking Retry and
+await the next public rejection for the exact capture before checking the two
+identical commands. Every result remains attached to its own source and artifact pair.
 
 The preceding cookbook-only refactor remains separately preserved: its
 [30-browser record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/guides/pilot-evidence.json)
