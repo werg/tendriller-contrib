@@ -17,7 +17,7 @@ tar -xzf tools.tgz -C tendriller-tools
 node tendriller-tools/tools/cli/bin/tendril.mjs --help
 ```
 
-The same release includes standalone `tendril.mjs` (CLI and component bundle without the full tools archive), `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
+The same release includes standalone `tendril.mjs` (lightweight CLI with vendoring; no full tools archive), `tendril-stream.mjs`, `tendril-preview.mjs`, watch/wait/event commands, and host bridges. Discovery may follow a latest-release link; saved dependencies always use an exact release URL and hash.
 
 For device notifications while the published page is closed, use `tendril notifications` to inspect opted-in owner devices and quota, then `tendril notify "Decision needed" "Please review"`. Deploy core `0.2.0-rc.5` or newer first; its `GET A/notify` endpoint is required. The owner must enable notifications in the built-in page control; see the [core Web Push runbook](https://github.com/werg/tendriller/blob/master/docs/PUSH_NOTIFICATIONS.md). These CLI commands use the authenticated agent API and do not need a live page tab.
 

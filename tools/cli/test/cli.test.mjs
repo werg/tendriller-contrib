@@ -93,6 +93,20 @@ test("asset sync refuses a symbolic link out of the page directory", () => {
   assert.throws(() => syncAssets(dir), /symbolic link/);
   assert.equal(existsSync(join(outside, "components", "chart.js")), false);
 });
+test("asset sync rejects nested and dangling lock symlinks", () => {
+  const dir = tmp(), outside = tmp();
+  writeFileSync(join(dir, "index.html"), "<h1>safe</h1>");
+  writeFileSync(join(dir, "tendril.json"), JSON.stringify({components:["chart"]}));
+  mkdirSync(join(dir, "assets"));
+  symlinkSync(outside, join(dir, "assets", "components"), "dir");
+  assert.throws(() => pack(dir), /symlink/);
+  assert.equal(existsSync(join(outside, "chart.js")), false);
+
+  const other = tmp();
+  writeFileSync(join(other, "tendril.json"), JSON.stringify({components:["chart"]}));
+  symlinkSync(join(other, "missing-lock.json"), join(other, "tendril.assets.json"));
+  assert.throws(() => pack(other), /Asset lock must not be a symlink/);
+});
 test("pack: single html file becomes index.html; --as overrides", () => {
   const d = tmp();
   const f = join(d, "page.html");

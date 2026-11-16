@@ -39,8 +39,8 @@ Talk to the page
   eval <js> | eval -f <file> | eval -   [--device primary|all|<id>] [--timeout-ms N]
   say <text> [--no-speak] [--in-reply-to SEQ] [--device ID|all] [--speak-on ID|primary|none]
   status <working|idle|done> [text]
-  notifications                push readiness, subscribed devices and quota (no notification sent)
   notify <title> [body] [--url U] [--device D] [--tag T]
+  notifications                push readiness, subscribed devices and quota (no notification sent)
   check [--device D]           accessibility audit (axe-core) in the page
 
 Hear from the page
