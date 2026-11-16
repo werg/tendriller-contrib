@@ -73,6 +73,19 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
   that pin and restores the original expiry. Agent assets and the install icon have
   their own retained policy, reported by `retention.reason`.
 
+## Device notifications while the page is closed
+
+Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. Use the same private page agent token as for other API commands:
+
+```sh
+tendril --tendril kitchen notifications
+# Inspect {available, subscribed_devices, count, quota} before attempting delivery.
+tendril --tendril kitchen notify "Decision needed" "Please approve the result" --tag job-42
+# Optionally --device d_<id> to target a subscribed owner device, or --url to set a page URL.
+```
+
+`notifications` performs the read-only `GET A/notify`; `notify` performs `POST A/notify`, limited to 20 attempts per page per hour. Responses list push services' acceptance and failure, not proof the operating system displayed the message. No browser tab or agent event listener is needed to **receive** push, but a deployed service, valid subscription and browser/OS permission are necessary. iOS requires launching the page as an installed Home Screen web app to opt in. See the [core Web Push runbook](https://github.com/werg/tendriller/blob/master/docs/PUSH_NOTIFICATIONS.md) for credentials, service-worker behavior, security and live-device tests.
+
 ## Read, handle, then acknowledge
 
 Use this loop on each notice from the host listener:
