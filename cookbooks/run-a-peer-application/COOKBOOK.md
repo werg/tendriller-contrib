@@ -32,6 +32,16 @@ pins above identify the portable foundation reviewed for this guide. A proposed
 scenario is not evidence that it passed; recorded checks name their actual
 artifacts and limits.
 
+The revised deployment target places **portable membership administration on
+Cloudflare by default**, separately from native application ordering, execution
+and payload storage. Small signed descriptors and inline roster/epoch records
+let that administrator follow membership without downloading application
+payloads or loading the application SQL engine. Full peers retrieve detached
+envelopes through their peer path. The
+[thin-administration plan](notes/thin-membership-administration.md) defines the
+live enrollment, revocation, restart and byte-accounting gates. Those gates are
+pending; the earlier task-board pilot does not establish this new boundary.
+
 ## Follow a concrete task to completion
 
 Imagine two colleagues managing an inspection board with an agent. Each browser

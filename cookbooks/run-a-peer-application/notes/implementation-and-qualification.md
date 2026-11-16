@@ -14,6 +14,15 @@ pre-release: replace prototype abstractions directly, with no compatibility
 conversion, legacy import, old/new bidirectional mirror, or alternate hidden
 authority.
 
+The follow-up simplification separates portable membership administration from
+native application ordering and execution. Cloudflare is the default
+administrator host; ordered application descriptors commit detached payloads,
+while small capability and epoch records remain inline. The
+[thin-administration target and measured gates](thin-membership-administration.md)
+are pending qualification. Earlier passing application checks retain their
+original scope and are not evidence of zero administrator payload traffic or
+live Cloudflare enrollment/revocation.
+
 ## Work ownership and dependencies
 
 | Work item | Owner | Depends on | Acceptance evidence |
@@ -33,6 +42,9 @@ authority.
 | Framed connection/bootstrap and signals | Tendriller public contract + Chronolog adapter | Portable sync | Bounded queues, explicit expiry/domain, application authorization independent of host access |
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
+| Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained ordering evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
+| Portable thin membership administrator | Chronolog administrator core and Tendriller Cloudflare composition | Durable root identity, inline capability/epoch history and public membership provider | Live device enrollment, exact decision retry/restart and revocation without application payload downloads or application SQL |
+| Membership placement qualification | Public host/peer fixtures and contrib evidence | Independent administrator, native authority and browser replicas | ADMIN-01 through ADMIN-10 with encoded-byte counters and exact artifact provenance |
 
 The [file/capture metadata recipe](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/examples/blob-metadata.ts)
 adds an application-owned SQL/emit schema over the existing host uploader. It
@@ -93,6 +105,9 @@ bounded-queue behavior and failure recovery. Include tunnel/provider paths in th
 route. A successful socket or a high native direct-connect percentage cannot
 stand in for these measurements. Choose one production path and a practical
 fallback from the results; adding all adapters is not a release prerequisite.
+Report small descriptor/inline-control traffic separately from detached
+application payload traffic. Prove the default Cloudflare administrator does not
+fetch application bodies during live join and catch-up.
 
 ### Measure moved application work and remaining relay cost
 
@@ -108,6 +123,9 @@ Use the current hosted backend's actual hibernation behavior as the baseline.
 Record provider pricing and date separately from measured usage. Publish raw
 measurements and the calculation; do not claim savings from moving SQL alone or
 from assumed browser direct routing.
+Include the administrator's retained metadata and control traffic, and vary
+candidate count independently from payload size. Moving payload bytes off the
+administrator is a measured property, not a reason to omit relay or storage cost.
 
 ### Rehearse authority storage loss and recovery
 
@@ -121,6 +139,9 @@ is required, and record the known backup lag at the last acknowledgment.
 Never resume the old history from an unproven stale backup or copy one authority
 key into two active stores. If immediate disk-loss survival is a product promise,
 specify and test a second-durable-copy acknowledgment contract before making it.
+Rehearse the Cloudflare administrator's root identity and roster recovery as a
+separate responsibility from native ordering and payload recovery. Restoring one
+role does not establish the other's continuity.
 
 ### Qualify device and privacy boundaries
 
@@ -131,6 +152,10 @@ exclusive Worker ownership, revocation and late responses, quota exhaustion,
 private agent data exclusion, and publish-only collectors. Review the actual
 deployed host login and application enrollment independently. Synthetic identities
 and topic filters do not prove production authentication or confidentiality.
+Use devices enrolled after genesis through the default Cloudflare provider.
+Exercise a revoked writer's direct native path while its host session remains
+valid, and reader removal followed by future-epoch key rotation. Do not infer
+membership readiness from an HTTP approval or an application SQL team invitation.
 
 ## Deliberately separate future work
 
