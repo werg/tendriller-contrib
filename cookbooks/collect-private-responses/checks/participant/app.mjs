@@ -1,6 +1,6 @@
 // The selected server policy owns privacy; this form renders only its projection.
 const runtime = window.tendril, $ = selector => document.querySelector(selector);
-let assignment = null, pending = null, draftRevision = crypto.randomUUID(), authEpoch = 0, started = false, key = '';
+let assignment = null, pending = null, draftRevision = crypto.randomUUID(), authEpoch = 0, started = false, resumeNeedsAuth = false, key = '';
 const read = () => runtime.request('workflows/private-responses/mine', {
   method: 'POST', body: { cid: crypto.randomUUID(), expected_generations: {}, data: {} },
 });
@@ -38,6 +38,7 @@ async function authorize() {
   try {
     const result = await read();
     if (epoch !== authEpoch) return;
+    resumeNeedsAuth = false;
     assignment = result.assignments[0];
     if (!assignment) {
       $('#prompt').textContent = 'No current question';
@@ -122,6 +123,11 @@ $('#form').addEventListener('submit', event => {
 $('#retry').addEventListener('click', () => void send());
 $('#review-current').addEventListener('click', () => { pending = null; save(); void authorize(); });
 runtime.on('role', () => void authorize());
-runtime.on('connect', () => { if (!started) void authorize(); });
+runtime.on('connect', () => { if (!started || resumeNeedsAuth) void authorize(); });
 if (runtime.connected) void authorize();
-addEventListener('pagehide', () => { save(); authEpoch++; clearSensitive(); });
+// BFCache preserves this document without re-running the bootstrap. Never show
+// its private projection again without fresh authorization.
+addEventListener('pagehide', () => { save(); authEpoch++; resumeNeedsAuth = true; clearSensitive(); });
+addEventListener('pageshow', event => {
+  if (event.persisted && runtime.connected) void authorize();
+});

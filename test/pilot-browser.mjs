@@ -213,6 +213,39 @@ try{
  await check('participant: explicit capability absence stays usable and makes no private request',()=>withPage('cookbooks/collect-private-responses/checks/participant',{},async({page,server})=>{
   await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('explicitly installed'));assert.equal(server.mockedHttp.length,0);assert.equal(await page.locator('#form').isVisible(),false);
  }));
+ await check('participant: cached restoration reauthorizes before showing a saved draft', () => withPage('cookbooks/collect-private-responses/checks/participant', {
+  ...privateBase, role: 'guest', http: [
+   { method: 'POST', path: '/_tendril/workflows/private-responses/mine', json: { assignments: [assignment] } },
+  ],
+ }, async ({ page, server }) => {
+  await page.locator('#form').waitFor({ state: 'visible' });
+  await page.locator('#answer').fill('Draft from before navigation');
+  const before = server.mockedHttp.filter(request => request.path.endsWith('/mine')).length;
+  await page.evaluate(() => dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })));
+  assert.equal(await page.locator('#form').isVisible(), false);
+  assert.equal(await page.locator('#answer').inputValue(), '');
+  await page.evaluate(() => dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await page.locator('#form').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('#answer').inputValue(), 'Draft from before navigation');
+  assert.equal(server.mockedHttp.filter(request => request.path.endsWith('/mine')).length, before + 1);
+ }, { mobile: true }));
+ await check('participant: cached restoration cannot redisplay a revoked answer', () => withPage('cookbooks/collect-private-responses/checks/participant', {
+  ...privateBase, role: 'guest', http: [
+   { method: 'POST', path: '/_tendril/workflows/private-responses/mine', json: { assignments: [assignment] } },
+  ],
+ }, async ({ page }) => {
+  await page.locator('#form').waitFor({ state: 'visible' });
+  await page.locator('#answer').fill('Private answer must remain hidden');
+  await page.route('**/_tendril/workflows/private-responses/mine', route => route.fulfill({
+   status: 403, json: { error: { code: 'forbidden', message: 'Access revoked' } },
+  }));
+  await page.evaluate(() => dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })));
+  await page.evaluate(() => dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Access revoked'));
+  assert.equal(await page.locator('#form').isVisible(), false);
+  assert.equal(await page.locator('#answer').inputValue(), '');
+  assert.ok(!(await page.locator('body').textContent()).includes('Private answer must remain hidden'));
+ }));
  await check('participant: fixture acceptance preserves new draft and only reads authorized projection',()=>withPage('cookbooks/collect-private-responses/checks/participant',{...privateBase,role:'guest',http:[
   {method:'POST',path:'/_tendril/workflows/private-responses/mine',json:{assignments:[assignment]}},
   {method:'POST',path:'/_tendril/workflows/private-responses/submit',expect_body:{data:{assignment:'assignment-a',answer:'First private answer',expected_revision:0}},json:{assignment:'assignment-a',answer:'First private answer',revision:1,submitted_at:1}},
