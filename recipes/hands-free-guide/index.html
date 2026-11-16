@@ -10,6 +10,7 @@
 <details><summary>Hands-free and screen settings</summary>
 <p>Hands-free listening lives in the standard Tendriller control. Open its Settings and history tab, select <strong>Hands-free wake phrase</strong>, and configure “Hey guide”. In Talk, tap Start hands-free, then say “Hey guide, next” or “Hey guide, repeat”. Your agent receives the spoken command and updates the shared guide. Buttons below work without speech recognition.</p>
 <p>To stop listening, use the Stop button in the control’s microphone indicator. Spoken commands require your agent to be connected; use the guide buttons for immediate local actions.</p>
+<p id="handsfree-role" class="muted" role="status"></p>
 <div id="screen"></div><button id="stop-speaking">Stop speaking</button></details>
 <details><summary>All steps and checkpoints</summary><ol id="steps"></ol><button id="export">Export progress</button></details>
 <details><summary>Show the agent what you are working on</summary><p>Review a photo or voice note before sending it. Evidence is linked to the step where you captured it.</p><div id="evidence"></div></details>
@@ -60,6 +61,7 @@
   let evidence,inputRole;
   function syncInputs(){
     const role=tendril.device.role;if(inputRole===role)return;inputRole=role;
+    $('handsfree-role').textContent=role==='display'?'This is a display. Use your controller device to change steps.':'';
     evidence?.stop();evidence=null;$('evidence').replaceChildren();
     if(role!=='display') {
       evidence=tendrilSnippets.inputs.mount('#evidence',{modalities:['photo','audio'],block:'guide-evidence',command:()=>workflow.scope('guide'),context:()=>({guide_id:spec().id,step_id:active()?.id})});
