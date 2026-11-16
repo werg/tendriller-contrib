@@ -1,0 +1,11 @@
+{
+  "evidence": "exercised",
+  "date": "2026-11-16",
+  "host": "real built Worker, fresh storage, public engine test fixture",
+  "scenarios_passed": 3,
+  "sdk_sha256": "08a312b5278bacdfa5988e76af5b69a05ceb74a425a23a92980ce4ec4b701148",
+  "engine_sha256": "6c6a9f557592f8de3402bd49f2be5c657c1551c4b54f0d64f6dbca1ec3833c62",
+  "private_reference_sha256": "6ed68842d49981b8693ac83bc5f760d33de0ea053a8762ddca56eaec20bdfb8d",
+  "approval_reference_sha256": "529a394fe423dad903be710fb62bc1a02ed13b0cdd87b386f85488c725691097",
+  "limits": ["Synthetic identities bypass OAuth setup", "Text-only records; no private-media guarantee", "External effect deduplication remains the caller's responsibility"]
+}
