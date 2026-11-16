@@ -18,7 +18,7 @@ const run = (args, env) => new Promise(resolve => execFile(process.execPath, [cl
 test("CLI changed bytes at the same path get a new transfer; identical retries reuse their receipt", async () => {
   const root=mkdtempSync(join(tmpdir(),"tendriller-resume-")), source=join(root,"bytes.dat");
   let starts=0;
-  const sessions=new Map(), byId=new Map();
+  const sessions=new Map(), byId=new Map(), heads=new Map();
   const server=createServer(async (req,res) => {
     const path=new URL(req.url,"http://localhost").pathname;
     const buffers=[];
@@ -42,6 +42,21 @@ test("CLI changed bytes at the same path get a new transfer; identical retries r
         assert.equal(session.size,request.size);
       }
       return json(session);
+    }
+    if(path==="/api/t/abcdefghijkl/file-refs"){
+      const filePath=new URL(req.url,"http://localhost").searchParams.get("path");
+      if(req.method==="GET"){
+        const current=heads.get(filePath);
+        return current?json(current):json({error:{code:"not_found"}},404);
+      }
+      if(req.method==="PUT"){
+        const command=JSON.parse(bytes.toString()),current=heads.get(command.path);
+        if((current?.revision??0)!==command.expected_revision)
+          return json({error:{code:"file_conflict"}},409);
+        const file={path:command.path,revision:command.expected_revision+1,blob_id:command.blob_id};
+        heads.set(command.path,file);
+        return json({file,cursor:file.revision});
+      }
     }
     const match=/^\/api\/t\/abcdefghijkl\/uploads\/(u_[a-z2-7]{20})\/(content|complete)$/.exec(path);
     if(match){
@@ -78,6 +93,21 @@ test("CLI changed bytes at the same path get a new transfer; identical retries r
     const repeat=await run(["blob","upload",source],env);
     assert.equal(repeat.code,0,repeat.stderr);
     assert.equal(starts,2,"retry of identical intent should use its durable receipt");
+
+    writeFileSync(source,Buffer.from([0,254,5]));
+    const file1=await run(["file","put","inputs/data.bin",source],env);
+    assert.equal(file1.code,0,file1.stderr);
+    assert.equal(JSON.parse(file1.stdout).file.revision,1);
+    writeFileSync(source,Buffer.from([0,254,6]));
+    const file2=await run(["file","put","inputs/data.bin",source],env);
+    assert.equal(file2.code,0,file2.stderr);
+    assert.equal(JSON.parse(file2.stdout).file.revision,2,
+      "a changed local file must not be rejected by an old completed resume record");
+    assert.equal(starts,4);
+    const fileRetry=await run(["file","put","inputs/data.bin",source],env);
+    assert.equal(fileRetry.code,0,fileRetry.stderr);
+    assert.equal(starts,4);
+    assert.equal(heads.get("inputs/data.bin").revision,2);
   }finally{
     server.closeAllConnections();
     await new Promise(resolve=>server.close(resolve));
