@@ -19,9 +19,12 @@ Use an independent collector when data arrives while an agent is absent or a bro
 
 Imagine a remote training job that writes numeric records overnight. The operator needs to set up a source, confirm that the expected run is arriving, leave it running, identify a stalled or lossy feed, and close it without losing admitted records. A useful collector experience therefore includes setup validation, a first-record preview, delivery status, backlog inspection, and an explicit stop/drain choice.
 
-Before collecting a large backlog, claim the page and inspect effective stream limits. Choose its ongoing lifetime deliberately; producer activity neither claims a page nor proves that an agent is available. Keep the collector's scoped producer credential apart from the administrative handle. Show its safe source name and allowed streams in status views, never the credential.
+Before collecting a large backlog, claim the page and inspect effective stream limits.
+The create response declares the pre-claim 1 MiB stream-retention ceiling
+(`unclaimed_limits.stream_retained_bytes`); running a collector first can fill
+it even in a normal first-use workflow. Choose its ongoing lifetime deliberately; producer activity neither claims a page nor proves that an agent is available. Keep the collector's scoped producer credential apart from the administrative handle. Show its safe source name and allowed streams in status views, never the credential.
 
-During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [core's collector reference](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback.
+During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [current core collector reference](https://github.com/werg/tendriller/blob/master/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback. The `sources` links in the frontmatter are pinned historical provenance to retired contrib file locations, not links to files on current `main`.
 
 ## Choose acquisition and its failure meaning
 
@@ -50,6 +53,11 @@ Set maximum line/frame size, output record size, spool bytes, pending records, r
 These are policy alternatives, not promises that every collector exposes each mode. Verify the selected implementation's actual behavior. A nonblocking tail of an existing durable log can leave unread data upstream; a live source may have no recoverable history. Report which boundary lost data and whether replay is possible.
 
 Keep stable record identities through retry and durable spool recovery. Advance a file-tail checkpoint only when the bytes are safely represented under the spool policy. Upload acknowledgement and local dequeue must survive a crash without either skipping data or inventing a new observation. A bounded chart buffer is a separate presentation decision and cannot conceal collector loss.
+
+For NVIDIA GB10 hosts, core host sampling now exposes `unified_memory:true`
+in its GPU record. On other models the value is `null` (unknown). Do not infer
+unified memory from missing `nvidia-smi` framebuffer counters alone, and do not
+add unified GPU RAM to the host RAM total.
 
 ## Make status actionable
 

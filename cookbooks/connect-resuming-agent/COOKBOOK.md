@@ -34,7 +34,7 @@ Offer explicit cancellation or supersession only if the application has a define
 
 Tendriller no longer offers HTTP long polling. `GET /events?after=<cursor>` is a nonblocking replay read, and `wait` (including `wait=0`) is rejected. Receive asynchronous wakes through the agent WebSocket, an authenticated webhook or an MCP Events subscription, then read the pending batch and acknowledge only after the work succeeds. The core `tendril-wait.mjs` and CLI `tendril wait` now use WebSockets; the shell long-poll helper was removed.
 
-Specific host products change. Read [core's bridge reference](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
+Specific host products change. Read [current core bridge reference](https://github.com/werg/tendriller/blob/master/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
 
 Choose persistence deliberately. A short task may use a host-managed wait that must be rearmed; an ongoing task may justify a persistent service with a named owner, private installation path, restart policy, and teardown procedure. Do not claim a page is continuously monitored merely because its collector continues reporting measurements.
 
@@ -43,7 +43,7 @@ Choose persistence deliberately. A short task may use a host-managed wait that m
 1. Identify the page, intended host conversation, and authorized owner. Store the administrative handle privately, separate from published source and user-facing URLs.
 2. Inspect the service contract and the host's supported admission mechanism. Set up the receiver against the exact conversation; refuse an accidental rebind to another session.
 3. Restore the page-bound handled checkpoint or start from a deliberate initial position. A successful connection must also check already pending work, not wait only for a new notice.
-4. Send an end-to-end delivery probe. End the current agent turn, confirm that the intended conversation resumes, and acknowledge through the probe's authenticated path.
+4. Send an end-to-end delivery probe with `tendril events send --wake` or the standalone `tendril-events /private/page.json send --wake` helper. End the current agent turn, confirm that the intended conversation resumes, and acknowledge through the probe's authenticated path.
 5. Handle work, rearm or remain listening, and run a second probe. The second round detects one-shot integrations that appeared healthy during setup.
 6. Send a real page request, observe the reply in the intended interface, and verify that a new draft typed during delivery survives. Record the tested receiver identity privately and expose a safe readiness summary.
 
@@ -57,7 +57,7 @@ Process batches in order under the selected consumer policy. Advance the handled
 
 External side effects need their own deduplication or reconciliation. If a worker crashes after an external action but before acknowledgement, first find the action's authoritative result. Blindly repeating it is unsafe, while marking it handled without evidence loses the request. A durable Tendriller receipt does not make another system exactly once. A chart checkpoint is unrelated to this consumer acknowledgement.
 
-Where multiple host processes can consume a queue, use the public named-consumer coordination when appropriate or an explicit single-owner design. Do not let two uncoordinated receivers overwrite one handled cursor. Keep checkpoint files page-bound and validate corruption or mismatch instead of silently resetting to the latest sequence.
+Where multiple host processes can consume a queue, use the public named-consumer coordination when appropriate or an explicit single-owner design. Do not let two uncoordinated receivers overwrite one handled cursor. Keep checkpoint files page-bound and validate corruption or mismatch instead of silently resetting to the latest sequence. `tendril-events` stores a private `<handle>.events.json` with separate `handled_cursor` and `delivered_cursor`; the `events`/`wait` read cursor is not acknowledgement. The pinned `sources` above record historical contrib origins, not current source paths.
 
 ## Recover and retire visibly
 
