@@ -44,14 +44,18 @@ for coordinating a platform fix with its examples and verification.
 
 Start with [the smallest useful page](../cookbooks/publish-smallest-page/COOKBOOK.md)
 and [choosing a data model](../cookbooks/choose-data-model/COOKBOOK.md). Use the
-[core public entry](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/agent.md) for exact
+[current core public entry](https://github.com/werg/tendriller/blob/master/agent.md) for exact
 operations, authentication, and current limits.
 
-## Reviewed core target
+## Current references versus historical provenance
+
+For runnable commands and supported paths, use the [current core CLI](https://github.com/werg/tendriller/blob/master/docs/tools/CLI.md), [tool artifacts](https://github.com/werg/tendriller/blob/master/docs/tools/ARTIFACTS.md), and [preview guide](https://github.com/werg/tendriller/blob/master/docs/tools/PREVIEW.md). In a release archive, commands live under `bin/`; `tools/cli/bin/` is a source-checkout path. Published releases provide `manifest.json` and `SHA256SUMS`, not `tools-manifest.json`. Cookbook `sources:` URLs are immutable **historical provenance**, often referencing files moved out of contrib; they are not instructions to fetch those paths from current `main`.
+
+## Reviewed core target (historical)
 
 The API examples in this expansion were reviewed against
 [Tendriller `7668af407fd0`](https://github.com/werg/tendriller/tree/7668af4ae59ae7dced87eba999bd040836f9fc06),
-implemented in [core PR #34](https://github.com/werg/tendriller/pull/34). This target
+implemented in [core PR #34](https://github.com/werg/tendriller/pull/34). This historical target is not the current source of installation instructions. It
 includes conditional shared-state transactions, coherent state snapshots, durable
 timer commands, sensor cancellation, and durable browser receipt settlement.
 
