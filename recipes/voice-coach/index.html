@@ -1,20 +1,36 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voice coach</title>
-<style>body{font:18px system-ui;max-width:40rem;margin:auto;padding:1.5rem;line-height:1.5}button{font:inherit;padding:.7rem;min-height:44px;border-radius:.65rem}#handsfree{padding:1rem;background:#eef5f3;border-radius:1rem}#handsfree p{margin:.5rem 0 0}small{display:block;margin:1rem 0;color:#485754}</style>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voice coach</title>
+<style>
+body{font:18px/1.5 system-ui;max-width:40rem;margin:auto;padding:1.5rem}
+button{font:inherit;padding:.7rem;min-height:44px;border-radius:.65rem}
+#handsfree{padding:1rem;background:#eef5f3;color:#183a30;border-radius:1rem}
+#handsfree h2{margin:0 0 .5rem}
+#handsfree p{margin:.4rem 0}
+small{display:block;margin:1rem 0;color:#485754}
+</style>
+</head>
+<body>
 <h1>Voice coach</h1>
-<p>Keep this page open while you work. Enable hands-free in the standard Tendriller menu if available, or use the button below on older core versions. Say “Hey coach” after setting that phrase in the menu; then speak your request. You can also say “Hey coach, what's next?” in one breath.</p>
-<div id="handsfree"></div>
+<section id="handsfree" aria-labelledby="handsfree-title">
+  <h2 id="handsfree-title">Hands-free commands</h2>
+  <p>Open the standard Tendriller control, choose <strong>Settings and history → Hands-free wake phrase</strong>, and set the phrase to <strong>Hey coach</strong>.</p>
+  <p>Select your recognition and privacy mode, then tap <strong>Start hands-free</strong> in the Talk tab. Say “Hey coach, what's next?” or say the wake phrase and then speak your command.</p>
+  <p>Tap Stop in the microphone indicator whenever you want to turn listening off.</p>
+</section>
 <div id="screen"></div>
-<small>Hands-free needs browser speech recognition and may pause when you lock your phone or switch apps. “Keep screen on” can help during an activity but uses battery. Stop listening whenever you like. Use the conversation microphone or type if it is unavailable.</small>
-<h2>Voice note</h2><p>Record a longer note for the agent:</p><div id="inputs"></div>
-<script src="assets/components/wakeword.js"></script><script src="assets/components/wakelock.js"></script><script src="assets/components/input-kit.js"></script>
+<small>Hands-free recognition requires a supported browser and an open, unlocked page. “Keep screen on” can help during an activity but uses battery. You can always use the built-in conversation microphone or type.</small>
+<h2>Voice note</h2>
+<p>Record a longer note for the agent:</p>
+<div id="inputs"></div>
+<script src="assets/components/wakelock.js"></script>
+<script src="assets/components/input-kit.js"></script>
 <script>
-const hasCoreWake = Boolean(window.tendril?.preferences?.get?.().wakePhrase);
-if (hasCoreWake) {
-  document.querySelector('#handsfree').textContent = 'Hands-free is in the standard Tendriller menu. Open the control, set your wake phrase to “Hey coach” in Settings and history, then press Start hands-free on the Talk tab.';
-} else {
-  // Pre-integration core: keep the optional snippet until the paired core is upgraded.
-  tendrilSnippets.wakeword.mount('#handsfree', {phrases:['hey coach']});
-}
-tendrilSnippets.wakelock.button('#screen',{fullscreenButton:false});
-tendrilSnippets.inputs.mount('#inputs',{modalities:['audio']});
-</script></html>
+tendrilSnippets.wakelock.button("#screen", {fullscreenButton:false});
+tendrilSnippets.inputs.mount("#inputs", {modalities:["audio"]});
+</script>
+</body>
+</html>
