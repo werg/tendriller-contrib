@@ -8,6 +8,10 @@ cost calculator consumes usage and prices as separate files. Provider usage that
 has not been measured remains unknown; it cannot silently become a zero charge
 or a savings claim.
 
+The [2026-11-16 native before/after evidence](membership-cost-review-2026-11-16.md)
+records the executed workload, exact raw reports and the measured reduction in
+administrator writes from atomic page ingestion.
+
 ## Run the native measurement
 
 In an exact Chronolog checkout with its pinned dependencies and native engine:

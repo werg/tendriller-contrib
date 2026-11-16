@@ -1,0 +1,2272 @@
+{
+  "format": "chronolog-membership-cost/v1",
+  "passed": true,
+  "startedAt": "2026-11-16T22:00:11.052Z",
+  "finishedAt": "2026-11-16T22:00:26.954Z",
+  "command": [
+    "/workspace/scratch/ca9b61072c94/chronolog-db/tools/membership-cost.ts",
+    "--output",
+    "artifacts/membership-cost/baseline-8e497555"
+  ],
+  "source": {
+    "head": "8e497555d5231a6e552246a4ab04ee9d02af77b7",
+    "dirtyPaths": [
+      "M test/browser/event-page.ts",
+      " M test/browser/event-worker.ts",
+      " M tools/test-browser-events.ts",
+      "?? test/authority-recovery.integration.test.ts",
+      "?? tools/lib/authority-recovery-child.ts",
+      "?? tools/lib/authority-recovery-fixture.ts"
+    ],
+    "files": {
+      "tools/membership-cost.ts": "9bf68427565bf77cd55b631d14f9d7d32ba1bbef8e3755822ab863123c7d6ac3",
+      "tools/thin-membership-native.ts": "009cdec2faf3c8c78009c6d6a8dee0648b847aba26953a8489df284aceccef29"
+    }
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "6.18.57",
+    "arch": "x64"
+  },
+  "topology": {
+    "route": "signed HTTP loopback",
+    "administratorStore": "NativeAgentStore SQLite WAL FULL",
+    "nativeAuthority": "separate identity and persistent stores, same process",
+    "applicationMaterializer": "actual native DoltLite",
+    "provider": null,
+    "browser": null,
+    "relay": null
+  },
+  "phases": [
+    {
+      "name": "baseline",
+      "startedAt": "2026-11-16T22:00:11.170Z",
+      "elapsedMs": 27.631778999999938,
+      "result": {
+        "finalThrough": 1
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 47907,
+        "processSystemCpuMicroseconds": 5095,
+        "sampledProcessPeakRssBytes": 143450112,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 390,
+        "descriptorTransfers": 0,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 10,
+          "valueBytesWritten": 7231,
+          "retainedValueBytes": 5112,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 2,
+              "bytes": 2629
+            }
+          }
+        },
+        "after": {
+          "putCalls": 11,
+          "valueBytesWritten": 8736,
+          "retainedValueBytes": 5112,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 3,
+              "bytes": 4134
+            }
+          }
+        },
+        "durablePutCalls": 1,
+        "durableValueBytesWritten": 1505,
+        "retainedValueBytesDelta": 0
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 347728,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 141904
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 28872
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 135992
+            }
+          ]
+        },
+        "after": {
+          "bytes": 351300,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 145476
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 28872
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 135992
+            }
+          ]
+        },
+        "fileBytesDelta": 3572
+      },
+      "progress": {
+        "verifiedThrough": 1,
+        "finalThrough": 1,
+        "headPosition": 1
+      }
+    },
+    {
+      "name": "schema-and-prime",
+      "startedAt": "2026-11-16T22:00:11.198Z",
+      "elapsedMs": 97.52879199999995,
+      "result": {
+        "proposals": [
+          "tx_98be38a052efa89d703b8c01f496c3d1e3e673ca8b786cadd1a66996acac1a18"
+        ],
+        "count": 1,
+        "descriptorBytes": 142,
+        "detachedEnvelopeBytes": 640,
+        "finalThrough": 3
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 70838,
+        "processSystemCpuMicroseconds": 18919,
+        "sampledProcessPeakRssBytes": 140423168,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 1186,
+        "descriptorTransfers": 2,
+        "candidateDescriptorBytes": 284,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 11,
+          "valueBytesWritten": 8736,
+          "retainedValueBytes": 5112,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 3,
+              "bytes": 4134
+            }
+          }
+        },
+        "after": {
+          "putCalls": 14,
+          "valueBytesWritten": 15622,
+          "retainedValueBytes": 6289,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 6,
+              "bytes": 11020
+            }
+          }
+        },
+        "durablePutCalls": 3,
+        "durableValueBytesWritten": 6886,
+        "retainedValueBytesDelta": 1177
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 351300,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 145476
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 28872
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 135992
+            }
+          ]
+        },
+        "after": {
+          "bytes": 647563,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 223379
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 28872
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 354352
+            }
+          ]
+        },
+        "fileBytesDelta": 296263
+      },
+      "progress": {
+        "verifiedThrough": 3,
+        "finalThrough": 3,
+        "headPosition": 3
+      }
+    },
+    {
+      "name": "four-small",
+      "startedAt": "2026-11-16T22:00:11.296Z",
+      "elapsedMs": 217.26873999999998,
+      "result": {
+        "proposals": [
+          "tx_fe0bc4dce3f8c0e85e6a243257be9d4b183fbfd04fc0318dc3b7219554d14331",
+          "tx_d6b7243e4ba5a8801dcd8924154f15bbcaa0941c4b0176d7e7598c69601141f0",
+          "tx_22b343352ae595b4d4803f8d20ab699248701f3c21bbf4b63c8e7ea82f3d0342",
+          "tx_e16e60e6092ccf90e20d8e9d0d4656279b82eb23de74ab0e7ce2f7b5d43e196e"
+        ],
+        "count": 4,
+        "descriptorBytes": 568,
+        "detachedEnvelopeBytes": 2628,
+        "finalThrough": 7
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 175289,
+        "processSystemCpuMicroseconds": 41435,
+        "sampledProcessPeakRssBytes": 150384640,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 1982,
+        "descriptorTransfers": 4,
+        "candidateDescriptorBytes": 568,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 14,
+          "valueBytesWritten": 15622,
+          "retainedValueBytes": 6289,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 6,
+              "bytes": 11020
+            }
+          }
+        },
+        "after": {
+          "putCalls": 19,
+          "valueBytesWritten": 34985,
+          "retainedValueBytes": 8262,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 11,
+              "bytes": 30383
+            }
+          }
+        },
+        "durablePutCalls": 5,
+        "durableValueBytesWritten": 19363,
+        "retainedValueBytesDelta": 1973
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 647563,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 223379
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 28872
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 354352
+            }
+          ]
+        },
+        "after": {
+          "bytes": 1243517,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 320813
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 70072
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 811672
+            }
+          ]
+        },
+        "fileBytesDelta": 595954
+      },
+      "progress": {
+        "verifiedThrough": 7,
+        "finalThrough": 7,
+        "headPosition": 7
+      }
+    },
+    {
+      "name": "four-large",
+      "startedAt": "2026-11-16T22:00:11.514Z",
+      "elapsedMs": 1595.5115230000001,
+      "result": {
+        "proposals": [
+          "tx_a6f9489f6937aab45f0b0a327831a58cca085bf247c4265e61bbf6e774291360",
+          "tx_9447c2fe376ea8e4bc226c2bf51ec6a0e4efd4c9219c523b048e5fe9e248702f",
+          "tx_a190e37008d27f7d262a38da2135424a6a61cc59ff6ff686f1e06ca19b5f065e",
+          "tx_09de74a9ae4fb5a91f0f50dbec015601c44bd113e3f0974921c3f3370328978b"
+        ],
+        "count": 4,
+        "descriptorBytes": 576,
+        "detachedEnvelopeBytes": 789052,
+        "finalThrough": 11
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1937384,
+        "processSystemCpuMicroseconds": 287788,
+        "sampledProcessPeakRssBytes": 286949376,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 1990,
+        "descriptorTransfers": 4,
+        "candidateDescriptorBytes": 576,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 19,
+          "valueBytesWritten": 34985,
+          "retainedValueBytes": 8262,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 11,
+              "bytes": 30383
+            }
+          }
+        },
+        "after": {
+          "putCalls": 24,
+          "valueBytesWritten": 64241,
+          "retainedValueBytes": 10243,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 16,
+              "bytes": 59639
+            }
+          }
+        },
+        "durablePutCalls": 5,
+        "durableValueBytesWritten": 29256,
+        "retainedValueBytesDelta": 1981
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 1243517,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 320813
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 70072
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 811672
+            }
+          ]
+        },
+        "after": {
+          "bytes": 11577522,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 3002954
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1713952
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 2641920
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 10334005
+      },
+      "progress": {
+        "verifiedThrough": 11,
+        "finalThrough": 11,
+        "headPosition": 11
+      }
+    },
+    {
+      "name": "eight-small",
+      "startedAt": "2026-11-16T22:00:13.110Z",
+      "elapsedMs": 3090.1455560000004,
+      "result": {
+        "proposals": [
+          "tx_3251fd56308dcc5a692a5df8c1cf4bf25dcbd71b6075d4a50e82ec973d710285",
+          "tx_998ff17d8303a6a88689af0884054e082b5b88468a1e68951f6d43c446d66f5f",
+          "tx_51b89b4f641c3da8688af66e021540be33d0ac20ed739eeb7834bcbe943067ad",
+          "tx_8a3722876dd261682c9499fbb127bbba1ac76d33fc1b6c08c095add8bbac9872",
+          "tx_b6a8a1401c9ae37267aa635b26cf624e1e9804ce86aa11db68594aba191526f0",
+          "tx_ae711a62e981364d55791accf11a1eab29733c099614a5f3dc25d5d96b52d4d5",
+          "tx_f3636a582521f0c6a945672e6a47f4ee55c4d1395eb854b3b2883828b13777fc",
+          "tx_60e9c656e6032ac794a79410cc2f723152b5393d7d3939b48c331a23c20c7c6e"
+        ],
+        "count": 8,
+        "descriptorBytes": 1136,
+        "detachedEnvelopeBytes": 5240,
+        "finalThrough": 19
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 3775477,
+        "processSystemCpuMicroseconds": 354292,
+        "sampledProcessPeakRssBytes": 288518144,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 3574,
+        "descriptorTransfers": 8,
+        "candidateDescriptorBytes": 1136,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 24,
+          "valueBytesWritten": 64241,
+          "retainedValueBytes": 10243,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 16,
+              "bytes": 59639
+            }
+          }
+        },
+        "after": {
+          "putCalls": 33,
+          "valueBytesWritten": 141859,
+          "retainedValueBytes": 13809,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 25,
+              "bytes": 137257
+            }
+          }
+        },
+        "durablePutCalls": 9,
+        "durableValueBytesWritten": 77618,
+        "retainedValueBytesDelta": 3566
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 11577522,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 3002954
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1713952
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 2641920
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15556068,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4891964
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 3978546
+      },
+      "progress": {
+        "verifiedThrough": 19,
+        "finalThrough": 19,
+        "headPosition": 19
+      }
+    },
+    {
+      "name": "warm-empty-sync",
+      "startedAt": "2026-11-16T22:00:16.201Z",
+      "elapsedMs": 787.8503870000004,
+      "result": {
+        "newCandidates": 0
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1058494,
+        "processSystemCpuMicroseconds": 75967,
+        "sampledProcessPeakRssBytes": 288985088,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 396,
+        "membershipResponseBytes": 390,
+        "descriptorTransfers": 0,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 33,
+          "valueBytesWritten": 141859,
+          "retainedValueBytes": 13809,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 25,
+              "bytes": 137257
+            }
+          }
+        },
+        "after": {
+          "putCalls": 34,
+          "valueBytesWritten": 152061,
+          "retainedValueBytes": 13809,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 26,
+              "bytes": 147459
+            }
+          }
+        },
+        "durablePutCalls": 1,
+        "durableValueBytesWritten": 10202,
+        "retainedValueBytesDelta": 0
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15556068,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4891964
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15560990,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4896886
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 4922
+      },
+      "progress": {
+        "verifiedThrough": 19,
+        "finalThrough": 19,
+        "headPosition": 19
+      }
+    },
+    {
+      "name": "approval-lost-reply",
+      "startedAt": "2026-11-16T22:00:16.999Z",
+      "elapsedMs": 946.1773869999997,
+      "result": {
+        "responseLost": true
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1281965,
+        "processSystemCpuMicroseconds": 104825,
+        "sampledProcessPeakRssBytes": 290615296,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 3,
+        "membershipRequestBytes": 1998,
+        "membershipResponseBytes": 1844,
+        "descriptorTransfers": 2,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 1614,
+        "inlineControlEnvelopeBytes": 1326,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 34,
+          "valueBytesWritten": 152061,
+          "retainedValueBytes": 13809,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 4,
+              "bytes": 2023
+            },
+            "membership/control": {
+              "calls": 2,
+              "bytes": 714
+            },
+            "membership/ledger": {
+              "calls": 26,
+              "bytes": 147459
+            }
+          }
+        },
+        "after": {
+          "putCalls": 42,
+          "valueBytesWritten": 188714,
+          "retainedValueBytes": 18722,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 5,
+              "bytes": 3743
+            },
+            "membership/control": {
+              "calls": 4,
+              "bytes": 1660
+            },
+            "membership/ledger": {
+              "calls": 29,
+              "bytes": 180574
+            },
+            "enrollment": {
+              "calls": 2,
+              "bytes": 872
+            }
+          }
+        },
+        "durablePutCalls": 8,
+        "durableValueBytesWritten": 36653,
+        "retainedValueBytesDelta": 4913
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15560990,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4896886
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15565912,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4901808
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 4922
+      },
+      "progress": {
+        "verifiedThrough": 20,
+        "finalThrough": 20,
+        "headPosition": 20
+      }
+    },
+    {
+      "name": "administrator-reopen-and-exact-retry",
+      "startedAt": "2026-11-16T22:00:17.946Z",
+      "elapsedMs": 1359.4589069999993,
+      "result": {
+        "signedApprovalSha256": "8d6e0d19835c53cf37f9506e348fdb7aeca1ac5c73080955e90e0907b8d63235"
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1788884,
+        "processSystemCpuMicroseconds": 167614,
+        "sampledProcessPeakRssBytes": 301359104,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 6,
+        "membershipRequestBytes": 3865,
+        "membershipResponseBytes": 4508,
+        "descriptorTransfers": 3,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 2159,
+        "inlineControlEnvelopeBytes": 1719,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 42,
+          "valueBytesWritten": 188714,
+          "retainedValueBytes": 18722,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 5,
+              "bytes": 3743
+            },
+            "membership/control": {
+              "calls": 4,
+              "bytes": 1660
+            },
+            "membership/ledger": {
+              "calls": 29,
+              "bytes": 180574
+            },
+            "enrollment": {
+              "calls": 2,
+              "bytes": 872
+            }
+          }
+        },
+        "after": {
+          "putCalls": 58,
+          "valueBytesWritten": 258622,
+          "retainedValueBytes": 22653,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 10,
+              "bytes": 6829
+            },
+            "membership/control": {
+              "calls": 6,
+              "bytes": 2535
+            },
+            "membership/ledger": {
+              "calls": 34,
+              "bytes": 242370
+            },
+            "enrollment": {
+              "calls": 6,
+              "bytes": 5023
+            }
+          }
+        },
+        "durablePutCalls": 16,
+        "durableValueBytesWritten": 69908,
+        "retainedValueBytesDelta": 3931
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15565912,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4901808
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15570834,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4906730
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 4922
+      },
+      "progress": {
+        "verifiedThrough": 21,
+        "finalThrough": 21,
+        "headPosition": 21
+      }
+    },
+    {
+      "name": "approval-exact-retry",
+      "startedAt": "2026-11-16T22:00:19.306Z",
+      "elapsedMs": 2307.729346,
+      "result": {
+        "newOrderedEntries": 0,
+        "conflictingRequestRefused": true
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 3236026,
+        "processSystemCpuMicroseconds": 315263,
+        "sampledProcessPeakRssBytes": 311713792,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 3,
+        "membershipRequestBytes": 1188,
+        "membershipResponseBytes": 1170,
+        "descriptorTransfers": 0,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 58,
+          "valueBytesWritten": 258622,
+          "retainedValueBytes": 22653,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 10,
+              "bytes": 6829
+            },
+            "membership/control": {
+              "calls": 6,
+              "bytes": 2535
+            },
+            "membership/ledger": {
+              "calls": 34,
+              "bytes": 242370
+            },
+            "enrollment": {
+              "calls": 6,
+              "bytes": 5023
+            }
+          }
+        },
+        "after": {
+          "putCalls": 62,
+          "valueBytesWritten": 297937,
+          "retainedValueBytes": 22653,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 10,
+              "bytes": 6829
+            },
+            "membership/control": {
+              "calls": 6,
+              "bytes": 2535
+            },
+            "membership/ledger": {
+              "calls": 37,
+              "bytes": 281253
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            }
+          }
+        },
+        "durablePutCalls": 4,
+        "durableValueBytesWritten": 39315,
+        "retainedValueBytesDelta": 0
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15570834,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4906730
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15585600,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4921496
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 14766
+      },
+      "progress": {
+        "verifiedThrough": 21,
+        "finalThrough": 21,
+        "headPosition": 21
+      }
+    },
+    {
+      "name": "revoke-writer-and-rotate",
+      "startedAt": "2026-11-16T22:00:21.615Z",
+      "elapsedMs": 1087.4023130000005,
+      "result": {
+        "epoch": "1"
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1590944,
+        "processSystemCpuMicroseconds": 140446,
+        "sampledProcessPeakRssBytes": 311844864,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 5,
+        "membershipRequestBytes": 3373,
+        "membershipResponseBytes": 4990,
+        "descriptorTransfers": 4,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 2774,
+        "inlineControlEnvelopeBytes": 2190,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 62,
+          "valueBytesWritten": 297937,
+          "retainedValueBytes": 22653,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 10,
+              "bytes": 6829
+            },
+            "membership/control": {
+              "calls": 6,
+              "bytes": 2535
+            },
+            "membership/ledger": {
+              "calls": 37,
+              "bytes": 281253
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            }
+          }
+        },
+        "after": {
+          "putCalls": 82,
+          "valueBytesWritten": 377100,
+          "retainedValueBytes": 29154,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 17,
+              "bytes": 11409
+            },
+            "membership/control": {
+              "calls": 10,
+              "bytes": 4516
+            },
+            "membership/ledger": {
+              "calls": 42,
+              "bytes": 353301
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            },
+            "membership/revocations": {
+              "calls": 3,
+              "bytes": 327
+            },
+            "membership/revocation-result": {
+              "calls": 1,
+              "bytes": 227
+            }
+          }
+        },
+        "durablePutCalls": 20,
+        "durableValueBytesWritten": 79163,
+        "retainedValueBytesDelta": 6501
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15585600,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4921496
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15590522,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4926418
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 4922
+      },
+      "progress": {
+        "verifiedThrough": 23,
+        "finalThrough": 23,
+        "headPosition": 23
+      }
+    },
+    {
+      "name": "revoke-reader-and-rotate",
+      "startedAt": "2026-11-16T22:00:22.704Z",
+      "elapsedMs": 1109.598700999999,
+      "result": {
+        "epoch": "2"
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 1560815,
+        "processSystemCpuMicroseconds": 158755,
+        "sampledProcessPeakRssBytes": 331919360,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 5,
+        "membershipRequestBytes": 3217,
+        "membershipResponseBytes": 4682,
+        "descriptorTransfers": 4,
+        "candidateDescriptorBytes": 0,
+        "inlineControlDescriptorBytes": 2460,
+        "inlineControlEnvelopeBytes": 1876,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 82,
+          "valueBytesWritten": 377100,
+          "retainedValueBytes": 29154,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 17,
+              "bytes": 11409
+            },
+            "membership/control": {
+              "calls": 10,
+              "bytes": 4516
+            },
+            "membership/ledger": {
+              "calls": 42,
+              "bytes": 353301
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            },
+            "membership/revocations": {
+              "calls": 3,
+              "bytes": 327
+            },
+            "membership/revocation-result": {
+              "calls": 1,
+              "bytes": 227
+            }
+          }
+        },
+        "after": {
+          "putCalls": 102,
+          "valueBytesWritten": 466684,
+          "retainedValueBytes": 35031,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 24,
+              "bytes": 15361
+            },
+            "membership/control": {
+              "calls": 14,
+              "bytes": 6596
+            },
+            "membership/ledger": {
+              "calls": 47,
+              "bytes": 436297
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            },
+            "membership/revocations": {
+              "calls": 6,
+              "bytes": 654
+            },
+            "membership/revocation-result": {
+              "calls": 2,
+              "bytes": 456
+            }
+          }
+        },
+        "durablePutCalls": 20,
+        "durableValueBytesWritten": 89584,
+        "retainedValueBytesDelta": 5877
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15590522,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4926418
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 15595444,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4931340
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 4922
+      },
+      "progress": {
+        "verifiedThrough": 25,
+        "finalThrough": 25,
+        "headPosition": 25
+      }
+    },
+    {
+      "name": "future-epoch-payload",
+      "startedAt": "2026-11-16T22:00:23.814Z",
+      "elapsedMs": 2110.473954000001,
+      "result": {
+        "proposals": [
+          "tx_86c61ce010caa9da30bdf104069454d556478ba9663bd89cfe42c32e60996ed5"
+        ],
+        "count": 1,
+        "descriptorBytes": 142,
+        "detachedEnvelopeBytes": 4743,
+        "finalThrough": 26
+      },
+      "resources": {
+        "processUserCpuMicroseconds": 2993146,
+        "processSystemCpuMicroseconds": 191388,
+        "sampledProcessPeakRssBytes": 308527104,
+        "rssSamplingIntervalMs": 10
+      },
+      "traffic": {
+        "membershipRequests": 1,
+        "membershipRequestBytes": 397,
+        "membershipResponseBytes": 790,
+        "descriptorTransfers": 1,
+        "candidateDescriptorBytes": 142,
+        "inlineControlDescriptorBytes": 0,
+        "inlineControlEnvelopeBytes": 0,
+        "applicationEnvelopeBytesToAdministrator": 0,
+        "unexpectedAdministratorRequests": 0,
+        "peerInboundBytes": 0,
+        "peerOutboundBytes": 0
+      },
+      "administrator": {
+        "before": {
+          "putCalls": 102,
+          "valueBytesWritten": 466684,
+          "retainedValueBytes": 35031,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 24,
+              "bytes": 15361
+            },
+            "membership/control": {
+              "calls": 14,
+              "bytes": 6596
+            },
+            "membership/ledger": {
+              "calls": 47,
+              "bytes": 436297
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            },
+            "membership/revocations": {
+              "calls": 6,
+              "bytes": 654
+            },
+            "membership/revocation-result": {
+              "calls": 2,
+              "bytes": 456
+            }
+          }
+        },
+        "after": {
+          "putCalls": 104,
+          "valueBytesWritten": 502606,
+          "retainedValueBytes": 35812,
+          "categories": {
+            "membership/identity": {
+              "calls": 1,
+              "bytes": 86
+            },
+            "membership/provision": {
+              "calls": 1,
+              "bytes": 1779
+            },
+            "governance": {
+              "calls": 24,
+              "bytes": 15361
+            },
+            "membership/control": {
+              "calls": 14,
+              "bytes": 6596
+            },
+            "membership/ledger": {
+              "calls": 49,
+              "bytes": 472219
+            },
+            "enrollment": {
+              "calls": 7,
+              "bytes": 5455
+            },
+            "membership/revocations": {
+              "calls": 6,
+              "bytes": 654
+            },
+            "membership/revocation-result": {
+              "calls": 2,
+              "bytes": 456
+            }
+          }
+        },
+        "durablePutCalls": 2,
+        "durableValueBytesWritten": 35922,
+        "retainedValueBytesDelta": 781
+      },
+      "nativeStorage": {
+        "before": {
+          "bytes": 15595444,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 4931340
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1812832
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "after": {
+          "bytes": 16458473,
+          "files": [
+            {
+              "path": "private-native-state/.application.sqlite-lock",
+              "bytes": 0
+            },
+            {
+              "path": "private-native-state/application.sqlite",
+              "bytes": 5773769
+            },
+            {
+              "path": "private-native-state/native-control.sqlite",
+              "bytes": 4096
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-shm",
+              "bytes": 32768
+            },
+            {
+              "path": "private-native-state/native-control.sqlite-wal",
+              "bytes": 1833432
+            },
+            {
+              "path": "private-native-state/native.sqlite",
+              "bytes": 4632576
+            },
+            {
+              "path": "private-native-state/native.sqlite-wal",
+              "bytes": 4181832
+            }
+          ]
+        },
+        "fileBytesDelta": 863029
+      },
+      "progress": {
+        "verifiedThrough": 26,
+        "finalThrough": 26,
+        "headPosition": 26
+      }
+    }
+  ],
+  "checks": [
+    "independent payload-size and candidate-count workloads used real accepted SQL/event candidates",
+    "lost append reply, administrator reopen and exact/conflicting approval retries preserve original identity and decision",
+    "enrollment and writer/reader revocation with future epoch payload are included in per-phase costs",
+    "instrumented signed native endpoint returns no application envelopes and administrator attempts no body endpoint"
+  ],
+  "final": {
+    "traffic": {
+      "membershipRequests": 31,
+      "membershipRequestBytes": 17885,
+      "membershipResponseBytes": 29761,
+      "descriptorTransfers": 34,
+      "candidateDescriptorBytes": 2706,
+      "inlineControlDescriptorBytes": 10359,
+      "inlineControlEnvelopeBytes": 8167,
+      "applicationEnvelopeBytesToAdministrator": 0,
+      "unexpectedAdministratorRequests": 0,
+      "peerInboundBytes": 0,
+      "peerOutboundBytes": 0
+    },
+    "verifiedThrough": 26,
+    "nativeFinalThrough": 26,
+    "administrator": {
+      "putCalls": 104,
+      "valueBytesWritten": 502606,
+      "retainedValueBytes": 35812,
+      "categories": {
+        "membership/identity": {
+          "calls": 1,
+          "bytes": 86
+        },
+        "membership/provision": {
+          "calls": 1,
+          "bytes": 1779
+        },
+        "governance": {
+          "calls": 24,
+          "bytes": 15361
+        },
+        "membership/control": {
+          "calls": 14,
+          "bytes": 6596
+        },
+        "membership/ledger": {
+          "calls": 49,
+          "bytes": 472219
+        },
+        "enrollment": {
+          "calls": 7,
+          "bytes": 5455
+        },
+        "membership/revocations": {
+          "calls": 6,
+          "bytes": 654
+        },
+        "membership/revocation-result": {
+          "calls": 2,
+          "bytes": 456
+        }
+      }
+    },
+    "nativeLiveFiles": {
+      "bytes": 16463571,
+      "files": [
+        {
+          "path": "private-native-state/.application.sqlite-lock",
+          "bytes": 0
+        },
+        {
+          "path": "private-native-state/application.sqlite",
+          "bytes": 5778867
+        },
+        {
+          "path": "private-native-state/native-control.sqlite",
+          "bytes": 4096
+        },
+        {
+          "path": "private-native-state/native-control.sqlite-shm",
+          "bytes": 32768
+        },
+        {
+          "path": "private-native-state/native-control.sqlite-wal",
+          "bytes": 1833432
+        },
+        {
+          "path": "private-native-state/native.sqlite",
+          "bytes": 4632576
+        },
+        {
+          "path": "private-native-state/native.sqlite-wal",
+          "bytes": 4181832
+        }
+      ]
+    },
+    "deviceValueBytes": 563,
+    "backup": {
+      "measured": false,
+      "latestDurableCopy": null,
+      "lag": null
+    },
+    "providerUsage": {
+      "measured": false,
+      "activeDuration": null,
+      "billedRequests": null,
+      "billedRowsWritten": null,
+      "billedStorage": null,
+      "relayEgress": null
+    },
+    "closedStorage": {
+      "administrator": {
+        "path": "private-administrator.sqlite",
+        "bytes": 77824
+      },
+      "device": {
+        "path": "private-device.sqlite",
+        "bytes": 12288
+      },
+      "native": {
+        "bytes": 12090803,
+        "files": [
+          {
+            "path": "private-native-state/.application.sqlite-lock",
+            "bytes": 0
+          },
+          {
+            "path": "private-native-state/application.sqlite",
+            "bytes": 5778867
+          },
+          {
+            "path": "private-native-state/native-control.sqlite",
+            "bytes": 1679360
+          },
+          {
+            "path": "private-native-state/native.sqlite",
+            "bytes": 4632576
+          }
+        ]
+      },
+      "nativeValues": [
+        {
+          "category": "authority-and-deduplication",
+          "valuesCount": 3,
+          "valueBytes": 14715
+        },
+        {
+          "category": "detached-payload",
+          "valuesCount": 19,
+          "valueBytes": 802899
+        },
+        {
+          "category": "feed-and-evidence",
+          "valuesCount": 73,
+          "valueBytes": 834087
+        },
+        {
+          "category": "operation-journal",
+          "valuesCount": 20,
+          "valueBytes": 2397002
+        },
+        {
+          "category": "other-native-state",
+          "valuesCount": 2,
+          "valueBytes": 204
+        },
+        {
+          "category": "verified-history",
+          "valuesCount": 1,
+          "valueBytes": 24630
+        }
+      ]
+    }
+  },
+  "error": "",
+  "limits": [
+    "Native loopback measurement, not deployed Cloudflare, Internet routing, browser storage, or a hosted/peer cost comparison.",
+    "CPU and RSS cover the measurement process containing both native authority and administrator; they are not per-role billing.",
+    "Store put counts and value bytes are logical durable writes, not provider SQL row billing, block writes, or write amplification.",
+    "Live file sizes include SQLite WAL/SHM and materializer files; closed sizes are separate. Neither is time-integrated billed storage.",
+    "No backup was taken and no blob was replicated. A committed descriptor does not establish any second durable payload copy.",
+    "Inline control envelopes are a subset of inline control descriptor bytes. Traffic includes repeated transfers."
+  ]
+}

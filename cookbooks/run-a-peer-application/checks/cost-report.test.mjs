@@ -79,6 +79,7 @@ test('unknown providers, inconsistent units and duplicate meters cannot disappea
 test('invalid numbers, fabricated zeros, missing provenance and incomplete workload coverage fail closed', () => {
   for (const value of [-1, NaN, Infinity, '100', Number.MAX_SAFE_INTEGER + 1]) assert.throws(() => incrementalCharge(value, 0, price));
   assert.throws(() => incrementalCharge(1, 0, { ...price, unitSize: 0 }));
+  assert.throws(() => incrementalCharge(1_000_000, 1_000_000, { ...price, unitSize: Number.MIN_VALUE }), /numeric range/);
   const usage = measuredInput();
   usage.cases[0].costs.backup = { status: 'measured', evidence: 'none', charges: [] };
   assert.throws(() => calculateCosts(usage, pricebook()), /measured requires charges/);
@@ -88,6 +89,8 @@ test('invalid numbers, fabricated zeros, missing provenance and incomplete workl
   assert.throws(() => calculateCosts(measuredInput(), book), /Price source/);
   const incomplete = measuredInput(); delete incomplete.cases[0].workloads['capture-and-blob'];
   assert.throws(() => calculateCosts(incomplete, pricebook()), /invalid status/);
+  const extra = measuredInput(); extra.cases[0].costs['forgotten-tunnel'] = { status: 'unmeasured', reason: 'Not captured yet', charges: [] };
+  assert.throws(() => calculateCosts(extra, pricebook()), /Unknown cost boundary/);
 });
 
 test('native summaries preserve encoded boundaries without adding inline envelopes twice', () => {

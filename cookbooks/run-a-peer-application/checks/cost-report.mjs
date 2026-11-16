@@ -47,7 +47,9 @@ export function incrementalCharge(quantity, priorAccountUsage, price) {
     return billable / price.unitSize * price.rate;
   };
   requireValue(finite(priorAccountUsage + quantity), 'Combined account usage is outside the supported numeric range');
-  return Number((charge(priorAccountUsage + quantity) - charge(priorAccountUsage)).toPrecision(12));
+  const amount = charge(priorAccountUsage + quantity) - charge(priorAccountUsage);
+  requireValue(finite(amount), 'Calculated charge is outside the supported numeric range');
+  return Number(amount.toPrecision(12));
 }
 
 function evidenceStatus(item, name, { allowUnused = true } = {}) {
@@ -80,6 +82,8 @@ export function calculateCosts(usage, pricebook) {
     requireValue(['hosted', 'peer'].includes(input.mode), `Invalid case mode: ${input.id}`);
     requireValue(['unmeasured', 'native-loopback', 'local-workerd', 'deployed'].includes(input.setting), `Invalid setting: ${input.id}`);
     requireValue(['hosted', 'loopback', 'direct', 'relayed'].includes(input.route), `Invalid route: ${input.id}`);
+    requireValue(input.costs && Object.keys(input.costs).every(name => COST_BOUNDARIES.includes(name)),
+      `Unknown cost boundary: assign every provider charge to a declared boundary`);
     const gaps = [], boundaries = {}, meters = new Set();
     let knownSubtotal = 0;
     for (const name of COST_BOUNDARIES) {
