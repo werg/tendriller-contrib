@@ -53,12 +53,21 @@ test('streams one line per wake, resumes from the stored cursor and reconnects',
     t.sockets[0].send('not json');
     t.sockets[0].send(JSON.stringify({ t: 'wake', seq: 9 }));
     await until(() => t.out.stdout.split('\n').filter(Boolean).length === 2);
-    assert.deepEqual(t.out.stdout.trim().split('\n').map((l) => JSON.parse(l)), [{ t: 'wake', seq: 8 }, { t: 'wake', seq: 9 }]);
+    const wakes=t.out.stdout.trim().split('\n').map(JSON.parse);
+    assert.deepEqual(wakes.map(({t,seq})=>({t,seq})),[{t:'wake',seq:8},{t:'wake',seq:9}]);
+    assert.ok(wakes.every(event => !Number.isNaN(Date.parse(event.at))));
+    await until(() => t.out.stderr.includes('connected, listening'));
     // The agent advances its cursor; a dropped socket reconnects from the new one.
     const handle=JSON.parse(readFileSync(t.file,'utf8')); writeFileSync(t.file+'.events.json',JSON.stringify({version:1,api:handle.api,handled_cursor:9,delivered_cursor:9}));
     t.sockets[0].terminate();
     await until(() => t.sockets.length === 2);
     assert.match(t.urls[1], /after=9$/);
+    t.sockets[1].send(JSON.stringify({t:'wake',seq:9})); // duplicate catch-up does not resume twice
+    await new Promise(r => setTimeout(r,60));
+    assert.equal(t.out.stdout.trim().split('\n').length,2);
+    assert.match(t.out.stderr,/socket closed; reconnecting/);
+    assert.match(t.out.stderr,/"code":1006/);
+    assert.match(t.out.stderr,/reconnected, listening/);
     assert.ok(!t.out.stdout.includes(token) && !t.out.stderr.includes(token));
   } finally { await t.close(); }
 });
@@ -70,7 +79,7 @@ test('stops with one notice when the socket keeps being refused', async () => {
       t.child.on('exit', resolve); setTimeout(() => reject(Error('did not stop')), 5000);
     });
     assert.equal(code, 1);
-    assert.match(t.out.stdout, /^tendril-watch: stopped, the socket was refused five times/);
+    assert.match(t.out.stdout, /^tendril-watch: stopped at .* socket refused five times/);
     assert.ok(!t.out.stdout.includes(token));
   } finally { await t.close(); }
 });
@@ -114,5 +123,5 @@ test('refuses a file without a valid token', async () => {
   let stdout = '';
   child.stdout.on('data', (c) => { stdout += c; });
   assert.equal(await new Promise((r) => child.on('exit', r)), 1);
-  assert.match(stdout, /stopped, The file needs the creation response/);
+  assert.match(stdout, /stopped at .* The file needs the creation response/);
 });

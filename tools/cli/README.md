@@ -4,13 +4,15 @@ Reference CLI for the Tendriller agent API, using Node ≥ 22.15. API commands u
 runtime and optional local Playwright. The HTTPS API is also described in `/agent.md`.
 
 `npm run build` produces a dependency-free tool archive and standalone helper scripts.
-The archive embeds the exact public core runtime and contrib resources. `npm run
+A standalone `tendril.mjs` CLI also ships in the release for creating and publishing pages without the large tools archive. It embeds the resources needed for `assets sync`. The archive embeds the exact public core runtime and contrib resources. `npm run
 test:distribution` unpacks it in an empty directory and verifies this boundary.
-For headless scenarios, install Playwright locally and its Chromium browser.
+For headless scenarios, install Playwright locally and its Chromium browser:
+`npm install --no-save playwright && npx playwright install chromium`.
+Normal local previews do not require a browser automation package.
 
 ```sh
 node tools/cli/bin/tendril.mjs --help
-export TENDRIL_SERVER=http://localhost:8787          # default
+export TENDRIL_SERVER=https://tendriller.dev         # default; use http://localhost:8787 for local development
 node tools/cli/bin/tendril.mjs new Kitchen --owner you@example.com
 # Attach and verify a host listener using /agent.md before publishing.
 node tools/cli/bin/tendril.mjs --tendril kitchen push ./kitchen
@@ -40,6 +42,7 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
   These raw reading commands advance their cursor when they read, before an
   application handles the output. They do not acknowledge successful processing.
   These reads still update the service's read position; avoid competing readers of a live bridge.
+- **assets sync**: `tendril assets sync ./page` resolves `tendril.json` into the complete component/workflow closure, including lazy siblings. Hand-edited files require explicit `--force`. `push` runs the same safe sync before packing a declared directory, preventing missing-component 404s. Review forced replacements.
 - **push** uploads a directory as one atomic version (`POST /files`, `replace: true`),
   skipping dotfiles and `node_modules`; binary files go as base64. A single `.html` file
   is uploaded as `index.html`. It then polls `/versions` up to `--timeout` s (20) and
