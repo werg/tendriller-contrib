@@ -60,7 +60,10 @@ function closeReview() {
   $('#drawing').hidden = false; $('#review').hidden = true;
 }
 $('#review-button').addEventListener('click', () => {
-  const version = editVersion, context = platform.scopes.capture('evidence');
+  const version = editVersion;
+  let context;
+  try { context = platform.scopes.capture('evidence'); }
+  catch { say('This evidence question has no active submission context. Your drawing remains a draft.'); return; }
   canvas.toBlob(blob => {
     if (!blob) { say('Could not capture the canvas. Keep your text description.'); return; }
     if (editVersion !== version) { say('Drawing changed during capture; review a fresh snapshot.'); return; }

@@ -32,7 +32,7 @@ async function check(name, fn) {
   console.log('PASS ' + name);
  } catch (error) {
   results.push({ name, status: 'failed', duration_ms: Date.now() - start, error: error.stack || String(error) });
-  throw error;
+  console.error('FAIL ' + name + ': ' + error.message);
  } finally { writeEvidence(); }
 }
 const deferred = () => { let resolve; const promise = new Promise(done => resolve = done); return { promise, resolve }; };
@@ -49,8 +49,9 @@ function writeEvidence() {
 }
 async function withPage(directory,fixture,fn,{path='/',mobile=false,beforeOpen=async()=>{}}={}){
  const server=await startServer(resolve(root,directory),undefined,fixture),origin=`http://127.0.0.1:${server.address().port}`;
+ let scenarioTimeout;
  const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},serviceWorkers:'block'}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.stack || error.message));
- try{await beforeOpen({server,origin,context,page});await page.goto(origin+path);await page.waitForFunction(()=>window.tendril?.connected);await fn({server,origin,context,page});assert.deepEqual(errors,[],nameFor(directory)+' browser errors');}finally{await context.close();await server.stopPreview();}
+ try{await beforeOpen({server,origin,context,page});await page.goto(origin+path);await page.waitForFunction(()=>window.tendril?.connected);await Promise.race([fn({server,origin,context,page}),new Promise((_,reject)=>{scenarioTimeout=setTimeout(()=>reject(Error('Pilot scenario exceeded 60 seconds')),60000);})]);assert.deepEqual(errors,[],nameFor(directory)+' browser errors');}finally{clearTimeout(scenarioTimeout);await context.close();await server.stopPreview();}
 }
 const nameFor=directory=>directory.split('/').slice(-2).join('/');
 const waitCursor=(page,cursor)=>page.waitForFunction(expected=>document.querySelector('#budget')?.dataset.cursor===String(expected),cursor);
@@ -101,6 +102,14 @@ try{
  for(const layout of ['inline','fullscreen']){
   const directory=`cookbooks/capture-reviewed-evidence/checks/${layout}`,draft=layout==='inline'?'#question':'#description';
   const prepare=async page=>{if(layout==='inline')await page.locator('#file').setInputFiles(image);else{await page.locator('#rectangle').click();await page.locator('#review-button').click();await page.locator('#review').waitFor({state:'visible'});}};
+  await check(`${layout}: missing task context preserves the unsent draft`, () => withPage(directory, {}, async ({ page, server }) => {
+   await page.locator(draft).fill('Draft without a current question');
+   if (layout === 'inline') { await page.locator('#file').setInputFiles(image); await page.locator('#send').click(); }
+   else { await page.locator('#rectangle').click(); await page.locator('#review-button').click(); }
+   await page.waitForFunction(() => document.querySelector('#status').textContent.includes('no active submission context'));
+   assert.equal(await page.locator(draft).inputValue(), 'Draft without a current question');
+   assert.equal(server.preview.events.length, 0); assert.equal(await page.evaluate(() => window.tendril.captures().length), 0);
+  }));
   await check(`${layout}: reviewed snapshot acceptance preserves later typing`,()=>withPage(directory,{scopes:scopes('generation-a')},async({page,server})=>{
    await page.locator(draft).fill('Submitted question');await prepare(page);
    let release;const held=new Promise(resolve=>release=resolve);let uploaded;const arrived=new Promise(resolve=>uploaded=resolve);
@@ -157,6 +166,25 @@ try{
   {method:'POST',path:'/_tendril/workflows/private-responses/publish',expect_body:{data:{summary:'Reviewed aggregate only',expected_revision:2}},json:{summary:{text:'Reviewed aggregate only',source_revision:2,reviewed_at:1},revision:3}},
  ]},async({page,server})=>{
   await page.getByText('Private fixture answer',{exact:true}).waitFor();assert.equal(await page.locator('#summary').inputValue(),'');await page.locator('#summary').fill('Reviewed aggregate only');await page.locator('#publish').click();await page.getByText('Published: Reviewed aggregate only',{exact:true}).waitFor();const publication=server.mockedHttp.find(row=>row.path.endsWith('/publish'));assert.equal(publication.body.data.summary,'Reviewed aggregate only');assert.ok(!JSON.stringify(publication.body).includes('Private fixture answer'));await page.screenshot({path:resolve(dirname(output),'private-facilitator.png'),fullPage:true});
+ }));
+ await check('facilitator: a conflicted original can be replaced only after deliberate fresh review', () => withPage('cookbooks/collect-private-responses/checks/facilitator', {
+  ...privateBase, http: [
+   { method: 'POST', path: '/_tendril/workflows/private-responses/review', once: true, json: review },
+   { method: 'POST', path: '/_tendril/workflows/private-responses/review', json: { ...review, round: { ...review.round, revision: 3 } } },
+   { method: 'POST', path: '/_tendril/workflows/private-responses/publish', once: true, status: 409, json: { error: { code: 'revision_conflict', message: 'New answers need review' } } },
+   { method: 'POST', path: '/_tendril/workflows/private-responses/publish', json: { summary: { text: 'Newly reviewed aggregate', source_revision: 3 }, revision: 4 } },
+  ],
+ }, async ({ page, server }) => {
+  await page.getByText('Private fixture answer', { exact: true }).waitFor();
+  await page.locator('#summary').fill('Original aggregate'); await page.locator('#publish').click();
+  await page.locator('#review-current').waitFor({ state: 'visible' });
+  await page.locator('#summary').fill('Newly reviewed aggregate'); await page.locator('#review-current').click();
+  await page.waitForFunction(() => document.querySelector('#round').textContent.includes('revision 3'));
+  assert.equal(await page.locator('#summary').inputValue(), 'Newly reviewed aggregate');
+  await page.locator('#publish').click(); await page.getByText('Published: Newly reviewed aggregate', { exact: true }).waitFor();
+  const commands = server.mockedHttp.filter(row => row.path.endsWith('/publish')).map(row => row.body);
+  assert.equal(commands.length, 2); assert.notEqual(commands[0].cid, commands[1].cid);
+  assert.equal(commands[0].data.expected_revision, 2); assert.equal(commands[1].data.expected_revision, 3);
  }));
  const denied = { error: { code: 'forbidden', message: 'Current identity is not authorized' } };
  const privateDirectory = 'cookbooks/collect-private-responses/checks/';
@@ -254,4 +282,5 @@ try{
  }));
  console.log(`Recorded ${results.length} browser scenarios in ${output}`);
  console.log(readFileSync(output, 'utf8'));
+ if(results.some(result=>result.status==='failed'))process.exitCode=1;
 }finally{writeEvidence();await browser.close();}

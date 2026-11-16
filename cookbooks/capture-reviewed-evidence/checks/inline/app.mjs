@@ -119,7 +119,10 @@ $('#form').addEventListener('submit', async event => {
   event.preventDefault();
   const text = $('#question').value;
   if (!text.trim() && !candidate) { $('#status').textContent = 'Add a question or select evidence.'; return; }
-  const context = api.scopes.capture('evidence'), submissionId = crypto.randomUUID(), file = candidate?.file;
+  let context;
+  try { context = api.scopes.capture('evidence'); }
+  catch { $('#status').textContent = 'This evidence question has no active submission context. Review the current task before sending.'; return; }
+  const submissionId = crypto.randomUUID(), file = candidate?.file;
   const row = { submissionId, captureId: null, text, draftRevision, status: 'sending', context, name: file?.name || 'question.txt' };
   submissions.set(submissionId, row);
   save(); show(); discardCandidate();

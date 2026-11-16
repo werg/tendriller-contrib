@@ -71,6 +71,8 @@ async function send() {
   const sent = pending, epoch = authEpoch, id = assignment.id;
   const current = () => epoch === authEpoch && assignment?.id === id;
   $('#submit').disabled = true;
+  $('#retry').hidden = true;
+  $('#review-current').hidden = true;
   try {
     const result = await runtime.request('workflows/private-responses/submit', { method: 'POST', body: sent.body });
     if (!current()) return;
@@ -106,9 +108,12 @@ $('#form').addEventListener('submit', event => {
   if (!assignment || pending) return;
   const answer = $('#answer').value.trim();
   if (!answer) return;
+  let context;
+  try { context = runtime.scopes.capture('private-responses:round'); }
+  catch { $('#status').textContent = 'This question has no active submission context. Reopen the current assignment before sending.'; return; }
   pending = {
     draftRevision,
-    body: { cid: crypto.randomUUID(), ...runtime.scopes.capture('private-responses:round'), data: { assignment: assignment.id, answer, expected_revision: assignment.response?.revision || 0 } },
+    body: { cid: crypto.randomUUID(), ...context, data: { assignment: assignment.id, answer, expected_revision: assignment.response?.revision || 0 } },
   };
   save();
   void send();

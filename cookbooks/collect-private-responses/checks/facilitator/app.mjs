@@ -10,6 +10,7 @@ function clearSensitive() {
   $('#round').textContent = '';
   $('#publish').disabled = true;
   $('#retry').hidden = true;
+  $('#review-current').hidden = true;
 }
 
 async function load(epoch = authEpoch) {
@@ -53,6 +54,8 @@ async function publish() {
   if (!pending) return;
   const snapshot = pending, epoch = authEpoch;
   $('#publish').disabled = true;
+  $('#retry').hidden = true;
+  $('#review-current').hidden = true;
   try {
     const result = await api.request('workflows/private-responses/publish', { method: 'POST', body: snapshot.body });
     if (epoch !== authEpoch) return;
@@ -71,6 +74,7 @@ async function publish() {
     }
     $('#status').textContent = `Publication not accepted: ${error.message}. The original reviewed revision is retained.`;
     $('#retry').hidden = false;
+    $('#review-current').hidden = false;
   }
 }
 
@@ -78,13 +82,25 @@ $('#summary').addEventListener('input', () => edits++);
 $('#refresh').addEventListener('click', () => void load());
 $('#publish').addEventListener('click', () => {
   if (!current || pending || !$('#summary').value.trim()) return;
+  let context;
+  try { context = api.scopes.capture('private-responses:round'); }
+  catch { $('#status').textContent = 'This review has no active submission context. Refresh the round before publishing.'; return; }
   pending = {
     edits,
-    body: { cid: crypto.randomUUID(), ...api.scopes.capture('private-responses:round'), data: { summary: $('#summary').value, expected_revision: current.round.revision } },
+    body: { cid: crypto.randomUUID(), ...context, data: { summary: $('#summary').value, expected_revision: current.round.revision } },
   };
   void publish();
 });
 $('#retry').addEventListener('click', () => void publish());
+$('#review-current').addEventListener('click', () => {
+  pending = null;
+  current = null;
+  $('#publish').disabled = true;
+  $('#retry').hidden = true;
+  $('#review-current').hidden = true;
+  $('#status').textContent = 'Checking the current revision before a new publication…';
+  void load();
+});
 api.on('role', authorize);
 api.on('connect', () => { if (!started) authorize(); });
 if (api.connected) authorize();
