@@ -124,7 +124,7 @@ try{
   await check(`${layout}: reviewed snapshot acceptance preserves later typing`,()=>withPage(directory,{scopes:scopes('generation-a')},async({page,server})=>{
    await page.locator(draft).fill('Submitted question');await prepare(page);
    let release;const held=new Promise(resolve=>release=resolve);let uploaded;const arrived=new Promise(resolve=>uploaded=resolve);
-   await page.route('**/_tendril/blob',async route=>{uploaded();await held;await route.continue();});
+   await page.route('**/_tendril/uploads/*/content',async route=>{assert.equal(route.request().method(),'PUT');uploaded();await held;await route.continue();});
    await page.locator('#send').click();await arrived;await page.locator(draft).fill('New draft while upload is pending');release();await page.locator('[data-status=accepted]').waitFor();
    assert.equal(await page.locator(draft).inputValue(),'New draft while upload is pending');assert.equal(server.preview.events.length,1);assert.equal(server.preview.events[0].data.text,'Submitted question');assert.equal(server.preview.events[0].context.generations.evidence,'generation-a');const receipt=page.locator('[data-status=accepted]');assert.equal(await receipt.getAttribute('data-submission'),server.preview.events[0].data.submission_id);assert.notEqual(await receipt.getAttribute('data-capture'),await receipt.getAttribute('data-submission'));
    await page.reload();assert.equal(await page.locator(draft).inputValue(),'New draft while upload is pending');await page.screenshot({path:resolve(dirname(output),`capture-${layout}.png`),fullPage:true});
@@ -132,7 +132,7 @@ try{
   await check(`${layout}: delayed stale rejection preserves original context and current draft`,()=>withPage(directory,{scopes:scopes('generation-a')},async({page,server})=>{
    await page.locator(draft).fill('Original reviewed evidence');await prepare(page);
    let release;const held=new Promise(resolve=>release=resolve);let uploaded;const arrived=new Promise(resolve=>uploaded=resolve);
-   await page.route('**/_tendril/blob',async route=>{uploaded();await held;await route.continue();});await page.locator('#send').click();await arrived;await page.locator(draft).fill('Unrelated new draft');server.preview.setScopes(scopes('generation-b'));release();await page.locator('[data-status=rejected]').waitFor();
+   await page.route('**/_tendril/uploads/*/complete',async route=>{assert.equal(route.request().method(),'POST');uploaded();await held;await route.continue();});await page.locator('#send').click();await arrived;await page.locator(draft).fill('Unrelated new draft');server.preview.setScopes(scopes('generation-b'));release();await page.locator('[data-status=rejected]').waitFor();
    assert.equal(await page.locator(draft).inputValue(),'Unrelated new draft');assert.equal(server.preview.events.length,0);assert.match(await page.locator('[data-status=rejected]').textContent(),/Original reviewed evidence/);const completed=server.preview.messages.find(m=>m.t==='capture_complete');assert.equal(completed.expected_generations.evidence,'generation-a');
    const captureId = await page.locator('[data-status=rejected]').getAttribute('data-capture');
    await page.reload(); await page.getByText('Retry original capture', { exact: true }).waitFor();
@@ -144,6 +144,54 @@ try{
    assert.equal(completions.length, 2); assert.deepEqual(completions[1], completions[0]);
   }));
  }
+ await check('inline: lost upload completion resumes the original session after reload without resending bytes', () => withPage('cookbooks/capture-reviewed-evidence/checks/inline', { scopes: scopes('generation-a') }, async ({ page, server }) => {
+  const starts = [], contents = [], completions = [], lost = deferred();
+  await page.route('**/_tendril/uploads', async route => {
+   assert.equal(route.request().method(), 'POST');
+   const intent = route.request().postDataJSON(), response = await route.fetch();
+   assert.equal(response.status(), 201);
+   starts.push({ intent, session: await response.json() });
+   await route.fulfill({ response });
+  });
+  await page.route('**/_tendril/uploads/*/content', async route => {
+   assert.equal(route.request().method(), 'PUT');
+   contents.push({ path: new URL(route.request().url()).pathname, bytes: route.request().postDataBuffer() });
+   await route.continue();
+  });
+  await page.route('**/_tendril/uploads/*/complete', async route => {
+   assert.equal(route.request().method(), 'POST');
+   const response = await route.fetch();
+   assert.equal(response.status(), 200);
+   completions.push({ path: new URL(route.request().url()).pathname, receipt: await response.json() });
+   if (completions.length === 1) {
+    await route.abort('failed'); // The service committed; the browser did not receive its receipt.
+    lost.resolve();
+   } else await route.fulfill({ response });
+  });
+  await page.locator('#question').fill('Evidence whose completion reply was lost');
+  await page.locator('#file').setInputFiles(image); await page.locator('#send').click(); await lost.promise;
+  const captureId = await page.locator('[data-capture]').getAttribute('data-capture');
+  const submissionId = await page.locator('[data-capture]').getAttribute('data-submission');
+  assert.equal(server.preview.events.length, 0);
+  await page.locator('#question').fill('Separate draft retained across reload');
+  await page.reload(); await page.locator('[data-status=accepted]').waitFor();
+  assert.ok(starts.length >= 2);
+  assert.ok(starts.every(start => start.intent.cid === captureId));
+  assert.ok(starts.every(start => start.session.id === starts[0].session.id));
+  assert.ok(starts.slice(1).every(start => start.session.phase === 'completed' && start.session.upload_required === false));
+  assert.equal(contents.length, 1);
+  assert.equal(contents[0].bytes.length, starts[0].intent.size);
+  assert.equal(createHash('sha256').update(contents[0].bytes).digest('hex'), starts[0].intent.sha256);
+  assert.equal(completions.length, 2);
+  assert.deepEqual(completions[1], completions[0]);
+  assert.equal(await page.locator('[data-status=accepted]').getAttribute('data-capture'), captureId);
+  assert.equal(await page.locator('[data-status=accepted]').getAttribute('data-submission'), submissionId);
+  assert.equal(await page.locator('#question').inputValue(), 'Separate draft retained across reload');
+  assert.equal(server.preview.events.length, 1);
+  assert.equal(server.preview.events[0].data.submission_id, submissionId);
+  assert.equal(server.preview.events[0].data.text, 'Evidence whose completion reply was lost');
+  assert.equal(server.preview.events[0].context.generations.evidence, 'generation-a');
+ }));
  await check('inline: discarded candidate never becomes a submitted image',()=>withPage('cookbooks/capture-reviewed-evidence/checks/inline',{scopes:scopes('generation-a')},async({page,server})=>{
   await page.locator('#file').setInputFiles(image);await page.locator('#discard').click();await page.locator('#send').click();assert.equal(server.preview.events.length,0);assert.match(await page.locator('#status').textContent(),/Add a question/);
  }));
