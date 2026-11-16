@@ -1,7 +1,7 @@
 import { signals } from './deployment/bootstrap.mjs';
 import { claimTask, postMessage, requestSummary } from './actions.mjs';
 import { mergeOperation, operationLabel, readBoard, TOPICS } from './projection.mjs';
-import { clearSubmittedText, newDrafts, retainReference, validateDrafts } from './drafts.mjs';
+import { canRemoveReference, captureMessageDraft, clearSubmittedText, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './drafts.mjs';
 
 const $ = selector => document.querySelector(selector);
 const api = window.tendril;
@@ -10,6 +10,7 @@ let backend, drafts = newDrafts(), storageKey, painting = false, dirty = false, 
 let lastTyping = 0;
 const outcomes = new Map();
 const operationWatchers = new Map();
+const submissions = new Set();
 const rowNodes = new Map();
 
 function status(text, failure = false) {
@@ -32,6 +33,7 @@ function element(tag, text, className) {
 
 function paintOperations() {
   const active = document.activeElement?.dataset.operation;
+  const activeAction = document.activeElement?.dataset.action;
   $('#operations').replaceChildren(...drafts.operations.slice().reverse().map(reference => {
     const operation = outcomes.get(reference.operationId);
     const row = element('li');
@@ -42,17 +44,37 @@ function paintOperations() {
     copy.type = 'button';
     copy.disabled = reference.kind !== 'message';
     copy.dataset.operation = reference.operationId;
+    copy.dataset.action = 'copy';
     copy.onclick = () => {
       try { saveDrafts({ ...drafts, message: reference.text }); $('#message').value = drafts.message; $('#message').focus(); }
       catch (error) { status(`Draft could not be saved: ${error.message}`, true); }
     };
     row.append(copy);
-    if (operation && ['final', 'rejected'].includes(operation.status)) {
-      const remove = element('button', 'Remove this receipt');
+    if (!submissions.has(reference.operationId) && !['final', 'rejected'].includes(operation?.status)) {
+      const recheck = element('button', 'Check original status');
+      recheck.type = 'button';
+      recheck.dataset.operation = reference.operationId;
+      recheck.dataset.action = 'check-status';
+      recheck.onclick = async () => {
+        recheck.disabled = true;
+        try {
+          const observed = await backend.operations.get(reference.operationId);
+          if (!drafts.operations.some(value => value.operationId === reference.operationId)) return;
+          outcomes.set(reference.operationId, mergeOperation(outcomes.get(reference.operationId), observed));
+          paintOperations();
+          void watchOperation(reference.operationId);
+        } catch (error) { status(`Original status is unavailable: ${error.message}. The saved reference is retained.`, true); }
+        finally { recheck.disabled = false; }
+      };
+      row.append(recheck);
+    }
+    if (canRemoveReference(operation, { submitting: submissions.has(reference.operationId) })) {
+      const remove = element('button', operation === null ? 'Remove saved reference' : 'Remove this receipt');
       remove.type = 'button';
       remove.onclick = () => {
         try {
-          saveDrafts({ ...drafts, operations: drafts.operations.filter(value => value.operationId !== reference.operationId) });
+          saveDrafts(removeReviewedReference(drafts, reference.operationId, outcomes.get(reference.operationId),
+            { submitting: submissions.has(reference.operationId) }));
           operationWatchers.get(reference.operationId)?.abort();
           outcomes.delete(reference.operationId);
           paintOperations();
@@ -63,7 +85,7 @@ function paintOperations() {
     }
     return row;
   }));
-  if (active) [...$('#operations').querySelectorAll('button')].find(button => button.dataset.operation === active)?.focus({ preventScroll: true });
+  if (active) [...$('#operations').querySelectorAll('button')].find(button => button.dataset.operation === active && button.dataset.action === activeAction)?.focus({ preventScroll: true });
 }
 
 function taskRow(task) {
@@ -131,7 +153,7 @@ async function refresh() {
   }
 }
 
-async function submit(kind, domainId, submittedText) {
+async function submit(kind, domainId, submittedText, editorSnapshot = submittedText) {
   if (kind === 'message' && submittingMessage) return;
   if (kind === 'message') { submittingMessage = true; $('#send').disabled = true; }
   const operationId = crypto.randomUUID();
@@ -140,6 +162,7 @@ async function submit(kind, domainId, submittedText) {
   const reference = { operationId, kind, domainId: jobId ?? messageId, text: submittedText };
   try {
     saveDrafts(retainReference(drafts, reference));
+    submissions.add(operationId);
     paintOperations();
     void watchOperation(operationId);
     status('Preparing the original operation…');
@@ -147,17 +170,21 @@ async function submit(kind, domainId, submittedText) {
       : kind === 'claim' ? await claimTask(backend, domainId, operationId)
         : await requestSummary(backend, domainId, jobId, operationId);
     outcomes.set(operationId, mergeOperation(outcomes.get(operationId), result));
-    if (kind === 'message') { saveDrafts(clearSubmittedText(drafts, submittedText)); $('#message').value = drafts.message; }
+    if (kind === 'message') { saveDrafts(clearSubmittedText(drafts, editorSnapshot)); $('#message').value = drafts.message; }
     paintOperations();
     const observed = outcomes.get(operationId);
     status(operationLabel(observed), observed.status === 'rejected');
     await refresh();
   } catch (error) {
-    try { const operation = await backend.operations.get(operationId); if (operation) outcomes.set(operationId, mergeOperation(outcomes.get(operationId), operation)); }
+    try { const operation = await backend.operations.get(operationId); outcomes.set(operationId, mergeOperation(outcomes.get(operationId), operation)); }
     catch { /* Keep the reference; delivery/reconciliation still belongs to the backend. */ }
     paintOperations();
     status(`Submission needs review: ${error.message}. Its original draft and operation reference are retained.`, true);
-  } finally { if (kind === 'message') { submittingMessage = false; $('#send').disabled = false; } }
+  } finally {
+    submissions.delete(operationId);
+    paintOperations();
+    if (kind === 'message') { submittingMessage = false; $('#send').disabled = false; }
+  }
 }
 
 async function watchEvents() {
@@ -210,9 +237,11 @@ async function watchTyping() {
 
 $('#message-form').addEventListener('submit', event => {
   event.preventDefault();
-  const text = $('#message').value.trim();
-  if (!text || !backend) return;
-  void submit('message', '', text);
+  try {
+    const snapshot = captureMessageDraft($('#message').value);
+    if (!snapshot || !backend) return;
+    void submit('message', '', snapshot.text, snapshot.editorText);
+  } catch (error) { status(`Draft could not be submitted: ${error.message}`, true); }
 });
 $('#message').addEventListener('input', () => {
   try { saveDrafts({ ...drafts, message: $('#message').value }); }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DISPLAY_LIMIT, emptyProjection, mergeOperation, operationLabel, readBoard, reduceBatch } from './shared/projection.mjs';
-import { clearSubmittedText, newDrafts, retainReference, validateDrafts } from './shared/drafts.mjs';
+import { canRemoveReference, captureMessageDraft, clearSubmittedText, MAX_OPERATION_REFERENCES, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './shared/drafts.mjs';
 
 const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${index}`, eventOrdinal: 0, topic: 'conversation', payload: { type: 'message.posted', version: 1, messageId: `message-${index}`, text: `Text ${index}` } });
 const jobRequest = (index, jobId = 'job-1', taskId = 'task-1') => ({ ...message(index), topic: 'job-requests',
@@ -147,11 +147,46 @@ test('references are not a second outbox and old completion preserves new typing
   assert.throws(() => validateDrafts({ ...drafts, operations: [reference, reference] }), /Invalid operation/);
 });
 
+test('normalized message content clears only the exact captured editor snapshot', () => {
+  const snapshot = captureMessageDraft('  Inspection is complete.\n');
+  assert.equal(snapshot.text, 'Inspection is complete.');
+  assert.equal(snapshot.editorText, '  Inspection is complete.\n');
+  assert(Object.isFrozen(snapshot));
+  assert.equal(clearSubmittedText({ ...newDrafts(), message: snapshot.editorText }, snapshot.editorText).message, '');
+  const newer = { ...newDrafts(), message: 'Inspection is complete.\nA newer unsent thought.' };
+  assert.equal(clearSubmittedText(newer, snapshot.editorText), newer);
+  assert.equal(captureMessageDraft(' \n\t '), null);
+  assert.throws(() => captureMessageDraft('x'.repeat(8001)), /Invalid message draft/);
+});
+
+test('an observed absent operation can be reviewed away without discarding unresolved or prepared work', () => {
+  let drafts = newDrafts();
+  for (let index = 0; index < MAX_OPERATION_REFERENCES; index++) {
+    drafts = retainReference(drafts, { operationId: `operation-${index}`, kind: 'job', domainId: `job-${index}`, text: 'Review' });
+  }
+  const next = { operationId: 'next', kind: 'job', domainId: 'next-job', text: 'New review' };
+  assert.throws(() => retainReference(drafts, next), /Review and remove/);
+  for (const operation of [undefined, { operationId: 'operation-0', status: 'queued' }, { operationId: 'operation-0', status: 'provisional' }]) {
+    assert.equal(canRemoveReference(operation), false);
+    assert.throws(() => removeReviewedReference(drafts, 'operation-0', operation), /Wait for the original/);
+  }
+  assert.equal(canRemoveReference(null, { submitting: true }), false);
+  assert.throws(() => removeReviewedReference(drafts, 'operation-0', null, { submitting: true }), /Wait for the original/);
+  const reviewed = removeReviewedReference(drafts, 'operation-0', null);
+  assert.equal(reviewed.operations.length, MAX_OPERATION_REFERENCES - 1);
+  assert.equal(drafts.operations.length, MAX_OPERATION_REFERENCES);
+  assert.equal(retainReference(reviewed, next).operations.length, MAX_OPERATION_REFERENCES);
+  assert(canRemoveReference({ status: 'final' }));
+  assert(canRemoveReference({ status: 'rejected' }));
+  assert.throws(() => removeReviewedReference(drafts, 'operation-0', { operationId: 'another', status: 'final' }), /different operation/);
+});
+
 test('provisional rejection is distinct from final rejection or unknown submission', () => {
   assert.match(operationLabel({ status: 'provisional', outcome: 'rejected' }), /awaiting final order/);
   assert.match(operationLabel({ status: 'rejected', error: 'already_claimed' }), /Rejected: already_claimed/);
   assert.equal(operationLabel({ status: 'final' }), 'Accepted and final');
   assert.match(operationLabel(null), /No durable submission found/);
+  assert.match(operationLabel(undefined), /Checking the original/);
 });
 
 test('delayed submit replies cannot regress an observed final or provisional outcome', () => {

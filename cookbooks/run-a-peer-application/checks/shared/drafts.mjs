@@ -3,6 +3,12 @@ export const DRAFT_VERSION = 1;
 export const MAX_OPERATION_REFERENCES = 100;
 export const newDrafts = () => ({ version: DRAFT_VERSION, message: '', operations: [] });
 
+export function captureMessageDraft(editorText) {
+  if (typeof editorText !== 'string' || editorText.length > 8000) throw new TypeError('Invalid message draft');
+  const text = editorText.trim();
+  return text ? Object.freeze({ text, editorText }) : null;
+}
+
 export function validateDrafts(value) {
   if (!value || value.version !== DRAFT_VERSION || typeof value.message !== 'string' || value.message.length > 8000 || !Array.isArray(value.operations) || value.operations.length > MAX_OPERATION_REFERENCES) throw new TypeError('Invalid draft record');
   const seen = new Set();
@@ -21,11 +27,23 @@ export function retainReference(drafts, reference) {
     if (JSON.stringify(existing) !== JSON.stringify(reference)) throw new Error('An operation reference cannot change its reviewed meaning');
     return drafts;
   }
-  if (drafts.operations.length >= MAX_OPERATION_REFERENCES) throw new Error('Review and remove finished operation references before submitting more work');
+  if (drafts.operations.length >= MAX_OPERATION_REFERENCES) throw new Error('Review and remove resolved or absent operation references before submitting more work');
   return validateDrafts({ ...drafts, operations: [...drafts.operations, reference] });
 }
 
 export function clearSubmittedText(drafts, submittedText) {
   // An old receipt must never erase text entered after this submission started.
   return drafts.message === submittedText ? { ...drafts, message: '' } : drafts;
+}
+
+export function canRemoveReference(operation, { submitting = false } = {}) {
+  // undefined is an unresolved/failed lookup; null is an observed absence.
+  return !submitting && (operation === null || ['final', 'rejected'].includes(operation?.status));
+}
+
+export function removeReviewedReference(drafts, operationId, operation, options) {
+  if (!canRemoveReference(operation, options)) throw new Error('Wait for the original submission or its outcome before removing this reference');
+  if (operation && operation.operationId !== operationId) throw new Error('A different operation cannot authorize removing this reference');
+  // This changes only the local review list. It does not cancel backend work.
+  return validateDrafts({ ...drafts, operations: drafts.operations.filter(reference => reference.operationId !== operationId) });
 }

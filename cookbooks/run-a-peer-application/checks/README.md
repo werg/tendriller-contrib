@@ -54,6 +54,19 @@ durable proposal outbox. After reload the page queries
 redeliver old intent. A locally saved reference with no backend operation remains
 an unsent/reviewable draft, rather than a claim of successful preparation.
 
+The receipt list distinguishes an unresolved lookup from an observed missing
+operation. **Check original status** reads that same operation ID and can restart
+its status subscription without authoring anything. After review, a reference
+with an observed missing operation can be removed from the device's list; active
+submission, unresolved lookup, queued and provisional work cannot. Removing a
+reference does not cancel backend work. This lets a failed preparation release
+its local review slot without silently throwing away a prepared proposal.
+
+Message normalization and editor recovery use different captured values: the
+payload contains trimmed message content, while completion compares the exact
+original editor text before clearing it. Leading/trailing whitespace does not
+leave an already submitted draft behind, and a later edit still survives.
+
 ## Prepare the actual application
 
 The mixed profile expects a `tasks` table with `id TEXT PRIMARY KEY`,
@@ -214,3 +227,7 @@ accepted malformed payload cannot make the whole board unreadable. Focused Node
 checks exercise malformed/future payloads followed by valid records, handler and
 job identity validation, and the distinction from a failing SQL/revision read.
 Those checks do not relabel the earlier browser run or claim a new browser result.
+The same focused review covers normalization versus the original editor snapshot,
+observed-missing reference removal at the review-list limit, and refusal to
+discard unresolved, actively submitted, queued or provisional operations. The
+page's recheck action only uses the existing public operation lookup/subscription.

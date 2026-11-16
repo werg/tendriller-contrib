@@ -111,7 +111,8 @@ export async function readBoard(backend, { view = 'final', signal } = {}) {
 }
 
 export function operationLabel(operation) {
-  if (!operation) return 'No durable submission found; review the saved draft';
+  if (operation === undefined) return 'Checking the original operation…';
+  if (operation === null) return 'No durable submission found; review the saved draft';
   if (operation.status === 'rejected') return `Rejected: ${operation.message || operation.error || 'Review this intent'}`;
   if (operation.status === 'final') return 'Accepted and final';
   if (operation.status === 'provisional') return operation.outcome === 'rejected'
