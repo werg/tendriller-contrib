@@ -11,11 +11,12 @@
  * Commands go to an explicit callback or an `utterance` page event.
  * For custom UI use start({phrases,onWake,onCommand,onState,onError}).
  *
- * Honest note: this is NOT a true offline wake word engine. It runs the browser's
- * SpeechRecognition continuously and matches text, so it works only where that works
- * (Chrome, Edge, Safari; usually needs a network connection, and audio may go to the browser
- * vendor's speech service). Browsers may stop recognition after silence; this snippet
- * restarts it with a back-off. Background tabs and locked phones are unreliable.
+ * This is an optional custom-page snippet, not the standard Tendriller control.
+ * On core releases with integrated hands-free controls, prefer the built-in menu.
+ * This snippet is NOT a true offline wake word engine: it matches browser
+ * SpeechRecognition transcripts, which may be processed by a vendor/cloud.
+ * The microphone stops when a page is backgrounded and never auto-restarts.
+ * Background/locked-screen use is unreliable.
  */
 (() => {
   const ns = (window.tendrilSnippets = window.tendrilSnippets || {});
@@ -36,6 +37,16 @@
     let commandTimer = null, awaitingCommand = false;
     const handled = new Set(); // final result indexes already handled in this session
     const state = (name, detail) => onState?.(name, detail);
+    function stop(reason = "stopped", detail) {
+      if (stopped) return;
+      stopped = true;
+      clearTimeout(restartTimer);
+      clearCommand();
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pagehide", onLeave);
+      try { rec?.abort(); } catch {}
+      state(reason, detail);
+    }
     const clearCommand = () => { clearTimeout(commandTimer); commandTimer = null; awaitingCommand = false; };
 
     function match(text) {
@@ -85,9 +96,7 @@
       };
       rec.onerror = (e) => {
         if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-          stopped = true;
-          clearCommand();
-          state("error", "Microphone or speech permission was denied.");
+          stop("error", "Microphone or speech permission was denied.");
           if (onError) onError("Microphone or speech permission was denied; wake word stopped.");
         } else if (e.error !== "no-speech" && e.error !== "aborted") {
           failures++;
@@ -112,26 +121,15 @@
       }
     }
 
-    // Recognition is suspended in background tabs; restart when we come back.
+    // No background microphone capture or implicit re-activation on return.
     const onVis = () => {
-      if (document.visibilityState === "visible" && !stopped) {
-        clearTimeout(restartTimer);
-        try { rec && rec.abort(); } catch {}
-      } else if (!stopped) state("background");
+      if (document.visibilityState !== "visible") stop("paused", "Page hidden. Tap Start hands-free again to resume.");
     };
+    const onLeave = () => stop("paused", "Page closed. Tap Start hands-free on the next visit.");
     document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pagehide", onLeave);
     begin();
-    return {
-      get running() { return !stopped; },
-      stop() {
-        stopped = true;
-        clearTimeout(restartTimer);
-        clearCommand();
-        document.removeEventListener("visibilitychange", onVis);
-        try { rec && rec.abort(); } catch {}
-        state("stopped");
-      },
-    };
+    return { get running() { return !stopped; }, stop };
   }
 
   // Optional ready-made control. The explicit tap unlocks the audio cue and requests
@@ -169,7 +167,11 @@
       status.textContent = `“${text}” — sending…`;
       try {
         if (onCommand) await onCommand(text);
-        else await window.tendril.send({ type: "utterance", text, via: "wakeword" }, { wake: true });
+        else {
+          if (!window.tendril?.send) throw new Error("Tendriller is not available on this page.");
+          const result = await window.tendril.send({ type: "utterance", text, via: "wakeword" }, { wake: true });
+          if (result?.error) throw new Error(result.message || result.error.message || String(result.error));
+        }
         status.textContent = `“${text}” — sent. Say “${phrases[0]}” for another command.`;
       } catch (e) { status.textContent = "Could not send: " + e.message; }
     };
@@ -181,7 +183,12 @@
       } else if (name === "command") {
         status.textContent = "Ready for your command. Speak now.";
         if (wakeCue) cue(880);
-      } else if (name === "background") status.textContent = "Page is in the background. Wake-word listening may pause; keep it open for reliable use.";
+      } else if (name === "paused" || name === "stopped") {
+        active = false; cued = false;
+        button.textContent = "Start hands-free";
+        button.setAttribute("aria-pressed", "false");
+        status.textContent = detail || "Hands-free off. Tap Start to resume.";
+      }
       else if (name === "restarting" || name === "starting") status.textContent = "Reconnecting microphone…";
       else if (name === "error") status.textContent = detail;
     };
