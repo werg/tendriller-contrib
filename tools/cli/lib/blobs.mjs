@@ -67,6 +67,11 @@ export async function downloadBlob(api, id, destination, { overwrite = false, si
   const meta = await blobInfo(api, id);
   if (!destination || typeof destination !== "string") throw new TypeError("Select an explicit local download destination");
   const target = resolve(destination);
+  // Do not follow an attacker-created parent directory symlink during writes.
+  // Remote names are never used to construct this destination.
+  for (let parent = dirname(target), previous = ""; parent !== previous; previous = parent, parent = dirname(parent)) {
+    if (existsSync(parent) && lstatSync(parent).isSymbolicLink()) throw new Error("Refusing a symlink download destination parent");
+  }
   if (existsSync(target)) {
     if (lstatSync(target).isSymbolicLink()) throw new Error("Refusing a symlink download destination");
     if (!overwrite) throw new Error("Destination exists; pass --overwrite deliberately");

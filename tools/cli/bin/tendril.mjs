@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Tendriller contrib CLI. Requires its pinned core contract and runtime artifacts.
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { catalog, scaffold } from "../lib/assets.mjs";
 import { checkService } from "../lib/service.mjs";
 import { readFileSync, writeFileSync, existsSync, statSync, cpSync, mkdirSync } from "node:fs";
@@ -8,11 +8,14 @@ import { basename, resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs, toPath, parseJsonArg, intFlag } from "../lib/args.mjs";
 import {
-  resolveConfig, saveConfig, removeConfig, serverBase, cursorPath, readCursor, writeCursor, checkpointPath,
+  resolveConfig, saveConfig, removeConfig, serverBase, configDir, cursorPath, readCursor, writeCursor, checkpointPath,
 } from "../lib/config.mjs";
 import { request, client, ApiError, sleep } from "../lib/api.mjs";
 import { pendingEvents, acknowledgeEvents } from "../../bridges/lib/pending-events.mjs";
 import { pack, guessType } from "../lib/pack.mjs";
+import { uploadBlob, downloadBlob, blobInfo } from "../lib/blobs.mjs";
+import { putSharedFile, readFileHead, getSharedFile, deleteSharedFile, listSharedFiles, fileHistory } from "../lib/shared-files.mjs";
+import { publishFiles } from "../lib/publications.mjs";
 import { terminalQr } from "../lib/qr.mjs";
 
 const HELP = `tendril <command> [args] [--tendril <name>] [--pretty]
@@ -27,9 +30,13 @@ Create / attach
 
 Content
   push <dir|file> [--message M] [--no-replace] [--as <path>] [--no-wait] [--timeout S]
-  files | versions | rollback [version]
-  upload <file> [--name N]     store a blob (e.g. an icon) -> {id,url}
-  blobs | blobs info <id> | blobs keep <id> | blobs expire <id>
+  versions | rollback <version>    compare-and-swap publication rollback
+  blob upload <local-file> [--name N] [--resume-file PATH]
+  blob download <id> <local-file> [--overwrite] | blob info <id> | blob list
+  blob pin <id> [--keep true|false] [--cid C] [--generations @file]
+  file put <shared/path> <local-file> [--revision N] [--resume-file PATH]
+  file get <shared/path> <local-file> [--overwrite] | file list | file history <shared/path>
+  file delete <shared/path> [--revision N] [--cid C]
   preview <dir> [--fixture scenario.json] [--out png] [--wait-ms N] [--eval JS] [--state file.json] [--desktop] [--headed]
   recipes                      list complete starter pages
   scaffold <recipe> <dir>      copy a starter page for editing
@@ -86,6 +93,16 @@ function boundedInteger(value, name, fallback, min, max = Number.MAX_SAFE_INTEGE
   return number;
 }
 const retryable = e => !(e instanceof ApiError) || [408, 425, 429].includes(e.status) || e.status >= 500;
+
+function transferRecord(cfg, what, key, flag) {
+  if (flag) return resolve(flag);
+  const path = join(configDir(), "transfers",
+    createHash("sha256").update(`${cfg.api}\0${what}\0${key}`).digest("hex") + ".json");
+  mkdirSync(dirname(path), { recursive:true, mode:0o700 });
+  return path;
+}
+function generationsOf(flags) { return flags.generations ? jsonArg(flags.generations, "generation preconditions") : {}; }
+function revisionOf(flags) { return flags.revision === undefined ? undefined : boundedInteger(flags.revision,"revision",0,0); }
 
 function jsonArg(s, what) {
   if (s === undefined) fail(`missing ${what}`);
@@ -169,8 +186,10 @@ const commands = {
     const declaration = statSync(target).isDirectory() && existsSync(join(target,"tendril.json")) ? JSON.parse(readFileSync(join(target,"tendril.json"),"utf8")) : null;
     if (declaration?.requires) await checkService(cfg.api,{requirements:declaration.requires});
     const body = pack(target, { as: f.as, merge: !!f["no-replace"], message: f.message });
-    const r = await api.post("/files", body);
-    const result = { version: r.version, files: r.files };
+    const r = await publishFiles(api, body, { merge: !!f["no-replace"], generations: generationsOf(f), scope:f.scope,
+      cid:f.cid, resumeFile:transferRecord(cfg,"push",target,f["resume-file"]), maxBytes:5 * 1024 * 1024,
+      concurrency: boundedInteger(f.concurrency, "concurrency", 3, 1, 8) });
+    const result = { version: r.version, head_revision:r.head_revision, files: r.files, reused:r.reused };
     if (f["no-wait"]) return out({ ...result, status: "pending" });
     const { entry, list, timedOut } = await waitForHealth(api, r.version, intFlag(f.timeout, "timeout", 20));
     result.status = entry ? entry.status : "unknown";
@@ -182,23 +201,49 @@ const commands = {
     if (result.status === "failed") process.exitCode = 3;
   },
 
-  async files(args, f, api) { out(await api.get("/files" + (f.version ? `?version=${f.version}` : ""))); },
-  async versions(args, f, api) { out(await api.get("/versions")); },
-  async rollback(args, f, api) { out(await api.post("/rollback", args[0] ? { version: Number(args[0]) } : {})); },
-
-  async upload(args, f, api) {
-    if (!args[0]) fail("usage: tendril upload <file>");
-    const headers = { "content-type": guessType(args[0]), "x-tendril-name": f.name || basename(args[0]) };
-    out(await api.raw("/blobs", { method: "PUT", body: readFileSync(args[0]), headers }));
+  async versions(args, f, api) { out(await api.get("/publications")); },
+  async rollback(args, f, api) {
+    if (args.length !== 1 || !/^[1-9]\d*$/.test(args[0])) fail("usage: tendril rollback <version>", 64);
+    const head = await api.get("/publications");
+    if (!Number.isSafeInteger(head.head_revision)) fail("Service did not provide a publication head revision", 3);
+    out(await api.post("/publications/rollback", { ...commandMetadata(f), expected_head_revision:head.head_revision, version:Number(args[0]) }));
   },
 
-  async blobs(args, f, api) {
-    const [sub, id] = args;
-    if (!sub) return out(await api.get("/blobs"));
-    if (!id || !/^b_[a-z2-7]{20}$/.test(id)) fail("usage: tendril blobs [info|keep|expire <blob-id>]", 64);
-    if (sub === "info") return out(await api.get(`/blobs/${id}/info`));
-    if (sub === "keep" || sub === "expire") return out(await api.patch(`/blobs/${id}`, { keep: sub === "keep" }));
-    fail("usage: tendril blobs [info|keep|expire <blob-id>]", 64);
+  async blob(args, f, api, cfg) {
+    const [verb, value, target] = args;
+    if (verb === "list" && args.length === 1) return out(await api.get("/blobs"));
+    if (verb === "info" && value && args.length === 2) return out(await blobInfo(api,value));
+    if (verb === "upload" && value && args.length === 2) {
+      const name = f.name || basename(value);
+      const record = transferRecord(cfg,"blob",value,f["resume-file"]);
+      return out(await uploadBlob(api,readFileSync(value),{type:f.type||guessType(value),name,
+        cid:f.cid,resumeFile:record,maxBytes:5 * 1024 * 1024}));
+    }
+    if (verb === "download" && value && target && args.length === 3)
+      return out(await downloadBlob(api,value,target,{overwrite:!!f.overwrite}));
+    if (verb === "pin" && value && args.length === 2) {
+      if (f.keep !== "true" && f.keep !== "false") fail("blob pin needs --keep true|false",64);
+      return out(await api.put(`/blobs/${encodeURIComponent(value)}/pin`,{...commandMetadata(f),keep:f.keep === "true"}));
+    }
+    fail("usage: tendril blob upload|download|info|list|pin",64);
+  },
+
+  async file(args, f, api, cfg) {
+    const [verb, path, local] = args;
+    if (verb === "list" && args.length === 1) return out(await listSharedFiles(api));
+    if (verb === "history" && path && args.length === 2) return out(await fileHistory(api,path));
+    if (verb === "get" && path && local && args.length === 3)
+      return out(await getSharedFile(api,path,local,{overwrite:!!f.overwrite}));
+    if (verb === "put" && path && local && args.length === 3) {
+      const record = transferRecord(cfg,"file",path,f["resume-file"]);
+      return out(await putSharedFile(api,path,readFileSync(local),{localName:basename(local),
+        type:f.type || guessType(local),expectedRevision:revisionOf(f),cid:f.cid,
+        expectedGenerations:generationsOf(f),scope:f.scope,resumeFile:record,maxBytes:5 * 1024 * 1024}));
+    }
+    if (verb === "delete" && path && args.length === 2)
+      return out(await deleteSharedFile(api,path,{cid:f.cid || randomUUID(),expectedRevision:revisionOf(f),
+        expectedGenerations:generationsOf(f),scope:f.scope}));
+    fail("usage: tendril file put|get|list|history|delete",64);
   },
 
   async eval(args, f, api) {
@@ -524,7 +569,7 @@ async function main() {
   } catch (e) {
     if (e instanceof ApiError) {
       process.stderr.write(JSON.stringify({ status: e.status, ...(e.body || { error: { message: e.message } }) }) + "\n");
-      process.exit(e.status === 409 ? 4 : 1);
+      process.exit(e.status === 409 ? 4 : e.status === 401 || e.status === 403 ? 5 : e.status >= 500 ? 3 : 1);
     }
     if (e.code) process.stderr.write(JSON.stringify({ error: { code: e.code, message: e.message } }) + "\n");
     else note(`tendril: ${e.message}`);
