@@ -260,7 +260,7 @@ remote speech provider. Browser-managed recognition (which may process audio on 
 vendor server) requires an explicit privacy choice. Spoken commands use the
 **ordinary conversation instruction path**, with the same permissions, delivery
 receipts, and offline recovery as typed or push-to-talk messages. They do not
-produce custom page events. See [hands-free setup and technical limits](https://github.com/werg/tendriller/blob/feat/core-hands-free-wake-settings/docs/HANDS_FREE.md).
+produce custom page events. See [hands-free setup and technical limits](https://github.com/werg/tendriller/blob/master/docs/HANDS_FREE.md).
 
 The [voice coach](../recipes/voice-coach/index.html) and
 [hands-free task guide](../recipes/hands-free-guide/index.html) use the standard
