@@ -58,7 +58,7 @@ function publicationApi(h: Handle) {
       });
       const bytes = await response.body();
       expect(response.ok(), bytes.toString('utf8')).toBe(true);
-      return new Response(bytes, { status: response.status() });
+      return new Response(response.status() === 204 ? null : bytes, { status: response.status() });
     },
   };
 }
