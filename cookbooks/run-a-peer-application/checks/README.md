@@ -76,6 +76,14 @@ Browser writer grants include `job-requests`; only the trusted worker may write
 `job-results`. Selecting a handler is a trusted deployment decision; a JSON event
 cannot install a workflow or grant tool authority.
 
+The projection recognizes handler `summarize-task`, version `1`, and validates
+its bounded job, task, origin-event and effect identities. A topic grant permits
+JSON publication without guaranteeing this application's payload schema. A
+malformed or unsupported message/job record is counted as omitted while later
+valid records remain visible. Conflicting job results cannot replace another
+intent. SQL schema or captured-revision failures still reject the whole read;
+those indicate that the requested coherent view is unavailable.
+
 For the event-only variation, select a genuine event-only execution profile and
 an adapter without the `sql` capability. The page omits the task section and
 never calls `query`. It remains a durable conversation view, not a full verifier
@@ -196,3 +204,13 @@ remain explicitly pregranted, while the thin fixture enrolls a fresh device.
 Actual deployed authentication, public-network routes and provider costs remain in issues
 [#14](https://github.com/werg/tendriller-contrib/issues/14) through
 [#17](https://github.com/werg/tendriller-contrib/issues/17).
+
+## Review changes after the recorded browser pairing
+
+The preserved browser reports remain attached to contrib `a3797d5` and their
+recorded core/artifact pins. A subsequent specimen review added reducer-version
+invalidation, per-event domain validation and a bounded omission count so one
+accepted malformed payload cannot make the whole board unreadable. Focused Node
+checks exercise malformed/future payloads followed by valid records, handler and
+job identity validation, and the distinction from a failing SQL/revision read.
+Those checks do not relabel the earlier browser run or claim a new browser result.

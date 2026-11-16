@@ -106,6 +106,7 @@ function paint(view) {
     if (job.text) row.append(element('p', job.text)); return row;
   }));
   $('#revision').textContent = `${view.view === 'final' ? 'Confirmed' : 'Including provisional changes'} · ${view.eventCount} visible-topic events scanned`;
+  if (view.omittedEventCount) $('#revision').textContent += ` · ${view.omittedEventCount} message or job records could not be displayed`;
   $('#revision').dataset.revision = view.revision;
 }
 

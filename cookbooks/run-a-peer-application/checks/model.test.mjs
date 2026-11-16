@@ -4,6 +4,13 @@ import { DISPLAY_LIMIT, emptyProjection, mergeOperation, operationLabel, readBoa
 import { clearSubmittedText, newDrafts, retainReference, validateDrafts } from './shared/drafts.mjs';
 
 const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${index}`, eventOrdinal: 0, topic: 'conversation', payload: { type: 'message.posted', version: 1, messageId: `message-${index}`, text: `Text ${index}` } });
+const jobRequest = (index, jobId = 'job-1', taskId = 'task-1') => ({ ...message(index), topic: 'job-requests',
+  payload: { type: 'job.requested', version: 1, jobId, taskId, kind: 'summarize-task' } });
+const jobResult = (index, request, overrides = {}) => ({ ...message(index), topic: 'job-results', payload: {
+  type: 'effect.completed', version: 1, effectId: `effect-${index}`, originEventId: request.id,
+  handlerId: 'summarize-task', handlerVersion: '1',
+  result: { type: 'job.completed', version: 1, jobId: request.payload.jobId, taskId: request.payload.taskId, text: 'Reviewed', ...overrides },
+} });
 const batch = (events, revision = 'view-a', scannedThrough = 'opaque-cursor', hasMore = false) => ({ transactions: [{ proposalId: 'proposal', events }], revision, scannedThrough, hasMore });
 const taskResult = { columns: ['id', 'title', 'claimed_by', 'status'].map(name => ({ name })), rows: [['task-1', 'Review evidence', null, 'open']], truncated: false };
 
@@ -18,8 +25,8 @@ test('UI projection is bounded while its source history remains untouched', () =
 });
 
 test('message identity and final job results survive pure rebuild without effects', () => {
-  const events = [message(1), { ...message(2), topic: 'job-requests', payload: { type: 'job.requested', version: 1, jobId: 'job-1', taskId: 'task-1' } },
-    { ...message(3), topic: 'job-results', payload: { type: 'effect.completed', version: 1, effectId: 'effect-1', originEventId: 'proposal-2:0', result: { type: 'job.completed', version: 1, jobId: 'job-1', text: 'Reviewed' } } }];
+  const request = jobRequest(2);
+  const events = [message(1), request, jobResult(3, request)];
   const first = reduceBatch(emptyProjection(), batch(events));
   const replayed = reduceBatch(emptyProjection(), batch(events));
   assert.deepEqual(first, replayed);
@@ -30,16 +37,51 @@ test('message identity and final job results survive pure rebuild without effect
 });
 
 test('job results bind their original intent and duplicate display IDs cannot merge separate effects', () => {
-  const request = { ...message(1), topic: 'job-requests', payload: { type: 'job.requested', version: 1, jobId: 'same', taskId: 'one' } };
+  const request = jobRequest(1, 'same', 'one');
   const another = { ...request, id: 'second:0', proposalId: 'second' };
   const before = reduceBatch(emptyProjection(), batch([request, another]));
   assert.equal(before.jobs.length, 2);
-  const completed = { ...message(3), topic: 'job-results', payload: { type: 'effect.completed', version: 1, originEventId: request.id,
-    result: { type: 'job.completed', version: 1, jobId: 'same', text: 'Done' } } };
+  const completed = jobResult(3, request);
   const after = reduceBatch(before, batch([completed]));
   assert.equal(after.jobs.filter(job => job.status === 'completed').length, 1);
   assert.equal(after.jobs.find(job => job.requestEventId === 'second:0').status, 'requested');
-  assert.throws(() => reduceBatch(before, batch([{ ...completed, payload: { ...completed.payload, result: { ...completed.payload.result, jobId: 'different' } } }])), /identity differs/);
+  for (const overrides of [{ jobId: 'different' }, { taskId: 'other-task' }]) {
+    const rejected = reduceBatch(before, batch([jobResult(3, request, overrides)]));
+    assert.deepEqual(rejected.jobs, before.jobs);
+    assert.equal(rejected.omittedEventCount, 1);
+    assert.equal(reduceBatch(rejected, batch([completed])).jobs[1].status, 'completed');
+  }
+});
+
+test('malformed or unsupported domain records cannot hide later valid history', () => {
+  const invalid = [
+    { ...message(2), payload: { ...message(2).payload, text: undefined } },
+    { ...message(3), payload: { ...message(3).payload, inReplyTo: 17 } },
+    { ...message(4), payload: { ...message(4).payload, version: 2 } },
+    { ...message(5), payload: [] },
+  ];
+  const events = [message(1), ...invalid, message(6)];
+  const state = reduceBatch(emptyProjection(), batch(events));
+  assert.deepEqual(state.messages.map(value => value.messageId), ['message-1', 'message-6']);
+  assert.equal(state.eventCount, 6);
+  assert.equal(state.omittedEventCount, 4);
+  assert.deepEqual(reduceBatch(emptyProjection(), batch(events)), state);
+  assert.equal(events.length, 6);
+});
+
+test('the task-summary projection validates its handler and bounded domain fields', () => {
+  const request = jobRequest(1);
+  const result = jobResult(2, request);
+  const invalid = [
+    { ...request, payload: { ...request.payload, kind: 'another-handler' } },
+    { ...result, payload: { ...result.payload, handlerId: 'another-handler' } },
+    { ...result, payload: { ...result.payload, handlerVersion: '2' } },
+    jobResult(2, request, { text: 'x'.repeat(8001) }),
+  ];
+  const state = reduceBatch(emptyProjection(), batch([...invalid, request, result]));
+  assert.equal(state.jobs.length, 1);
+  assert.equal(state.jobs[0].status, 'completed');
+  assert.equal(state.omittedEventCount, invalid.length);
 });
 
 test('SQL and empty-event scan progress use one captured handle and release it', async () => {
@@ -66,6 +108,21 @@ test('event-only view never calls SQL and malformed captured revisions fail clos
   assert.equal(released, 1);
   backend.readView = async () => ({ revision: 'view-a', readEvents: () => batch([], 'view-b'), release: () => { released++; } });
   await assert.rejects(readBoard(backend), /captured task revision/);
+  assert.equal(released, 2);
+});
+
+test('a coherent read skips malformed domain input but still rejects an invalid SQL result', async () => {
+  let released = 0;
+  const backend = { capabilities: ['sql'], readView: async () => ({ revision: 'view-a', query: () => taskResult,
+    readEvents: () => batch([{ ...message(1), payload: null }, message(2)]), release: () => { released++; } }) };
+  const view = await readBoard(backend);
+  assert.equal(view.tasks[0].id, 'task-1');
+  assert.equal(view.messages[0].messageId, 'message-2');
+  assert.equal(view.omittedEventCount, 1);
+  assert.equal(released, 1);
+  backend.readView = async () => ({ revision: 'view-a', query: () => ({ ...taskResult, columns: [] }),
+    readEvents: () => batch([message(2)]), release: () => { released++; } });
+  await assert.rejects(readBoard(backend), /Unexpected task query columns/);
   assert.equal(released, 2);
 });
 

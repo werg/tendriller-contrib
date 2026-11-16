@@ -1,26 +1,35 @@
 // Page-owned task-board vocabulary. This reducer never authors a change or effect.
-export const REDUCER_VERSION = 'task-board/v1';
+export const REDUCER_VERSION = 'task-board/v2';
 export const TOPICS = Object.freeze(['conversation', 'job-requests', 'job-results', 'tasks']);
 export const DISPLAY_LIMIT = 100;
 
-export const emptyProjection = () => ({ messages: [], jobs: [], eventCount: 0 });
+export const emptyProjection = () => ({ messages: [], jobs: [], eventCount: 0, omittedEventCount: 0 });
 
+const isText = (value, limit) => typeof value === 'string' && value.length > 0 && value.length <= limit;
+const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value, limit, field) => {
-  if (typeof value !== 'string' || !value || value.length > limit) throw new TypeError(`Invalid ${field}`);
+  if (!isText(value, limit)) throw new TypeError(`Invalid ${field}`);
   return value;
 };
+const advance = (state, update = {}, omitted = false) => ({
+  ...state, ...update, eventCount: state.eventCount + 1,
+  omittedEventCount: state.omittedEventCount + Number(omitted),
+});
 
 export function reduceEvent(state, event) {
+  // Task rows come from the captured SQL query; these events only wake that read.
+  if (event.topic === 'tasks') return advance(state);
   const data = event.payload;
-  // Other versions are not silently reinterpreted as this application's schema.
-  if (!data || typeof data !== 'object' || data.version !== 1) return { ...state, eventCount: state.eventCount + 1 };
+  // Topic grants authorize publication, not this page's application vocabulary.
+  // Preserve later valid history when another writer emits an unsupported record.
+  if (!isText(event.id, 1024) || !isObject(data) || data.version !== 1) return advance(state, {}, true);
   let messages = state.messages, jobs = state.jobs;
   if (event.topic === 'conversation' && data.type === 'message.posted') {
+    if (!isText(data.messageId, 128) || !isText(data.text, 8000) ||
+        (data.inReplyTo !== undefined && !isText(data.inReplyTo, 128))) return advance(state, {}, true);
     const entry = {
-      eventId: text(event.id, 1024, 'event identity'),
-      messageId: text(data.messageId, 128, 'message identity'),
-      text: text(data.text, 8000, 'message text'),
-      inReplyTo: data.inReplyTo === undefined ? null : text(data.inReplyTo, 128, 'reply identity'),
+      eventId: event.id, messageId: data.messageId, text: data.text,
+      inReplyTo: data.inReplyTo ?? null,
     };
     // Identity is the effective event, not a mutable display position or label.
     messages = [...messages.filter(value => value.eventId !== entry.eventId), entry].slice(-DISPLAY_LIMIT);
@@ -28,23 +37,23 @@ export function reduceEvent(state, event) {
              (event.topic === 'job-results' && data.type === 'effect.completed')) {
     const result = event.topic === 'job-results';
     const job = result ? data.result : data;
-    if (!job || typeof job !== 'object' || job.version !== 1 ||
-        !(result ? ['job.completed', 'job.failed'] : ['job.requested']).includes(job.type)) {
-      return { ...state, eventCount: state.eventCount + 1 };
-    }
-    const jobId = text(job.jobId, 128, 'job identity');
-    const requestEventId = text(result ? data.originEventId : event.id, 1024, 'job request event identity');
+    if (!isObject(job) || job.version !== 1 ||
+        !(result ? ['job.completed', 'job.failed'] : ['job.requested']).includes(job.type) ||
+        !isText(job.jobId, 128) || !isText(job.taskId, 128) ||
+        (job.text !== undefined && !isText(job.text, 8000)) ||
+        (!result && job.kind !== 'summarize-task') ||
+        (result && (data.handlerId !== 'summarize-task' || data.handlerVersion !== '1' ||
+          !isText(data.effectId, 256) || !isText(data.originEventId, 1024)))) return advance(state, {}, true);
+    const jobId = job.jobId, requestEventId = result ? data.originEventId : event.id;
     const prior = jobs.find(value => value.requestEventId === requestEventId);
-    if (prior && prior.jobId !== jobId) throw new Error('Job result identity differs from its final intent');
+    if (prior && (prior.jobId !== jobId || prior.taskId !== job.taskId)) return advance(state, {}, true);
     const entry = {
       jobId, requestEventId, status: job.type.slice(4),
-      taskId: job.taskId === undefined ? prior?.taskId ?? null : text(job.taskId, 128, 'task identity'),
-      text: job.text === undefined ? prior?.text ?? '' : text(job.text, 8000, 'job text'),
-      eventId: text(event.id, 1024, 'event identity'),
+      taskId: job.taskId, text: job.text ?? prior?.text ?? '', eventId: event.id,
     };
     jobs = [...jobs.filter(value => value.requestEventId !== requestEventId), entry].slice(-DISPLAY_LIMIT);
-  }
-  return { messages, jobs, eventCount: state.eventCount + 1 };
+  } else return advance(state, {}, true);
+  return advance(state, { messages, jobs });
 }
 
 export function reduceBatch(state, batch) {
