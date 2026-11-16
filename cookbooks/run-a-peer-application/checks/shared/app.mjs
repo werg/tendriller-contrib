@@ -9,6 +9,7 @@ const lifecycle = new AbortController();
 let backend, drafts = newDrafts(), storageKey, painting = false, dirty = false, currentView, currentRead, submittingMessage = false;
 let lastTyping = 0;
 const outcomes = new Map();
+const operationWatchers = new Map();
 const rowNodes = new Map();
 
 function status(text, failure = false) {
@@ -50,7 +51,12 @@ function paintOperations() {
       const remove = element('button', 'Remove this receipt');
       remove.type = 'button';
       remove.onclick = () => {
-        try { saveDrafts({ ...drafts, operations: drafts.operations.filter(value => value.operationId !== reference.operationId) }); paintOperations(); }
+        try {
+          saveDrafts({ ...drafts, operations: drafts.operations.filter(value => value.operationId !== reference.operationId) });
+          operationWatchers.get(reference.operationId)?.abort();
+          outcomes.delete(reference.operationId);
+          paintOperations();
+        }
         catch (error) { status(error.message, true); }
       };
       row.append(remove);
@@ -134,6 +140,7 @@ async function submit(kind, domainId, submittedText) {
   try {
     saveDrafts(retainReference(drafts, reference));
     paintOperations();
+    void watchOperation(operationId);
     status('Preparing the original operation…');
     const result = kind === 'message' ? await postMessage(backend, messageId, submittedText, operationId)
       : kind === 'claim' ? await claimTask(backend, domainId, operationId)
@@ -162,15 +169,25 @@ async function watchEvents() {
   } catch (error) { if (!lifecycle.signal.aborted) status(`Live history paused: ${error.message}. Refresh to read durable history.`, true); }
 }
 
-async function watchOperations() {
+async function watchOperation(operationId) {
+  if (operationWatchers.has(operationId) || ['final', 'rejected'].includes(outcomes.get(operationId)?.status)) return;
+  const controller = new AbortController();
+  operationWatchers.set(operationId, controller);
+  const signal = AbortSignal.any([lifecycle.signal, controller.signal]);
   try {
-    for await (const operation of backend.operations.subscribe({ signal: lifecycle.signal })) {
-      if (drafts.operations.some(value => value.operationId === operation.operationId)) outcomes.set(operation.operationId, operation);
+    for await (const operation of backend.operations.subscribe({ operationId, signal })) {
+      if (!drafts.operations.some(value => value.operationId === operationId)) break;
+      outcomes.set(operationId, operation);
       paintOperations();
       // Status-only changes also trigger a coherent replacement, even with equal rows.
       await refresh();
+      if (['final', 'rejected'].includes(operation.status)) break;
     }
-  } catch (error) { if (!lifecycle.signal.aborted) status(`Operation updates paused: ${error.message}`, true); }
+  } catch (error) { if (!signal.aborted) status(`Operation updates paused: ${error.message}`, true); }
+  finally {
+    controller.abort();
+    if (operationWatchers.get(operationId) === controller) operationWatchers.delete(operationId);
+  }
 }
 
 async function watchTyping() {
@@ -218,5 +235,7 @@ try {
   paintOperations();
   await refresh();
   $('#message').disabled = $('#send').disabled = false;
-  void watchEvents(); void watchOperations(); void watchTyping();
+  void watchEvents();
+  for (const reference of drafts.operations) void watchOperation(reference.operationId);
+  void watchTyping();
 } catch (error) { status(`Application unavailable: ${error.message}`, true); }
