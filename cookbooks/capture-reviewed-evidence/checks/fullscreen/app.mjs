@@ -1,6 +1,6 @@
 const platform = window.tendril, $ = selector => document.querySelector(selector);
 const canvas = $('canvas'), ctx = canvas.getContext('2d'), description = $('#description');
-const cacheKey = `sketch:${platform.identity.page}:${platform.device.id}:v1`, submissions = new Map();
+const cacheKey = `sketch:${platform.identity.page}:${platform.device.id}:v1`, submissions = new Map(), unsaved = new Map();
 let editVersion = 0, reviewed = null, drawing = false, last = null, durableIds = new Set(), restoringImage = null, restoringVersion = -1;
 const say = text => { $('#status').textContent = text; };
 
@@ -84,6 +84,14 @@ function render() {
     const title = document.createElement('h2'), text = document.createElement('p'), message = document.createElement('p');
     title.textContent = row.status; text.textContent = row.text; message.textContent = row.message || '';
     article.append(title, text, message);
+    if (unsaved.has(row.submissionId)) {
+      const download = document.createElement('a');
+      download.href = unsaved.get(row.submissionId);
+      download.download = 'unsent-reviewed-sketch.png';
+      download.dataset.unsaved = '';
+      download.textContent = 'Save unsent snapshot before leaving';
+      article.append(download);
+    }
     if (durableIds.has(row.captureId) && ['queued', 'rejected'].includes(row.status)) {
       const retry = document.createElement('button'), discard = document.createElement('button');
       retry.textContent = 'Retry original capture'; discard.textContent = 'Discard from device queue';
@@ -106,10 +114,17 @@ function render() {
   }));
 }
 
+function releaseUnsent(id) {
+  if (!unsaved.has(id)) return;
+  URL.revokeObjectURL(unsaved.get(id));
+  unsaved.delete(id);
+}
+
 function received(result, submitted) {
   const row = submitted || [...submissions.values()].find(item => item.captureId === result.capture_id);
   if (!row) return;
   row.captureId = result.capture_id;
+  if (result.status === 'accepted') releaseUnsent(row.submissionId);
   row.status = result.error === 'discarded' ? 'discarded' : result.status;
   row.message = result.message || result.error || '';
   if (result.status === 'accepted' && editVersion === row.version && description.value === row.text) {
@@ -118,6 +133,7 @@ function received(result, submitted) {
   persist(); render();
   say(result.status === 'accepted' ? 'Snapshot accepted. New edits are untouched.'
     : result.status === 'queued' ? 'Snapshot queued with its original context.'
+    : result.error === 'storage_unavailable' ? 'This exact snapshot is only in this tab. Save it before leaving; newer drawing is still a separate draft.'
     : row.status === 'discarded' ? 'Removed from the device queue. This cannot undo remote acceptance.'
     : 'Snapshot rejected; the submitted description remains below and your current draft is intact.');
 }
@@ -132,6 +148,7 @@ function reconcileQueue(queue) {
       row = { submissionId: data.submission_id, text: String(data.text || ''), version: -1 };
       submissions.set(row.submissionId, row);
     }
+    releaseUnsent(row.submissionId);
     Object.assign(row, { captureId: capture.capture_id, status: capture.status, message: capture.message || capture.error || '' });
   }
   persist(); render();
@@ -142,6 +159,7 @@ $('#send').addEventListener('click', async () => {
   const { blob, context } = reviewed, submissionId = crypto.randomUUID();
   const row = { submissionId, captureId: null, text: description.value, version: editVersion, status: 'sending' };
   submissions.set(submissionId, row);
+  unsaved.set(submissionId, URL.createObjectURL(blob));
   persist(); render(); closeReview();
   try {
     received(await platform.uploadEvent(blob, {
@@ -150,7 +168,7 @@ $('#send').addEventListener('click', async () => {
     }), row);
   } catch (error) {
     row.status = 'error'; row.message = error.message;
-    persist(); render(); say('Snapshot could not start; your draft remains.');
+    persist(); render(); say('Snapshot could not start. Save the unsent snapshot before leaving; your draft remains.');
   }
 });
 
@@ -159,4 +177,4 @@ platform.on('upload_event', received);
 reconcileQueue(platform.captures());
 platform.on('connect', () => say('Ready. Review a snapshot when your drawing is useful.'));
 if (platform.connected) say('Ready. Review a snapshot when your drawing is useful.');
-addEventListener('pagehide', () => { persist(); if (reviewed) URL.revokeObjectURL(reviewed.url); });
+addEventListener('pagehide', event => { persist(); if (!event.persisted) { if (reviewed) URL.revokeObjectURL(reviewed.url); for (const id of unsaved.keys()) releaseUnsent(id); } });

@@ -1,6 +1,6 @@
 const api = window.tendril, $ = selector => document.querySelector(selector);
 const cacheKey = `inline-evidence:${api.identity.page}:${api.device.id}`;
-const submissions = new Map();
+const submissions = new Map(), unsaved = new Map();
 let candidate = null, draftRevision = crypto.randomUUID(), durableIds = new Set();
 
 try {
@@ -31,6 +31,14 @@ function show() {
     text.textContent = row.text;
     message.textContent = row.message || '';
     article.append(heading, text, message);
+    if (unsaved.has(row.submissionId)) {
+      const download = document.createElement('a');
+      download.href = unsaved.get(row.submissionId);
+      download.download = row.name;
+      download.dataset.unsaved = '';
+      download.textContent = 'Save unsent evidence before leaving';
+      article.append(download);
+    }
     if (durableIds.has(row.captureId) && ['queued', 'rejected'].includes(row.status)) {
       const retry = document.createElement('button'), discard = document.createElement('button');
       retry.type = discard.type = 'button';
@@ -77,12 +85,19 @@ $('#file').addEventListener('change', () => {
 $('#discard').addEventListener('click', discardCandidate);
 $('#question').addEventListener('input', () => { draftRevision = crypto.randomUUID(); save(); });
 
+function releaseUnsent(id) {
+  if (!unsaved.has(id)) return;
+  URL.revokeObjectURL(unsaved.get(id));
+  unsaved.delete(id);
+}
+
 function received(result, submitted) {
   // The queue normally provides this mapping first. A storage rejection has no
   // queue entry, so the awaiting caller supplies its own submitted snapshot.
   const row = submitted || [...submissions.values()].find(item => item.captureId === result.capture_id);
   if (!row) return;
   row.captureId = result.capture_id;
+  if (result.status === 'accepted') releaseUnsent(row.submissionId);
   row.status = result.error === 'discarded' ? 'discarded' : result.status;
   row.message = result.message || result.error || '';
   if (result.status === 'accepted' && draftRevision === row.draftRevision && $('#question').value === row.text) {
@@ -92,6 +107,7 @@ function received(result, submitted) {
   save(); show();
   $('#status').textContent = result.status === 'accepted' ? 'Accepted by the service; agent action is separate.'
     : result.status === 'queued' ? 'Queued on this device. Original context is retained.'
+    : result.error === 'storage_unavailable' ? 'This snapshot could not be saved durably. Save the unsent evidence before leaving this tab.'
     : row.status === 'discarded' ? 'Removed from this device queue. A remote acceptance cannot be undone here.'
     : 'Rejected. Submitted evidence and your current draft remain separate.';
 }
@@ -106,6 +122,7 @@ function reconcileQueue(queue) {
       row = { submissionId: data.submission_id, text: String(data.text || ''), draftRevision: null, name: capture.name };
       submissions.set(row.submissionId, row);
     }
+    releaseUnsent(row.submissionId); // This queue entry exists only after durable storage commits.
     Object.assign(row, {
       captureId: capture.capture_id, status: capture.status,
       context: { scope: capture.scope, expected_generations: capture.expected_generations },
@@ -124,10 +141,11 @@ $('#form').addEventListener('submit', async event => {
   catch { $('#status').textContent = 'This evidence question has no active submission context. Review the current task before sending.'; return; }
   const submissionId = crypto.randomUUID(), file = candidate?.file;
   const row = { submissionId, captureId: null, text, draftRevision, status: 'sending', context, name: file?.name || 'question.txt' };
+  const blob = file || new Blob([text], { type: 'text/plain' });
   submissions.set(submissionId, row);
+  unsaved.set(submissionId, URL.createObjectURL(blob));
   save(); show(); discardCandidate();
   try {
-    const blob = file || new Blob([text], { type: 'text/plain' });
     received(await api.uploadEvent(blob, {
       name: row.name, data: { kind: 'reviewed_evidence', submission_id: submissionId, question: 'inspection-1', text },
       dataPath: ['evidence'], ...context,
@@ -135,7 +153,7 @@ $('#form').addEventListener('submit', async event => {
   } catch (error) {
     row.status = 'error'; row.message = error.message;
     save(); show();
-    $('#status').textContent = 'Submission could not start; the question remains a draft.';
+    $('#status').textContent = 'Submission could not start. Save the unsent evidence before leaving; the question remains a draft.';
   }
 });
 
@@ -145,4 +163,4 @@ api.on('upload_event', received);
 reconcileQueue(api.captures());
 api.on('connect', () => { $('#status').textContent = 'Ready. Review evidence before sending.'; });
 if (api.connected) $('#status').textContent = 'Ready. Review evidence before sending.';
-addEventListener('pagehide', () => { if (candidate) URL.revokeObjectURL(candidate.url); save(); });
+addEventListener('pagehide', event => { save(); if (!event.persisted) { if (candidate) URL.revokeObjectURL(candidate.url); for (const id of unsaved.keys()) releaseUnsent(id); } });

@@ -1,13 +1,13 @@
 // The selected server policy owns privacy; this form renders only its projection.
 const runtime = window.tendril, $ = selector => document.querySelector(selector);
-let assignment = null, pending = null, draftRevision = 0, authEpoch = 0, started = false, key = '';
+let assignment = null, pending = null, draftRevision = crypto.randomUUID(), authEpoch = 0, started = false, key = '';
 const read = () => runtime.request('workflows/private-responses/mine', {
   method: 'POST', body: { cid: crypto.randomUUID(), expected_generations: {}, data: {} },
 });
 
 function save() {
   if (!key) return;
-  try { localStorage.setItem(key, JSON.stringify({ text: $('#answer').value, pending })); }
+  try { localStorage.setItem(key, JSON.stringify({ text: $('#answer').value, draftRevision, pending })); }
   catch { $('#status').textContent = 'Draft storage unavailable; keep this page open until an outcome.'; }
 }
 
@@ -15,6 +15,7 @@ function clearSensitive() {
   assignment = null;
   pending = null;
   key = '';
+  draftRevision = crypto.randomUUID();
   $('#form').hidden = true;
   $('#answer').value = '';
   $('#receipt').textContent = '';
@@ -50,10 +51,10 @@ async function authorize() {
       const saved = JSON.parse(localStorage.getItem(key) || 'null');
       if (saved) {
         $('#answer').value = String(saved.text || '');
+        if (typeof saved.draftRevision === 'string') draftRevision = saved.draftRevision;
         pending = saved.pending?.body?.data?.assignment === assignment.id ? saved.pending : null;
       }
     } catch {}
-    draftRevision++;
     $('#form').hidden = false;
     $('#retry').hidden = !pending;
     $('#review-current').hidden = !pending;
@@ -79,7 +80,7 @@ async function send() {
     assignment.response = result;
     $('#receipt').hidden = false;
     $('#receipt').textContent = `Accepted revision ${result.revision}: ${sent.body.data.answer}`;
-    if (draftRevision === sent.draftRevision && $('#answer').value === sent.body.data.answer) $('#answer').value = '';
+    if (draftRevision === sent.draftRevision && $('#answer').value === sent.body.data.answer) { $('#answer').value = ''; draftRevision = crypto.randomUUID(); }
     pending = null;
     $('#retry').hidden = true;
     $('#review-current').hidden = true;
@@ -102,7 +103,7 @@ async function send() {
   } finally { if (current()) $('#submit').disabled = false; }
 }
 
-$('#answer').addEventListener('input', () => { draftRevision++; save(); });
+$('#answer').addEventListener('input', () => { draftRevision = crypto.randomUUID(); save(); });
 $('#form').addEventListener('submit', event => {
   event.preventDefault();
   if (!assignment || pending) return;

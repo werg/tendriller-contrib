@@ -110,6 +110,17 @@ try{
    assert.equal(await page.locator(draft).inputValue(), 'Draft without a current question');
    assert.equal(server.preview.events.length, 0); assert.equal(await page.evaluate(() => window.tendril.captures().length), 0);
   }));
+  await check(`${layout}: unavailable durable storage retains a saveable original snapshot`, () => withPage(directory, { scopes: scopes('generation-a') }, async ({ page, server }) => {
+   await page.locator(draft).fill('Original evidence without storage'); await prepare(page); await page.locator('#send').click();
+   await page.locator('[data-status=rejected]').waitFor();
+   const retained = page.locator('[data-status=rejected] [data-unsaved]'); await retained.waitFor({ state: 'visible' });
+   const bytes = await retained.evaluate(async link => { const blob = await fetch(link.href).then(response => response.blob()); return { size: blob.size, type: blob.type }; });
+   assert.ok(bytes.size > 0); assert.equal(bytes.type, 'image/png');
+   assert.equal(server.preview.events.length, 0); assert.equal(await page.evaluate(() => window.tendril.captures().length), 0);
+   await page.locator(draft).fill('New draft after storage failure');
+   assert.match(await page.locator('[data-status=rejected]').textContent(), /Original evidence without storage/);
+   assert.equal(await page.locator(draft).inputValue(), 'New draft after storage failure');
+  }, { beforeOpen: async ({ page }) => page.addInitScript(() => { IDBFactory.prototype.open = () => { throw new DOMException('Storage disabled for this scenario', 'SecurityError'); }; }) }));
   await check(`${layout}: reviewed snapshot acceptance preserves later typing`,()=>withPage(directory,{scopes:scopes('generation-a')},async({page,server})=>{
    await page.locator(draft).fill('Submitted question');await prepare(page);
    let release;const held=new Promise(resolve=>release=resolve);let uploaded;const arrived=new Promise(resolve=>uploaded=resolve);
@@ -159,6 +170,22 @@ try{
  ]},async({page,server})=>{
   await page.locator('#form').waitFor({state:'visible'});await page.locator('#answer').fill('Original pending answer');await page.locator('#submit').click();await page.locator('#retry').waitFor({state:'visible'});await page.locator('#answer').fill('Later draft');await page.locator('#retry').click();await page.waitForFunction(()=>document.querySelector('#submit').disabled===false);
   const requests=server.mockedHttp.filter(row=>row.path.endsWith('/submit'));assert.equal(requests.length,2);assert.deepEqual(requests[0].body,requests[1].body);assert.equal(await page.locator('#answer').inputValue(),'Later draft');
+ }));
+ await check('participant: reload keeps the original retry while later typing keeps a distinct draft revision', () => withPage('cookbooks/collect-private-responses/checks/participant', {
+  ...privateBase, role: 'guest', http: [
+   { method: 'POST', path: '/_tendril/workflows/private-responses/mine', json: { assignments: [assignment] } },
+   { method: 'POST', path: '/_tendril/workflows/private-responses/submit', once: true, status: 503, json: { error: { code: 'unavailable', message: 'Outcome not received' } } },
+   { method: 'POST', path: '/_tendril/workflows/private-responses/submit', json: { assignment: assignment.id, answer: 'Repeated words with new intent', revision: 1 } },
+  ],
+ }, async ({ page, server }) => {
+  await page.locator('#form').waitFor({ state: 'visible' }); await page.locator('#answer').fill('Repeated words with new intent');
+  await page.locator('#submit').click(); await page.locator('#retry').waitFor({ state: 'visible' });
+  await page.reload(); await page.locator('#retry').waitFor({ state: 'visible' });
+  await page.locator('#answer').fill('Repeated words with new intent'); await page.locator('#retry').click();
+  await page.waitForFunction(() => document.querySelector('#receipt').textContent.startsWith('Accepted'));
+  assert.equal(await page.locator('#answer').inputValue(), 'Repeated words with new intent');
+  const requests = server.mockedHttp.filter(row => row.path.endsWith('/submit'));
+  assert.equal(requests.length, 2); assert.deepEqual(requests[0].body, requests[1].body);
  }));
  const review={round:{id:'round-1',label:'Team reflection',revision:2},assignments:[{...assignment,participant:'person-a'}],answers:[{assignment:'assignment-a',answer:'Private fixture answer',revision:1}]};
  await check('facilitator: deliberate aggregate is a revisioned operation separate from private answers',()=>withPage('cookbooks/collect-private-responses/checks/facilitator',{...privateBase,http:[
