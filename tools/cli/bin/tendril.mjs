@@ -196,8 +196,12 @@ const commands = {
     const declaration = statSync(target).isDirectory() && existsSync(join(target,"tendril.json")) ? JSON.parse(readFileSync(join(target,"tendril.json"),"utf8")) : null;
     if (declaration?.requires) await checkService(cfg.api,{requirements:declaration.requires});
     const body = pack(target, { as: f.as, merge: !!f["no-replace"], message: f.message });
-    const r = await publishFiles(api, body, { merge: !!f["no-replace"], generations: generationsOf(f), scope:f.scope,
-      cid:f.cid, resumeFile:transferRecord(cfg,"push",target,f["resume-file"]), maxBytes:5 * 1024 * 1024,
+    const generations = generationsOf(f);
+    const intent = JSON.stringify({target:resolve(target),entry:body.entry,message:body.message??null,
+      merge:!!f["no-replace"],generations,scope:f.scope??null,cid:f.cid??null,
+      files:body.files.map(({path,size,sha256,type})=>({path,size,sha256,type}))});
+    const r = await publishFiles(api, body, { merge: !!f["no-replace"], generations, scope:f.scope,
+      cid:f.cid, resumeFile:transferRecord(cfg,"push",intent,f["resume-file"]), maxBytes:5 * 1024 * 1024,
       concurrency: boundedInteger(f.concurrency, "concurrency", 3, 1, 8) });
     const result = { version: r.version, head_revision:r.head_revision, files: r.files, reused:r.reused };
     if (f["no-wait"]) return out({ ...result, status: "pending" });
@@ -224,9 +228,12 @@ const commands = {
     if (verb === "list" && args.length === 1) return out(await api.get("/blobs"));
     if (verb === "info" && value && args.length === 2) return out(await blobInfo(api,value));
     if (verb === "upload" && value && args.length === 2) {
-      const name = f.name || basename(value);
-      const record = transferRecord(cfg,"blob",value,f["resume-file"]);
-      return out(await uploadBlob(api,readTransferFile(value),{type:f.type||guessType(value),name,
+      const name = f.name || basename(value), type = f.type || guessType(value);
+      const bytes = readTransferFile(value);
+      const intent = JSON.stringify({local:resolve(value),name,type,cid:f.cid??null,
+        sha256:createHash("sha256").update(bytes).digest("hex")});
+      const record = transferRecord(cfg,"blob",intent,f["resume-file"]);
+      return out(await uploadBlob(api,bytes,{type,name,
         cid:f.cid,resumeFile:record,maxBytes:MAX_TRANSFER_BYTES}));
     }
     if (verb === "download" && value && target && args.length === 3)
@@ -245,10 +252,15 @@ const commands = {
     if (verb === "get" && path && local && args.length === 3)
       return out(await getSharedFile(api,path,local,{overwrite:!!f.overwrite}));
     if (verb === "put" && path && local && args.length === 3) {
-      const record = transferRecord(cfg,"file",path,f["resume-file"]);
-      return out(await putSharedFile(api,path,readTransferFile(local),{localName:basename(local),
-        type:f.type || guessType(local),expectedRevision:revisionOf(f),cid:f.cid,
-        expectedGenerations:generationsOf(f),scope:f.scope,resumeFile:record,maxBytes:5 * 1024 * 1024}));
+      const bytes = readTransferFile(local), type = f.type || guessType(local);
+      const expectedRevision = revisionOf(f), expectedGenerations = generationsOf(f);
+      const intent = JSON.stringify({path,local:resolve(local),name:basename(local),type,
+        sha256:createHash("sha256").update(bytes).digest("hex"),
+        expectedRevision:expectedRevision??null,expectedGenerations,scope:f.scope??null,cid:f.cid??null});
+      const record = transferRecord(cfg,"file",intent,f["resume-file"]);
+      return out(await putSharedFile(api,path,bytes,{localName:basename(local),
+        type,expectedRevision,cid:f.cid,expectedGenerations,scope:f.scope,
+        resumeFile:record,maxBytes:MAX_TRANSFER_BYTES}));
     }
     if (verb === "delete" && path && args.length === 2)
       return out(await deleteSharedFile(api,path,{cid:f.cid || randomUUID(),expectedRevision:revisionOf(f),
