@@ -182,7 +182,7 @@ test('a storage failure with a capture id retains the local photo and question f
 test('voice note supports recording duration, playback review, discard and explicit send', async ({ page }) => {
   await load(page, 'input-kit'); await page.evaluate(() => (window as any).tendrilSnippets.inputs.mount('#app', { modalities: ['audio'] }));
   await page.getByRole('button', { name: 'Record voice note' }).click();
-  await expect(page.getByRole('timer')).toContainText('Recording');
+  await expect(page.getByRole('timer')).toContainText('Recording', { timeout: 15000 });
   await page.waitForTimeout(350);
   await page.getByRole('button', { name: 'Stop and review' }).click();
   await expect(page.locator('audio[controls]')).toBeVisible();

@@ -43,9 +43,9 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
   application handles the output. They do not acknowledge successful processing.
   These reads still update the service's read position; avoid competing readers of a live bridge.
 - **assets sync**: `tendril assets sync ./page` resolves `tendril.json` into the complete component/workflow closure, including lazy siblings. Hand-edited files require explicit `--force`. `push` runs the same safe sync before packing a declared directory, preventing missing-component 404s. Review forced replacements.
-- **push** uploads a directory as one atomic version (`POST /files`, `replace: true`),
-  skipping dotfiles and `node_modules`; binary files go as base64. A single `.html` file
-  is uploaded as `index.html`. It then polls `/versions` up to `--timeout` s (20) and
+- **push** uploads a directory as one atomic Contract 3 publication (`POST /publications`),
+  skipping dotfiles and `node_modules`; file bytes use verified blob uploads. A single `.html` file
+  is published as `index.html`. It then polls `/publications` up to `--timeout` s (20) and
   reports `healthy`, `failed` (with errors) or still `pending` (no device has loaded it).
 - **preview** uses the compiled production runtime, real control, state and
   persistent outbox with an explicit local protocol adapter. For checkout

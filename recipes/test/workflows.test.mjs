@@ -45,7 +45,7 @@ test("scenario references connect agent results to actual generated event/device
 });
 test("workshop machine contract bounds coordinates and permits a frame before the first step", () => {
   const schema = JSON.parse(readFileSync(new URL("../multi-device-workshop/contract.json", import.meta.url)));
-  assert.deepEqual(validateSchema(schema, { type: "workshop.frame", device: "d_camera", step_id: null, blob: "b_frame", url: "_tendril/blob/b_frame", at: 1 }), []);
+  assert.deepEqual(validateSchema(schema, { type: "workshop.frame", device: "d_camera", step_id: null, blob: "b_frame", url: "_tendril/blobs/b_frame", at: 1 }), []);
   assert.ok(validateSchema(schema, { type: "workshop.point", device: "d_camera", frame: "b_frame", x: 2, y: .5 }).length);
   assert.ok(validateSchema(schema, { type: "workshop.step_ack", device: "d_camera" }).length);
 });

@@ -138,7 +138,7 @@ async function waitForHealth(api, version, timeoutS) {
   const deadline = Date.now() + timeoutS * 1000;
   let last;
   for (;;) {
-    last = await api.get("/versions");
+    last = await api.get("/publications");
     const v = (last.versions || []).find((x) => x.version === version);
     if (v && v.status !== "pending") return { entry: v, list: last };
     if (Date.now() > deadline) return { entry: v, list: last, timedOut: true };

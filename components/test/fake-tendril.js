@@ -32,7 +32,7 @@
       list: () => ['notebook','guide','workshop','experiment','decisions','facilitation'].map(name=>({id:'sessions:'+name,generation:'fixture-'+name,paths:[[name]],operations:[]})),
       capture: name => ({scope:name,expected_generations:{[name]:'fixture-'+name.slice('sessions:'.length)}}),
     },
-    blobUrl: id => new URL('/_tendril/blob/'+id,location.href).href,
+    blobUrl: id => new URL('/_tendril/blobs/'+id,location.href).href,
     async request(path,{method='GET',body}={}) { const response=await fetch('/_tendril/'+path,{method,headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw Object.assign(Error(result.error?.message||'Request failed'),{status:response.status,code:result.error?.code});return result;},
     device: { id: "d_testdevice000000", role: "owner", name: "test", pending: false },
     version: 1,
@@ -43,7 +43,7 @@
       const bytes = new Uint8Array(await blob.arrayBuffer());
       const id = "b_test" + String(++n).padStart(15, "0");
       calls.upload.push({ id, type: blob.type, size: blob.size, name: opts && opts.name, head: Array.from(bytes.slice(0, 8)), objectUrl: URL.createObjectURL(blob) });
-      return { id, url: "_tendril/blob/" + id };
+      return { id, url: "_tendril/blobs/" + id };
     },
     async send(data, opts) {
       calls.send.push({ data: clone(data), scope: opts?.scope, expected_generations: clone(opts?.expected_generations), wake: opts && opts.wake !== undefined ? opts.wake : true });
