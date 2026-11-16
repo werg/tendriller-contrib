@@ -6,7 +6,7 @@ group: "Make sense of information"
 tags: ["streams", "visualization", "recovery"]
 choices: ["Latest reading, trend, or run comparison", "Raw values, EMA, or time-aware smoothing", "Replay or an atomic view-and-cursor checkpoint"]
 capabilities: ["streams"]
-evidence: "explained"
+evidence: "exercised"
 related: ["choose-data-model", "ingest-bounded-telemetry", "recover-outdated-work"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/README.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/chart.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/examples/training-dashboard/model.mjs"]
 ---
@@ -65,4 +65,4 @@ Both must process the same admitted records, separate runs, retain raw values, a
 - Expire server history. The incomplete-history notice persists after checkpoint/reload.
 - Revoke access. Cached private values do not appear merely because they are on disk.
 
-**Evidence:** algorithms and scenarios are extracted from the source below. Numerical and browser checks record their results separately; a fixture display does not establish live service authorization or retention behavior.
+**Evidence:** five numerical cases and eight browser scenarios across the desktop and mobile adaptations passed. The [pilot record](../../guides/pilot-evidence.json) identifies exact source, runtime, preview, browser, and CI artifacts. These checks cover bounded ingestion, exact values, gaps, reload, and delayed authorization changes. A fixture display does not establish live service authorization or production retention behavior.

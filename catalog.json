@@ -136,7 +136,7 @@
         "captures",
         "durable commands"
       ],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "discover-capabilities",
         "annotate-a-frame",
@@ -766,7 +766,7 @@
       "capabilities": [
         "streams"
       ],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "choose-data-model",
         "ingest-bounded-telemetry",

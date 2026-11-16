@@ -6,7 +6,7 @@ group: "Collect evidence"
 tags: ["capture", "privacy", "drafts"]
 choices: ["File or typed fallback versus a live sensor", "Inline review versus a separate capture route", "Local draft lifetime and late rejection behavior"]
 capabilities: ["captures", "durable commands"]
-evidence: "explained"
+evidence: "exercised"
 related: ["discover-capabilities", "annotate-a-frame", "recover-outdated-work"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html"]
 ---
@@ -33,7 +33,7 @@ Permission must be requested by the relevant user gesture. API presence does not
 
 **Conditional requirement:** use the current public capture/blob interface for durable bytes and the public command interface for submission. Do not expose raw device handles or private transport. Use the exact current core contract for operations and byte limits; this guide intentionally specifies behavior rather than preserving an obsolete capture wire format.
 
-For the current browser API, `uploadEvent` creates a new durable operation and returns its runtime-owned `capture_id`. Give the reviewed snapshot a separate page-owned `submission_id` inside `data`; use `capture_queue` to associate that ID with the runtime operation, then correlate `upload_event` results by `capture_id`. Subscribe before reading `captures()` so initialization or reload cannot hide a pending item. Also associate the awaited result with its original snapshot: a local-storage rejection may never enter the queue. Use `retryCapture(capture_id)` for the original operation; calling `uploadEvent` again creates another submission.
+For the current browser API, `uploadEvent` creates a new durable operation and returns its runtime-owned `capture_id`. Give the reviewed snapshot a separate page-owned `submission_id` inside `data`; use `capture_queue` to associate that ID with the runtime operation, then correlate `upload_event` results by `capture_id`. Subscribe before reading `captures()` so initialization or reload cannot hide a pending item. Also associate the awaited result with its original snapshot: a local-storage rejection may never enter the queue. Use `retryCapture(capture_id)` for the original operation; calling `uploadEvent` again creates another submission. If local storage rejects the work before it becomes durable, retain the original bytes in memory and offer an explicit save or review action. Label that snapshot as present only in the open tab; do not promise interruption recovery when no durable copy exists.
 
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
 
@@ -52,7 +52,7 @@ For the current browser API, `uploadEvent` creates a new durable operation and r
 
 The [inline specimen](checks/inline/index.html) uses an ordinary file input, text area, local review, and explicit send. The [fullscreen sketch specimen](checks/fullscreen/index.html) uses a canvas capture route and a separate review step. Neither mounts a shared input component or assumes a universal event vocabulary. Both retain an immutable submitted snapshot and distinguish pending outcomes from new drafts.
 
-These specimens use deterministic fixture transport for UI failure cases. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
+Nine browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance is pending. The [pilot record](../../guides/pilot-evidence.json) names exact source and public artifacts. These checks use deterministic fixture transport for UI failure cases. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
 
 ## Verify the flow
 
