@@ -137,7 +137,17 @@ try{
    const captureId = await page.locator('[data-status=rejected]').getAttribute('data-capture');
    await page.reload(); await page.getByText('Retry original capture', { exact: true }).waitFor();
    assert.equal(await page.locator('[data-status=rejected]').getAttribute('data-capture'), captureId);
+   await page.evaluate(captureId => {
+    window.__pilotRetryReceipt = new Promise(resolve => {
+     const unsubscribe = window.tendril.on('upload_event', result => {
+      if (result.capture_id !== captureId || result.status !== 'rejected') return;
+      unsubscribe(); resolve(result);
+     });
+    });
+   }, captureId);
    await page.getByText('Retry original capture', { exact: true }).click();
+   // The existing rejected row is not evidence that the new retry has completed.
+   await page.evaluate(() => window.__pilotRetryReceipt);
    await page.waitForFunction(() => document.querySelector('[data-status=rejected]') !== null);
    assert.equal(await page.locator(draft).inputValue(), 'Unrelated new draft');
    const completions = server.preview.messages.filter(message => message.t === 'capture_complete');
