@@ -47,14 +47,17 @@ an application that chooses the recipe consume the same built program module.
    awaits `tendril.application.ready()`.
 4. Connect portable synchronization through the public WebRTC framed transport;
    the resident native authority supplies inclusion and author-time closure
-   evidence. Every replica derives the same chronological execution order. A preexisting cold
-   bootstrap can still use hosting services. Use one bounded Tendriller
-   rendezvous offer/answer, then close introduction resources and authenticate the
-   Chronolog peer over the data channel. The page owns RTC negotiation and
+   evidence. Every replica derives the same chronological execution order. Use
+   the configured resident HTTPS endpoint for one bounded offer/answer, then
+   close introduction resources and authenticate the Chronolog peer over the
+   data channel. The page owns RTC negotiation and
    synchronously transfers the untouched data channel to the exclusive replica
    Worker, which owns framing, authentication and durable replication. The
-   [public composition recipe](../snippets/introduce-peer-worker.mjs) keeps this
-   small handoff separate from membership and application ownership.
+   [public resident connection recipe](../snippets/connect-resident-worker.mjs)
+   keeps this handoff separate from membership and application ownership. The
+   native [resident task](../snippets/serve-resident-webrtc.mjs) starts its HTTPS
+   listener independently of page visits. Coordinated Tendriller rendezvous is
+   a separate optional path requiring both peers to join the attempt.
 5. Export `signals`, either an authorized public `EphemeralChannel` instance or
    `null`. Grant/session/sequence/expiry validation belongs to that channel.
 
@@ -158,7 +161,9 @@ public package containing `package.json` and `assets/kernel.mjs`. The CLI uses
 only that package's assets, and the contrib wrapper invokes the core's public
 qualification command without importing its implementation. `--tendriller-engine`
 identifies the extracted public engine package from the same source. It enables
-the actual packaged-workerd rendezvous. Both layouts exchange application bytes
+the actual packaged-workerd rendezvous. This explicitly coordinated specimen
+starts both halves of each introduction; the default cold resident connection
+uses the separate HTTPS recipe above. Both layouts exchange application bytes
 over WebRTC with the native adapter. The runner retires introduction, interrupts
 and reconnects peers, compares original records/capabilities/outcomes, and records
 host introduction separately from RTC data-channel bytes. Its local TLS bridge
@@ -223,8 +228,9 @@ Qualification covers these observations:
 ## Qualify the browser/native WebRTC transport
 
 The peer transport gate runs actual Chromium, an exclusive browser OPFS Worker
-and Chronolog's native Werift adapter. It uses a small loopback HTTP offer/answer
-fixture, closes that introduction service, then exchanges authenticated records
+and Chronolog's native Werift adapter. Its current runner uses the public direct
+HTTP signaling client and resident offer handler on loopback, closes that
+introduction listener, then exchanges authenticated records
 and detached bodies through the RTC data channel. The fixture is independent
 of the packaged Tendriller server; complete peer-page host quiescence needs the
 separate [warm-host assertions](../notes/peer-network.md#prove-the-intended-load-boundary).
@@ -358,6 +364,11 @@ headers and credits. Native introduction JSON request/response bytes, descriptio
 counts and SDP bytes remain separately named counters. Do not compare them with
 the HTTP application-stream byte boundaries of the historical v1 reports below
 as though they measured the same transport.
+Successful wrapper runs require the v2 runtime report, actual browser/native
+RTC observations for all three introductions, retired signaling and complete
+separate administrator/application counters. The small
+[membership report validator](membership-report.mjs) checks those recorded
+observations; its synthetic tests are not an enrollment qualification.
 The initial complete gate passed in
 [CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
 seven runtime assertions plus the public-package/bundle check in actual workerd

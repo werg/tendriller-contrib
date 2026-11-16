@@ -141,7 +141,8 @@ boundaries below remain unchanged.
 | Topic-scoped and ephemeral grants | Chronolog capabilities | Governed grants | Unauthorized topic/SQL/platform operations rejected; revoked old grant stays revoked |
 | Signed publish-only ingress | Chronolog wire/core | Topic grants | Original signature/operation preserved through forwarding, without history keys |
 | Selected application backend | Tendriller public contract/runtime | Small public interface | One write owner and one outbox; hosted and Chronolog implementations consume it |
-| Bounded peer introduction | Tendriller rendezvous | Authenticated participant routing | One complete SDP per side, bounded bytes, fresh session identity and host socket retirement after exchange |
+| Cold resident introduction | Chronolog direct HTTPS offer handler and native resident task | Explicit endpoint, admission policy and page origins | Independent resident listener, bounded offer/answer, active reader authorization over RTC, and no page-host polling |
+| Coordinated peer introduction | Optional Tendriller rendezvous | Both endpoints explicitly join one attempt | One complete SDP per side, bounded bytes, fresh session identity and host socket retirement after exchange |
 | WebRTC framed connection and Worker ownership | Chronolog transport | Browser/native RTC and portable sync | Synchronous transfer to the exclusive Worker, bounded queues, receiver flow control, independent application authorization and zero further introduction traffic |
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
@@ -201,7 +202,7 @@ them.
 
 Tracking: [contrib #14](https://github.com/werg/tendriller-contrib/issues/14).
 
-Qualify browser/native WebRTC through the bounded introduction service and record
+Qualify browser/native WebRTC through the declared resident HTTPS endpoint and record
 the selected ICE candidate pair. Preserve the historical framed WSS measurements
 as their own baseline. Use home Wi-Fi, a mobile hotspot, and a
 restrictive corporate network. Include browser suspension, connection interruption,

@@ -232,11 +232,15 @@ ownership/fencing design, which this first profile does not assume.
 
 ## Connect peers without hiding the route
 
-Use the [WebRTC peer architecture](notes/peer-network.md): Tendriller introduces
-peers with one bounded offer/answer exchange, then closes the rendezvous sockets.
-Chronolog's authenticated framed connection carries application traffic directly
-between peers. Bind application identity and grants independently of rendezvous
-hints and transport endpoint keys. A
+Use the [WebRTC peer architecture](notes/peer-network.md). The initial page
+configuration declares the resident's reachable HTTPS introduction endpoint.
+[`connectResidentWorker`](snippets/connect-resident-worker.mjs) sends one bounded
+offer and receives one answer from the independently running
+[native resident task](snippets/serve-resident-webrtc.mjs), then closes signaling.
+Chronolog's authenticated framed connection carries application traffic between
+peers. Optional Tendriller rendezvous requires both endpoints to join the same
+attempt; it is a separate coordinated introduction path. Bind application
+identity and grants independently of endpoint admission and routing hints. A
 publish-only collector can submit its own signed, topic-scoped proposal without
 receiving group history keys; allowing one topic must not authorize SQL or
 platform operations in a mixed program.
