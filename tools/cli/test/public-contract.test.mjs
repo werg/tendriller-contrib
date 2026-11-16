@@ -105,10 +105,13 @@ test("supported mutations match the current public service routes", async () => 
   assert.equal((await cli(["link", "rotate"])).code, 0);
   assert.equal(requests.at(-1).path, "/api/t/abcdefghijkl/links/l_main/rotate");
   const blob = "b_aaaaaaaaaaaaaaaaaaaa";
-  assert.equal((await cli(["blobs", "keep", blob])).code, 0);
-  assert.deepEqual(requests.at(-1).body, { keep: true });
-  assert.equal((await cli(["blobs", "expire", blob])).code, 0);
-  assert.deepEqual(requests.at(-1).body, { keep: false });
+  const keep = await cli(["blob", "pin", blob, "--keep", "true", "--cid", "pin-once"]);
+  assert.equal(keep.code, 0, keep.stderr);
+  assert.equal(requests.at(-1).path, `/api/t/abcdefghijkl/blobs/${blob}/pin`);
+  assert.deepEqual(requests.at(-1).body, { cid: "pin-once", expected_generations: {}, keep: true });
+  const expire = await cli(["blob", "pin", blob, "--keep", "false", "--cid", "unpin-once"]);
+  assert.equal(expire.code, 0, expire.stderr);
+  assert.deepEqual(requests.at(-1).body, { cid: "unpin-once", expected_generations: {}, keep: false });
 });
 
 test("push notification commands expose readiness and preserve delivery targeting", async () => {
