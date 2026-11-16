@@ -8,7 +8,7 @@ choices: ["Quiet record, agent wake, local cue, timer, or push", "Coalescing, co
 capabilities: []
 evidence: "explained"
 related: ["detect-meaningful-changes", "connect-resuming-agent", "choose-voice-interaction", "plan-time-and-deadlines", "track-habits-and-routines"]
-sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md"]
+sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/DURABILITY.md"]
 ---
 
 # Choose when to interrupt
@@ -57,9 +57,23 @@ Choose what acknowledgement means. “Dismiss on this device” can be local pre
 
 The retired foreground rule used twenty-second ticks and a two-minute local-time grace window. Those constants described an approximate active-page policy, not a scheduler guarantee. A page timer can be delayed or suspended; do not promise background execution by keeping a countdown visible.
 
-For real scheduled work, use the deployed durable timer operations and inspect their [outbox and receipt policy](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md). Core commits a timer occurrence and its notification intent durably, then attempts push separately with bounded retries. Its delivery states distinguish pending, sending, sent, failed, cancelled, and unavailable. A sent receipt reflects provider acceptance, and a retry can repeat an uncertain delivery.
+For real scheduled work, use the [public browser timer API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md#durable-timers) and inspect its [outbox and receipt policy](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/DURABILITY.md). Call `runtime.timers.create(settings, context)` once for a reviewed reminder. The runtime persists its CID, settings, and generation guards and retries that exact command after an uncertain reply. The server records one accepted timer for that identity. Agent/HTTP callers preserve the equivalent explicit command metadata themselves; a changed intention needs a new CID.
+
+Creation, schedule changes, and notification delivery have different pending states. A mutation result with `status:"queued"` means the local command awaits a service outcome. Show that request through `timers.pending()` and its `timer_queue`/`timer_result` updates. `status:"accepted"` supplies the original receipt in `value`; refresh `timers.list()` for the current schedule. It may have advanced since that command was accepted. `status:"rejected"` calls for an explanation and a deliberate next action, not another click that silently recreates the same intention.
+
+When a due timer runs, core commits its occurrence and notification intent durably, then attempts push separately with bounded retries. `timers.history()` exposes delivery states including pending, sending, sent, failed, cancelled, and unavailable. A sent receipt reflects provider acceptance, and a retry can repeat an uncertain delivery. None of these states resolves the underlying notice or demonstrates a human response.
 
 Choose whether a missed schedule should run late, be skipped, or be summarized according to the supported operation. A local calendar date differs from an absolute instant; specify timezone and daylight-saving behavior when the person's intent is calendar-based. Rescheduling should create a reviewable change to timing and cancel obsolete intent through the actual supported mechanism. An already accepted provider request may still appear after cancellation.
+
+## Make snooze and cancellation dependable
+
+For a one-shot reminder, a snooze can change its `due_at` and keep the same timer identity. Read its current revision, show the proposed return time, and submit `timers.update(id, changes, {expected_revision})` using the revision the person reviewed. Cancellation changes `state` to `cancelled`; removal uses `timers.remove(id, {expected_revision})`. Revisions advance on both edits and alarm transitions, so a stale snooze cannot silently overwrite a reminder that ran or was changed on another device.
+
+On `timer_conflict`, keep the person's requested snooze visible beside the refreshed schedule. Explain the difference and request a new decision before sending a new command. Do not refresh the revision automatically inside a retry. If `timer.write` is bound to a task scope, preserve its captured `scope`/`expected_generations` as well. Core checks the revision, generations, timer change, cancellation of outstanding notification intents, and receipt in one transaction; a rejected command leaves the existing reminder intact.
+
+Make a recurring snooze's meaning explicit. Supplying a new next time to a calendar repeat leaves its clock rule to choose later runs; supplying it to an interval repeat shifts the interval anchor. If the person meant only to hide a local notice, use local presentation state instead of changing the schedule.
+
+An offline Stop can silence local sound immediately while a server cancellation remains queued. Label both outcomes: “Muted here; reminder cancellation awaiting service.” Even after an accepted cancellation, an in-flight provider request may still display. Open current authorized task state from that notice and explain its obsolescence. Do not equate removing a timer with recalling a notification or deleting the unresolved task.
 
 ## Give people effective control
 
@@ -77,9 +91,13 @@ Use concise status text, keyboard-accessible actions, and a calm announcement po
 | A condition remains active through cooldown. | The page explains suppression and whether further action is pending. |
 | Push is unavailable, denied, or unsubscribed. | The task remains visible; the UI does not claim notifications are enabled. |
 | The host is absent or the page is suspended. | Local cues, agent delivery, and durable work are reported separately. |
+| Reminder creation is accepted but its reply is lost. | The original CID is retried, one timer exists, and the restored queue clears when its receipt arrives. |
+| Two devices snooze the same reviewed revision differently. | One change wins; `timer_conflict` leaves the other proposal reviewable without cancelling the winner's notification intent. |
+| An alarm fires before an open snooze form is submitted. | The timer's new revision prevents an unnoticed overwrite of its advanced schedule. |
+| A delayed accepted receipt names a now-cancelled reminder. | The refreshed list controls current status; the old receipt does not re-enable its cue. |
 | A notification is delivered twice or after cancellation. | Stable occurrence identity prevents duplicate work and current state explains the obsolete notice. |
 | A user dismisses on one device. | The configured local/shared acknowledgement policy is visible and does not imply completion. |
 | The clock or timezone changes. | Absolute occurrences and calendar intent follow the declared policy without accidental double firing. |
-| Stop is pressed offline. | Local sound/speech and restarting loops cease immediately under application control. |
+| Stop is pressed offline. | Local sound/speech stops immediately; queued remote cancellation remains visible until accepted or rejected. |
 
 These are proposed adaptation checks. Actual closed-page push and host-resume claims require testing the deployed service and target devices, not only a browser fixture.

@@ -7,8 +7,8 @@ tags: ["routines", "scheduling", "progress"]
 choices: ["Calendar-based occurrences or elapsed intervals", "Observed, skipped, unknown, and corrected outcomes", "Optional reminders with honest delivery state"]
 capabilities: []
 evidence: "explained"
-related: ["guide-explicit-checkpoints", "choose-interruptions", "resume-across-sessions", "localize-an-interaction"]
-sources: ["https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md"]
+related: ["guide-explicit-checkpoints", "choose-interruptions", "plan-time-and-deadlines", "resume-across-sessions", "localize-an-interaction"]
+sources: ["https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/contract/v3.json", "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md"]
 ---
 
 # Track routines without misleading progress
@@ -59,15 +59,43 @@ When two devices edit the same occurrence, choose a revision or conflict policy.
 
 Offer reminders after the routine itself is useful. Explain the chosen time, device/audience, quiet behavior, and how to pause or stop. A reminder is an invitation to act, not evidence that action occurred. Keep notification text discreet where it might appear on a locked screen.
 
-Tendriller's reviewed [public schema](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json) distinguishes interval repeats from local clock-time repeats and exposes time zone and missed-run policy. Inspect the deployed contract and actual next occurrence before promising a schedule. An application field containing a date does not create a service timer by itself. More elaborate recurrence rules may require application scheduling or a deliberately selected external scheduler.
+Tendriller's [public timer contract](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) distinguishes interval repeats from local clock-time repeats and exposes time zone and missed-run policy. Inspect the actual next occurrence and page lifetime before promising a schedule. The owner must claim the page. An application field containing a date does not create a service timer by itself; more elaborate recurrence rules need an explicit additional scheduling policy.
 
-The [durability contract](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md) persists timer occurrences and bounded notification intents, while delivery remains at least once. Use stable run identity when processing repeated notices; do not credit a duplicate notification as another completed routine. Provider acceptance is not a human read receipt or a device-display guarantee.
+Use the [browser timer API](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/BROWSER_API.md#durable-timers) once for each reviewed reminder choice. For example, with an initialized public `runtime`, this asks for a weekday equipment-check reminder in the site's zone:
+
+```js
+const result = await runtime.timers.create({
+  title: "Review the equipment checklist",
+  timezone: "Europe/Berlin",
+  repeat: { at: "18:00", days: [1, 2, 3, 4, 5] },
+  missed: "skip",
+  notify: true,
+});
+```
+
+The runtime creates and persists the CID and retries the exact command after a lost reply. Calling `create` again is a new intention, so do not use repeated calls as a retry loop. A `queued` result means “Routine saved; reminder request awaiting service.” Restore that pending view with `timers.pending()` and follow `timer_queue`/`timer_result`. An `accepted` result supplies the original timer receipt in `value`; keep its ID with the routine's reminder setting. A `rejected` result needs an actionable explanation. Routine persistence and reminder scheduling are separate outcomes.
+
+Read `timers.list()` for current timer revisions and next occurrences, and `timers.history()` for runs. An accepted creation receipt may arrive after the timer already fired or was removed; it should not restore an obsolete scheduled indicator. When a scope binds `timer.write`, retain the reviewed `scope` and `expected_generations` in the timer operation's context. Agent/HTTP callers supply their stable CID and guards explicitly and retry the unchanged command.
+
+The [durability contract](https://github.com/werg/tendriller/blob/feat/core-cookbook-dx/docs/DURABILITY.md) persists timer occurrences and bounded notification intents, while delivery remains at least once. Use stable run identity when processing repeated notices; do not credit a duplicate notification as another completed routine. Provider acceptance is not a human read receipt or a device-display guarantee.
 
 For push, verify service readiness and have each eligible owner device opt in through the [public notification flow](https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md). Keep agent credentials private. Do not make foreground browser timers carry a promise that must survive a closed tab. Show unavailable, failed, or cancelled delivery separately from the routine's task state.
 
 ## Handle exceptions and changes humanely
 
-Let the person pause a routine, skip a day, reduce a target, or retire it without erasing useful history. A pause should explain whether future occurrences and reminders are suspended and when they resume. Editing a timer cancels its outstanding notification intents under the public contract, but cannot recall a provider request already accepted.
+Let the person pause a routine, skip a day, reduce a target, or retire it without erasing useful history. A routine's definition revision and its timer's revision describe different records. Use the timer revision that the person reviewed when changing a reminder:
+
+```js
+const result = await runtime.timers.update(
+  reviewedTimer.id,
+  { state: "cancelled" },
+  { expected_revision: reviewedTimer.revision },
+);
+```
+
+The same guard is required by `timers.remove(id, {expected_revision})` when retiring a reminder. Alarm advancement also increments timer revisions. If another device edits the schedule or an alarm fires first, `timer_conflict` leaves the current timer unchanged. Refresh the schedule, retain the proposed pause or revision, and ask the person to review what should happen next. Do not overwrite the new revision automatically or treat a conflict as a completed routine.
+
+A pause should explain which future expectations stop and when they resume. If the routine is paused locally while its timer cancellation is queued, show both states and keep local mute available. Only an accepted timer edit cancels its outstanding notification intents; an already accepted provider request cannot be recalled. Cancellation and deletion leave useful occurrence history within its normal retention bounds, and neither erases recorded completion observations.
 
 If a missed-run policy emits one catch-up notification, that does not mean all missed occurrences happened. Offer a compact review of unknowns instead of an automatic burst of overdue alerts. When travelling, changing a time zone, or crossing a daylight-saving boundary, show the next planned times and choose how existing occurrence identities are retained. A date correction is deliberate new work, not a retry silently moved into today's window.
 
@@ -79,4 +107,15 @@ Offer a reflection prompt that helps adjust the routine: whether the time, size,
 
 ## Acceptance scenarios
 
-Test midnight boundaries, travel/time-zone change, daylight-saving transitions, late logging, paused periods, and schedule edits. Verify which occurrence each observation addresses. Repeat a queued completion and conflicting two-device edits: no duplicate credit or lost correction should appear. Deny push, cancel a reminder during delivery, and close the page: status must distinguish persisted schedule, provider outcome, and unknown human action. Test keyboard use, clear date labels, and a week with no observations. These are proposed checks, and no activity metric in this guide establishes a health or learning outcome.
+| Scenario | Expected observation |
+| --- | --- |
+| Midnight, travel, or a daylight-saving transition changes the displayed day. | The declared occurrence and day-boundary policy determines credit; reminder formatting does not move an observation silently. |
+| Reminder creation commits but its reply is lost before a reload. | The restored command retains its CID and guards, yields one timer, and leaves completion counts unchanged. |
+| Two devices change the same reminder revision. | One change wins; the rejected proposal remains reviewable and does not cancel the winner's notification intents. |
+| A reminder runs while its pause form is open. | The alarm's newer revision rejects an obsolete cancellation; a fresh review decides whether to cancel the current schedule. |
+| Pause is requested offline, or a provider accepts a push before cancellation. | Local mute works; pending server cancellation and possible late notification remain clear; the task is not marked done. |
+| A delayed accepted receipt arrives after removal. | Current `timers.list()` status stays authoritative; the routine does not show its old reminder as active. |
+| A completion is replayed, corrected, or changed from Done to Skip on another device. | The observation's own identity and conflict policy prevent duplicate credit or an unexplained lost correction. |
+| No observations exist for the review period. | The summary says unknown or unreported, with an honest denominator and accessible date labels. |
+
+Also test keyboard completion, late logging, paused intervals, and unavailable push. These remain proposed adaptation checks under explained evidence; no activity metric in this guide establishes a health or learning outcome.

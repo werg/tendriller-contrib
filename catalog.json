@@ -245,7 +245,9 @@
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
         "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts",
-        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md"
+        "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/DURABILITY.md"
       ],
       "path": "cookbooks/choose-interruptions/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-interruptions/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
@@ -1060,10 +1062,10 @@
         "review-exact-proposal"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/DURABILITY.md",
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md",
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json"
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/contract/v3.json"
       ],
       "path": "cookbooks/plan-time-and-deadlines/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/plan-time-and-deadlines/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
@@ -1513,12 +1515,14 @@
       "related": [
         "guide-explicit-checkpoints",
         "choose-interruptions",
+        "plan-time-and-deadlines",
         "resume-across-sessions",
         "localize-an-interaction"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/contract/v3.json",
-        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/contract/v3.json",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/a9f310442e143258339781813bbd60adbbf7fd38/docs/EXPERIENCES.md",
         "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PUSH_NOTIFICATIONS.md"
       ],
       "path": "cookbooks/track-habits-and-routines/COOKBOOK.md",
