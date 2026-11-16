@@ -31,6 +31,8 @@ Assignments and feedback can be as sensitive as answers. A participant should re
 
 The default core installs no application workflow. This cookbook's [private-response reference](snippets/private-responses.mjs) is deliberately selected and adapted through the public trusted host. Reading this guide never activates it. Review its operation names, identities, record projection, limits, and generation policy for the actual task before deployment.
 
+The shipped reference accepts text only. It rejects media-bearing records because ordinary page blob access is not a participant-private media boundary. Private media requires a separately reviewed storage and authorization implementation before enabling that branch. The text-only archive/reset checks do not establish private-media retention.
+
 Keep application vocabulary and record shapes in the selected extension. The host supplies authenticated identity, transactional mutation, concurrency protection, private storage, retained media references, and post-commit behavior. Do not write raw answers into shared state and rely on the UI to filter them. Browser fixtures cannot validate these guarantees.
 
 **Platform invariants:** retries retain the original command and generation; stale work is rejected; authorized operations and private reads are checked on the server. **Conditional requirements:** if archive/reset is offered, the archive, media retention, active-state reset, and generation change must commit together or not at all. **Example choices:** prompt names, assignment structure, grouping, facilitator layout, and aggregation algorithms belong to this application.
