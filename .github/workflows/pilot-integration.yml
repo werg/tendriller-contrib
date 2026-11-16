@@ -20,13 +20,16 @@ on:
         type: string
 permissions:
   contents: read
+concurrency:
+  group: cookbook-pilots-${{ github.head_ref || github.ref_name }}-${{ inputs.core_ref || 'pinned' }}
+  cancel-in-progress: true
 jobs:
   pilots:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       # A one-way test pairing, not a prose/release compatibility requirement.
-      CORE_CHECK_REF: ${{ inputs.core_ref || 'dc4997e2d728d790ede4d893613342fd51f80898' }}
+      CORE_CHECK_REF: ${{ inputs.core_ref || 'd59b9864510bd32c7f0ac7f76b5e537b96e44285' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

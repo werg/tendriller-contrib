@@ -43,7 +43,7 @@ function writeEvidence() {
   core_commit: process.env.CORE_CHECK_REF || null, tool_package: pkg.name, tool_version: pkg.version,
   runtime: pkg.tendriller.runtime, preview_bundle_sha256: hash(resolve(toolRoot, pkg.exports['./preview'])),
   browser: browserVersion, scenarios: results,
-  limits: ['Preview fixtures do not establish service authorization or transactions.', 'No live camera, microphone, instrument, or production deployment was exercised.', 'Private policy authority is covered by the separate public-engine host checks.'],
+  limits: ['Preview fixtures do not establish service authorization or transactions.', 'No live camera, microphone, instrument, or production deployment was exercised.', 'Private policy authority is covered by the separate public-engine host checks.', 'Service workers are blocked in these browser scenarios for deterministic HTTP interception; offline publication is checked separately in core.'],
  };
  writeFileSync(output, JSON.stringify(evidence, null, 2) + '\n');
 }
