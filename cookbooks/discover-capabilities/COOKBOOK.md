@@ -27,6 +27,18 @@ Keep capability checks separate from permission requests and active resource han
 
 Select alternatives by outcome. If taking a photo fails, file upload may still provide evidence. If a sensor cannot measure progress, a manual checkpoint may finish the task. Do not disable the whole application because an optional input is absent.
 
+## Keep observations current across interruptions
+
+A permission query is asynchronous. An older query can finish after a newer
+result, an identity change, or a cached-page restoration. Tag refreshes with a
+generation and discard responses from superseded generations. Detach listeners
+while the page is suspended, then reattach and request a fresh no-prompt report
+on a persisted `pageshow`; a restored JavaScript realm does not rerun startup.
+Keep the page's active-use indicator and Stop affordance synchronized with the
+actual tracked resources, rather than a remembered permission or requested state.
+Reobserving must never restart a camera, microphone, geolocation watch, or lock
+without the person's chosen active-task behavior.
+
 ## Check
 
 Exercise absent API, denied permission, cancelled chooser, no physical device, unsupported data format, interrupted resource, and successful start/stop. Verify the initial page load requests no optional permission. Test a keyboard-only route through fallback and recovery. Record observed device/browser conditions where claiming exercised behavior; do not promote method existence into broad support.
