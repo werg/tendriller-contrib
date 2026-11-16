@@ -493,6 +493,36 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/discover-capabilities/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish API presence from usable permission and offer a task-completing alternative before requesting access. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "export-and-restore-work",
+      "title": "Export, inspect, and restore portable work",
+      "summary": "Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.",
+      "group": "Keep work dependable",
+      "tags": [
+        "export",
+        "restore",
+        "provenance"
+      ],
+      "choices": [
+        "Readable report versus restorable data versus portable page",
+        "Complete evidence versus explicitly bounded export",
+        "New copy versus guarded restore into existing work"
+      ],
+      "related": [
+        "import-for-review",
+        "publish-coherent-updates",
+        "choose-data-model"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/tools/CLI.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/export-and-restore-work/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/export-and-restore-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "follow-location-progress",
       "title": "Follow location changes and route progress",
       "summary": "Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops.",
@@ -691,6 +721,35 @@
       ],
       "path": "cookbooks/keep-task-active/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/keep-task-active/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose foreground wake lock and interruption behavior without promising background execution. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "manage-sensitive-data",
+      "title": "Give people control over sensitive information",
+      "summary": "Minimize collection, keep private and shared representations distinct, and make redaction, export, retention, and deletion reflect actual authority.",
+      "group": "Keep work dependable",
+      "tags": [
+        "privacy",
+        "retention",
+        "redaction"
+      ],
+      "choices": [
+        "Minimum necessary data and reader boundaries",
+        "Original evidence versus reviewed redacted derivatives",
+        "Local removal versus reference removal versus actual retention"
+      ],
+      "related": [
+        "collect-private-responses",
+        "separate-evidence-interpretation",
+        "choose-data-model"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/manage-sensitive-data/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/manage-sensitive-data/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Minimize collection, keep private and shared representations distinct, and make redaction, export, retention, and deletion reflect actual authority. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "notice-visual-changes",
@@ -1112,6 +1171,35 @@
       ],
       "path": "cookbooks/turn-records-into-signals/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/turn-records-into-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Project fields, preserve units, and bound flattening without silently changing the meaning of a source record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "work-offline-and-reconnect",
+      "title": "Keep a task useful offline and reconnect deliberately",
+      "summary": "Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.",
+      "group": "Keep work dependable",
+      "tags": [
+        "offline",
+        "drafts",
+        "recovery"
+      ],
+      "choices": [
+        "Saved publication versus unsaved optional capabilities",
+        "Local work versus accepted server outcomes",
+        "Original retries versus reviewed reconciliation"
+      ],
+      "related": [
+        "recover-outdated-work",
+        "publish-coherent-updates",
+        "resume-across-sessions"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "path": "cookbooks/work-offline-and-reconnect/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/work-offline-and-reconnect/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     }
   ]
 }

@@ -132,6 +132,14 @@
       ]
     },
     {
+      "id": "export-and-restore-work",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/tools/CLI.md"
+      ]
+    },
+    {
       "id": "follow-location-progress",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
@@ -177,6 +185,13 @@
       "id": "keep-task-active",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/wakelock.js"
+      ]
+    },
+    {
+      "id": "manage-sensitive-data",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md"
       ]
     },
     {
@@ -287,6 +302,13 @@
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-sources/records.mjs"
+      ]
+    },
+    {
+      "id": "work-offline-and-reconnect",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/PROTOCOL.md"
       ]
     }
   ]

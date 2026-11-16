@@ -69,13 +69,16 @@ byte equality.
 - [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
 - [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.
+- [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
 - [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.
+- [Give people control over sensitive information](cookbooks/manage-sensitive-data/COOKBOOK.md) — Minimize collection, keep private and shared representations distinct, and make redaction, export, retention, and deletion reflect actual authority.
 - [Publish coherent page updates](cookbooks/publish-coherent-updates/COOKBOOK.md) — Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
+- [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 
 ### Make sense of information
 
