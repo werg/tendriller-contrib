@@ -55,6 +55,8 @@ Choose the visible raw-data budget, server retention, and local checkpoint budge
 
 For a sample-weighted EMA, `s = alpha × y + (1 − alpha) × previous`. A larger alpha reacts faster. Fixed alpha weights samples rather than elapsed time. With irregular intervals, `alpha = 1 − exp(−deltaTime / tau)` can represent a time-decay model. Neither formula decides what a gap means. Choose whether a missing segment resets smoothing. Perform smoothing in original units before a logarithmic display unless a different scientific model is justified.
 
+For that time-decay model, require finite `tau > 0` and finite `deltaTime >= 0` in the same time units. Stream sequence order does not guarantee increasing source timestamps: choose a bounded reordering policy, exclude late points from the forward smoother while preserving their raw observations, or start a new segment after a source-clock reset. Do not feed a negative elapsed time into the formula; it produces a negative weight. At `tau = 2 seconds`, a zero interval gives weight `0` and a two-second interval gives approximately `0.632`. Define duplicate-time behavior explicitly because a zero weight leaves the smoothed value unchanged. These are proposed time-aware semantics; the linked numerical specimen exercises the separately described fixed-alpha model.
+
 The extracted chart seeded EMA at the oldest retained observation, restarted at gaps and nonpositive log values, and recomputed the bounded window after eviction. Earlier displayed averages could therefore change. Those are example semantics, not requirements on every adaptation. The [small numerical specimen](snippets/measurements.mjs) makes these decisions inspectable.
 
 ## Adapt the plan
@@ -79,6 +81,7 @@ Both must process the same admitted records, separate runs, retain raw values, a
 
 - Replay a burst larger than the paint budget. Every admitted record changes the model even if only one paint occurs.
 - Give two runs the same metric name. They remain separate, including after reload.
+- For a time-aware adaptation, supply a late timestamp, a source-clock reset, and a duplicate timestamp. The declared ordering/segment policy applies, invalid elapsed times never enter the formula, and raw observations remain distinguishable from smoothing results.
 - Select an x absent from one series. Show a missing value; do not silently choose a nearby sample.
 - Feed zero, negative, null, and nonnumeric values to a log view. Raw values remain inspectable and invalid segments remain gaps.
 - Evict old observations. Export and summaries say which samples are retained; smoothing follows the stated seed policy.
