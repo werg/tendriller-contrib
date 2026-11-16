@@ -29,7 +29,7 @@
     },
     {
       "role": "display",
-      "click": "details:has(#handsfree) > summary",
+      "click": "details:has(#screen) > summary",
       "expect_text": "This is a display. Use your controller device to change steps."
     }
   ],

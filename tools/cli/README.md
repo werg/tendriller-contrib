@@ -4,13 +4,15 @@ Reference CLI for the Tendriller agent API, using Node ≥ 22.15. API commands u
 runtime and optional local Playwright. The HTTPS API is also described in `/agent.md`.
 
 `npm run build` produces a dependency-free tool archive and standalone helper scripts.
-The archive embeds the exact public core runtime and contrib resources. `npm run
+A standalone `tendril.mjs` CLI also ships in the release for creating and publishing pages without the large tools archive. It embeds the resources needed for `assets sync`. The archive embeds the exact public core runtime and contrib resources. `npm run
 test:distribution` unpacks it in an empty directory and verifies this boundary.
-For headless scenarios, install Playwright locally and its Chromium browser.
+For headless scenarios, install Playwright locally and its Chromium browser:
+`npm install --no-save playwright && npx playwright install chromium`.
+Normal local previews do not require a browser automation package.
 
 ```sh
 node tools/cli/bin/tendril.mjs --help
-export TENDRIL_SERVER=http://localhost:8787          # default
+export TENDRIL_SERVER=https://tendriller.dev         # default; use http://localhost:8787 for local development
 node tools/cli/bin/tendril.mjs new Kitchen --owner you@example.com
 # Attach and verify a host listener using /agent.md before publishing.
 node tools/cli/bin/tendril.mjs --tendril kitchen push ./kitchen
@@ -40,6 +42,7 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
   These raw reading commands advance their cursor when they read, before an
   application handles the output. They do not acknowledge successful processing.
   These reads still update the service's read position; avoid competing readers of a live bridge.
+- **assets sync**: `tendril assets sync ./page` resolves `tendril.json` into the complete component/workflow closure, including lazy siblings. Hand-edited files require explicit `--force`. `push` runs the same safe sync before packing a declared directory, preventing missing-component 404s. Review forced replacements.
 - **push** uploads a directory as one atomic version (`POST /files`, `replace: true`),
   skipping dotfiles and `node_modules`; binary files go as base64. A single `.html` file
   is uploaded as `index.html`. It then polls `/versions` up to `--timeout` s (20) and
@@ -75,7 +78,7 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
 
 ## Device notifications while the page is closed
 
-Deploy core `0.2.0-rc.4` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
+Deploy core `0.2.0-rc.6` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
 
 ```sh
 tendril --tendril kitchen notifications
@@ -142,7 +145,7 @@ The same implementation is available as a standalone Node 22.15+ script with no
 package installation. Keep the creation response in a private JSON file:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.2/tendril-events.mjs -o ./tendril-events.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-events.mjs -o ./tendril-events.mjs
 node ./tendril-events.mjs ./page.json pending
 # Handle the returned input, then acknowledge the successfully handled sequence.
 node ./tendril-events.mjs ./page.json ack 42
@@ -161,7 +164,7 @@ The helper does not attach a host listener or automatically rearm one.
 Download one script and serve any local page directory:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.2/tendril-preview.mjs -o ./tendril-preview.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-preview.mjs -o ./tendril-preview.mjs
 node ./tendril-preview.mjs ./my-page --fixture ./scenario.json
 ```
 
@@ -194,7 +197,7 @@ No live account, producer credential, collector or agent is created.
 Use the installed `tendril-stream` command or download its standalone Node helper:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.2/tendril-stream.mjs -o ./tendril-stream.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-stream.mjs -o ./tendril-stream.mjs
 node ./tendril-stream.mjs init --page ./page.json --streams ./streams.json --out ./private/collector.json
 node ./tendril-stream.mjs ./private/collector.json
 ```
