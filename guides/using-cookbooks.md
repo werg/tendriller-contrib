@@ -19,6 +19,8 @@ does not require reading or installing every linked approach.
    constants, markup, state paths, and layouts as choices to reconsider.
 5. Implement page-owned source through the current public core contract. Install a
    trusted extension only deliberately, after reviewing its authority and policy.
+   If a general correctness or developer-experience gap blocks the design, improve
+   core and its public API, then revise the recipe to use that guarantee.
 6. Exercise the selected failure cases and actual platform guarantees. Distinguish
    fixture/browser evidence from service authorization and transaction evidence.
 7. Preserve useful provenance, assumptions, and material deviations for future work.
@@ -34,6 +36,11 @@ Do not load the entire collection into an agent context, install a component gra
 or activate a named workflow just because a guide links to it. A copied snippet is
 source you own and adapt. Exact publication identity covers the final files; it does
 not lock editable source to the cookbook's bytes.
+
+The platform is unreleased and its architecture can change. Use a cookbook to
+identify useful guarantees, not to justify recurring application workarounds.
+See [the core improvement guidance](contributing.md#improve-core-when-a-cookbook-exposes-a-platform-gap)
+for coordinating a platform fix with its examples and verification.
 
 Start with [the smallest useful page](../cookbooks/publish-smallest-page/COOKBOOK.md)
 and [choosing a data model](../cookbooks/choose-data-model/COOKBOOK.md). Use the

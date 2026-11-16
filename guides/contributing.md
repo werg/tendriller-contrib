@@ -59,6 +59,28 @@ and the observable result. Proposed scenarios remain a plan until exercised and
 recorded under the evidence guidance. A fuller guide need not add executable code,
 prescribe a screen layout, or claim features that core does not supply.
 
+## Improve core when a cookbook exposes a platform gap
+
+Treat difficult adaptations as feedback on Tendriller itself. If several tasks
+need the same durable command queue, atomic state check, cancellation boundary,
+or recovery guarantee, implement the general primitive in `werg/tendriller` and
+update the recipes to use it. Do not preserve the current unreleased architecture
+by teaching every page to repair the same limitation.
+
+Separate that primitive from domain policy. Core can make a conditional state
+change atomic; the application still decides which transition is appropriate,
+and its trusted boundary enforces any additional authorization. Core can retain
+one timer command across retries; the task still decides when a reminder helps.
+When the distinction is unclear, use the concrete user journey and failure case
+to choose the smallest coherent abstraction, including a revised existing API.
+
+Coordinate the core and contrib changes through linked pull requests. Verify the
+contract, all affected callers, and the actual authority boundary before citing
+the new guarantee. Pin explanatory references to the tested core commit and keep
+the cookbook's evidence label scoped to the adaptation actually exercised. Real
+browser or external-service limits should remain explicit; they are different
+from platform gaps we can fix.
+
 ## Review and maintain
 
 Compare the new decision with existing guides and consolidate repeated reasoning.

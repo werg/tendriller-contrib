@@ -49,9 +49,11 @@ A page-owned state model might distinguish `unknown`, `available-to-try`, `reque
 | Interrupted | Preserve any candidate and offer restart or an equivalent fallback. |
 | Unavailable here | Explain the limitation and keep a task-completing route prominent. |
 
-Keep active resource handles separate from this UI state. A remembered permission or requested state must never drive the active indicator. Observe actual tracks, watches, connections, and engine state; a resource can end after successful startup. Stop and release owned resources on cancellation, route exit, and the selected inactive-page policy. The runtime's sensor reporting is best effort, so authored adapters must also own their cleanup.
+Keep active resource handles separate from this UI state. A remembered permission or requested state must never drive the active indicator. Observe actual tracks, watches, connections, and engine state; a resource can end after successful startup. Stop and release owned resources on cancellation, route exit, and the selected inactive-page policy.
 
-An application-level Cancel invalidates the attempt; it does not necessarily dismiss a browser-owned permission prompt or chooser. Avoid creating a duplicate request while the first is unresolved. If an abandoned request later succeeds, immediately stop its tracks or release its acquired device resources before ignoring the result. Merely suppressing the callback's UI update can leave a resource active.
+For a page-wide **Stop sensors** action, use core's [sensor cancellation boundary](https://github.com/werg/tendriller/blob/340efda5bc2d74b53b94826039ac89921f493a3f/docs/BROWSER_API.md): `tendril.sensors.stopAll()` stops tracked resources and immediately rejects pending wrapped camera/microphone/screen requests with `AbortError`. A browser-owned permission chooser may remain open; core stops any stream it grants afterward, including known captured track and stream clones. A later deliberate acquisition is a new attempt. The active report describes observed use, not a pending permission prompt.
+
+Keep a task's draft identity and cancellation UI in the application, but do not rebuild that global acquisition-race protection in every page. Handle the aborted promise as a cancelled attempt without losing the draft. Stop all sensors only when that is the intended scope: cancelling one of several independent inputs should release that input's owned resources. Optional adapters and resources created outside the tracked browser APIs still need their own cleanup; instrumentation is not a security boundary or a way to dismiss native browser UI.
 
 ## Keep observations current across interruptions
 
