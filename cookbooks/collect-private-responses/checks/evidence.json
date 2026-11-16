@@ -1,8 +1,8 @@
 {
   "evidence": "exercised",
-  "date": "2026-11-16T12:06:49.382Z",
+  "date": "2026-11-16T12:14:18.095Z",
   "host": "real built Worker",
-  "source_commit": "9cae769c7492bcb9d7268d4e643d46dc2691f082",
+  "source_commit": "f76913b3db44569b601529fc62ef2ca2eb57de60",
   "core_commit": "c0aaaecbd01eaaced3aab10706f359125a437a26",
   "sdk_sha256": "b09cc055e3d4756490acb3b11a92c4258625357e254986f5479d9f30d6c5defd",
   "engine_sha256": "bde99a9c20bd28c18ab3643dcdbe1b64b9fe1cc86bb99f87ec5cdc7fa6822753",
@@ -27,14 +27,14 @@
     "Synthetic identities bypass production OAuth setup.",
     "External effect deduplication remains the caller's responsibility."
   ],
-  "source_head_commit": "0ea40ad8cd18d1032ab6db68e42d907f224430fa",
-  "source_tree": "a7da7d9f5765b29ee32e641cd9e255a4ee53e7cf",
+  "source_head_commit": "38ff221447431822f248db3134be5deb3c5bf2a5",
+  "source_tree": "3d7225c0c20b0aea454f2f769a0b3eef24b99950",
   "ci": {
-    "run_id": 43863478301,
-    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43863478301",
-    "artifact_id": 14224985107,
-    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43863478301/artifacts/14224985107",
-    "artifact_sha256": "079705fb629bc2584b2d2ae0e6218726432fcf4c33461cec01dc43f8b3c1d649"
+    "run_id": 43864588134,
+    "url": "https://github.com/werg/tendriller-contrib/actions/runs/43864588134",
+    "artifact_id": 14223859744,
+    "artifact_url": "https://github.com/werg/tendriller-contrib/actions/runs/43864588134/artifacts/14223859744",
+    "artifact_sha256": "86d7e0df0c6d9d68fe9a25708102d30f2924957a8fd946cf1a1ecf0b125a9bd2"
   },
   "command": "node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts .core-build/dist"
 }
