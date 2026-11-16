@@ -248,8 +248,9 @@ disconnected receiver cannot promise immediate knowledge of revocations elsewher
 
 Keep the page host out of the warm data path: peer pages have no implicit hosted
 application socket, event stream or health poll. The browser owns its RTC
-connection; an exclusive replica Worker can exchange bounded frames through a
-MessagePort. A warm session continues while introduction services are unavailable.
+connection; its synchronous channel callback transfers the untouched data
+channel to the exclusive replica Worker for framing and authentication. A warm
+session continues while introduction services are unavailable.
 Cold page loads, new introductions and participant administration retain their
 declared service dependencies.
 

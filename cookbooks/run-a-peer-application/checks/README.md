@@ -50,9 +50,11 @@ an application that chooses the recipe consume the same built program module.
    evidence. Every replica derives the same chronological execution order. A preexisting cold
    bootstrap can still use hosting services. Use one bounded Tendriller
    rendezvous offer/answer, then close introduction resources and authenticate the
-   Chronolog peer over the data channel. Keep the exclusive replica Worker
-   independent from the page-owned RTC connection through the public bounded
-   MessagePort bridge where needed.
+   Chronolog peer over the data channel. The page owns RTC negotiation and
+   synchronously transfers the untouched data channel to the exclusive replica
+   Worker, which owns framing, authentication and durable replication. The
+   [public composition recipe](../snippets/introduce-peer-worker.mjs) keeps this
+   small handoff separate from membership and application ownership.
 5. Export `signals`, either an authorized public `EphemeralChannel` instance or
    `null`. Grant/session/sequence/expiry validation belongs to that channel.
 

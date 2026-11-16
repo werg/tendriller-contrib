@@ -58,11 +58,65 @@ peer protocol. Durable history and ephemeral signals retain their existing
 protocol domains and authorization. RTC transport configuration cannot choose a
 new signer, rewrite a proposal or change finality.
 
-A browser page owns its `RTCPeerConnection`. An exclusive OPFS Worker can retain
-the replica and signing identity while a bounded `MessagePort` bridge carries
-frames to that page connection. Closing the page or replacing the Worker must
-close the bridge, pending sends and owned data channel. Opening another tab does
-not create a second writer for the same local durable store.
+A browser page owns its `RTCPeerConnection` and introduction. The synchronous
+`negotiateWebRtc` data-channel callback transfers the untouched `RTCDataChannel`
+to the exclusive OPFS Worker before it loses transferability. That Worker owns
+the framed channel, authenticated peer link, replica and signing identity. This
+requires a browser implementing transferable RTC data channels; unsupported
+transfer must fail visibly. Closing the page or replacing the Worker must close
+the connection and pending sends. Opening another tab does not create a second
+writer for the same local durable store.
+
+## Compose the public APIs
+
+The page-owned [introduction recipe](../snippets/introduce-peer-worker.mjs) is a
+small public composition. Bundle it with `@chronolog/transport-webrtc` and the
+actual deployment assets. It accepts the selected runtime's public `peers`
+client, waits for its assigned role and gives signaling to `negotiateWebRtc`.
+It closes the rendezvous if pairing fails before negotiation begins. It adds
+no reconnect loop, durable queue or application identity.
+
+After opening the exclusive replica Worker, a deployment can use:
+
+```js
+import { introducePeerWorker } from './introduce-peer-worker.mjs';
+
+const connectionLifetime = new AbortController();
+const session = await introducePeerWorker({
+  peers: tendril.peers,
+  channel: groupConnectionChannel,
+  configuration: rtcConfiguration,
+  signal: connectionLifetime.signal,
+  handoff(channel) {
+    replicaWorker.postMessage({ type: 'peer-channel', channel }, [channel]);
+  },
+});
+
+// End this lifetime before replacing the replica Worker or leaving the page.
+// connectionLifetime.abort();
+// await session.close();
+```
+
+The message shape is chosen by the deployment. Transfer inside `handoff`
+synchronously, without awaiting, attaching a listener or wrapping the channel
+first. An asynchronous callback cannot safely transfer it later. The default
+endpoint ID is fresh for this attempt and is unrelated to the durable signing
+identity. Both endpoints must use the intended same introduction channel.
+
+In the receiving Worker, use public `frameRtcDataChannel(channel)` from
+`@chronolog/transport-webrtc`. Feed that framed connection to
+`openAuthenticatedPeerLink` from `@chronolog/agent-service/peer-link`, then attach
+the authenticated link to the replica's portable transport. Use the persisted
+signing identity and active reader grant, and verify the remote identity against
+the current membership snapshot. Neither the recipe nor the rendezvous grants
+access. Install `createChronologApplicationBackend` through the same selected
+`tendril.application` interface after the actual replica is ready.
+
+For a native peer, `openWebRtcConnection` uses the same signaling interface with
+`createPeerConnection: configuration => createNativePeerConnection(configuration)`.
+Import the factory from `@chronolog/transport-webrtc/native`; keep that native
+entrypoint out of browser bundles. The native peer's authenticated protocol and
+resident services consume the same framed connection and signed history.
 
 ## Keep an established session independent
 
@@ -108,7 +162,8 @@ sent/received body bytes, not only the hosted application write endpoint.
    and verify that no host retry loop was started.
 4. **Peer interruption.** Preserve the prepared outbox while reconnecting through
    a new introduction. Compare original operations and complete authenticated
-   histories after catch-up. Bound queued frames during slow readers and refusal.
+   histories after catch-up. Bound queued frames during slow readers and refusal,
+   and close the transferred channel when its owning Worker is replaced.
 5. **Participant update.** Restore the administration service and exercise an
    explicit approval or revoke/rotate operation. Attribute its descriptor,
    control and key-wrap traffic to this phase instead of the warm application

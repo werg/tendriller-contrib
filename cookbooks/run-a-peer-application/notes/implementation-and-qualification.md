@@ -142,7 +142,7 @@ boundaries below remain unchanged.
 | Signed publish-only ingress | Chronolog wire/core | Topic grants | Original signature/operation preserved through forwarding, without history keys |
 | Selected application backend | Tendriller public contract/runtime | Small public interface | One write owner and one outbox; hosted and Chronolog implementations consume it |
 | Bounded peer introduction | Tendriller rendezvous | Authenticated participant routing | One complete SDP per side, bounded bytes, fresh session identity and host socket retirement after exchange |
-| WebRTC framed connection and Worker bridge | Chronolog transport | Browser/native RTC and portable sync | Bounded queues, receiver flow control, independent application authorization and zero further introduction traffic |
+| WebRTC framed connection and Worker ownership | Chronolog transport | Browser/native RTC and portable sync | Synchronous transfer to the exclusive Worker, bounded queues, receiver flow control, independent application authorization and zero further introduction traffic |
 | Task-board/chat application | Contrib | Built public artifacts | Shared conditional tasks, durable conversation/jobs, ephemeral typing, retained drafts |
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
 | Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained inclusion/closure evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
@@ -189,7 +189,7 @@ The following are separate assertions, not a single generic “P2P works” test
 | P2P-25 | Establish browser/native WebRTC, then retire introduction. | Actual authenticated records and detached bodies move in both directions without another signaling message. | Real browser and native RTC implementation |
 | P2P-26 | Hold membership fixed and perform warm application work. | Peer byte counters increase; all page-host request/body-byte counters and administrator work stay unchanged. | Instrumented complete page bootstrap and host |
 | P2P-27 | Stop hosting/introduction after establishing a warm session. | Original operations continue over RTC and reach the selected finality provider; no host reconnect/health loop starts. | Actual peer page, administrator and independent finality provider |
-| P2P-28 | Saturate or close the page/Worker frame bridge. | Bounded buffers, rejected pending sends and disposal of the owned connection without replacing the operation identity. | Actual RTC adapter and MessagePort lifecycle |
+| P2P-28 | Saturate or close the data channel transferred to the replica Worker. | Bounded buffers, rejected pending sends and disposal of the owned connection without replacing the operation identity. | Actual RTC adapter and transferred-channel lifecycle |
 
 ## Deployment issues that require external evidence
 
