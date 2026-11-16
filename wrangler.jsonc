@@ -1,0 +1,13 @@
+{
+  "name": "tendriller-cookbook-gallery",
+  "compatibility_date": "2026-11-16",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "cookbooks.tendriller.dev", "custom_domain": true },
+    { "pattern": "cookbooks.tendriller.dev/*", "zone_name": "tendriller.dev" }
+  ],
+  "assets": {
+    "directory": "./dist/static"
+  }
+}

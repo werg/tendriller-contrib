@@ -7,7 +7,7 @@ tags: ["privacy", "collaboration", "transactions"]
 choices: ["Public poll or authorized private records", "Revisioned answers or append-only revisions", "Reviewed aggregate and atomic round reset"]
 capabilities: ["explicit trusted extension", "private records", "transactions"]
 evidence: "exercised"
-related: ["review-exact-proposal", "choose-data-model", "coordinate-devices"]
+related: ["review-exact-proposal", "choose-data-model", "coordinate-devices", "manage-sensitive-data"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"]
 ---
 
@@ -36,6 +36,26 @@ The shipped reference accepts text only. It rejects media-bearing records becaus
 Keep application vocabulary and record shapes in the selected extension. The host supplies authenticated identity, transactional mutation, concurrency protection, private storage, retained media references, and post-commit behavior. Do not write raw answers into shared state and rely on the UI to filter them. Browser fixtures cannot validate these guarantees.
 
 **Platform invariants:** retries retain the original command and generation; stale work is rejected; authorized operations and private reads are checked on the server. **Conditional requirements:** if archive/reset is offered, the archive, media retention, active-state reset, and generation change must commit together or not at all. **Example choices:** prompt names, assignment structure, grouping, facilitator layout, and aggregation algorithms belong to this application.
+
+## Make each person's journey complete
+
+For a workshop check-in, begin with a plain explanation of who reads raw answers, what may be shared, whether answers may change, and what happens when the round closes. “Private” should name its readers; do not imply anonymity merely because the public screen omits names.
+
+The participant first sees the current authorized assignment and its prompt, then a local draft and an intentional submit action. Their receipt distinguishes queued, accepted, rejected, and superseded responses. If the facilitator changes the assignment, keep the old draft associated with its original context and ask for review. A late rejection must not erase a newer edit. Show a useful closed-round state with the disposition of pending work instead of an empty form that looks broken.
+
+The facilitator needs a different view: eligible assignments, received and missing responses, revision freshness, private review, and a separate aggregate draft. Missing is not a negative answer. A denominator should explain whether it counts invited participants, active assignments, or received answers. Before sharing, review whether a rare category, identifying quotation, or small group reveals someone indirectly. The application must decide its aggregation and quotation policy; this reference does not automatically anonymize text.
+
+The shared display opens directly onto the last intentionally published aggregate with its source revision and review time. A new private response can make that aggregate outdated without silently changing what the room sees. Show that a new review is available in the facilitator view, and publish a replacement only after the appropriate intentional action. Do not show raw-response previews on a projector while preparing the summary.
+
+Use clear keyboard-accessible forms, labels and error summaries on participants' phones. Keep a local recoverable draft where the privacy and device policy allow it, but explain that local storage on a shared device can be inappropriate. Closing a round should stop further collection under the authoritative generation without restarting sensors or deleting a participant's recoverable unsent text without explanation.
+
+## Choose extensions deliberately
+
+The shipped reference supports assignment, private text submission and revision, controller review, owner publication, and atomic archive/reset. It does not implement anonymous participation, participant deletion, private attachments, automatic moderation, blind reviewer assignment, or a general feedback inbox. These can be useful features, but require an explicit policy and verified implementation rather than merely adding controls to the specimen.
+
+For several prompts, decide whether assignments are independent or must be submitted together. For a withdrawal request, decide whether a response can be removed before publication, what happens to an already shared aggregate, and how retained archives are handled. For feedback, create an authorized recipient projection rather than reusing shared conversation targeting as privacy. Explain those decisions before collecting data.
+
+Keep facilitation convenience separate from access. A participant display name or a device purpose does not establish identity. A collaborator invited to help summarize may need a different authorized projection from an owner who can archive/reset. If the selected host cannot express that distinction, simplify the role design or deliberately implement the missing policy.
 
 ## Adapt the plan
 

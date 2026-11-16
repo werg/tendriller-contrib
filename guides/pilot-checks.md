@@ -53,12 +53,17 @@ pair contrib `1ade2ae0fb220e7ec9417536092dae0bd6eb08ed` with core
 scenario and adds the immutable-upload recovery case against the completed storage
 contract; results from the two artifact pairs are not combined.
 
-The dependency-free editorial/numerical suite also passes **10 tests**. It validates
+That source snapshot's dependency-free editorial/numerical suite also passed **10 tests**. It validated
 all 37 guide entries, generated discovery, local links, and 237 source-accounting
 decisions; five tests exercise numerical/model semantics. The separate
 [storage-source supplement](storage-source-delta.md) accounts for the initial 13-path
 storage snapshot and the complete 80-path concurrent-main reconciliation. Exported snapshot links and
 the clean source identity were checked separately.
+
+These counts and outcomes describe the recorded source pair, not every subsequent
+addition to the collection. Run the ordinary checks below to obtain the current
+guide count. Expanded user journeys and new feature choices are explained designs
+unless a separate record names the actual scenarios and artifacts exercised.
 
 ## Run the checks
 
@@ -84,8 +89,9 @@ and stable execution identity for the selected references.
 Preview fixtures exercise interaction behavior; they do not establish service privacy,
 transaction enforcement, or production byte retention. Browser scenarios block service
 workers for deterministic HTTP interception. Offline publication belongs to core's
-separate tests. The local workspace cannot launch Chromium because its required Unix
-socket is blocked, so browser execution was performed in CI.
+separate tests. The local workspace used for that recorded run could not launch
+Chromium because its required Unix socket was blocked, so browser execution was
+performed in CI.
 
 Cached-page restoration checks dispatch persisted page-transition events. They verify
 fresh authorization before restoring a draft and continued clearing after denied access;
