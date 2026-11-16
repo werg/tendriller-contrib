@@ -6,7 +6,7 @@ group: "Decide and act"
 tags: ["batch", "review", "partial-results"]
 choices: ["Exact selected snapshot versus changing query results", "Atomic transaction versus independent per-item outcomes", "Retry original item intent versus a newly reviewed batch"]
 related: ["review-exact-proposal", "recover-outdated-work", "undo-and-revise-work"]
-sources: ["https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -40,7 +40,7 @@ A dry run validates under the conditions it observed; it does not reserve author
 
 ## Choose atomic or partial semantics honestly
 
-An atomic batch means every covered mutation commits together or none does at the actual authority boundary. For shared-state changes, use core's [conditional `state.apply` operation](https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md). It checks all supplied conditions against one authoritative snapshot and applies every operation in one transaction. It also persists the command and its accepted or state-conflict receipt. A page does not need a custom transaction implementation for this guarantee.
+An atomic batch means every covered mutation commits together or none does at the actual authority boundary. For shared-state changes, use core's [conditional `state.apply` operation](https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md). It checks all supplied conditions against one authoritative snapshot and applies every operation in one transaction. It also persists the command and its accepted or state-conflict receipt. A page does not need a custom transaction implementation for this guarantee.
 
 For example, after `observed = await tendril.state.snapshot()`, freeze a bounded list of existing `selectedIds` for review. Retain each exact record from `observed.state.items`. Once the person confirms archiving those records, submit:
 

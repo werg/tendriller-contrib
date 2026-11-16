@@ -28,15 +28,15 @@
     {
       "id": "build-correctable-forms",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/CAPTURES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "capture-rendered-evidence",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/screenshot.js",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
@@ -56,8 +56,8 @@
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/stream-view.js",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs",
         "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"
       ]
     },
     {
@@ -66,9 +66,9 @@
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
         "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts",
         "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
@@ -105,8 +105,8 @@
     {
       "id": "complete-accessible-interactions",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/CAPTURES.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/CAPTURES.md"
       ]
     },
     {
@@ -149,30 +149,30 @@
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "document-a-field-inspection",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/CAPTURES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md"
       ]
     },
     {
       "id": "explore-what-if-scenarios",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/agent.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/agent.md"
       ]
     },
     {
       "id": "export-and-restore-work",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/tools/CLI.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/tools/CLI.md"
       ]
     },
     {
@@ -192,17 +192,17 @@
     {
       "id": "guide-practice-and-feedback",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/CAPTURES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PUSH_NOTIFICATIONS.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/CAPTURES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PUSH_NOTIFICATIONS.md"
       ]
     },
     {
       "id": "hand-off-responsibility",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"
       ]
     },
     {
@@ -242,15 +242,15 @@
     {
       "id": "localize-an-interaction",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/CAPTURES.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/CAPTURES.md"
       ]
     },
     {
       "id": "manage-sensitive-data",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
@@ -271,11 +271,11 @@
     {
       "id": "plan-time-and-deadlines",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PUSH_NOTIFICATIONS.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/contract/v3.json",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PUSH_NOTIFICATIONS.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/contract/v3.json",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
@@ -309,8 +309,8 @@
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/list.js",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ui.js",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
@@ -320,8 +320,8 @@
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
         "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md"
       ]
     },
     {
@@ -350,23 +350,23 @@
     {
       "id": "run-reviewed-batch-actions",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "schedule-shared-resources",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "search-and-filter-collections",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/STREAMS.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/STREAMS.md"
       ]
     },
     {
@@ -395,20 +395,20 @@
     {
       "id": "track-habits-and-routines",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/contract/v3.json",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PUSH_NOTIFICATIONS.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/contract/v3.json",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PUSH_NOTIFICATIONS.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "triage-incoming-work",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/DURABILITY.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/EXPERIENCES.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/EXPERIENCES.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"
       ]
     },
     {
@@ -421,23 +421,23 @@
     {
       "id": "undo-and-revise-work",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md"
       ]
     },
     {
       "id": "work-offline-and-reconnect",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md"
       ]
     },
     {
       "id": "write-with-versioned-feedback",
       "sources": [
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/BROWSER_API.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/docs/PROTOCOL.md",
-        "https://github.com/werg/tendriller/blob/c5af12a07fd0b642732dfcaa745df3adf328944f/agent.md"
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/docs/PROTOCOL.md",
+        "https://github.com/werg/tendriller/blob/111bde967a1831fb16a33201acc5c67b624fd360/agent.md"
       ]
     }
   ]
