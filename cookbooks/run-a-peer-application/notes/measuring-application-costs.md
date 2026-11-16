@@ -19,6 +19,16 @@ polling cadence with each new measurement.
 The earlier before/after reports predate those markers and do not measure that
 additional retained history or idle traffic.
 
+For the [WebRTC architecture](peer-network.md), record three separate windows:
+cold page/enrollment/introduction, warm application work with fixed membership,
+and an explicit participant update. The warm window must show unchanged host
+request and body-byte counters while authenticated peer bytes and real
+application outcomes progress. Stop the host after establishment and repeat
+the operation before claiming independence. A zero hosted application-write
+counter alone does not exclude host event sockets, health polls or relayed
+payloads. Participant operations may still scan intervening descriptors; no
+sparse membership proof or constant participant-update cost is assumed.
+
 ## Run the native measurement
 
 In an exact Chronolog checkout with its pinned dependencies and native engine:

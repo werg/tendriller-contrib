@@ -35,10 +35,11 @@ artifacts and limits.
 
 The implementation places **portable membership administration on
 Cloudflare by default**, separately from native inclusion/finality, execution
-and payload storage. Small signed descriptors and inline roster/epoch records
-let that administrator follow membership without downloading application
-payloads or loading the application SQL engine. Full peers retrieve detached
-envelopes through their peer path. The
+and payload storage. Participant operations synchronize small signed descriptors
+and inline roster/epoch records without downloading application payloads or
+loading the application SQL engine. Ordinary application writes do not trigger
+administrator synchronization. Full peers retrieve detached envelopes through
+their peer path. The
 [thin-administration evidence](notes/thin-membership-administration.md) records
 passing live enrollment, revocation, restart and byte-accounting checks against
 the packaged Cloudflare Worker, a separate native authority and an actual browser.
@@ -231,8 +232,11 @@ ownership/fencing design, which this first profile does not assume.
 
 ## Connect peers without hiding the route
 
-Consume the public framed connection/bootstrap boundary. Bind application identity
-and grants independently of rendezvous hints and transport endpoint keys. A
+Use the [WebRTC peer architecture](notes/peer-network.md): Tendriller introduces
+peers with one bounded offer/answer exchange, then closes the rendezvous sockets.
+Chronolog's authenticated framed connection carries application traffic directly
+between peers. Bind application identity and grants independently of rendezvous
+hints and transport endpoint keys. A
 publish-only collector can submit its own signed, topic-scoped proposal without
 receiving group history keys; allowing one topic must not authorize SQL or
 platform operations in a mixed program.
@@ -242,11 +246,17 @@ replication and ephemeral signals in separate protocol domains. Apply bounded
 frames, queues, expiry, and receiver-known membership to transient signals. A
 disconnected receiver cannot promise immediate knowledge of revocations elsewhere.
 
-A practical first deployment can use one framed WSS path and a selected direct or
-relay fallback. Qualify browser-to-native WebRTC or direct WSS on the actual host
-before choosing it for production. Iroh can be appropriate for native peers; do
-not infer browser direct-connect behavior from native results. Implementing every
-transport is not necessary to establish the application contract.
+Keep the page host out of the warm data path: peer pages have no implicit hosted
+application socket, event stream or health poll. The browser owns its RTC
+connection; an exclusive replica Worker can exchange bounded frames through a
+MessagePort. A warm session continues while introduction services are unavailable.
+Cold page loads, new introductions and participant administration retain their
+declared service dependencies.
+
+Qualify the selected ICE route on the actual browser/native pair. A TURN
+candidate uses a relay and must be accounted for as such. Configure any fallback
+explicitly; a failed direct connection must not silently put application traffic
+back through Cloudflare or switch the application's durable write owner.
 
 Measure direct and relayed **bytes**, reconnect/catch-up time, memory, and failure
 behavior across the real networks. Keep Cloudflare application write avoidance

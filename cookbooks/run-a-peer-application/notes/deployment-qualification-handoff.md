@@ -11,6 +11,11 @@ qualification notes; a command or test's presence is not a passing result.
 
 ## Keep the architecture simple
 
+The [peer network contract](peer-network.md) defines the current WebRTC target:
+bounded introduction, explicit participant operations, peer-owned application
+traffic and no implicit hosted socket or health poll in a peer page. Keep cold
+load/participant costs separate from the warm application interval.
+
 The administrator approves small signed roster and epoch operations. Cloudflare
 hosts it by default; its portable implementation does not need application SQL
 or application payloads. Members create their own signing and reader key pairs.
@@ -68,13 +73,16 @@ passing scenario does not turn an earlier failure into a successful workflow.
 
 ### Limits that need explicit observations
 
-- Local direct WSS proves the implemented route can carry the real protocol. It
-  does not establish public reachability through NAT, a corporate policy, a
-  mobile network or a paid tunnel. WebRTC is not an implemented alternative.
-- The relay fixture uses the actual packaged engine, but its local TLS bridge
+- Historical local direct WSS proves its recorded route can carry the real
+  protocol. A new browser/native WebRTC run must name its own source, runtime,
+  selected candidate route and results. Neither loopback route establishes
+  public reachability through NAT, a corporate policy or a mobile network.
+- The historical relay fixture used the actual packaged engine, but its local TLS bridge
   supplies a synthetic page session. Test production cookie/origin/login and
   participant authorization on the deployed host.
-- SDK frame counters exclude WebSocket/TLS/TCP overhead. Sampled queue sizes,
+- Frame counters exclude transport overhead. Count RTC signaling separately
+  from data-channel bytes and distinguish direct candidate pairs from TURN.
+  Sampled queue sizes,
   page metric snapshots and one process's RSS are not a whole-device peak or a
   queue-saturation qualification.
 - A deliberately small browser Storage Bucket can produce a bounded real OPFS

@@ -45,12 +45,22 @@ an application that chooses the recipe consume the same built program module.
    from `@chronolog/transport-tendriller`, using the
    same immutable backend ID selected when the host page was created. The page
    awaits `tendril.application.ready()`.
-4. Connect portable synchronization through the selected public framed transport;
+4. Connect portable synchronization through the public WebRTC framed transport;
    the resident native authority supplies inclusion and author-time closure
    evidence. Every replica derives the same chronological execution order. A preexisting cold
-   bootstrap can still use hosting services.
+   bootstrap can still use hosting services. Use one bounded Tendriller
+   rendezvous offer/answer, then close introduction resources and authenticate the
+   Chronolog peer over the data channel. Keep the exclusive replica Worker
+   independent from the page-owned RTC connection through the public bounded
+   MessagePort bridge where needed.
 5. Export `signals`, either an authorized public `EphemeralChannel` instance or
    `null`. Grant/session/sequence/expiry validation belongs to that channel.
+
+The [peer network contract](../notes/peer-network.md) specifies ownership,
+connection lifetime and the warm host-independence assertions. The WSS/relay
+reports below qualify their exact historical routes; they are not WebRTC
+measurements. Updated runtime evidence must identify both actual RTC
+implementations and the observed ICE route.
 
 Application callers only retain operation references and draft snapshots in
 local storage. The actual signed program and retry state live in Chronolog's
