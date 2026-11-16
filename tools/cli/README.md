@@ -78,7 +78,7 @@ node tools/cli/bin/tendril.mjs --tendril kitchen pending    # replay pending inp
 
 ## Device notifications while the page is closed
 
-Deploy core `0.2.0-rc.6` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
+Deploy core `0.3.0-rc.1` or newer, with its `GET A/notify` readiness endpoint, before using these commands. Once the service operator configures VAPID and the owner enables **Device notifications** in the page's embedded control, agent code can send an encrypted Web Push notification even after the user closes all page tabs. VAPID configuration and device consent alone do not add the endpoint to an older Worker. Use the same private page agent token as for other API commands:
 
 ```sh
 tendril --tendril kitchen notifications
@@ -145,7 +145,7 @@ The same implementation is available as a standalone Node 22.15+ script with no
 package installation. Keep the creation response in a private JSON file:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-events.mjs -o ./tendril-events.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.3.0-rc.1/tendril-events.mjs -o ./tendril-events.mjs
 node ./tendril-events.mjs ./page.json pending
 # Handle the returned input, then acknowledge the successfully handled sequence.
 node ./tendril-events.mjs ./page.json ack 42
@@ -164,7 +164,7 @@ The helper does not attach a host listener or automatically rearm one.
 Download one script and serve any local page directory:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-preview.mjs -o ./tendril-preview.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.3.0-rc.1/tendril-preview.mjs -o ./tendril-preview.mjs
 node ./tendril-preview.mjs ./my-page --fixture ./scenario.json
 ```
 
@@ -197,7 +197,7 @@ No live account, producer credential, collector or agent is created.
 Use the installed `tendril-stream` command or download its standalone Node helper:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.3/tendril-stream.mjs -o ./tendril-stream.mjs
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.3.0-rc.1/tendril-stream.mjs -o ./tendril-stream.mjs
 node ./tendril-stream.mjs init --page ./page.json --streams ./streams.json --out ./private/collector.json
 node ./tendril-stream.mjs ./private/collector.json
 ```

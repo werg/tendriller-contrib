@@ -1,7 +1,7 @@
 {
   "format": "tendriller-components",
   "version": 1,
-  "release": "0.2.0-rc.3",
+  "release": "0.3.0-rc.1",
   "components": [
     {
       "id": "bluetooth",
