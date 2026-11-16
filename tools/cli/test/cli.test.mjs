@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, statSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, statSync, readFileSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs, toPath, parseJsonArg, intFlag } from "../lib/args.mjs";
@@ -82,6 +82,21 @@ test("pack vendors declared components before publication and refuses modified c
   assert.doesNotThrow(() => pack(dir));
   writeFileSync(join(dir,"tendril.json"),JSON.stringify({components:["chart"]}));
   assert.equal(pack(dir).files["assets/components/stream-view.js"],undefined);
+});
+test("asset synchronization rejects symlinked components and dangling lock symlinks", () => {
+  const dir = tmp(), outside = tmp();
+  writeFileSync(join(dir, "index.html"), "<h1>safe</h1>");
+  writeFileSync(join(dir, "tendril.json"), JSON.stringify({components:["chart"]}));
+  mkdirSync(join(dir, "assets"));
+  symlinkSync(outside, join(dir, "assets", "components"), "dir");
+  assert.throws(() => pack(dir), /symlink/);
+  assert.equal(readFileSync(join(dir, "index.html"), "utf8"), "<h1>safe</h1>");
+
+  const other = tmp();
+  writeFileSync(join(other, "index.html"), "<h1>safe</h1>");
+  writeFileSync(join(other, "tendril.json"), JSON.stringify({components:["chart"]}));
+  symlinkSync(join(other, "missing-lock.json"), join(other, "tendril.assets.json"));
+  assert.throws(() => pack(other), /Asset lock must not be a symlink/);
 });
 test("pack: single html file becomes index.html; --as overrides", () => {
   const d = tmp();
