@@ -24,6 +24,42 @@ final integrated or tested contract.
 | `tools/cli/test/public-contract.test.mjs` | Preserve current core public-consumer checks and incorporate the storage schemas and command envelopes. |
 | `tools/cli/test/transfer-resume-cli.test.mjs` | Move and adapt to core's interrupted-transfer and original-intent retry checks. |
 
+## Reconcile the concurrently merged default branch
+
+During final verification, the default branch advanced to
+[`cb50d60f0ccb3f201975b462b93c49bd1996b221`](https://github.com/werg/tendriller-contrib/tree/cb50d60f0ccb3f201975b462b93c49bd1996b221),
+merging storage-branch head `95ac1e87490d87d278c7e8f99494951695ea7857`.
+The [complete concurrent-source inventory](concurrent-main-delta.json) accounts for
+all **80 changed paths** from the original `6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce`
+base, including before/after Git blob identities and each disposition. A rename is
+one change record with its previous path retained. This is a separate revision range;
+its counts overlap the original inventory and the earlier 13-path snapshot.
+
+| Concurrent source area | Changed paths | Reconciliation |
+| --- | ---: | --- |
+| Root packaging, distribution, source-archive workflow, and vendored artifacts | 13 | Keep the dependency-free reading collection and core-owned public artifacts. Do not restore executable contrib packaging, core locks, or the old source-archive workflow. |
+| Components and their fixtures | 6 | Contract literals, canonical blob URLs, and a recording-test timeout add no new page mechanism. Keep extracted reasoning and independent specimens. |
+| Recipe and example declarations | 28 | Keep the established guide conversions; do not reinstate recipe manifests, component closures, or a scaffolder. |
+| Workflow adapters and tests | 4 | Version/contract alignment adds no new policy. Explicit trusted references and actual-host checks remain the authority boundary. |
+| Old browser publishing helper | 1 | Public uploads, complete publication manifests, and empty upload-response handling already exist in the current SDK and service fixtures. |
+| Operational tools, tests, and documentation | 28 | Preserve useful behavior in core, including publication health polling, contract discovery, complete preview transfers, and original-intent retries. Asset-lock and notebook-recipe fixtures remain retired. |
+
+The operational review checked these changes against released core
+[`c0aaaecbd01eaaced3aab10706f359125a437a26`](https://github.com/werg/tendriller/tree/c0aaaecbd01eaaced3aab10706f359125a437a26).
+Its preview already supplies upload sessions, cancellation, verified completion,
+stable blob identity, metadata, and pins with stricter authority and replay checks.
+The additional upstream successive-write subprocess assertion introduces no new
+production logic: target shared-file records distinguish changed bytes and preserve
+accepted receipt replay. That exact redundant assertion is not copied solely to match
+source layout; its disposition is explicit in the inventory.
+
+The merge preserves the concurrent default branch as an ancestor while retaining
+the tested target architecture. Only source-accounting documentation changes from
+the previously verified feature tree. Executable code, specimens, and assertions
+remain those exercised at contrib `38ff221447431822f248db3134be5deb3c5bf2a5` against
+the published `0.3.0-rc.2` artifacts; the [recorded proof](pilot-checks.md) keeps its
+original exact identities.
+
 ## Knowledge retained here
 
 The collection explains [where each kind of application data belongs](../cookbooks/choose-data-model/COOKBOOK.md),
@@ -33,8 +69,7 @@ and [how reviewed evidence differs from verified uploaded bytes](../cookbooks/ca
 Annotations name the [exact reviewed object or file revision](../cookbooks/annotate-a-frame/COOKBOOK.md).
 Operational software and transport authority remain in core.
 
-The browser harness uses the supplied public preview/runtime artifacts. Its storage
-follow-up must exercise the upload-session protocol and lost-completion behavior;
-the [recorded earlier pilot run](pilot-checks.md) remains evidence for its exact
-pre-integration source and artifacts until a new run is recorded. No source-delta
-accounting entry upgrades private media, retention, or production authority claims.
+The browser harness uses the supplied public preview/runtime artifacts and exercises
+the upload-session protocol and lost-completion behavior. The [recorded pilot checks](pilot-checks.md)
+identify their exact source and artifacts. No source-delta accounting entry upgrades
+private media, retention, or production authority claims.
