@@ -18,10 +18,43 @@ The follow-up simplification separates portable membership administration from
 native application ordering and execution. Cloudflare is the default
 administrator host; ordered application descriptors commit detached payloads,
 while small capability and epoch records remain inline. The
-[thin-administration target and measured gates](thin-membership-administration.md)
-are pending qualification. Earlier passing application checks retain their
-original scope and are not evidence of zero administrator payload traffic or
-live Cloudflare enrollment/revocation.
+[thin-administration evidence and measured gates](thin-membership-administration.md)
+record a complete passing packaged workerd/native/Chromium run. Earlier passing
+application checks retain their original scope. The new gate separately proves
+zero administrator application-envelope traffic, live host-reviewed device
+enrollment and writer/reader revocation; deployed qualification remains open.
+
+## Current recorded implementation evidence
+
+[Chronolog browser run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
+passed on authored head `5cfa04440029c24d4313e7b8e88e593952180adb`, tested clean merge
+`43efd510001c2608bc1e28ee4c7d100cb34c773b`. It consumed Tendriller source
+`43cac4e75b0bbe1e422f4879b7249d6db5988440`, embedded portable membership source
+`46b72ebc1c69f71b4cabab744ef19c6a4e50dfec`, and contrib specimens
+`a3797d528d3bbbc649cda637e1e465105ea86c1c`. The immutable
+[thin-membership report](evidence/2026-11-16-thin-membership.json) preserves all
+seven runtime checks plus the build/import audit, package hashes and measured
+transport bytes. The separate [application report](evidence/2026-11-16-application-pilot.json)
+records eight checks, one final-intent dispatch and zero host application writes.
+
+The same browser workflow passed the real native/WASM comparison, SQL-free OPFS,
+mixed SQL/OPFS recovery and public enrollment/peer bridge gates.
+[Quality run 43940378562](https://github.com/werg/chronolog-db/actions/runs/43940378562)
+passed 682 tests, with four actual-WASM tests exercised separately by the browser
+workflow, plus Linux/macOS deterministic digest comparison.
+[Container chaos 43940378716](https://github.com/werg/chronolog-db/actions/runs/43940378716)
+passed its healed-convergence scenario. These establish the named local and CI
+boundaries, not a deployed authority-loss or public-network contract.
+
+Tendriller's [public-service run 43938435186](https://github.com/werg/tendriller/actions/runs/43938435186)
+passed its Node 22/24 checks, including 780 tests, public-package consumption and
+the actual browser gate. Contrib's
+[collection run 43936379719](https://github.com/werg/tendriller-contrib/actions/runs/43936379719)
+verified 56 reading entries and 19 tests at the specimen pin; its
+[public-artifact run 43936379799](https://github.com/werg/tendriller-contrib/actions/runs/43936379799)
+also passed the existing independent browser adaptations and three actual-host
+privacy checks. Neither older contrib workflow runs the new cross-repository
+thin-membership scenario; that evidence belongs to the Chronolog run above.
 
 ## Work ownership and dependencies
 
@@ -44,7 +77,7 @@ live Cloudflare enrollment/revocation.
 | Independent package consumption | Both core release checks and contrib | Built artifacts | No private sibling imports; either core usable on its own |
 | Typed descriptors and detached application envelopes | Chronolog protocol and peer transport | Canonical hashes, signed records and retained ordering evidence | Exact envelope binding; missing/corrupt bodies block full application progress without blocking roster verification |
 | Portable thin membership administrator | Chronolog administrator core and Tendriller Cloudflare composition | Durable root identity, inline capability/epoch history and public membership provider | Live device enrollment, exact decision retry/restart and revocation without application payload downloads or application SQL |
-| Membership placement qualification | Public host/peer fixtures and contrib evidence | Independent administrator, native authority and browser replicas | ADMIN-01 through ADMIN-10 with encoded-byte counters and exact artifact provenance |
+| Membership placement qualification | Public host/peer fixtures and contrib evidence | Independent administrator, native authority and browser replicas | Passing actual workerd/native/fresh-browser gate, encoded-byte counters and exact artifacts; ADMIN map distinguishes the two pregranted layouts and remaining deployed faults/recovery |
 
 The [file/capture metadata recipe](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/examples/blob-metadata.ts)
 adds an application-owned SQL/emit schema over the existing host uploader. It

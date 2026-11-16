@@ -6,7 +6,7 @@ group: "Keep work dependable"
 tags: ["peers", "events", "sql", "agent", "recovery"]
 choices: ["Native authority or the hosted backend", "Atomic SQL and events or an event-only history", "Final worker intent versus provisional views and transient signals"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
 sources: ["https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md", "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md", "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md", "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"]
 ---
@@ -32,15 +32,19 @@ pins above identify the portable foundation reviewed for this guide. A proposed
 scenario is not evidence that it passed; recorded checks name their actual
 artifacts and limits.
 
-The revised deployment target places **portable membership administration on
+The implementation places **portable membership administration on
 Cloudflare by default**, separately from native application ordering, execution
 and payload storage. Small signed descriptors and inline roster/epoch records
 let that administrator follow membership without downloading application
 payloads or loading the application SQL engine. Full peers retrieve detached
 envelopes through their peer path. The
-[thin-administration plan](notes/thin-membership-administration.md) defines the
-live enrollment, revocation, restart and byte-accounting gates. Those gates are
-pending; the earlier task-board pilot does not establish this new boundary.
+[thin-administration evidence](notes/thin-membership-administration.md) records
+passing live enrollment, revocation, restart and byte-accounting checks against
+the packaged Cloudflare Worker, a separate native authority and an actual browser.
+The two task-board layouts also pass their separate public-runtime regression.
+Their fixture pregrants its two identities; it does not replace the fresh-device
+enrollment gate. Deployed networking, login, storage recovery and cost remain
+explicit qualification issues.
 
 ## Follow a concrete task to completion
 

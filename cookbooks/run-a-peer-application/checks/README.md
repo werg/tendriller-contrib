@@ -171,7 +171,7 @@ hashes. It does not inject a roster provider or import the host's private source
 `--build-only` records an artifact/bundle build and explicitly leaves workerd and
 browser scenarios unrun.
 
-The gate is intended to demonstrate device-created keys, account-bound signed
+The gate exercises device-created keys, account-bound signed
 requests, owner approval, certified control-history verification, authorized key
 delivery, then peer payload catch-up. It separately exercises a lost approval
 reply, real Durable Object eviction, exact retry, direct-path writer revocation,
@@ -184,9 +184,15 @@ Encoded descriptor/control traffic and detached application bytes have separate
 counters. Equal candidate counts with substantially different SQL payload sizes
 must still deliver zero application envelope bytes to the administrator. Keep
 the observed byte report, source/artifact identities and per-stage outcomes.
-This gate is **pending qualification** until its exact complete report is
-recorded. A passing native-only subtest or compiled Worker does not establish
-the Cloudflare/browser result. Even a complete local workerd run leaves actual
-deployed authentication, public-network routes and provider costs to issues
+The complete gate passed in
+[CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
+seven runtime assertions plus the public-package/bundle check in actual workerd
+and Chromium `158.0.8127.18`. The
+[recorded evidence](../notes/thin-membership-administration.md#recorded-public-artifact-qualification)
+preserves the unaltered report, exact source/artifact hashes, measured bytes and
+each acceptance boundary. The separate two-layout pilot also passed eight
+checks with one effect dispatch and zero host application writes. Its identities
+remain explicitly pregranted, while the thin fixture enrolls a fresh device.
+Actual deployed authentication, public-network routes and provider costs remain in issues
 [#14](https://github.com/werg/tendriller-contrib/issues/14) through
 [#17](https://github.com/werg/tendriller-contrib/issues/17).

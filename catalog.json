@@ -1320,7 +1320,7 @@
         "Final worker intent versus provisional views and transient signals"
       ],
       "capabilities": [],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "choose-data-model",
         "reconcile-concurrent-edits",

@@ -1,11 +1,13 @@
 # Thin membership administration and detached payloads
 
-This is the revised deployment target for the paired
+This records the implemented boundary and its measured qualification for the paired
 [Tendriller #35](https://github.com/werg/tendriller/pull/35) and
-[Chronolog #1](https://github.com/werg/chronolog-db/pull/1) work. Implementation and
-qualification are in progress. The earlier task-board pilot establishes SQL,
-event, worker and recovery behavior; it does **not** establish the membership
-placement or bandwidth properties described here.
+[Chronolog #1](https://github.com/werg/chronolog-db/pull/1) work. On 2026-11-16 the
+complete packaged Cloudflare/native/browser gate passed, including live enrollment,
+restart, revocation and measured exclusion of application payloads from the
+administrator. The actual Worker runs in a local workerd harness with synthetic
+authenticated accounts. Deployed Cloudflare authentication, public-network routes,
+provider cost and operational recovery remain separate qualification work.
 
 ## Put membership administration on Cloudflare by default
 
@@ -43,7 +45,7 @@ SQL executor. A fixture-specific local root override is not a valid substitute.
 
 ## Order small descriptors and fetch payloads through peers
 
-Replace opaque, payload-sized log entries with canonical typed descriptors.
+The implementation replaces opaque, payload-sized log entries with canonical typed descriptors.
 Each application candidate commits its exact signed envelope hash and length,
 group, record type and epoch. Small signed capability and epoch envelopes travel
 inline, so an administrator can verify membership history without downloading
@@ -96,24 +98,81 @@ request under that operation ID must fail explicitly. Portability uses the same
 administrator core and identity/history contract in another supported host; it
 does not imply automatic failover or two simultaneously active root stores.
 
-## Required measured gates
+## Recorded public-artifact qualification
 
-All rows below are **pending** until an exact source/artifact pair, command and
-observed report are attached. Test names or an implementation checklist do not
-constitute a passing result.
+[Browser workflow 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
+passed the complete gate. The [unaltered thin-membership report](evidence/2026-11-16-thin-membership.json)
+records seven runtime assertions plus the independent package/bundle build check,
+Chromium `158.0.8127.18`, no page errors and `passed: true`. The separate
+[two-layout application report](evidence/2026-11-16-application-pilot.json) in the
+same run passed eight checks, with one resident effect dispatch and zero host
+application writes.
 
-| ID | Scenario | Required observation |
+| Provenance | Exact identity |
+| --- | --- |
+| Chronolog authored PR head | `5cfa04440029c24d4313e7b8e88e593952180adb` |
+| Clean tested PR merge | `43efd510001c2608bc1e28ee4c7d100cb34c773b` |
+| Tendriller public SDK, runtime and engine source | `43cac4e75b0bbe1e422f4879b7249d6db5988440` |
+| Embedded portable membership source | `46b72ebc1c69f71b4cabab744ef19c6a4e50dfec` |
+| Contrib pages and runner wrapper | `a3797d528d3bbbc649cda637e1e465105ea86c1c` |
+| SDK tarball SHA-256 | `24f3da2394a151e97e368e1129b8e4ab725cdff0bfca62d858d4ca8e1e3a9042` |
+| Engine tarball SHA-256 | `6e8915ca86b788105c0e40c92d0cd610559c596fe76957f6c1f26fcd3e516832` |
+| CI archive | Artifact `14262634338`, SHA-256 `910ac51584c70818dcbf93c945a0766abc01ecaa16c168f80b7cf6810e2b877d` |
+
+The report also retains the exact browser bundle, SQL WASM, manifest and portable
+membership module/declaration hashes. Its membership import inventory excludes
+the application materializer, native SQLite/SSB runtime and full node executor.
+The engine's public provenance export is checked before the scenario starts.
+The native SQL view independently verifies one native schema administrator and
+zero application group memberships for the Cloudflare root.
+
+Reproduce with the [public qualification command](../checks/README.md#qualify-thin-cloudflare-membership-separately).
+The recorded command runs `tools/thin-membership-pilot.ts` against the built
+Tendriller `dist` tarballs and the independently built SQL WASM assets. The
+contrib wrapper invokes that core command; it supplies no replacement provider.
+
+### Encoded byte measurements
+
+These totals are actual canonical descriptor and signed encrypted envelope
+lengths for the named candidates. The requested payload sizes are SQL string
+values; envelope totals also include the rest of each signed program.
+
+| Workload | Candidates | SQL payload per candidate | Descriptor bytes | Detached envelope bytes |
+| --- | ---: | ---: | ---: | ---: |
+| Small | 4 | 16 bytes | 568 | 2,668 |
+| Large | 4 | 196,608 bytes | 576 | 789,092 |
+| More small | 8 | 16 bytes | 1,136 | 5,320 |
+
+Increasing body size at the same candidate count changed descriptor traffic by
+only eight bytes, from the encoded length fields. Doubling the small candidate
+count doubled descriptor bytes. The complete scenario made 21 signed membership
+requests: 13,115 request bytes and 26,251 response bytes. It transferred 2,706
+candidate-descriptor bytes and 9,552 inline-control-descriptor bytes; the latter
+already includes 7,504 inline signed envelope bytes and must not be double-counted.
+The remaining response bytes contain framing, ordering evidence and certificates.
+Repeated range transfer is included in these session totals.
+
+The administrator received **zero application envelope bytes**, with **zero
+unexpected administrator endpoint requests**. The authenticated full-peer path
+separately transferred 57,444 inbound and 1,657,484 outbound framed bytes. Those
+counts include synchronization overhead and repeated ranges; they are not unique
+payload sizes or provider billing. Retained storage size, production relay cost,
+Internet latency and NAT behavior were not measured by this fixture.
+
+### Acceptance map and remaining boundaries
+
+| ID | Scenario | Observed evidence and limit |
 | --- | --- | --- |
-| ADMIN-01 | Start the public Cloudflare membership composition with a separate native full peer. | Root identity and roster survive host restart; no application materializer or SQL engine is loaded by the administrator. |
-| ADMIN-02 | Enroll a device that generated its own keys after genesis. | Signed request and exact approval lead to independently verified activation, authorized keys and full application readiness, in that order. |
-| ADMIN-03 | Order histories with equal candidate counts but substantially different payload sizes. | Administrator receives zero application envelope bytes and makes zero application body fetches. Descriptor/inline-control byte totals are recorded separately from full-peer payload traffic. |
-| ADMIN-04 | Drop an approval response after durable commit and restart the host. | Same request/operation returns the original grant and proposal; conflicting content is refused and no duplicate membership mutation appears. |
-| ADMIN-05 | Revoke a writer, retain its host session and send a fresh proposal directly to the native peer. | Application admission rejects the new operation after verified activation; original accepted retries remain original. |
-| ADMIN-06 | Revoke a reader, rotate the epoch and publish new application data. | Retained members receive authorized future keys; the removed device cannot decrypt the new epoch. Previously obtained data is not claimed erased. |
-| ADMIN-07 | Withhold, corrupt, duplicate and reorder detached application envelopes. | Exact hash/length/type/group checks prevent substitution; full replicas stop before unresolved application inputs and recover from a valid source without duplicate outcomes. |
-| ADMIN-08 | Deliver roster changes after large or unavailable application bodies. | Thin administration verifies the roster from descriptors and inline control records; full application peers retain their stricter applied-data frontier. |
-| ADMIN-09 | Reopen both browser OPFS and administrator storage with an in-flight enrollment. | Device identity, approved scope, original operation and membership state are retained; no new identity or broadened grant is invented. |
-| ADMIN-10 | Run both task-board layouts after real enrollment and after the detached format change. | Existing SQL/event atomicity, coherent views, worker results, draft preservation and exact retry checks still pass through public artifacts. |
+| ADMIN-01 | Default public Cloudflare composition with a separate native full peer. | Passed actual workerd provider, real Durable Object restart and durable root/roster recovery; bundle audit excludes the application engine. This is not a deployed Cloudflare service. |
+| ADMIN-02 | Device-created identity after genesis and live approval. | Passed account-bound signed request, approval, independently verified active grants and HPKE keys, then authenticated detached-body catch-up and application readiness. No raw epoch key or pregrant is injected. |
+| ADMIN-03 | Equal candidate counts with very different body sizes; double count with fixed size. | Passed both measurements above, zero administrator application envelopes and no body endpoint requests. Public-network cost and retained-storage measurements remain issue #15. |
+| ADMIN-04 | Lose the committed approval response and restart the host. | Passed original signed approval and capability IDs after actual Durable Object eviction; a changed decision under the same operation ID is refused. The native integration also drops the native append response. |
+| ADMIN-05 | Revoke writer while host login remains valid; submit directly to native. | Passed final `WRITER_UNAUTHORIZED` rejection and unchanged proposal identity for an earlier accepted exact retry. |
+| ADMIN-06 | Revoke reader and rotate future access. | Passed active-reader removal, refusal of its host history route, known future epoch with no device key, and native publication using its retained authorized future key. Previously held keys/plaintext are not erased. |
+| ADMIN-07 | Withheld, corrupt, duplicated or reordered bodies. | Actual host/browser gate proves missing-body blocking and later authenticated recovery. Separate codec/core tests reject length, digest, type, group and epoch substitution. This run is not a deployed-route corruption/reordering fault campaign; issue #14 retains that work. |
+| ADMIN-08 | Roster changes after large or unavailable application bodies. | Passed activation and authorized key receipt while the browser application frontier is explicitly blocked on detached payloads; thin administration progresses using descriptors/inline controls. |
+| ADMIN-09 | Restart durable host and browser state. | Passed host restart after lost approval response and abrupt browser Worker replacement after accepted/rejected operations, retaining identity, grants and exact receipts. Production storage loss and every enrollment crash boundary remain separate recovery qualifications. |
+| ADMIN-10 | Existing two task-board layouts after the detached-format change. | Eight application checks passed against the same core/runtime pins. These two identities are explicitly pregranted by their application fixture; the fresh-device Cloudflare enrollment check is the separate thin fixture above. |
 
 Record encoded transport bytes, not JSON character counts or estimates. The
 report should identify candidate count and envelope size distribution, descriptor
@@ -133,9 +192,9 @@ constant storage for an unbounded retained history.
 
 The earlier application pilot used a native root administrator and pregranted
 browser identities. The public bridge pilot exercised live enrollment, but its
-administrator was also a full SQL reader. Neither result proves ADMIN-01 through
-ADMIN-09. Preserve those reports as application and bridge regressions rather
-than relabeling their scope.
+administrator was also a full SQL reader. Neither earlier result proves the new
+membership placement. Preserve those reports as application and bridge
+regressions rather than relabeling their scope.
 
 A test against the built Worker in a local workerd harness establishes that host
 composition. A real deployed Cloudflare run separately establishes the chosen
@@ -157,4 +216,4 @@ The existing deployment issues remain the tracking surface:
   enrollment, host-session independence, writer and reader revocation, epoch
   delivery, OPFS reopen and private-data exclusion.
 
-No deployment issue is closed by this target document or by the earlier pilot.
+No deployment issue is closed by the local workerd/native/Chromium qualification.
