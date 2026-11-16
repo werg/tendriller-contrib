@@ -29,4 +29,4 @@ Keep stable record IDs through retries and durable spool recovery. A file-tail c
 
 ## Verify
 
-Fill the spool, revoke the producer, interrupt upload acknowledgement, rotate/truncate a tailed file, emit an oversized line, and restart while records are pending. Verify the selected loss/backpressure policy and that credentials do not appear in logs. Compare retained server history with the display buffer so a bounded chart cannot hide collector loss. Read exact commands and limits in [core's collector reference](https://github.com/werg/tendriller/tree/master/tools/collector).
+Fill the spool, revoke the producer, interrupt upload acknowledgement, rotate/truncate a tailed file, emit an oversized line, and restart while records are pending. Verify the selected loss/backpressure policy and that credentials do not appear in logs. Compare retained server history with the display buffer so a bounded chart cannot hide collector loss. Read exact commands and limits in [core's collector reference](https://github.com/werg/tendriller/blob/master/docs/tools/COLLECTOR.md).

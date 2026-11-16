@@ -59,11 +59,11 @@ export function agentPrompt(entry, sourceBase = 'https://github.com/werg/tendril
   return `Read ${sourceBase}/${entry.path}. Inspect my task and existing page before choosing an approach. ${entry.summary} Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability.`;
 }
 
-export function readingCatalog(entries) {
+export function readingCatalog(entries, sourceBase) {
   return {
     format: 'tendriller-cookbooks',
     version: 1,
-    cookbooks: entries.map(({ body, ...entry }) => ({ ...entry, prompt: agentPrompt(entry) })),
+    cookbooks: entries.map(({ body, ...entry }) => ({ ...entry, prompt: agentPrompt(entry, sourceBase) })),
   };
 }
 

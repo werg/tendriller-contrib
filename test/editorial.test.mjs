@@ -15,6 +15,7 @@ test('ambiguous or invalid metadata fails at the source',()=>{
 test('reading catalog and prompts never create an install graph',()=>{
  const entry={...parseCookbook(minimal).metadata,path:'cookbooks/useful-task/COOKBOOK.md',body:'private body'};
  const catalog=readingCatalog([entry]);assert.equal(catalog.format,'tendriller-cookbooks');assert.ok(!('body' in catalog.cookbooks[0]));
+ assert.match(readingCatalog([entry], 'https://example.test/exact-revision').cookbooks[0].prompt, /^Read https:\/\/example.test\/exact-revision\//);
  assert.match(agentPrompt(entry),/Reading this cookbook does not install software/);assert.doesNotMatch(agentPrompt(entry),/scaffold|sessions\.activate|tendrilSnippets/);
 });
 test('gallery treats author-controlled metadata and prompts as text',()=>{

@@ -23,9 +23,10 @@ permissions:
 jobs:
   pilots:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       # A one-way test pairing, not a prose/release compatibility requirement.
-      CORE_CHECK_REF: 24a01e401e45cbf4e4fa0ebd9ccd2fc41503578b
+      CORE_CHECK_REF: ${{ inputs.core_ref || '1c7766d73527055b0dc33a4d7a60fc558e8af33b' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,9 +35,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/tendriller
-          ref: ${{ inputs.core_ref || env.CORE_CHECK_REF }}
+          ref: ${{ env.CORE_CHECK_REF }}
           path: .core-build
       - name: Build public core artifacts
+        id: artifacts
         working-directory: .core-build
         run: npm ci && npm run build:artifacts
       - name: Install browser used by the public-artifact checks
@@ -45,6 +47,7 @@ jobs:
       - name: Exercise independent page adaptations against the public preview artifact
         run: node test/pilot-browser.mjs --tools .core-build/dist/tools --playwright .core-build/node_modules/playwright/index.mjs
       - name: Exercise trusted references against the packaged actual host
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
         run: node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts .core-build/dist
       - uses: actions/upload-artifact@v4
         if: always()

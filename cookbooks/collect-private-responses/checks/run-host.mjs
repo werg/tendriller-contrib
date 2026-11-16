@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-const { values } = parseArgs({ options: { artifacts: { type: 'string' } } });
+const { values } = parseArgs({ options: { artifacts: { type: 'string' }, output: { type: 'string' } } });
 if (!values.artifacts) throw Error('Usage: node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts /path/to/core/dist');
 const artifacts = resolve(values.artifacts), here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
@@ -54,7 +54,18 @@ const require = createRequire(import.meta.url);
 const migrations = await readD1Migrations(dirname(require.resolve('@tendriller/engine/accounts-schema')));
 export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:30000,provide:{d1Migrations:migrations}}});\n`);
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund']);
-  run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.config.mjs']);
-  console.log(JSON.stringify({ evidence: 'exercised', host: 'real built Worker', sdk_sha256: identity(sdk), engine_sha256: identity(engine),
-    private_reference_sha256: identity(join(directory, 'private-responses.mjs')), approval_reference_sha256: identity(join(directory, 'approval.mjs')) }, null, 2));
+  run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.config.mjs', '--reporter=default', '--reporter=json', '--outputFile=vitest-results.json']);
+  const testReport = JSON.parse(readFileSync(join(directory, 'vitest-results.json'), 'utf8'));
+  const evidence = {
+    evidence: 'exercised', date: new Date().toISOString(), host: 'real built Worker',
+    source_commit: process.env.GITHUB_SHA || null, core_commit: process.env.CORE_CHECK_REF || null,
+    sdk_sha256: identity(sdk), engine_sha256: identity(engine),
+    private_reference_sha256: identity(join(directory, 'private-responses.mjs')), approval_reference_sha256: identity(join(directory, 'approval.mjs')),
+    scenarios: testReport.testResults.flatMap(file => file.assertionResults.map(test => ({ name: test.fullName, status: test.status }))),
+    limits: ['Synthetic test identities and text responses; private media and production deployment are not exercised.'],
+  };
+  const output = resolve(values.output || join(root, 'test-results/host-evidence.json'));
+  mkdirSync(dirname(output), { recursive: true });
+  writeFileSync(output, JSON.stringify(evidence, null, 2) + '\n');
+  console.log(JSON.stringify(evidence, null, 2));
 } finally { rmSync(directory, { recursive: true, force: true }); }
