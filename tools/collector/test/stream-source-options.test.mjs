@@ -19,6 +19,13 @@ async function directory(t) {
   return path;
 }
 
+test('latest file source validates format, path and durable policy', () => {
+  const latest = { ...base, type:'latest', path:'snapshot.json' };
+  const config = source => validateConfig({api,token,sources:[source]},'/work');
+  assert.equal(config(latest).sources[0].path,'/work/snapshot.json');
+  assert.throws(()=>config({...latest,format:'jsonl'}),/Latest file format/);
+  assert.throws(()=>config({...latest,durability:'ephemeral'}),/durable/);
+});
 test('source projection validates bounded literal paths and preserves input metadata', () => {
   const config = source => validateConfig({ api, token, sources: [source] }, '/work');
   for (const max_line_bytes of [0, 1023, 1048577, Infinity, '65536'])
@@ -61,7 +68,9 @@ test('raw and wrapped records retain explicit source/run values and use configur
       assert.equal(record.data.run, expected.run);
     }
   }
-  assert.deepEqual(lineRecord({ ...base, run: undefined }, '7').data, { value: 7, source: base.id, run: null });
+  assert.deepEqual(lineRecord({ ...base, run: undefined }, '7').data, { value: 7, source: base.id });
+  assert.deepEqual(lineRecord({ ...base, run: undefined }, '{"run":null,"loss":1}').data,
+    {run:null, loss:1, source:base.id});
 });
 
 test('projection keeps distinct input runs and sources while collector diagnostics retain configured defaults', () => {
