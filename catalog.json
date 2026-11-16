@@ -552,6 +552,35 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/discover-capabilities/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Distinguish API presence from usable permission and offer a task-completing alternative before requesting access. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "explore-what-if-scenarios",
+      "title": "Explore assumptions with what-if scenarios",
+      "summary": "Build a bounded model with an inspectable baseline, comparable scenarios, sensitivity checks, and explicit uncertainty.",
+      "group": "Decide and act",
+      "tags": [
+        "scenarios",
+        "models",
+        "uncertainty"
+      ],
+      "choices": [
+        "Simple calculator or a scenario workspace",
+        "Fixed baseline versus changing model and source data",
+        "Sensitivity ranges versus unsupported predictive certainty"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "compare-options",
+        "present-live-measurements",
+        "review-exact-proposal"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/agent.md"
+      ],
+      "path": "cookbooks/explore-what-if-scenarios/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/explore-what-if-scenarios/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Build a bounded model with an inspectable baseline, comparable scenarios, sensitivity checks, and explicit uncertainty. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "export-and-restore-work",
       "title": "Export, inspect, and restore portable work",
       "summary": "Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.",
@@ -1145,6 +1174,35 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-measurement-experiment/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "search-and-filter-collections",
+      "title": "Search and filter a growing collection",
+      "summary": "Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.",
+      "group": "Design everyday interactions",
+      "tags": [
+        "search",
+        "collections",
+        "navigation"
+      ],
+      "choices": [
+        "Local filtering or an authorized indexed query",
+        "Stable ordering and snapshot versus live results",
+        "Visible-page selection versus every matching record"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "reconcile-concurrent-edits",
+        "separate-evidence-interpretation",
+        "triage-incoming-work"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/STREAMS.md"
+      ],
+      "path": "cookbooks/search-and-filter-collections/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/search-and-filter-collections/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "select-local-perception",
       "title": "Add local perception with an explicit engine",
       "summary": "Choose model assets, confidence rules, coordinate conventions, and evaluation for optional pose, object, or text recognition.",
@@ -1232,6 +1290,36 @@
       ],
       "path": "cookbooks/test-adaptive-page/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/test-adaptive-page/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "triage-incoming-work",
+      "title": "Triage an incoming queue without losing work",
+      "summary": "Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "triage",
+        "queues",
+        "ownership"
+      ],
+      "choices": [
+        "Shared inbox or an authoritative claim policy",
+        "Priority, due time, and escalation as separate decisions",
+        "Snoozed or filtered work versus completed work"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "search-and-filter-collections",
+        "reconcile-concurrent-edits",
+        "observe-long-running-process"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/BROWSER_API.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/DURABILITY.md",
+        "https://github.com/werg/tendriller/blob/44ba1371328281ad9a271b9a1709d6a5bfb2732e/docs/EXPERIENCES.md"
+      ],
+      "path": "cookbooks/triage-incoming-work/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/triage-incoming-work/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "turn-records-into-signals",

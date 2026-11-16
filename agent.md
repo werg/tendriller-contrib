@@ -26,6 +26,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 ### Decide and act
 
 - [Build a comparison and decision workspace](cookbooks/compare-options/COOKBOOK.md) — Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score.
+- [Explore assumptions with what-if scenarios](cookbooks/explore-what-if-scenarios/COOKBOOK.md) — Build a bounded model with an inspectable baseline, comparable scenarios, sensitivity checks, and explicit uncertainty.
 - [Observe long-running work and enable intervention](cookbooks/observe-long-running-process/COOKBOOK.md) — Separate freshness, progress, failures, and intervention from the agent conversation that may come and go.
 - [Review an exact proposal before acting](cookbooks/review-exact-proposal/COOKBOOK.md) — Bind approval to immutable content and an explicit version, expiry, and execution policy.
 
@@ -33,6 +34,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 
 - [Build forms people can complete and correct](cookbooks/build-correctable-forms/COOKBOOK.md) — Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work.
 - [Make the complete interaction accessible](cookbooks/complete-accessible-interactions/COOKBOOK.md) — Preserve keyboard operation, focus, understandable status, and equivalent task paths from first use through errors, recovery, and completion.
+- [Search and filter a growing collection](cookbooks/search-and-filter-collections/COOKBOOK.md) — Make query scope, filtering, ordering, and selection understandable as results grow, change, or become unavailable.
 
 ### Guide and coordinate work
 
@@ -43,6 +45,7 @@ Inspect the task and existing files first. Select only relevant guides; related 
 - [Guide practice with useful feedback](cookbooks/guide-practice-and-feedback/COOKBOOK.md) — Make attempts, hints, scoring, reflection, and return sessions transparent without confusing assistance or activity with demonstrated mastery.
 - [Join or transfer a page across devices](cookbooks/join-across-devices/COOKBOOK.md) — Choose role-aware links and a usable transfer method without turning device purpose into authority.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
+- [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
 ### Keep work dependable
 
