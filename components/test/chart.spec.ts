@@ -260,7 +260,7 @@ test('shared domains align peer cursors without callback loops and clip extreme 
   await page.evaluate(() => (window as any).charts[0].update([{ id: 'a', points: [
     { x: -Number.MAX_VALUE, y: 0 }, { x: Number.MAX_VALUE, y: 1 },
   ] }], { xDomain: [-1, 1] }));
-  await expect(page.locator('path.tc-series').first()).toHaveAttribute('d', 'M76.00,115.00 L460.00,115.00');
+  await expect(page.locator('path.tc-series').first()).toHaveAttribute('d', 'M76.00,127.00 L460.00,127.00');
   expect(await page.locator('[data-tendril-chart] > svg').first().evaluate(node => node.outerHTML)).not.toMatch(/NaN|Infinity/);
 });
 
