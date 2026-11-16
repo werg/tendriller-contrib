@@ -8,6 +8,14 @@ import { readFileSync } from 'node:fs';
 import { parseArgs } from '../../cli/lib/args.mjs';
 import { readCheckpoint } from '../lib/pending-events.mjs';
 
+const iso = () => new Date().toISOString();
+const PING_MS = Math.max(1000, Number(process.env.TENDRIL_WATCH_PING_MS) || 25000);
+const PONG_TIMEOUT_MS = Math.max(1000, Number(process.env.TENDRIL_WATCH_PONG_TIMEOUT_MS) || 12000);
+const WARN_GAP_MS = Math.max(3000, Number(process.env.TENDRIL_WATCH_WARN_GAP_MS) || 15000);
+const diagnostic = (state, data = {}) => process.stderr.write(JSON.stringify({watch:'tendril-watch',at:iso(),state,...data})+'\n');
+const notify = (t, data = {}) => console.log(JSON.stringify({t,at:iso(),...data}));
+let armed=false, outageAt=null, outageReason=null, warningSent=false, lastNotifiedSeq=0;
+
 let parsed;
 try { parsed = parseArgs(process.argv.slice(2)); } catch (error) { process.stderr.write(error.message + '\n'); process.exit(2); }
 const { cmd: file, args, flags } = parsed;
@@ -41,43 +49,74 @@ function connect() {
     // The server sends a catch-up wake at once if waking events newer than the cursor are queued.
     url.searchParams.set('after', String(cfg.after));
     const ws = new WebSocket(url, ['tendriller.agent.v2', cfg.token]);
-    let opened = false, lastPong = Date.now(), timer = null;
-    let settled = false;
-    const done = (result) => {
+    let opened=false, connectedAt=0, timer=null, pongTimeout=null, errored=false, settled=false;
+    const done = result => {
       if (settled) return;
-      settled = true; clearInterval(timer); try { ws.close(); } catch {} resolve(result);
+      settled=true; clearInterval(timer); clearTimeout(pongTimeout);
+      try { ws.close(); } catch { /* already closed */ }
+      resolve({opened,connected_ms:opened ? Date.now()-connectedAt : 0,...result});
     };
     ws.addEventListener('open', () => {
-      if (ws.protocol !== 'tendriller.agent.v2') { done({ fatal: 'the server did not accept the agent protocol' }); return; }
-      opened = true;
-      timer = setInterval(() => {
-        if (Date.now() - lastPong > 150000) { done({ opened }); return; }
-        try { ws.send('{"t":"ping"}'); } catch { done({ opened }); }
-      }, 60000);
+      if (ws.protocol !== 'tendriller.agent.v2') {done({fatal:'the server did not accept the agent protocol'}); return;}
+      opened=true; connectedAt=Date.now();
+      if (!armed) {diagnostic('connected, listening',{heartbeat_ms:PING_MS}); armed=true;}
+      else if (outageAt !== null) {
+        diagnostic('reconnected, listening',{gap_ms:Date.now()-outageAt,previous:outageReason});
+        outageAt=null; outageReason=null; warningSent=false;
+      }
+      timer=setInterval(() => {
+        if (ws.readyState !== WebSocket.OPEN || pongTimeout !== null) return;
+        try {ws.send('{"t":"ping"}');}
+        catch {done({code:1006,reason:'ping_send_failed'}); return;}
+        pongTimeout=setTimeout(() => {
+          try {ws.close(4000,'heartbeat timeout');} catch {}
+          done({code:4000,reason:'pong_timeout'});
+        },PONG_TIMEOUT_MS);
+      },PING_MS);
     });
-    ws.addEventListener('message', (event) => {
+    ws.addEventListener('message', event => {
       let message;
-      try { message = JSON.parse(String(event.data)); } catch { return; }
-      if (message.t === 'pong') lastPong = Date.now();
-      else if (message.t === 'wake' && Number.isSafeInteger(message.seq)) console.log(JSON.stringify({ t: 'wake', seq: message.seq }));
+      try {message=JSON.parse(String(event.data));} catch {return;}
+      if (message.t === 'pong') {clearTimeout(pongTimeout); pongTimeout=null;}
+      else if (message.t === 'wake' && Number.isSafeInteger(message.seq) && message.seq > lastNotifiedSeq) {
+        lastNotifiedSeq=message.seq;
+        notify('wake',{seq:message.seq});
+      }
     });
-    // Failing before the upgrade completes means the token was refused, the page is gone or the network is blocked.
-    const ended = () => done(opened ? { opened } : { rejected: true });
-    ws.addEventListener('error', ended);
-    ws.addEventListener('close', ended);
+    ws.addEventListener('error', () => {errored=true;});
+    ws.addEventListener('close', event => done({
+      code:event.code || 1006,
+      reason:event.reason || (errored?'socket_error':'peer_closed'),
+    }));
   });
 }
 
 const baseDelay = Number(process.env.TENDRIL_WATCH_RETRY_MS) || 1000;
-let failures = 0;
+let failures=0;
 for (;;) {
-  const result = await connect();
-  if (result.fatal) { console.log(`tendril-watch: stopped, ${result.fatal}`); process.exit(1); }
-  if (result.opened) failures = 0; else failures++;
-  if (failures >= 5) {
-    console.log('tendril-watch: stopped, the socket was refused five times; check the token, the page and network access to the service');
+  const result=await connect();
+  if (result.fatal) {
+    console.log(`tendril-watch: stopped at ${iso()}, ${result.fatal}`);
     process.exit(1);
   }
-  process.stderr.write('tendril-watch: socket closed; reconnecting\n');
-  await new Promise((r) => setTimeout(r, Math.min(baseDelay * 2 ** failures, 30000)));
+  failures=result.opened?0:failures+1;
+  if (outageAt === null) {
+    outageAt=Date.now();
+    outageReason={code:result.code??1006,reason:result.reason||'connection_refused'};
+  }
+  const gap=()=>Date.now()-outageAt;
+  const retryMs=Math.min(baseDelay*2**failures,30000);
+  diagnostic('socket closed; reconnecting',{
+    code:result.code??1006,reason:result.reason||'connection_refused',
+    connected_ms:result.connected_ms,gap_ms:gap(),retry_in_ms:retryMs,
+  });
+  if (failures>=5) {
+    console.log(`tendril-watch: stopped at ${iso()}, socket refused five times (code ${result.code??1006}; ${result.reason||'connection_refused'}; gap ${gap()}ms); check the token, page and network`);
+    process.exit(1);
+  }
+  await new Promise(resolve=>setTimeout(resolve,retryMs));
+  if (!warningSent && gap()>=WARN_GAP_MS) {
+    notify('watch_warning',{code:outageReason.code,reason:outageReason.reason,gap_ms:gap()});
+    warningSent=true;
+  }
 }
