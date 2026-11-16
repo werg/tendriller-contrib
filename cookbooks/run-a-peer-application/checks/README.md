@@ -278,6 +278,9 @@ The [first actual RTC run](../notes/webrtc-qualification-43976651713.md) preserv
 five passing assertions, the raw report and its validated summary. It exercised
 the loopback offer/answer fixture; it does not qualify later public HTTP endpoint
 or resident-task code under a newer source identity.
+The [subsequent direct-introduction run](../notes/direct-rtc-qualification-43978428041.md)
+separately passed all five Chromium/public-HTTP RTC assertions and six native
+HTTPS resident-task checks under exact clean source and recipe pins.
 
 Record the exact source heads, public bundle digest, native engine/WASM identity,
 browser version and per-scenario outcome. A screenshot or fixture-only browser
