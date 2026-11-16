@@ -8,7 +8,7 @@ choices: ["Simple calculator or a scenario workspace", "Fixed baseline versus ch
 capabilities: []
 evidence: "explained"
 related: ["compare-options", "present-live-measurements", "review-exact-proposal"]
-sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/agent.md"]
+sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/agent.md"]
 ---
 
 # Explore assumptions with what-if scenarios

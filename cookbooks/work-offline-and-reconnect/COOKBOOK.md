@@ -6,7 +6,7 @@ group: "Keep work dependable"
 tags: ["offline", "drafts", "recovery"]
 choices: ["Saved publication versus unsaved optional capabilities", "Local work versus accepted server outcomes", "Original retries versus reviewed reconciliation"]
 related: ["recover-outdated-work", "publish-coherent-updates", "resume-across-sessions"]
-sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PROTOCOL.md"]
+sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PROTOCOL.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -38,7 +38,7 @@ Keep a preparation checklist small and concrete: current publication saved, requ
 
 Test navigation to each required nested HTML file. A missing offline route must not silently show a different entry page. Verify the intended cold-start path in the target browser and identity context; an already-open tab surviving network loss does not prove a later fresh navigation will work. Do not promise indefinite offline access or background execution.
 
-Read exact behavior in the [reviewed browser contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md), then check the actual deployed environment and current public docs when implementing.
+Read exact behavior in the [reviewed browser contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md), then check the actual deployed environment and current public docs when implementing.
 
 ## Keep local work and the outbox understandable
 
@@ -46,7 +46,7 @@ Snapshot each submitted intent separately from the editable draft. Preserve appl
 
 Use documented results and lifecycle events for the specific operation. Ordinary events, actual state commands, and timer mutations distinguish accepted, queued, and rejected work. An empty unconditional state change returns `unchanged` without implying a service receipt. Capture work has its own queue and retry/discard controls; those controls do not apply to every command type. Cancelling a local preview does not undo accepted work.
 
-Use the [core browser queues](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md) to restore submitted work: `state.pending()` and `timers.pending()` expose the original durable commands, while `state_queue`/`timer_queue` and `state_result`/`timer_result` report changes and correlated outcomes. Keep the page's editable drafts and selection context separate, but do not duplicate core's mutation queue. A queued conditional state claim must not appear accepted, and a queued timer cancellation has not stopped the server schedule. The original operations, settings, checks, and generations survive a reload without being refreshed to current values.
+Use the [core browser queues](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md) to restore submitted work: `state.pending()` and `timers.pending()` expose the original durable commands, while `state_queue`/`timer_queue` and `state_result`/`timer_result` report changes and correlated outcomes. Keep the page's editable drafts and selection context separate, but do not duplicate core's mutation queue. A queued conditional state claim must not appear accepted, and a queued timer cancellation has not stopped the server schedule. The original operations, settings, checks, and generations survive a reload without being refreshed to current values.
 
 Bound draft bytes, attachment count, and pending items. When storage fails or a budget is reached, preserve the last coherent draft and explain what cannot be retained. Offer a reviewed export or a smaller submission only when appropriate for the data. Never silently evict the oldest unsent observation to make room for a new one unless that is an explicit, visible policy.
 

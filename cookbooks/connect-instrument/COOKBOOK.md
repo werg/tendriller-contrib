@@ -55,7 +55,7 @@ An example sample record can contain run ID, source identity, channel, sequence,
 
 Bound the in-memory model and render cadence separately from acquisition. A chart need not redraw for every accepted sample. Apply the [bounded telemetry guide](../ingest-bounded-telemetry/COOKBOOK.md) when the producer or network cannot keep up. Report lost or rejected samples and gaps rather than interpolating them into observations. Quiet telemetry should not wake an agent unless a task-specific intervention is useful.
 
-Use the [public collector guidance](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/tools/COLLECTOR.md) for an independently running producer. Browser connection success, collector process health, service admission, and agent handling are distinct states. Keep producer/admin credentials out of page-owned public files and exports.
+Use the [public collector guidance](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/tools/COLLECTOR.md) for an independently running producer. Browser connection success, collector process health, service admission, and agent handling are distinct states. Keep producer/admin credentials out of page-owned public files and exports.
 
 ## Interruption and accessibility
 

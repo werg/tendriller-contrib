@@ -44,7 +44,7 @@ For low-consequence dictation, automatic insertion may be sufficient. For a comm
 
 ## Keep the processing and lifecycle honest
 
-The [public voice contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/HANDS_FREE.md) makes voice an optional adapter. Construction starts no microphone, speech, or download. A stored engine preference is not consent to listen or play audio on a new visit. Use its explicit preparation, capture, cancellation, stop, and disposal lifecycle through page-owned controls; do not build a second invisible auto-restart loop around it.
+The [public voice contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/HANDS_FREE.md) makes voice an optional adapter. Construction starts no microphone, speech, or download. A stored engine preference is not consent to listen or play audio on a new visit. Use its explicit preparation, capture, cancellation, stop, and disposal lifecycle through page-owned controls; do not build a second invisible auto-restart loop around it.
 
 Browser SpeechRecognition is an engine choice, not evidence of local processing. The reviewed adapter's local mode requires supported local recognition and language assets; browser mode may use a network provider. Neither is a dedicated low-power acoustic wake-word model. Explain the chosen mode and fail visibly when it is unavailable rather than silently changing processing location. A model installation has its own size, progress, cancellation, and failure state.
 

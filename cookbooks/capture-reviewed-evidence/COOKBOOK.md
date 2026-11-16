@@ -76,7 +76,7 @@ begins that action, before asynchronous recording, processing, or rendering. Pas
 its returned `scope` and `expected_generations` to the durable submission and keep
 them unchanged. Capturing a fresh generation only after a long recording could
 silently attach old evidence to a reset task. The
-[public capture contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/CAPTURES.md)
+[public capture contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/CAPTURES.md)
 defines that boundary and the separate upload, pin, and semantic-event phases.
 
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.

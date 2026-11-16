@@ -8,7 +8,7 @@ choices: ["Date-only task, absolute instant, or local calendar recurrence", "Tas
 capabilities: []
 evidence: "explained"
 related: ["choose-interruptions", "guide-explicit-checkpoints", "triage-incoming-work", "review-exact-proposal"]
-sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PUSH_NOTIFICATIONS.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/contract/v3.json", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/EXPERIENCES.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/DURABILITY.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PUSH_NOTIFICATIONS.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/contract/v3.json", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
 ---
 
 # Plan work across time zones and deadlines
@@ -45,9 +45,9 @@ An agenda often works better than a full calendar on a phone. A team schedule ma
 
 ## Use the actual durable timer contract
 
-Core has real server timers. The [public timer guide](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) documents durable, guarded commands through the agent and owner-page interfaces. The owner must claim the page, and the page lifetime must cover the schedule. A timer does not keep an expired ad-hoc page alive. Inspect the deployed limits and lifetime before offering a long-lived reminder.
+Core has real server timers. The [public timer guide](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) documents durable, guarded commands through the agent and owner-page interfaces. The owner must claim the page, and the page lifetime must cover the schedule. A timer does not keep an expired ad-hoc page alive. Inspect the deployed limits and lifetime before offering a long-lived reminder.
 
-With the initialized public browser `runtime`, call [the timer API](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md#durable-timers) once when the person confirms a reviewed reminder. This example expresses a weekday review in Berlin and asks core to calculate its first occurrence:
+With the initialized public browser `runtime`, call [the timer API](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md#durable-timers) once when the person confirms a reviewed reminder. This example expresses a weekday review in Berlin and asks core to calculate its first occurrence:
 
 ```js
 const result = await runtime.timers.create({
@@ -63,7 +63,7 @@ The runtime owns and persists the command ID and retries the exact command after
 
 Use `runtime.timers.list()` to read the current schedule and lifetime, and `history()` for occurrences and delivery. An accepted receipt describes the original command: the timer may already have fired, advanced, or been removed when a delayed reply arrives. Refresh the list before presenting a recovered receipt as current scheduling status.
 
-Core also retains valid commands rejected with `quota`, `lifetime_required`, `unclaimed`, `timer_conflict`, `not_found`, `already_fired`, or a semantic `bad_request`. Their exact retries return the original decision, even after a slot opens or the page lifetime changes. Error details describe that earlier decision, including its observed revision or expiration. Refresh the schedule, address the cause, and review a new intent before calling the browser method again; the runtime then creates its new CID. Current authorization, malformed-command, generation, transport, and receipt-storage failures have different [receipt boundaries](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/DURABILITY.md#timer-mutation-receipts). Keep unresolved `queued` work visible until the runtime resolves it.
+Core also retains valid commands rejected with `quota`, `lifetime_required`, `unclaimed`, `timer_conflict`, `not_found`, `already_fired`, or a semantic `bad_request`. Their exact retries return the original decision, even after a slot opens or the page lifetime changes. Error details describe that earlier decision, including its observed revision or expiration. Refresh the schedule, address the cause, and review a new intent before calling the browser method again; the runtime then creates its new CID. Current authorization, malformed-command, generation, transport, and receipt-storage failures have different [receipt boundaries](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/DURABILITY.md#timer-mutation-receipts). Keep unresolved `queued` work visible until the runtime resolves it.
 
 Omit `repeat` for a one-shot timer with the intended `due_at`; interval recurrence uses `every_minutes`. Calendar days use Sunday as zero. The public contract does not advertise arbitrary cron expressions, monthly recurrences, or holiday calendars; choose an additional explicit policy when those are needed.
 
@@ -73,9 +73,9 @@ Core's calendar policy skips nonexistent spring-transition wall times and uses t
 
 Core's `missed:"fire_once"` coalesces missed repeating occurrences into one run before advancing to a future occurrence. `missed:"skip"` records an occurrence as skipped when it is more than two minutes late. Choose according to the task: an overdue review can still be useful, while a reminder for a concluded meeting may no longer help. Neither policy means the application can ignore the unresolved task itself.
 
-Timer occurrence, agent processing, push delivery, and human completion remain separate records. The [durability contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/DURABILITY.md) records the occurrence/event/notification intent atomically, then delivers push through bounded retries. Its history reports delivery states and errors. Provider acceptance does not prove display or reading, and retries after uncertain outcomes can repeat delivery.
+Timer occurrence, agent processing, push delivery, and human completion remain separate records. The [durability contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/DURABILITY.md) records the occurrence/event/notification intent atomically, then delivers push through bounded retries. Its history reports delivery states and errors. Provider acceptance does not prove display or reading, and retries after uncertain outcomes can repeat delivery.
 
-Use the stable timer run ID for retry-safe downstream work where the receiving service supports it. A timer event is ordinary page data; it does not automatically authorize an external action or make that action exactly-once. For notifications, verify service readiness and an eligible owner-device subscription through the [public notification contract](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PUSH_NOTIFICATIONS.md). Keep the underlying task visible if notification delivery is unavailable.
+Use the stable timer run ID for retry-safe downstream work where the receiving service supports it. A timer event is ordinary page data; it does not automatically authorize an external action or make that action exactly-once. For notifications, verify service readiness and an eligible owner-device subscription through the [public notification contract](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PUSH_NOTIFICATIONS.md). Keep the underlying task visible if notification delivery is unavailable.
 
 ## Reschedule without creating conflicting intent
 

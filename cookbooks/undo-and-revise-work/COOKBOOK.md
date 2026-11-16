@@ -6,7 +6,7 @@ group: "Design everyday interactions"
 tags: ["undo", "history", "concurrency"]
 choices: ["Local edit history versus accepted shared revisions", "Guarded inverse versus restore or compensation", "Reversible UI changes versus irreversible external effects"]
 related: ["reconcile-concurrent-edits", "review-exact-proposal", "recover-outdated-work"]
-sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -70,7 +70,7 @@ For restoring a truly absent record, `exists:false` can guard its stable ID befo
 
 An arithmetic inverse may also be wrong. Subtracting a previous increment can be valid for an explicitly additive domain but not for a field that someone has subsequently set to a chosen total. Reversing a deletion may require preserving identity, references, ordering, and permissions; recreating a visually similar row is not necessarily the same object.
 
-Each new browser write creates its own reversal command; automatic delivery retries retain that command's original predicates and generations. Keep the original operation's receipt available. A conditional inverse does not change the optimistic shared view: show “Undo pending” until `accepted`, retain it through `queued`, and offer comparison on `rejected`. Observe `state_result` for a terminal result after queuing. Do not invoke Undo again to retry delivery. A durable `state_conflict` remains rejected even if the predicate later becomes true; a fresh reviewed inverse is new intent. See the [browser API](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md).
+Each new browser write creates its own reversal command; automatic delivery retries retain that command's original predicates and generations. Keep the original operation's receipt available. A conditional inverse does not change the optimistic shared view: show “Undo pending” until `accepted`, retain it through `queued`, and offer comparison on `rejected`. Observe `state_result` for a terminal result after queuing. Do not invoke Undo again to retry delivery. A durable `state_conflict` remains rejected even if the predicate later becomes true; a fresh reviewed inverse is new intent. See the [browser API](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md).
 
 Use the admitted result's `cid` to correlate this reversal. `state.pending()` and `state_queue` restore unsettled operations after reload; `state_result` includes their original normalized `ops` and predicates, so the affected item and inverse value remain identifiable without another outbox. If accepted history needs an explicit “reverses this earlier operation” link, write that application history record in the same conditional `apply` batch. The pending view is not retained rejection history; keep the person's recoverable draft according to the history policy. An empty unconditional inverse returns `unchanged`, which is not an accepted reversal.
 

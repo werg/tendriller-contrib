@@ -6,7 +6,7 @@ group: "Guide and coordinate work"
 tags: ["scheduling", "resources", "concurrency"]
 choices: ["Advisory availability versus authoritative reservation", "Exclusive resources versus capacity and tentative holds", "Local-time intent versus exact instants and recurring exceptions"]
 related: ["review-exact-proposal", "reconcile-concurrent-edits", "plan-time-and-deadlines"]
-sources: ["https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md"]
+sources: ["https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/PROTOCOL.md", "https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md"]
 capabilities: []
 evidence: "explained"
 ---
@@ -47,7 +47,7 @@ Choose recurrence semantics deliberately. “Every Tuesday at 09:00 in this loca
 
 ## Put the guarantee at the authority boundary
 
-For a simple fixed-slot model, use a coherent `await tendril.state.snapshot()` for review, then [one conditional state batch](https://github.com/werg/tendriller/blob/dc3ca11c21dda979e295b53e1db0a53b6773b4bc/docs/BROWSER_API.md) to create the reservation and claim every selected slot. The following example assumes a validated resource, a nonempty bounded set of unique slot IDs, a new stable application `reservationId`, and scope generations retained with the reviewed proposal:
+For a simple fixed-slot model, use a coherent `await tendril.state.snapshot()` for review, then [one conditional state batch](https://github.com/werg/tendriller/blob/7c6e61529e8878a1dc3585f2eb4d9cc8945f734d/docs/BROWSER_API.md) to create the reservation and claim every selected slot. The following example assumes a validated resource, a nonempty bounded set of unique slot IDs, a new stable application `reservationId`, and scope generations retained with the reviewed proposal:
 
 ```js
 const result = await tendril.state.apply([
