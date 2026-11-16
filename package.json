@@ -1,6 +1,6 @@
 {
   "name": "@tendriller/contrib",
-  "version": "0.2.0-rc.2",
+  "version": "0.2.0-rc.3",
   "private": true,
   "type": "module",
   "description": "Optional first-party tools, components, workflows and examples for Tendriller",
@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",
-    "@tendriller/core": "file:vendor/core/tendriller-sdk-0.2.0-rc.4.tgz",
-    "@tendriller/runtime": "file:vendor/core/tendriller-runtime-0.2.0-rc.4.tgz",
+    "@tendriller/core": "file:vendor/core/tendriller-sdk-0.2.0-rc.5.tgz",
+    "@tendriller/runtime": "file:vendor/core/tendriller-runtime-0.2.0-rc.5.tgz",
     "ws": "8.21.0"
   },
   "devDependencies": {

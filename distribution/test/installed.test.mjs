@@ -15,9 +15,9 @@ async function workspace(t){const dir=await mkdtemp(join(tmpdir(),'contrib-insta
 
 test('installable tools run outside both repositories and every starter resolves its complete asset set',async t=>{
  const dir=await workspace(t),installed=join(dir,'installed');await mkdir(installed);
- await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.2.tgz'),'-C',installed]);
+ await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.3.tgz'),'-C',installed]);
  const npmPrefix=join(dir,'npm-install');
- await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.2.tgz')],{cwd:dir});
+ await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.3.tgz')],{cwd:dir});
  const cli=join(npmPrefix,'node_modules/@tendriller/contrib/tools/cli/bin/tendril.mjs');
  const {stdout}=await run(process.execPath,[cli,'recipes'],{cwd:dir});
  const recipes=JSON.parse(stdout).recipes;
