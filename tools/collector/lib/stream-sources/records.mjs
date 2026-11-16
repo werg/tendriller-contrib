@@ -97,10 +97,10 @@ function flatten(value, options) {
 export function recordFor(source, type, value, ts = Date.now()) {
   // Input metadata identifies the observation, not necessarily this collector.
   // Preserve it before projection so selecting metrics cannot merge distinct runs.
-  const identity = { source: object(value) && Object.hasOwn(value, 'source') ? value.source : source.id };
-  // Preserve explicit null, but do not inject a meaningless run:null into every observation.
-  if (object(value) && Object.hasOwn(value, 'run')) identity.run = value.run;
-  else if (source.run !== undefined) identity.run = source.run;
+  const identity = {
+    source: object(value) && Object.hasOwn(value, 'source') ? value.source : source.id,
+    run: object(value) && Object.hasOwn(value, 'run') ? value.run : source.run ?? null,
+  };
   value = flatten(project(value, source.fields), source.flatten);
   const data = { ...(object(value) ? value : { value }), ...identity };
   const record = { id: randomUUID(), ts, type, data };

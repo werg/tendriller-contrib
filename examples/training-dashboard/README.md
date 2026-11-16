@@ -5,8 +5,8 @@ configuration with Node.js 22.15+. No repository checkout or npm install is
 needed. Download the helper and complete example from one pinned contrib release:
 
 ```sh
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.1/manifest.json -o manifest.json
-curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.1/tendriller-tools-0.2.0-rc.1.tgz -o tools.tgz
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.2/manifest.json -o manifest.json
+curl -fL https://github.com/werg/tendriller-contrib/releases/download/v0.2.0-rc.2/tendriller-tools-0.2.0-rc.2.tgz -o tools.tgz
 # Verify tools.tgz against the manifest before extracting.
 mkdir tendriller-tools
 tar -xzf tools.tgz -C tendriller-tools
@@ -94,7 +94,6 @@ Provision the collector, then publish the downloaded dashboard files:
 ```sh
 node tendril-stream.mjs init --page ~/.config/tendril/training-chat.json \
   --streams streams.json --out private/collector.json
-tendril assets sync ./dashboard   # optional: push also vendors declared components
 tendril --tendril training-chat push ./dashboard
 ```
 

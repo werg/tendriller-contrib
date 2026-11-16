@@ -114,7 +114,7 @@ export async function pendingEvents(cfg, file, { limit = 100, initialCursor = 0 
     }
     return {
       state: { ...saved, handled_cursor: handled, delivered_cursor: Math.max(saved.delivered_cursor, batch.cursor) },
-      result: { ...(() => { const { agent_reminder, ...rest } = batch; return rest; })(), events, after, handled_cursor: handled, probes, has_more: batch.events.length === limit },
+      result: { ...batch, events, after, handled_cursor: handled, probes, has_more: batch.events.length === limit },
     };
   });
 }

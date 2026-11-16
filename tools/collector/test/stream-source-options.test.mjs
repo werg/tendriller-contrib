@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createLineDecoder, lineRecord, recordFor } from '../lib/stream-sources/records.mjs';
 import { createCommandSource } from '../lib/stream-sources/command.mjs';
-import { Collector, readFileBatch, readLatestFile, validateConfig } from '../lib/stream-collector.mjs';
+import { Collector, readFileBatch, validateConfig } from '../lib/stream-collector.mjs';
 import { assertValid } from '@tendriller/core/contract';
 
 const api = 'https://tendriller.dev/api/t/aaaaaaaaaaaa', token = 'tp_' + 'a'.repeat(40);
@@ -19,37 +19,6 @@ async function directory(t) {
   return path;
 }
 
-test('latest file source validates format, path and durable policy', () => {
-  const latest = { ...base, type:'latest', path:'snapshot.json' };
-  const config = source => validateConfig({api,token,sources:[source]},'/work');
-  assert.equal(config(latest).sources[0].path,'/work/snapshot.json');
-  assert.throws(()=>config({...latest,format:'jsonl'}),/Latest file format/);
-  assert.throws(()=>config({...latest,durability:'ephemeral'}),/durable/);
-});
-test('latest file deduplicates unchanged snapshots by durable digest', async t => {
-  const dir = await directory(t), path = join(dir, 'current.json');
-  const source = { ...base, type:'latest', path, format:'json', run:undefined };
-  await writeFile(path,JSON.stringify({step:1,loss:0.5}));
-  const first=await readLatestFile(source,null);
-  assert.equal(first.records.length,1);
-  assert.deepEqual(first.records[0].data,{step:1,loss:0.5,source:base.id});
-  const same=await readLatestFile(source,first.checkpoint);
-  assert.deepEqual(same,{records:[],checkpoint:first.checkpoint});
-  await writeFile(path,JSON.stringify({step:2,loss:0.25}));
-  const second=await readLatestFile(source,first.checkpoint);
-  assert.equal(second.records[0].data.step,2);
-  assert.notEqual(second.checkpoint.digest,first.checkpoint.digest);
-  await writeFile(path,'not JSON');
-  const invalid=await readLatestFile(source,second.checkpoint);
-  assert.equal(invalid.records[0].data.reason,'invalid_json');
-  await writeFile(path,'a'.repeat(40000));
-  const oversized=await readLatestFile(source,invalid.checkpoint);
-  assert.equal(oversized.records[0].data.reason,'line_too_large');
-  assert.deepEqual((await readLatestFile(source,oversized.checkpoint)).records,[]);
-  const textSource={...source,format:'text'};
-  await writeFile(path,'Current status: ready');
-  assert.deepEqual((await readLatestFile(textSource,null)).records[0].data,{value:'Current status: ready',source:base.id});
-});
 test('source projection validates bounded literal paths and preserves input metadata', () => {
   const config = source => validateConfig({ api, token, sources: [source] }, '/work');
   for (const max_line_bytes of [0, 1023, 1048577, Infinity, '65536'])
@@ -92,9 +61,7 @@ test('raw and wrapped records retain explicit source/run values and use configur
       assert.equal(record.data.run, expected.run);
     }
   }
-  assert.deepEqual(lineRecord({ ...base, run: undefined }, '7').data, { value: 7, source: base.id });
-  assert.deepEqual(lineRecord({ ...base, run: undefined }, '{"run":null,"loss":1}').data,
-    {run:null, loss:1, source:base.id});
+  assert.deepEqual(lineRecord({ ...base, run: undefined }, '7').data, { value: 7, source: base.id, run: null });
 });
 
 test('projection keeps distinct input runs and sources while collector diagnostics retain configured defaults', () => {

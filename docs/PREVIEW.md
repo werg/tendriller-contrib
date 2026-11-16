@@ -19,21 +19,6 @@ canonical URL to select the new publication. Reloading an already executing
 publication preserves its original bytes, including lazily loaded components.
 Offline reload uses the same complete graph when the browser has cached it.
 
-Serving a local preview in a browser requires only Node.js 22.15+. For
-headless scenarios/screenshots, install Playwright and Chromium from the
-directory where you launch the helper:
-
-```sh
-npm install --no-save playwright
-npx playwright install chromium
-```
-
-A preview uses **local fixtures**, never the live service. A built-in
-control showing "Offline" refers to its disconnected local fixture socket
-or an explicit scenario `offline` step, not to a live agent or internet
-outage. `tendril.connected` reports the local socket state. Preview
-health does not claim a real page or confirm a live publication.
-
 For automated steps and a screenshot, install Playwright in the working project
 and run:
 

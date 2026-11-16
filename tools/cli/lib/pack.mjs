@@ -1,4 +1,4 @@
-import { verifyAssets, syncAssets } from "./assets.mjs";
+import { verifyAssets } from "./assets.mjs";
 // Packs a directory (or one file) into the body of POST <api>/files.
 // Text files go as UTF-8 strings, everything else as {base64, type}.
 // Skips dotfiles/dot-directories, node_modules and the reserved _tendril/ prefix.
@@ -59,7 +59,6 @@ export function pack(target, { as, merge = false, message } = {}) {
   const st = statSync(target);
   const body = { files: {} };
   if (st.isDirectory()) {
-    if (readdirSync(target).includes('tendril.json')) syncAssets(target);
     verifyAssets(target);
     const paths = listFiles(target);
     if (paths.length === 0) throw new Error(`nothing to upload in ${target}`);
