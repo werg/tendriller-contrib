@@ -7,7 +7,8 @@ function report() {
   const host = { requests: 5, requestBytes: 2048, responseBytes: 20000, applicationRequests: 0,
     signalingMessages: 2, signalingBytes: 4096 };
   const browser = { proposalId: 'original-browser-proposal', outcome: { transactionId: 'original-browser-proposal',
-    final: true, outcome: { type: 'accepted' } } };
+    final: true, phase: 'accepted', admissible: true, orderKey: 'original-order-key', outcome: { type: 'accepted' },
+    observedAt: '2026-11-16T00:00:00.000Z', eventSetRevision: '10', materializedRevision: '10', changedByReplay: false } };
   return { format: 'chronolog-webrtc-qualification/v1', passed: true,
     source: { chronolog: { head: 'a'.repeat(40), dirty: false } },
     runtime: { node: 'v24.0.0', browser: 'fixture-browser-version', native: 'werift@0.23.0' },
@@ -20,6 +21,7 @@ function report() {
       bytesAfterSignalingClosed: { browserSent: 120000, nativeSent: 140000 },
       records: { browserAuthored: 2, nativeAuthored: 3, atBrowser: 5, atNative: 5 },
       history: { browserSha256: 'b'.repeat(64), nativeSha256: 'b'.repeat(64) },
+      retry: { browserAuthoredBefore: ['record-a', 'record-b'], browserAuthoredAfter: ['record-a', 'record-b'] },
       payload: { bytes: 100000, expectedSha256: 'c'.repeat(64), receivedSha256: 'c'.repeat(64) },
       outcomes: { browser, retry: structuredClone(browser), native: { transactionId: 'original-native-proposal',
         final: true, outcome: { type: 'accepted' } } } } };
@@ -49,9 +51,32 @@ test('original accepted outcomes and identity must survive exact retry after hos
   for (const change of [
     value => { value.metrics.outcomes.retry.proposalId = 'replacement-proposal'; },
     value => { value.metrics.outcomes.browser.outcome.final = false; },
+    value => { value.metrics.outcomes.retry.outcome.orderKey = 'replacement-order'; },
+    value => { value.metrics.outcomes.retry.outcome.admissible = false; },
     value => { value.metrics.outcomes.native.final = false; },
     value => { value.metrics.outcomes.native.outcome.type = 'rejected'; },
     value => { delete value.metrics.outcomes.browser; },
+  ]) { const value = report(); change(value); assert.throws(() => validateWebRtcReport(value)); }
+});
+
+test('a retry preserves its immutable decision while local observation revisions and time advance', () => {
+  const value = report();
+  Object.assign(value.metrics.outcomes.retry.outcome, { observedAt: '2026-11-16T00:00:01.000Z',
+    eventSetRevision: '12', materializedRevision: '12', changedByReplay: true });
+  const summary = validateWebRtcReport(value);
+  assert.equal(summary.originalOperations.retry.outcome.eventSetRevision, '12');
+  assert.equal(summary.originalOperations.browser.outcome.eventSetRevision, '10');
+  assert.equal(summary.originalOperations.retry.proposalId, summary.originalOperations.browser.proposalId);
+});
+
+test('retry evidence must show unchanged original authored records, not merely equal accepted outcomes', () => {
+  for (const change of [
+    value => { delete value.metrics.retry; },
+    value => { value.metrics.retry.browserAuthoredAfter.push('replacement-record'); },
+    value => { value.metrics.retry.browserAuthoredAfter[0] = 'replacement-record'; },
+    value => { value.metrics.retry.browserAuthoredBefore = []; value.metrics.retry.browserAuthoredAfter = []; },
+    value => { value.metrics.retry.browserAuthoredBefore = ['record-a', 'record-a'];
+      value.metrics.retry.browserAuthoredAfter = ['record-a', 'record-a']; },
   ]) { const value = report(); change(value); assert.throws(() => validateWebRtcReport(value)); }
 });
 

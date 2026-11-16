@@ -12,6 +12,17 @@ function counter(value, name, { positive = false } = {}) {
   assert(Number.isSafeInteger(value) && value >= (positive ? 1 : 0), `${name} must be a ${positive ? 'positive' : 'nonnegative'} safe integer`);
   return value;
 }
+function immutableOutcome({ proposalId, outcome }) {
+  assert(nonempty(proposalId), 'The original proposal identity is required');
+  assert.equal(outcome?.transactionId, proposalId, 'The outcome must belong to its original proposal');
+  assert.equal(outcome.phase, 'accepted', 'The original operation must have an accepted phase');
+  assert.equal(outcome.final, true, 'The original operation must reach finality');
+  assert.equal(outcome.admissible, true, 'The original accepted operation must remain admissible');
+  assert.equal(outcome.outcome?.type, 'accepted', 'The original operation must be accepted');
+  assert(nonempty(outcome.orderKey), 'The original deterministic order key is required');
+  return { proposalId, outcome: { transactionId: outcome.transactionId, phase: outcome.phase, outcome: outcome.outcome,
+    orderKey: outcome.orderKey, admissible: outcome.admissible, final: outcome.final } };
+}
 
 export function validateWebRtcReport(report) {
   assert.equal(report?.format, 'chronolog-webrtc-qualification/v1', 'A current WebRTC qualification report is required');
@@ -66,10 +77,13 @@ export function validateWebRtcReport(report) {
   assert.equal(host.after.applicationRequests, 0, 'Fixture host observed an application request');
   const outcomes = metrics.outcomes;
   assert(nonempty(outcomes?.browser?.proposalId), 'The browser original proposal identity is required');
-  assert.equal(outcomes.browser.outcome?.transactionId, outcomes.browser.proposalId, 'The browser outcome must belong to its original proposal');
-  assert.equal(outcomes.browser.outcome?.final, true, 'The original browser operation must reach finality');
-  assert.equal(outcomes.browser.outcome?.outcome?.type, 'accepted', 'The original browser operation must be accepted');
-  assert.deepEqual(outcomes.retry, outcomes.browser, 'Exact retry must preserve the original proposal and final outcome');
+  assert.deepEqual(immutableOutcome(outcomes.retry), immutableOutcome(outcomes.browser),
+    'Exact retry must preserve the original proposal, deterministic order and immutable final decision');
+  const retry = metrics.retry;
+  assert(Array.isArray(retry?.browserAuthoredBefore) && retry.browserAuthoredBefore.length > 0 && retry.browserAuthoredBefore.every(nonempty),
+    'The browser authored record identities immediately before retry are required');
+  assert.deepEqual(retry.browserAuthoredBefore, [...new Set(retry.browserAuthoredBefore)].sort(), 'Original authored record identities must be unique and sorted');
+  assert.deepEqual(retry.browserAuthoredAfter, retry.browserAuthoredBefore, 'Retry must not author a replacement record');
   assert(nonempty(outcomes.native?.transactionId), 'The native original proposal identity is required');
   assert.equal(outcomes.native?.final, true, 'The original native operation must reach finality');
   assert.equal(outcomes.native?.outcome?.type, 'accepted', 'The original native operation must be accepted');
@@ -79,7 +93,8 @@ export function validateWebRtcReport(report) {
     signaling: { messages: metrics.signalingMessages, bytes: metrics.signalingBytes,
       closedBeforeExchange: true, messagesAfterClosed: 0 },
     fixtureHost: host, peerBytesAfterIntroduction: traffic, records, history: metrics.history, payload,
-    originalOperations: { browser: outcomes.browser, retry: outcomes.retry, native: outcomes.native },
+    originalOperations: { browser: outcomes.browser, retry: outcomes.retry, native: outcomes.native }, retryAuthoredRecords: retry,
+    retryComparison: 'Compare proposal identity, transaction identity, phase, decision, order key, admissibility and finality. Preserve raw observation timestamps, replay flags and replica revisions without requiring them to remain unchanged.',
     qualification: 'Actual browser/native RTC, converged signed history, intact detached payload and original final operations after the fixture host stops.',
     limits: ['The report validator checks declared observations; it does not execute the scenario or authenticate the report.',
       'Peer byte counters measure logical frame payloads; they exclude RTC packet headers, credit messages and IP/UDP/DTLS/SCTP overhead.',

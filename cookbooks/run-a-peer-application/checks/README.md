@@ -247,7 +247,10 @@ commit and dirty state, actual browser/native versions, two introduction
 messages, disposed signaling, zero subsequent signaling, positive bidirectional
 RTC traffic, matching signed-history digests, retained records authored by both
 peers, matching detached-payload digests, unchanged complete fixture-host counters
-and original accepted final outcomes preserved through exact retry. Unknown counters cannot become zero,
+and original accepted final outcomes preserved through exact retry without
+authoring another record. Retry compares proposal identity, deterministic order
+and the immutable decision; later observation timestamps and replica revisions
+remain in the raw report and may advance. Unknown counters cannot become zero,
 and a WSS report or build-only result cannot be promoted to RTC evidence. These
 report checks verify the observations recorded by the real runner; their small
 Node tests use explicitly synthetic inputs and are not transport qualification.
