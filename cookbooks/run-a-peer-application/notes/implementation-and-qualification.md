@@ -67,11 +67,13 @@ The following are separate assertions, not a single generic “P2P works” test
 
 ## Deployment issues that require external evidence
 
-These issue-sized tasks can be copied into the repository tracker. Each names a
-deliverable and completion criteria. They are intentionally not marked complete
-by local checks.
+The following tracked issues name the deliverables and completion criteria.
+They remain open until deployed evidence is attached; local checks do not close
+them.
 
 ### Qualify the browser/native production route
+
+Tracking: [contrib #14](https://github.com/werg/tendriller-contrib/issues/14).
 
 Compare the selected framed WSS baseline with direct WSS to a reachable agent or
 browser/native WebRTC as the host permits. Use home Wi-Fi, a mobile hotspot, and a
@@ -87,6 +89,8 @@ fallback from the results; adding all adapters is not a release prerequisite.
 
 ### Measure moved application work and remaining relay cost
 
+Tracking: [contrib #15](https://github.com/werg/tendriller-contrib/issues/15).
+
 Run paired workloads for shared table edits and a contested claim, chat with
 ephemeral token progress, an agent intent/result with crash recovery, first-device
 catch-up and reconnect, and a capture/blob transfer. Record Cloudflare active
@@ -100,6 +104,8 @@ from assumed browser direct routing.
 
 ### Rehearse authority storage loss and recovery
 
+Tracking: [contrib #16](https://github.com/werg/tendriller-contrib/issues/16).
+
 Document the persistent volume and single-writer fencing configuration. Exercise
 ordinary restart and a consistent full restore. Separately simulate loss of the
 only up-to-date disk. Establish whether continuity can be proven or a new lineage
@@ -110,6 +116,8 @@ key into two active stores. If immediate disk-loss survival is a product promise
 specify and test a second-durable-copy acknowledgment contract before making it.
 
 ### Qualify device and privacy boundaries
+
+Tracking: [contrib #17](https://github.com/werg/tendriller-contrib/issues/17).
 
 Exercise fresh browser enrollment, historical-key approval, OPFS reopen,
 exclusive Worker ownership, revocation and late responses, quota exhaustion,
