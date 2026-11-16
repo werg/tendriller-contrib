@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",
-    "@tendriller/core": "file:vendor/core/tendriller-sdk-0.2.0-rc.5.tgz",
-    "@tendriller/runtime": "file:vendor/core/tendriller-runtime-0.2.0-rc.5.tgz",
+    "@tendriller/core": "file:vendor/core/tendriller-sdk-0.2.0-rc.6.tgz",
+    "@tendriller/runtime": "file:vendor/core/tendriller-runtime-0.2.0-rc.6.tgz",
     "ws": "8.21.0"
   },
   "devDependencies": {
