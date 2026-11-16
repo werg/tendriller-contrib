@@ -1,6 +1,6 @@
 // Page-owned task-board vocabulary. This reducer never authors a change or effect.
 export const REDUCER_VERSION = 'task-board/v1';
-export const TOPICS = Object.freeze(['conversation', 'jobs', 'tasks']);
+export const TOPICS = Object.freeze(['conversation', 'job-requests', 'job-results', 'tasks']);
 export const DISPLAY_LIMIT = 100;
 
 export const emptyProjection = () => ({ messages: [], jobs: [], eventCount: 0 });
@@ -13,7 +13,7 @@ const text = (value, limit, field) => {
 export function reduceEvent(state, event) {
   const data = event.payload;
   // Other versions are not silently reinterpreted as this application's schema.
-  if (!data || typeof data !== 'object' || data.version !== 1) return state;
+  if (!data || typeof data !== 'object' || data.version !== 1) return { ...state, eventCount: state.eventCount + 1 };
   let messages = state.messages, jobs = state.jobs;
   if (event.topic === 'conversation' && data.type === 'message.posted') {
     const entry = {
@@ -24,16 +24,25 @@ export function reduceEvent(state, event) {
     };
     // Identity is the effective event, not a mutable display position or label.
     messages = [...messages.filter(value => value.eventId !== entry.eventId), entry].slice(-DISPLAY_LIMIT);
-  } else if (event.topic === 'jobs' && ['job.requested', 'job.completed', 'job.failed'].includes(data.type)) {
-    const jobId = text(data.jobId, 128, 'job identity');
-    const prior = jobs.find(value => value.jobId === jobId);
+  } else if ((event.topic === 'job-requests' && data.type === 'job.requested') ||
+             (event.topic === 'job-results' && data.type === 'effect.completed')) {
+    const result = event.topic === 'job-results';
+    const job = result ? data.result : data;
+    if (!job || typeof job !== 'object' || job.version !== 1 ||
+        !(result ? ['job.completed', 'job.failed'] : ['job.requested']).includes(job.type)) {
+      return { ...state, eventCount: state.eventCount + 1 };
+    }
+    const jobId = text(job.jobId, 128, 'job identity');
+    const requestEventId = text(result ? data.originEventId : event.id, 1024, 'job request event identity');
+    const prior = jobs.find(value => value.requestEventId === requestEventId);
+    if (prior && prior.jobId !== jobId) throw new Error('Job result identity differs from its final intent');
     const entry = {
-      jobId, status: data.type.slice(4),
-      taskId: data.taskId === undefined ? prior?.taskId ?? null : text(data.taskId, 128, 'task identity'),
-      text: data.text === undefined ? prior?.text ?? '' : text(data.text, 8000, 'job text'),
+      jobId, requestEventId, status: job.type.slice(4),
+      taskId: job.taskId === undefined ? prior?.taskId ?? null : text(job.taskId, 128, 'task identity'),
+      text: job.text === undefined ? prior?.text ?? '' : text(job.text, 8000, 'job text'),
       eventId: text(event.id, 1024, 'event identity'),
     };
-    jobs = [...jobs.filter(value => value.jobId !== jobId), entry].slice(-DISPLAY_LIMIT);
+    jobs = [...jobs.filter(value => value.requestEventId !== requestEventId), entry].slice(-DISPLAY_LIMIT);
   }
   return { messages, jobs, eventCount: state.eventCount + 1 };
 }

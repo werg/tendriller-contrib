@@ -12,7 +12,7 @@ export function claimTask(backend, taskId, operationId) {
 export function requestSummary(backend, taskId, jobId, operationId) {
   return backend.submit(program(
     sqlStatement("SELECT chronolog_assert((SELECT claimed_by = lower(hex(chronolog_actor())) FROM tasks WHERE id = ?), 'claim_required')", [taskId]),
-    emit('jobs', { type: 'job.requested', version: 1, taskId, jobId, kind: 'summarize-task' }),
+    emit('job-requests', { type: 'job.requested', version: 1, taskId, jobId, kind: 'summarize-task' }),
   ), { operationId });
 }
 

@@ -37,7 +37,8 @@ missing runtime modules or replace a failed deployment with fixture state.
 2. Establish current application enrollment and historical access. A host account
    or transport endpoint is not the application grant.
 3. Bind its public Chronolog adapter with
-   `tendril.application.install(createTendrillerApplicationBackend(...))` using the
+   `tendril.application.install(createChronologApplicationBackend({ id, replica, sql }))`
+   from `@chronolog/transport-tendriller`, using the
    same immutable backend ID selected when the host page was created. The page
    awaits `tendril.application.ready()`.
 4. Connect portable synchronization through the selected public framed transport;
@@ -63,12 +64,16 @@ that membership. A table created by one signer does not automatically let other
 writers modify its rows. The sample claim asserts availability, updates
 `claimed_by` from `chronolog_actor()`, and emits `task.claimed` atomically.
 
-Install one designated resident worker for `jobs` intents whose
+Install one designated resident worker for `job-requests` intents whose
 `type` is `job.requested` and `kind` is `summarize-task`. It consumes final intent
-through the public worker service, journals dispatch state, and emits `jobs`
-events of `type: 'job.completed'` or `type: 'job.failed'`, `version: 1`, with the
-original `jobId`, `taskId`, and a bounded `text` result. The UI only renders those
-records. Selecting a handler is a trusted deployment decision; a JSON event
+through the public worker service and journals dispatch state. Its handler returns
+`type: 'job.completed'` or `type: 'job.failed'`, `version: 1`, with the original
+`jobId`, `taskId`, and a bounded `text`. Set its `resultTopic` to `job-results`.
+The service records the actual `effect.completed` envelope, including
+`originEventId` and the handler's `result`. The UI joins the result to that
+originating request event; a duplicate display `jobId` cannot merge effects.
+Browser writer grants include `job-requests`; only the trusted worker may write
+`job-results`. Selecting a handler is a trusted deployment decision; a JSON event
 cannot install a workflow or grant tool authority.
 
 For the event-only variation, select a genuine event-only execution profile and

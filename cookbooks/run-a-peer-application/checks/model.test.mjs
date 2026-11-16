@@ -18,13 +18,28 @@ test('UI projection is bounded while its source history remains untouched', () =
 });
 
 test('message identity and final job results survive pure rebuild without effects', () => {
-  const events = [message(1), { ...message(2), topic: 'jobs', payload: { type: 'job.requested', version: 1, jobId: 'job-1', taskId: 'task-1' } }, { ...message(3), topic: 'jobs', payload: { type: 'job.completed', version: 1, jobId: 'job-1', text: 'Reviewed' } }];
+  const events = [message(1), { ...message(2), topic: 'job-requests', payload: { type: 'job.requested', version: 1, jobId: 'job-1', taskId: 'task-1' } },
+    { ...message(3), topic: 'job-results', payload: { type: 'effect.completed', version: 1, effectId: 'effect-1', originEventId: 'proposal-2:0', result: { type: 'job.completed', version: 1, jobId: 'job-1', text: 'Reviewed' } } }];
   const first = reduceBatch(emptyProjection(), batch(events));
   const replayed = reduceBatch(emptyProjection(), batch(events));
   assert.deepEqual(first, replayed);
   assert.equal(first.jobs[0].taskId, 'task-1');
   assert.equal(first.jobs[0].status, 'completed');
+  assert.equal(first.jobs[0].requestEventId, 'proposal-2:0');
   assert.equal(first.messages[0].eventId, 'proposal-1:0');
+});
+
+test('job results bind their original intent and duplicate display IDs cannot merge separate effects', () => {
+  const request = { ...message(1), topic: 'job-requests', payload: { type: 'job.requested', version: 1, jobId: 'same', taskId: 'one' } };
+  const another = { ...request, id: 'second:0', proposalId: 'second' };
+  const before = reduceBatch(emptyProjection(), batch([request, another]));
+  assert.equal(before.jobs.length, 2);
+  const completed = { ...message(3), topic: 'job-results', payload: { type: 'effect.completed', version: 1, originEventId: request.id,
+    result: { type: 'job.completed', version: 1, jobId: 'same', text: 'Done' } } };
+  const after = reduceBatch(before, batch([completed]));
+  assert.equal(after.jobs.filter(job => job.status === 'completed').length, 1);
+  assert.equal(after.jobs.find(job => job.requestEventId === 'second:0').status, 'requested');
+  assert.throws(() => reduceBatch(before, batch([{ ...completed, payload: { ...completed.payload, result: { ...completed.payload.result, jobId: 'different' } } }])), /identity differs/);
 });
 
 test('SQL and empty-event scan progress use one captured handle and release it', async () => {
