@@ -89,6 +89,6 @@
     "scope": "sessions:guide",
     "location": "envelope; outside data",
     "capture": "tendril.scopes.capture(scope)",
-    "contract": 2
+    "contract": 3
   }
 }

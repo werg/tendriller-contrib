@@ -27,7 +27,7 @@
   window.__TENDRIL__ = window.__TENDRIL__ || { id: "test", base: "/", version: 1, ws: "/_tendril/ws", features: { speech: null, push: false, vapid: null } };
   window.tendril = {
     preferences: { get: () => ({ audio: true, language: null, voice: "browser", textSize: "normal", contrast: "normal", mode: "interactive" }) },
-    service: {contract:2,workflows:[{id:'sessions',interface_version:'1',schema_version:'1'}]},
+    service: {contract:3,workflows:[{id:'sessions',interface_version:'1',schema_version:'1'}]},
     scopes: {
       list: () => ['notebook','guide','workshop','experiment','decisions','facilitation'].map(name=>({id:'sessions:'+name,generation:'fixture-'+name,paths:[[name]],operations:[]})),
       capture: name => ({scope:name,expected_generations:{[name]:'fixture-'+name.slice('sessions:'.length)}}),

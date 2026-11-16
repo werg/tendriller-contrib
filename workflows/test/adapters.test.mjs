@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { createWorkflows } from '../client.mjs';
 
-const descriptor = { contract: 2, workflows: [{ id: 'sessions', interface_version: '1', schema_version: '1' }] };
+const descriptor = { contract: 3, workflows: [{ id: 'sessions', interface_version: '1', schema_version: '1' }] };
 const metadata = () => ({ cid: 'queued-command', scope: 'sessions:notebook', expected_generations: { 'sessions:notebook': 'original' } });
 
 test('agent adapter verifies requirements while preserving the command captured before preflight', async () => {
@@ -16,7 +16,7 @@ test('agent adapter verifies requirements while preserving the command captured 
   captured.expected_generations['sessions:notebook'] = 'rotated'; data.title = 'Changed';
   resolve(descriptor); await pending;
   assert.deepEqual(sent, ['sessions', 'archive', { ...metadata(), data: { title: 'Original draft' } }]);
-  const missing = createWorkflows({ service: async () => ({ contract: 2, workflows: [] }), workflow: () => assert.fail('Must not submit to an unavailable workflow') });
+  const missing = createWorkflows({ service: async () => ({ contract: 3, workflows: [] }), workflow: () => assert.fail('Must not submit to an unavailable workflow') });
   await assert.rejects(missing.call('archive'), /does not provide/);
 });
 
@@ -34,6 +34,6 @@ test('browser adapter discovers missing welcome metadata and never refreshes cap
   captured.expected_generations['sessions:notebook'] = 'new';
   resolve(descriptor); await pending;
   assert.deepEqual(received, { path: 'workflows/sessions/archive', command: { ...metadata(), data: { scope: 'notebook' } } });
-  const missing = window.TendrilWorkflows.create({ scopes: {}, request: async () => ({ contract: 2, workflows: [] }) });
+  const missing = window.TendrilWorkflows.create({ scopes: {}, request: async () => ({ contract: 3, workflows: [] }) });
   await assert.rejects(missing.call('archives'), /does not provide/);
 });

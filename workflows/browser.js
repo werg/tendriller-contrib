@@ -1,15 +1,15 @@
 /* Optional session workflows. All concurrency information stays outside app data. */
 (() => {
   function create(t) {
-    if (!t?.scopes || !t?.request) throw new Error('Session workflows require core contract 2.');
+    if (!t?.scopes || !t?.request) throw new Error('Session workflows require core contract 3.');
     const id = name => `sessions:${name}`;
     const scope = name => t.scopes.capture(id(name));
     const generation = name => t.scopes.list().find(item => item.id === id(name))?.generation ?? null;
     const assertService = async () => {
       const service = t.service ?? await t.request('service');
       const module = service?.workflows?.find(item => item.id === 'sessions');
-      if (service?.contract !== 2 || !module || module.interface_version !== '1' || module.schema_version !== '1')
-        throw new Error('This service does not provide sessions interface 1/schema 1 on core contract 2.');
+      if (service?.contract !== 3 || !module || module.interface_version !== '1' || module.schema_version !== '1')
+        throw new Error('This service does not provide sessions interface 1/schema 1 on core contract 3.');
       return service;
     };
     const call = (operation, data = {}, metadata = {}) => {

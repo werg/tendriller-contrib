@@ -46,7 +46,7 @@ test("preview shutdown closes preconnects, partial HTTP, active uploads and upgr
 
   const upload = await tcp();
   const request = once(server, "request");
-  upload.write("POST /_tendril/blob HTTP/1.1\r\nHost: preview\r\nContent-Type: image/png\r\nContent-Length: 1000\r\n\r\npartial");
+  upload.write("POST /_tendril/uploads HTTP/1.1\r\nHost: preview\r\nContent-Type: application/json\r\nContent-Length: 1000\r\n\r\npartial");
   await request; // The real upload handler is waiting for the rest of the body.
 
   // A raw upgraded peer never responds to a WebSocket close handshake.

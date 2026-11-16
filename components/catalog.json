@@ -8,7 +8,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "bluetooth.js"
@@ -20,7 +20,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "camera.js"
@@ -32,7 +32,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "chart.js"
@@ -44,7 +44,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "connectors.js"
@@ -56,7 +56,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "geo.js"
@@ -68,7 +68,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "glance.js"
@@ -80,7 +80,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "hardware-lab.js"
@@ -96,7 +96,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "input-kit.js"
@@ -111,7 +111,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "list.js"
@@ -123,7 +123,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "motion.js"
@@ -135,7 +135,7 @@
       "status": "experimental",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "objects.js"
@@ -147,7 +147,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "overlay.js"
@@ -159,7 +159,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "playground.js"
@@ -177,7 +177,7 @@
       "status": "experimental",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "pose.js"
@@ -191,7 +191,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "probe.js"
@@ -203,7 +203,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "ptt.js"
@@ -215,7 +215,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "qr.js",
@@ -229,7 +229,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "screenshot.js",
@@ -243,7 +243,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "serial.js"
@@ -255,7 +255,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "stream-view.js"
@@ -267,7 +267,7 @@
       "status": "experimental",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "text.js"
@@ -279,7 +279,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "ui.js"
@@ -295,7 +295,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "vad.js"
@@ -307,7 +307,7 @@
       "status": "supported",
       "maintainer": "werg",
       "requires": {
-        "contract": 2
+        "contract": 3
       },
       "files": [
         "wakelock.js"

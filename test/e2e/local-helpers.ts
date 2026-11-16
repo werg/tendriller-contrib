@@ -20,7 +20,7 @@ export function requester() { return localRequest ??= request.newContext({ ignor
 export type Handle = { id: string; page_url: string; api: string; token: string };
 export type CommandMetadata = { cid: string; scope?: string; expected_generations: Record<string, string> };
 
-export async function verifyService(requirements = { contract: 2, workflows: {} }) {
+export async function verifyService(requirements = { contract: 3, workflows: {} }) {
   const result = await (await requester()).get(new URL('/api/service', SERVICE).href);
   expect(result.ok(), await result.text()).toBe(true);
   return assertService(await result.json(), requirements);

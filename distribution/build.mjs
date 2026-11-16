@@ -28,7 +28,7 @@ for (const [source, target] of [
 ]) copy(join(root, 'node_modules', source), join(root, 'components/vendor', target));
 rmSync(dist, { recursive: true, force: true }); mkdirSync(dist, { recursive: true });
 const sourceCommit = process.env.SOURCE_COMMIT || (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], {cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim(); } catch { return null; } })();
-const release = { format: 'tendriller-contrib', version: pkg.version, source_commit: sourceCommit, requires: { contract: 2 }, core: JSON.parse(readFileSync(join(root,'core.lock.json'),'utf8')), runtime: { id: runtimeManifest.id, version: runtimeManifest.version }, maintainer: 'werg' };
+const release = { format: 'tendriller-contrib', version: pkg.version, source_commit: sourceCommit, requires: { contract: 3 }, core: JSON.parse(readFileSync(join(root,'core.lock.json'),'utf8')), runtime: { id: runtimeManifest.id, version: runtimeManifest.version }, maintainer: 'werg' };
 const notices = new Map();
 async function bundle(options) {
   const result = await build({ ...options, write: false, metafile: true });
@@ -95,7 +95,7 @@ const workflowEntry=['workflows/server.ts'].map(path=>join(root,path)).find(exis
 if(workflowEntry){
  const result=await build({entryPoints:[workflowEntry],outfile:join(workflowDir,'index.mjs'),bundle:true,platform:'neutral',format:'esm',target:'es2022',metafile:true});
  if(Object.keys(result.metafile.inputs).some(path=>/(?:^|\/)tools\/|node_modules\/(?:ws|playwright|@modelcontextprotocol)/.test(path)))throw Error('Trusted workflow artifact imported tool dependencies.');
- writeFileSync(join(workflowDir,'package.json'),JSON.stringify({name:'@tendriller/workflows',version:pkg.version,type:'module',exports:{'.':'./index.mjs'},tendriller:{contract:2,interfaces:{sessions:{interface_version:'1',schema_version:'1'}}}},null,2)+'\n');
+ writeFileSync(join(workflowDir,'package.json'),JSON.stringify({name:'@tendriller/workflows',version:pkg.version,type:'module',exports:{'.':'./index.mjs'},tendriller:{contract:3,interfaces:{sessions:{interface_version:'1',schema_version:'1'}}}},null,2)+'\n');
  writeFileSync(join(workflowDir,'manifest.json'),JSON.stringify({...release,format:'tendriller-workflows',interfaces:{sessions:{interface_version:'1',schema_version:'1'}},files:[{path:'index.mjs',sha256:hash(readFileSync(join(workflowDir,'index.mjs')))}]},null,2)+'\n');
  copy(join(root,'PROVENANCE.md'),join(workflowDir,'PROVENANCE.md'));
  archive(workflowDir,`tendriller-workflows-${pkg.version}.tgz`);

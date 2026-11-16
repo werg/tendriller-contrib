@@ -498,7 +498,7 @@ const commands = {
   async workflow(args, f, api, cfg) {
     const [module, operation, data = "{}"] = args;
     if (!module || !operation) fail("workflow <module> <operation> [json] [--scope ID --generations JSON --cid ID]");
-    await checkService(cfg.api, { requirements: { contract: 2, workflows: { [module]: { interface_version: String(f["interface-version"] || "1"), schema_version: String(f["schema-version"] || "1") } } } });
+    await checkService(cfg.api, { requirements: { contract: 3, workflows: { [module]: { interface_version: String(f["interface-version"] || "1"), schema_version: String(f["schema-version"] || "1") } } } });
     out(await api.post(`/workflows/${encodeURIComponent(module)}/${encodeURIComponent(operation)}`, { ...commandMetadata(f), data: jsonArg(data, "workflow data") }));
   },
 

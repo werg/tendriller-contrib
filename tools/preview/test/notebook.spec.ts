@@ -42,7 +42,7 @@ test("a pending photo save locks its snapshot, then permits a fresh draft that s
   await open(page);
   let release!: () => void, requested = false;
   const paused = new Promise<void>(resolve => { release = resolve; });
-  await page.route("**/_tendril/blob", async route => { requested = true; await paused; await route.continue(); });
+  await page.route("**/_tendril/uploads/*/content", async route => { requested = true; await paused; await route.continue(); });
   await page.locator("#note").fill("The observation being saved");
   await page.locator("#photo").setInputFiles(photo);
   await page.locator("#send").click();

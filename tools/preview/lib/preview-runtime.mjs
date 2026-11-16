@@ -1,6 +1,6 @@
 // Local protocol adapter for the production browser runtime. No browser API is
 // replaced here: the runtime owns its socket, control, state, IDB outbox and health.
-import { randomUUID, randomBytes } from "node:crypto";
+import { createHash, randomUUID, randomBytes } from "node:crypto";
 import { WebSocketServer } from "ws";
 import * as previewSupport from "@tendriller/runtime/preview-support";
 import { assertValid } from "@tendriller/core/contract";
@@ -23,7 +23,7 @@ export function resolveFixture(value, context) {
   return value;
 }
 
-export async function attachRuntime(server, { state = {}, role = "owner", name = "Local preview", onEvent, streams, version = () => 1, scopes = [], service = {contract:2,workflows:[]}, implementation } = {}) {
+export async function attachRuntime(server, { state = {}, role = "owner", name = "Local preview", onEvent, streams, version = () => 1, scopes = [], service = {contract:3,workflows:[]}, implementation } = {}) {
   const { applyOps, validateOps, historyPage, matchesContext } = implementation || previewSupport;
   const wss = new WebSocketServer({ noServer: true });
   const sockets = new Set();
@@ -96,13 +96,14 @@ export async function attachRuntime(server, { state = {}, role = "owner", name =
     },
     setPresence(value) { presence = { ...presence, ...value }; broadcast({ t: "presence", ...presence }); },
     broadcast,
-    storeBlob(data, type, name, cid, keep = false) {
+    storeBlob(data, type, name, cid, keep = false, reservedId) {
       if (cid && uploads.has(cid)) return uploads.get(cid);
       const alphabet = "abcdefghijklmnopqrstuvwxyz234567";
-      const id = "b_" + [...randomBytes(20)].map(byte => alphabet[byte % 32]).join("");
-      const retention = { keep, expires_at: keep ? null : Date.now() + 30 * 86_400_000, reason: keep ? "pinned" : "page_default" };
-      const value = { id, url: `_tendril/blob/${id}`, retention };
-      blobs.set(id, { ...value, data, type, name });
+      const id = reservedId ?? "b_" + [...randomBytes(20)].map(byte => alphabet[byte % 32]).join("");
+      const retention = { expires_at: keep ? null : Date.now() + 30 * 86_400_000, reasons: [keep ? "pinned" : "page_default"] };
+      const value = { id, sha256: createHash("sha256").update(data).digest("hex"), size: data.length,
+        type, ...(name ? { name } : {}), url: `_tendril/blobs/${id}`, created_at: Date.now(), retention };
+      blobs.set(id, { ...value, data });
       if (cid) uploads.set(cid, value);
       return value;
     },

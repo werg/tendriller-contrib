@@ -2,7 +2,7 @@
   "format": "tendriller-page",
   "version": 1,
   "requires": {
-    "contract": 2,
+    "contract": 3,
     "workflows": {}
   },
   "components": [
