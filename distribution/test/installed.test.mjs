@@ -11,13 +11,14 @@ import { createHash } from 'node:crypto';
 import { WebSocket } from 'ws';
 const run=promisify(execFile), root=fileURLToPath(new URL('../../',import.meta.url)), dist=join(root,'dist');
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+const version=JSON.parse(await readFile(join(root,'package.json'),'utf8')).version;
 async function workspace(t){const dir=await mkdtemp(join(tmpdir(),'contrib-install-'));t.after(()=>rm(dir,{recursive:true,force:true}));return dir;}
 
 test('installable tools run outside both repositories and every starter resolves its complete asset set',async t=>{
  const dir=await workspace(t),installed=join(dir,'installed');await mkdir(installed);
- await run('tar',['-xzf',join(dist,'tendriller-tools-0.2.0-rc.3.tgz'),'-C',installed]);
+ await run('tar',['-xzf',join(dist,`tendriller-tools-${version}.tgz`),'-C',installed]);
  const npmPrefix=join(dir,'npm-install');
- await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,'tendriller-tools-0.2.0-rc.3.tgz')],{cwd:dir});
+ await run('npm',['install','--prefix',npmPrefix,'--offline','--ignore-scripts','--no-audit','--no-fund',join(dist,`tendriller-tools-${version}.tgz`)],{cwd:dir});
  assert.match(await readFile(join(installed,'tools/cli/README.md'),'utf8'),/tendril CLI/);
  const standalone=await readFile(join(dist,'tendril.mjs'));
  assert.ok(standalone.length>10000);
@@ -28,7 +29,7 @@ test('installable tools run outside both repositories and every starter resolves
  for(const recipe of recipes){
   const target=join(dir,recipe.id);await run(process.execPath,[cli,'scaffold',recipe.id,target],{cwd:dir});
   const lock=JSON.parse(await readFile(join(target,'tendril.assets.json'),'utf8'));
-  assert.equal(lock.requires.contract,2);
+  assert.equal(lock.requires.contract,3);
   for(const file of lock.files)assert.equal(digest(await readFile(join(target,file.path))),file.sha256,file.path);
   const html=await readFile(join(target,'index.html'),'utf8');assert.doesNotMatch(html,/_tendril\/snippets|github\.com\/.+\.js/);
   for(const source of [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/g)].map(match=>match[1]))if(!/^https?:/.test(source))assert.ok((await readFile(join(target,source))).length,source);
@@ -64,7 +65,7 @@ test('standalone preview embeds the production runtime, public fixture transport
 });
 
 test('release manifest identifies exact bytes and workflows never depend on Node tools',async()=>{
- const manifest=JSON.parse(await readFile(join(dist,'manifest.json'),'utf8'));assert.equal(manifest.requires.contract,2);
+ const manifest=JSON.parse(await readFile(join(dist,'manifest.json'),'utf8'));assert.equal(manifest.requires.contract,3);
  for(const artifact of manifest.artifacts){assert.equal(digest(await readFile(join(dist,artifact.file))),artifact.sha256);assert.ok(new URL(artifact.url).pathname.includes(`/releases/download/v${manifest.version}/`));}
  const workflow=await readFile(join(dist,'workflows/index.mjs'),'utf8');assert.doesNotMatch(workflow,/(?:from|import)\s*\(?["'](?:node:|ws|playwright)|tools\//);
 });

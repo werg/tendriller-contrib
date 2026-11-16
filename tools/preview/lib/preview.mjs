@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { componentAssets } from "../../cli/lib/assets.mjs";
 // Headless preview: serves the production runtime with a local protocol adapter.
 // Uses real control/state/offline behavior, with deterministic sensor and agent fixtures.
@@ -12,7 +12,7 @@ import { isDeepStrictEqual } from "node:util";
 import { guessType, listFiles } from "../../cli/lib/pack.mjs";
 import { attachRuntime, TRACE_RUNTIME, resolveFixture } from "./preview-runtime.mjs";
 import { assets as runtimeAssets, implementation as runtimeSupport, manifest as runtimeManifest } from "./preview-bundle.mjs";
-import { schemaDocument } from "@tendriller/core/contract";
+import { assertValid, schemaDocument } from "@tendriller/core/contract";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -41,7 +41,11 @@ export async function startServer(dir, initialState, fixture = {}, options = {})
   const root = realpathSync(resolve(dir));
   options = { assets: runtimeAssets, implementation: runtimeSupport, ...options };
   const declaration = existsSync(join(root, "tendril.json")) ? JSON.parse(readFileSync(join(root,"tendril.json"),"utf8")) : {components:[]};
-  const service = { contract: 2, core_release: runtimeManifest.version, workflows: Object.entries(declaration.requires?.workflows || {}).map(([id, revisions]) => ({ id, ...revisions })) };
+  const service = { contract: 3, core_release: runtimeManifest.version, workflows: Object.entries(declaration.requires?.workflows || {}).map(([id, revisions]) => ({ id, ...revisions })) };
+  const uploadSessions = new Map();
+  const publicBlob = blob => { const { data, ...metadata } = blob; return metadata; };
+  const blobId = () => "b_" + [...randomBytes(20)].map(byte => "abcdefghijklmnopqrstuvwxyz234567"[byte % 32]).join("");
+  const uploadId = () => "u_" + [...randomBytes(20)].map(byte => "abcdefghijklmnopqrstuvwxyz234567"[byte % 32]).join("");
   const declaredAssets = new Map(componentAssets(declaration.components || [], {workflows:!!declaration.workflows?.length}).map(asset=>["/"+asset.path,asset.bytes]));
   const publications = new Map();
   let currentPublication;
@@ -110,7 +114,7 @@ export async function startServer(dir, initialState, fixture = {}, options = {})
       if (declaredAssets.has(p)) return send(200,guessType(p),declaredAssets.get(p),{"cache-control":"no-cache"});
       if (p === "/api/service" || p === "/_tendril/service") return json(200, service);
       if (p === "/_tendril/scopes" && req.method === "GET") return json(200, { scopes: adapter.scopes });
-      if (p === "/contract/v2.json") return json(200, schemaDocument);
+      if (p === "/contract/v3.json") return json(200, schemaDocument);
       if (p === "/_tendril/info") return json(200, { id: "preview", version: currentPublication.version, files: listFiles(root), publication: currentPublication, features: {} });
       const streamRoute = /^\/_tendril\/streams(?:\/([^/]+)(?:\/(records|latest))?)?$/.exec(p);
       if (streamRoute) {
@@ -135,26 +139,60 @@ export async function startServer(dir, initialState, fixture = {}, options = {})
       if (p === "/_tendril/manifest.webmanifest") return json(200, { name: "Tendriller preview", start_url: "/", display: "standalone" });
       if (p === "/_tendril/agents") return json(200, { agents: [{ name: "preview", active: true }] });
       if (p === "/_tendril/invites") return json(200, { invites: [] });
-      if (p === "/_tendril/blob" && req.method === "POST") {
+      if (p === "/_tendril/uploads" && req.method === "POST") {
         if (adapter.role === "display") return json(403, { error: { code: "forbidden", message: "Display devices cannot upload" } });
-        if (req.headers["x-tendril-keep"] === "true" && adapter.role !== "owner") return json(403, { error: { code: "forbidden", message: "Only owners can pin captures" } });
-        const chunks = []; let size = 0;
-        for await (const chunk of req) { size += chunk.length; if (size > 5 * 1024 * 1024) return json(413, { error: { code: "too_large", message: "Blob exceeds 5 MB" } }); chunks.push(chunk); }
-        return json(201, adapter.storeBlob(Buffer.concat(chunks), req.headers["content-type"] || "application/octet-stream", req.headers["x-tendril-name"], req.headers["x-tendril-cid"], req.headers["x-tendril-keep"] === "true"));
+        let body = ""; for await (const chunk of req) body += chunk;
+        const input = assertValid("uploadStart", JSON.parse(body));
+        const existing = uploadSessions.get(input.cid);
+        if (existing && (existing.sha256 !== input.sha256 || existing.size !== input.size || existing.type !== input.type || existing.name !== input.name))
+          return json(409, { error: { code: "command_conflict", message: "Upload ID belongs to different bytes" } });
+        const stored = [...adapter.blobs.values()].find(blob => blob.sha256 === input.sha256);
+        const session = existing ?? { ...input, id: uploadId(), blob_id: blobId(), phase: stored ? "ready" : "reserved",
+          data: stored?.data, expires_at: Date.now() + 86400000 };
+        uploadSessions.set(input.cid, session);
+        return json(201, { id: session.id, blob_id: session.blob_id, sha256: session.sha256, size: session.size,
+          phase: session.phase, upload_required: !session.data, expires_at: session.expires_at,
+          ...(session.phase === "completed" ? { blob: publicBlob(adapter.blobs.get(session.blob_id)) } : {}) });
       }
-      if (p.startsWith("/_tendril/blob/")) {
-        const retention = p.endsWith("/retention");
-        const blob = adapter.blobs.get(p.split("/")[3]);
-        if (!blob) return json(404, { error: { code: "not_found", message: "No such blob" } });
-        if (retention && req.method === "GET") return json(200, { id: blob.id, url: blob.url, retention: blob.retention });
-        if (retention && req.method === "PATCH") {
-          if (adapter.role !== "owner") return json(403, { error: { code: "forbidden", message: "Only the owner can change retention" } });
-          let body = ""; for await (const chunk of req) body += chunk;
-          const keep = JSON.parse(body).keep === true;
-          blob.retention = { keep, expires_at: keep ? null : Date.now() + 30 * 86400000, reason: keep ? "pinned" : "page_default" };
-          return json(200, { id: blob.id, url: blob.url, retention: blob.retention });
+      const uploadRoute = /^\/_tendril\/uploads\/(u_[a-z2-7]{20})(?:\/(content|complete))?$/.exec(p);
+      if (uploadRoute) {
+        const session = [...uploadSessions.values()].find(item => item.id === uploadRoute[1]);
+        if (!session) return json(404, { error: { code: "not_found", message: "No such upload" } });
+        if (req.method === "GET" && !uploadRoute[2]) return json(200, { id: session.id, blob_id: session.blob_id,
+          sha256: session.sha256, size: session.size, phase: session.phase, upload_required: !session.data,
+          expires_at: session.expires_at });
+        if (req.method === "DELETE" && !uploadRoute[2]) { session.phase = "aborted"; return json(200, { ok: true }); }
+        if (session.phase === "aborted") return json(409, { error: { code: "upload_closed", message: "Upload aborted" } });
+        if (uploadRoute[2] === "content" && req.method === "PUT") {
+          const chunks = []; let size = 0;
+          for await (const chunk of req) { size += chunk.length; if (size > 25 * 1024 * 1024) return json(413, { error: { code: "too_large", message: "Blob exceeds 25 MB" } }); chunks.push(chunk); }
+          const data = Buffer.concat(chunks);
+          if (data.length !== session.size || createHash("sha256").update(data).digest("hex") !== session.sha256)
+            return json(422, { error: { code: "digest_mismatch", message: "Upload content differs from reservation" } });
+          session.data = data; session.phase = "received"; res.writeHead(204).end(); return;
         }
-        return send(200, blob.type, blob.data);
+        if (uploadRoute[2] === "complete" && req.method === "POST") {
+          if (!session.data) return json(409, { error: { code: "upload_incomplete", message: "Upload content is missing" } });
+          const blob = adapter.storeBlob(session.data, session.type, session.name, session.cid, false, session.blob_id);
+          session.phase = "completed";
+          return json(200, { status: "completed", blob });
+        }
+      }
+      if (p === "/_tendril/blobs" && req.method === "GET")
+        return json(200, { blobs: [...adapter.blobs.values()].map(publicBlob), cursor: null });
+      const blobRoute = /^\/_tendril\/blobs\/(b_[a-z2-7]{20})(?:\/(info|pin))?$/.exec(p);
+      if (blobRoute) {
+        const blob = adapter.blobs.get(blobRoute[1]);
+        if (!blob) return json(404, { error: { code: "not_found", message: "No such blob" } });
+        if (blobRoute[2] === "info" && req.method === "GET") return json(200, { ...blob, data: undefined });
+        if (blobRoute[2] === "pin" && req.method === "PUT") {
+          if (adapter.role !== "owner") return json(403, { error: { code: "forbidden", message: "Only owners can pin captures" } });
+          let body = ""; for await (const chunk of req) body += chunk;
+          const { keep } = assertValid("blobPin", JSON.parse(body));
+          blob.retention = { expires_at: keep ? null : blob.created_at + 30 * 86400000, reasons: [keep ? "pinned" : "page_default"] };
+          return json(200, { ...blob, data: undefined });
+        }
+        if (!blobRoute[2] && req.method === "GET") return send(200, blob.type, blob.data);
       }
       if (p.startsWith("/_tendril/")) {
         if (options.assets) {

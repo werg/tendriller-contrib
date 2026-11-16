@@ -13,7 +13,7 @@ let server, origin, configDir;
 before(async () => {
   configDir = mkdtempSync(join(tmpdir(), "tendril-public-cli-"));
   server = createServer(async (req, res) => {
-    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:2,core_release:"0.2.0-rc.6",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
+    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:3,core_release:"0.2.0-rc.6",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
     let body = "";
     for await (const part of req) body += part;
     requests.push({ method: req.method, path: req.url, authorization: req.headers.authorization, body: body ? JSON.parse(body) : null });
@@ -105,10 +105,13 @@ test("supported mutations match the current public service routes", async () => 
   assert.equal((await cli(["link", "rotate"])).code, 0);
   assert.equal(requests.at(-1).path, "/api/t/abcdefghijkl/links/l_main/rotate");
   const blob = "b_aaaaaaaaaaaaaaaaaaaa";
-  assert.equal((await cli(["blobs", "keep", blob])).code, 0);
-  assert.deepEqual(requests.at(-1).body, { keep: true });
-  assert.equal((await cli(["blobs", "expire", blob])).code, 0);
-  assert.deepEqual(requests.at(-1).body, { keep: false });
+  const keep = await cli(["blob", "pin", blob, "--keep", "true", "--cid", "pin-once"]);
+  assert.equal(keep.code, 0, keep.stderr);
+  assert.equal(requests.at(-1).path, `/api/t/abcdefghijkl/blobs/${blob}/pin`);
+  assert.deepEqual(requests.at(-1).body, { cid: "pin-once", expected_generations: {}, keep: true });
+  const expire = await cli(["blob", "pin", blob, "--keep", "false", "--cid", "unpin-once"]);
+  assert.equal(expire.code, 0, expire.stderr);
+  assert.deepEqual(requests.at(-1).body, { cid: "unpin-once", expected_generations: {}, keep: false });
 });
 
 test("push notification commands expose readiness and preserve delivery targeting", async () => {

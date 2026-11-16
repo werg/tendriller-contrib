@@ -4,8 +4,8 @@ export function createWorkflows(client) {
   const assertService = async () => {
     const service = await client.service();
     const module = service?.workflows?.find(item => item.id === WORKFLOW_REQUIREMENT.id);
-    if (service?.contract !== 2 || !module || module.interface_version !== WORKFLOW_REQUIREMENT.interface_version || module.schema_version !== WORKFLOW_REQUIREMENT.schema_version)
-      throw new Error('Service does not provide sessions interface 1/schema 1 on core contract 2');
+    if (service?.contract !== 3 || !module || module.interface_version !== WORKFLOW_REQUIREMENT.interface_version || module.schema_version !== WORKFLOW_REQUIREMENT.schema_version)
+      throw new Error('Service does not provide sessions interface 1/schema 1 on core contract 3');
     return service;
   };
   return Object.freeze({

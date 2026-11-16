@@ -11,7 +11,7 @@ Load the selected file from the page's published asset set:
 Use the contrib scaffolder or `componentAssets()` to vendor the complete closure,
 including lazy-loaded siblings and third-party notices. The page asset lock records
 exact bytes; the server publication pins those bytes and the selected runtime.
-There is no deployment-wide component URL. All components require core contract 2.
+There is no deployment-wide component URL. All components require core contract 3.
 
 QR and screenshot libraries are vendored at exact versions during the release build.
 Experimental pose, object detection and OCR adapters require explicitly injected

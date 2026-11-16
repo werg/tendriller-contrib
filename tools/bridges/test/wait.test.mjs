@@ -16,7 +16,7 @@ function mock() {
   const seen = [];
   let calls = 0;
   const server = createServer((req, res) => {
-    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:2,core_release:"0.2.0-rc.6",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
+    if (req.url === "/api/service") { res.setHeader("content-type","application/json"); res.end(JSON.stringify({contract:3,core_release:"0.2.0-rc.6",workflows:[{id:"sessions",interface_version:"1",schema_version:"1"}]})); return; }
     const u = new URL(req.url, "http://x");
     seen.push({ path: u.pathname, after: u.searchParams.get("after"), wait: u.searchParams.get("wait"), auth: req.headers.authorization });
     calls++;
@@ -99,7 +99,7 @@ test("permanent HTTP errors stop follow and wait without retrying", async () => 
   try {
     for (const args of [["wait"], ["events", "--follow"]]) {
       const r = await run("node", [cli, ...args], { TENDRIL_API: `http://127.0.0.1:${server.address().port}/api/t/abc234abc234`, TENDRIL_TOKEN: "tk_test", TENDRIL_CONFIG_DIR: dir });
-      assert.equal(r.code, 1, r.stderr);
+      assert.equal(r.code, 5, r.stderr); // Authorization has a distinct exit code.
       assert.equal(JSON.parse(r.stderr).status, 403);
     }
     assert.equal(calls, 2);

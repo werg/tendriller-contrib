@@ -5,6 +5,8 @@ import { createConnection } from "node:net";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
+import { assertValid } from "@tendriller/core/contract";
 import WebSocket from "ws";
 import { startServer } from "../lib/preview.mjs";
 
@@ -46,7 +48,7 @@ test("preview shutdown closes preconnects, partial HTTP, active uploads and upgr
 
   const upload = await tcp();
   const request = once(server, "request");
-  upload.write("POST /_tendril/blob HTTP/1.1\r\nHost: preview\r\nContent-Type: image/png\r\nContent-Length: 1000\r\n\r\npartial");
+  upload.write("POST /_tendril/uploads HTTP/1.1\r\nHost: preview\r\nContent-Type: application/json\r\nContent-Length: 1000\r\n\r\npartial");
   await request; // The real upload handler is waiting for the rest of the body.
 
   // A raw upgraded peer never responds to a WebSocket close handshake.
@@ -87,4 +89,25 @@ test("preview shutdown stops admission immediately and shares one close promise 
   assert.equal(reconnectOpened, false);
   assert.strictEqual(server.stopPreview(), stopping);
   assert.strictEqual(server.preview.close(), adapterClosed);
+});
+
+test("preview serves the Contract 3 upload, metadata and pin lifecycle", async t => {
+  const { server } = await fixture(t);
+  const base = `http://127.0.0.1:${server.address().port}/_tendril`;
+  const bytes = Buffer.from("A notebook photograph");
+  const start = await fetch(base + "/uploads", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ cid: "preview-photo-1", sha256: createHash("sha256").update(bytes).digest("hex"), size: bytes.length, type: "image/png", name: "photo.png" }) });
+  assert.equal(start.status, 201);
+  const session = assertValid("uploadSession", await start.json());
+  assert.equal(session.phase, "reserved");
+  assert.equal((await fetch(base + `/uploads/${session.id}/content`, { method: "PUT", headers: { "content-type": "application/octet-stream" }, body: Buffer.from("wrong") })).status, 422);
+  assert.equal((await fetch(base + `/uploads/${session.id}/content`, { method: "PUT", headers: { "content-type": "application/octet-stream" }, body: bytes })).status, 204);
+  const completed = assertValid("uploadCompletion", await (await fetch(base + `/uploads/${session.id}/complete`, { method: "POST" })).json());
+  assert.equal(completed.blob.id, session.blob_id);
+  assert.deepEqual(Buffer.from(await (await fetch(base + `/blobs/${session.blob_id}`)).arrayBuffer()), bytes);
+  assert.deepEqual(assertValid("blobMetadata", await (await fetch(base + `/blobs/${session.blob_id}/info`)).json()), completed.blob);
+  assert.equal(assertValid("blobList", await (await fetch(base + "/blobs")).json()).blobs.length, 1);
+  const pinned = assertValid("blobMetadata", await (await fetch(base + `/blobs/${session.blob_id}/pin`, { method: "PUT", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ cid: "pin-1", expected_generations: {}, keep: true }) })).json());
+  assert.deepEqual(pinned.retention.reasons, ["pinned"]);
 });

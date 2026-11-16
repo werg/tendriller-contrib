@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const lock = JSON.parse(readFileSync(join(root, 'core.lock.json'), 'utf8'));
 const npm = JSON.parse(readFileSync(join(root, 'package-lock.json'), 'utf8'));
 const names = new Map([['@tendriller/core', 'tendriller-sdk'], ['@tendriller/runtime', 'tendriller-runtime']]);
-if (lock.format !== 'tendriller-core-lock' || lock.version !== 1 || lock.contract !== 2 || lock.artifacts.length !== names.size) throw Error('Invalid core pairing lock.');
+if (lock.format !== 'tendriller-core-lock' || lock.version !== 1 || lock.contract !== 3 || lock.artifacts.length !== names.size) throw Error('Invalid core pairing lock.');
 for (const [name, prefix] of names) {
   const file = `${prefix}-${lock.core_release}.tgz`, artifact = lock.artifacts.find(item => item.file === file);
   if (!artifact || !artifact.url.includes(`/releases/download/v${lock.core_release}/${file}`)) throw Error(`Missing immutable release origin for ${name}.`);

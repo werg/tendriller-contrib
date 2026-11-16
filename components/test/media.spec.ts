@@ -139,7 +139,7 @@ test("screenshot: take() uploads a PNG of the viewport (vendored html-to-image)"
     const out = await (window as any).tendrilSnippets.screenshot.take({ pixelRatio: 1 });
     return JSON.parse(JSON.stringify(out)); // what an eval caller would receive
   });
-  expect(r).toEqual({ width: 400, height: 300, id: expect.stringMatching(/^b_/), url: expect.stringContaining("_tendril/blob/") });
+  expect(r).toEqual({ width: 400, height: 300, id: expect.stringMatching(/^b_/), url: expect.stringContaining("_tendril/blobs/") });
   const c = await calls(page);
   expect(c.upload[0].type).toBe("image/png");
   expect(c.upload[0].head.slice(0, 4)).toEqual([0x89, 0x50, 0x4e, 0x47]);

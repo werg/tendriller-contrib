@@ -116,6 +116,6 @@
     "scope": "sessions:workshop",
     "location": "envelope; outside data",
     "capture": "tendril.scopes.capture(scope)",
-    "contract": 2
+    "contract": 3
   }
 }

@@ -2,9 +2,10 @@ import { expect, request, type APIRequestContext, type BrowserContext, type Page
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { scaffold, componentAssets } from '../../tools/cli/lib/assets.mjs';
-import { pack, encodeFile } from '../../tools/cli/lib/pack.mjs';
+import { pack, guessType } from '../../tools/cli/lib/pack.mjs';
+import { publishFiles } from '../../tools/cli/lib/publications.mjs';
 import { assertService } from '../../tools/cli/lib/service.mjs';
 
 // This suite consumes an explicitly started service with test identity fixtures.
@@ -20,7 +21,7 @@ export function requester() { return localRequest ??= request.newContext({ ignor
 export type Handle = { id: string; page_url: string; api: string; token: string };
 export type CommandMetadata = { cid: string; scope?: string; expected_generations: Record<string, string> };
 
-export async function verifyService(requirements = { contract: 2, workflows: {} }) {
+export async function verifyService(requirements = { contract: 3, workflows: {} }) {
   const result = await (await requester()).get(new URL('/api/service', SERVICE).href);
   expect(result.ok(), await result.text()).toBe(true);
   return assertService(await result.json(), requirements);
@@ -40,6 +41,26 @@ export async function agent(h: Handle, path = '', method = 'GET', body?: unknown
   const raw = await result.text();
   let data: any; try { data = JSON.parse(raw); } catch { data = raw; }
   return { status: result.status(), data };
+}
+function publicationApi(h: Handle) {
+  const json = async (path: string, method = 'GET', body?: unknown) => {
+    const result = await agent(h, path, method, body);
+    expect(result.status, JSON.stringify(result.data)).toBeGreaterThanOrEqual(200);
+    expect(result.status, JSON.stringify(result.data)).toBeLessThan(300);
+    return result.data;
+  };
+  return {
+    get: (path: string) => json(path),
+    post: (path: string, body: unknown) => json(path, 'POST', body),
+    raw: async (path: string, options: { method?: string; body?: Buffer; headers?: Record<string, string> }) => {
+      const response = await (await requester()).fetch(h.api + path, {
+        method: options.method || 'GET', headers: { Authorization: `Bearer ${h.token}`, ...options.headers }, data: options.body,
+      });
+      const bytes = await response.body();
+      expect(response.ok(), bytes.toString('utf8')).toBe(true);
+      return new Response(response.status() === 204 ? null : bytes, { status: response.status() });
+    },
+  };
 }
 export async function capturedGuards(h: Handle, scope?: string): Promise<CommandMetadata> {
   if (!scope) return { cid: randomUUID(), expected_generations: {} };
@@ -70,10 +91,13 @@ async function holdListener(h: Handle) {
 }
 export async function publish(h: Handle, body: string, components: string[] = []) {
   await holdListener(h);
-  const files: Record<string, unknown> = { 'index.html': `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>E2E</title></head><body>${body}</body></html>` };
-  for (const asset of componentAssets(components)) files[asset.path] = encodeFile(asset.bytes, asset.path);
-  const result = await agent(h, '/files', 'POST', { replace: true, files });
-  expect(result.status, JSON.stringify(result.data)).toBe(200); return result.data;
+  const files = new Map<string, Buffer>();
+  files.set('index.html', Buffer.from(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>E2E</title></head><body>${body}</body></html>`));
+  for (const asset of componentAssets(components)) files.set(asset.path, asset.bytes);
+  const enumeration = { entry: 'index.html', files: [...files].map(([path, bytes]) => ({
+    path, bytes, type: guessType(path), sha256: createHash('sha256').update(bytes).digest('hex'), size: bytes.length,
+  })) };
+  return publishFiles(publicationApi(h), enumeration);
 }
 export async function publishRecipe(h: Handle, name: string, scope: string) {
   const temp = mkdtempSync(join(tmpdir(), 'tendriller-e2e-'));
@@ -82,8 +106,7 @@ export async function publishRecipe(h: Handle, name: string, scope: string) {
     await verifyService(selected.requires);
     await activate(h, scope);
     await holdListener(h);
-    const result = await agent(h, '/files', 'POST', pack(directory));
-    expect(result.status, JSON.stringify(result.data)).toBe(200); return result.data;
+    return publishFiles(publicationApi(h), pack(directory));
   } finally { rmSync(temp, { recursive: true, force: true }); }
 }
 export function localPageUrl(h: Handle): string {

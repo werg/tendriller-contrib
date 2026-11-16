@@ -65,7 +65,7 @@ export function componentAssets(names, { workflows = false } = {}) {
 export function assetLock(declaration, assets = componentAssets(declaration.components || [], { workflows: !!declaration.workflows?.length })) {
   const core = JSON.parse(readResource('core.lock.json'));
   return { format: 'tendriller-page-assets', version: 1, contrib: JSON.parse(readResource('package.json')).version,
-    requires: declaration.requires || { contract: 2, workflows: {} }, core: core.artifacts,
+    requires: declaration.requires || { contract: 3, workflows: {} }, core: core.artifacts,
     files: assets.map(({ path, sha256 }) => ({ path, sha256 })) };
 }
 export function vendorAssets(directory, declaration) {

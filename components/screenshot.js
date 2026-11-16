@@ -2,7 +2,7 @@
  *
  * From the agent, via eval (the snippet loads itself if the page does not include it):
  *   POST <api>/eval  {"code": "if (!window.tendrilSnippets?.screenshot) await new Promise((r, j) => document.head.append(Object.assign(document.createElement('script'), {src: 'assets/components/screenshot.js', onload: r, onerror: j}))); return await tendrilSnippets.screenshot.take()"}
- *   → {"id":"b_…","url":"_tendril/blob/b_…","width":…,"height":…}   then GET <api>/blobs/<id>
+ *   → {"id":"b_…","url":"_tendril/blobs/b_…","width":…,"height":…}   then GET <api>/blobs/<id>
  *
  * In a page:
  *   <script src="assets/components/screenshot.js"></script>

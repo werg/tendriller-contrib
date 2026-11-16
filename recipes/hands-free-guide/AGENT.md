@@ -5,7 +5,7 @@ Keep the guide definition separate from guide_progress. Steps have stable IDs; c
 ## Prepare the page
 
 Scaffold this recipe through the released CLI so all assets are declared and pinned.
-Check `GET /api/service` for contract 2 and sessions interface/schema `1`.
+Check `GET /api/service` for contract 3 and sessions interface/schema `1`.
 An authorized controller must explicitly call `sessions.activate` with
 `data:{"scope":"guide"}` before initial protected state publication. Capture the
 returned authoritative `sessions:guide` generation through `GET A/scopes`.
