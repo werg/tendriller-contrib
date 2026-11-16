@@ -14,7 +14,10 @@
  * y breaks the line; invalid x values are ignored. No string/boolean coercion.
  * Points sort by x, retaining the newest maxPoints per series (default 500,
  * range 2..10000). At most 24 uniquely named series may be shown at once.
- * Options: title, xLabel, yLabel, xFormat(value), yFormat(value), maxPoints, theme.\n * theme: 'auto' (system preference, default), 'light', or 'dark'; may change\n * on update(series, {theme}) for a manual UI toggle. Series colors and dashes\n * are derived from id, not input order, and can be overridden with --tc-N.
+ * Options: title, xLabel, yLabel, xFormat(value), yFormat(value), maxPoints, theme.
+ * theme: 'auto' (system preference, default), 'light', or 'dark'; may change
+ * on update(series, {theme}) for a manual UI toggle. Series colors and dashes
+ * are derived from id, not input order, and can be overridden with --tc-N.
  * Optional emaAlpha in (0,1] weights the current sample: EMA = alpha*y +
  * (1-alpha)*previous. It runs in ascending x order, in original y units, resets
  * at gaps, and is recomputed from the bounded retained window. A faint raw line

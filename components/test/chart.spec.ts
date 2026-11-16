@@ -89,8 +89,8 @@ test('stable series ids preserve palette slots across reordering and explicit th
   await expect(page.locator('[data-tendril-chart]')).toHaveAttribute('data-tc-theme','dark');
   const positions=await page.locator('[data-tendril-chart] > svg text').evaluateAll(nodes => {
     const label=nodes.find(n=>n.textContent==='Very long reading')!;
-    const tick=nodes.find(n=>n.getAttribute('text-anchor')==='end')!;
-    return {labelBottom:label.getBBox().y+label.getBBox().height,tickTop:tick.getBBox().y};
+    const ticks=nodes.filter(n=>n.getAttribute('text-anchor')==='end');
+    return {labelBottom:label.getBBox().y+label.getBBox().height,tickTop:Math.min(...ticks.map(n=>n.getBBox().y))};
   });
   expect(positions.labelBottom).toBeLessThan(positions.tickTop);
   await page.evaluate(() => (window as any).chart.update([], {theme:'auto'}));
