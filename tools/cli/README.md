@@ -6,7 +6,9 @@ runtime and optional local Playwright. The HTTPS API is also described in `/agen
 `npm run build` produces a dependency-free tool archive and standalone helper scripts.
 A standalone `tendril.mjs` CLI also ships in the release for creating and publishing pages without the large tools archive. It embeds the resources needed for `assets sync`. The archive embeds the exact public core runtime and contrib resources. `npm run
 test:distribution` unpacks it in an empty directory and verifies this boundary.
-For headless scenarios, install Playwright locally and its Chromium browser.
+For headless scenarios, install Playwright locally and its Chromium browser:
+`npm install --no-save playwright && npx playwright install chromium`.
+Normal local previews do not require a browser automation package.
 
 ```sh
 node tools/cli/bin/tendril.mjs --help

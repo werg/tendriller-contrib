@@ -2,6 +2,18 @@
 
 Optional receivers and bridges for the core event protocol. Select an exact release and verify its manifest before installing a downloaded helper.
 
+## Check network access before attaching a receiver
+
+```sh
+curl -fsS https://tendriller.dev/api/service
+# Local development: curl -fsS http://localhost:8787/api/service
+```
+
+A successful descriptor advertises contract 2. DNS, TLS, proxy and firewall
+failures at this step are not missing listeners. After creation, inspect the
+authenticated `GET A` response for `agent_delivery.mode` and run two
+end-to-end delivery probes. Network reachability alone does not arm a watcher.
+
 ## Attach a host receiver
 
 The bundled local bridges need Node.js 22.15 or newer and use `A/events/socket`: a hibernating WebSocket that carries count-only wake notices. They read `GET A/events?after=<acknowledged cursor>&wait=0` on each wake and reconnect. A custom host without WebSockets can use `GET A/events?after=<cursor>&wait=300`, then reconnect after each response. The host must still resume the correct agent conversation.
