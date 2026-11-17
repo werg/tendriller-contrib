@@ -1,0 +1,37 @@
+2026-11-17T13:40:02.3047221Z ##[group]Run pnpm exec vitest run packages/runtime-browser/src/wasm-conformance.test.ts
+2026-11-17T13:40:02.3047703Z [36;1mpnpm exec vitest run packages/runtime-browser/src/wasm-conformance.test.ts[0m
+2026-11-17T13:40:02.3093164Z shell: /usr/bin/bash -e {0}
+2026-11-17T13:40:02.3093381Z env:
+2026-11-17T13:40:02.3093607Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-11-17T13:40:02.3093873Z   CHRONOLOG_REQUIRE_WASM: 1
+2026-11-17T13:40:02.3094087Z ##[endgroup]
+2026-11-17T13:40:02.7713867Z 
+2026-11-17T13:40:02.7715605Z [1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/home/runner/work/chronolog-db/chronolog-db[39m
+2026-11-17T13:40:02.7716032Z 
+2026-11-17T13:40:03.7717778Z [90mstderr[2m | packages/runtime-browser/src/wasm-conformance.test.ts[2m > [22m[2mnative/WASM deterministic engine qualification
+2026-11-17T13:40:03.7718701Z [22m[39mIgnoring inability to install 'opfs' sqlite3_vfs: TypeError: Cannot read properties of undefined (reading 'href')
+2026-11-17T13:40:03.7719579Z     at Object.callee [as initOptions] [90m(/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:18998:51[90m)[39m
+2026-11-17T13:40:03.7720674Z     at installOpfsVfs [90m(/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:20053:22[90m)[39m
+2026-11-17T13:40:03.7721716Z     at [90m/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:20140:10
+2026-11-17T13:40:03.7722664Z     at [90m/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:7440:51
+2026-11-17T13:40:03.7723692Z [90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+2026-11-17T13:40:03.7724138Z 
+2026-11-17T13:40:03.7726622Z [90mstderr[2m | packages/runtime-browser/src/wasm-conformance.test.ts[2m > [22m[2mnative/WASM deterministic engine qualification
+2026-11-17T13:40:03.7728333Z [22m[39mIgnoring inability to install the opfs-wl sqlite3_vfs: TypeError: Cannot read properties of undefined (reading 'href')
+2026-11-17T13:40:03.7729968Z     at Object.callee [as initOptions] [90m(/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:18998:51[90m)[39m
+2026-11-17T13:40:03.7731745Z     at installOpfsWlVfs [90m(/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:21660:22[90m)[39m
+2026-11-17T13:40:03.7733024Z     at [90m/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:21725:10
+2026-11-17T13:40:03.7734958Z     at [90m/home/runner/work/chronolog-db/chronolog-db/[39martifacts/wasm/sqlite3.mjs:7440:51
+2026-11-17T13:40:03.7736092Z [90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+2026-11-17T13:40:03.7737350Z     at [90m/home/runner/work/chronolog-db/chronolog-db/[39mpackages/runtime-browser/src/wasm-conformance.test.ts:35:20
+2026-11-17T13:40:03.7738122Z 
+2026-11-17T13:40:05.6562462Z  [32m✓[39m packages/runtime-browser/src/wasm-conformance.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 2215[2mms[22m[39m
+2026-11-17T13:40:05.6564196Z    [33m[2m✓[22m[39m native/WASM deterministic engine qualification[2m > [22mreplays authenticated encrypted peer order and earlier-prefix recovery identically in native and WASM SQL [33m 528[2mms[22m[39m
+2026-11-17T13:40:05.6565450Z    [33m[2m✓[22m[39m native/WASM deterministic engine qualification[2m > [22mexecutes identical histories, rejects assertions, replays a late predecessor, and reopens exact state [33m 378[2mms[22m[39m
+2026-11-17T13:40:05.6566629Z    [33m[2m✓[22m[39m native/WASM deterministic engine qualification[2m > [22menforces sealed writes and closes a deleted row policy identically across engines [33m 440[2mms[22m[39m
+2026-11-17T13:40:05.6865885Z 
+2026-11-17T13:40:05.6868677Z [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+2026-11-17T13:40:05.6869763Z [2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+2026-11-17T13:40:05.6870788Z [2m   Start at [22m 13:40:02
+2026-11-17T13:40:05.6872108Z [2m   Duration [22m 2.91s[2m (transform 480ms, setup 0ms, collect 451ms, tests 2.21s, environment 0ms, prepare 52ms)[22m
+2026-11-17T13:40:05.6872634Z 

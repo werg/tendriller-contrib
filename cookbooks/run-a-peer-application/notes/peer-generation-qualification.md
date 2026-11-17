@@ -9,6 +9,84 @@ independent package gate. Its [small synthetic tests](../checks/peer-generation-
 check whether incomplete or contradictory evidence is refused. Passing those
 tests is not evidence that a peer session, browser, network or deployment ran.
 
+## Structured release inventory
+
+The [release qualification manifest](peer-generation-release-manifest.json)
+records exact Chronolog, Tendriller and consumer commits/trees, clean-source
+flags, archive hashes, native/WASM identities, storage formats and implemented
+operating limits. It treats each runtime gate separately. Its current
+`releaseReady: false` records outstanding browser SQL recovery and deployed
+operating conditions; successful native, browser-events and fresh-consumer
+results do not fill those gaps.
+
+| Gate | Recorded result | Scope |
+| --- | --- | --- |
+| Core/session regression at `3187d9df` | Producer reported 149 passing tests; original log unavailable | Kept separate from independently preserved acceptance evidence. |
+| Native/WASM conformance at `3187d9df` | Seven tests passed in the [preserved CI stage](evidence/2026-11-17-peer-native-wasm-3187d9df-stage.log) | Actual engine replay/recovery under Node. The overall job later failed at browser bundle isolation. |
+| Browser events at `572fded7` | Passed | Actual Chromium, Worker/OPFS, RTC, content, selected-prefix recovery and reopen. |
+| Workerd/native RTC at `572fded7` + Tendriller `2e8200a3` | Passed | Actual public host control/rendezvous routes and measured host-blocked commands. |
+| Native task domain at `fe752b7f` | Passed | Real SQL/event guards, shared creator departure, recovery, linked reapply and reopen. |
+| Fresh consumer at `fe752b7f` + Tendriller `2e8200a3` | Passed with recorded coaching | Independent domain source, canonical bootstrap and actual Worker controls; native stores use local direct transport. |
+| Current complete browser SQL gate | Not yet qualified | Prior real SQL forms and same-view race passed before a later receipt timeout; that report remains failed. |
+| Deployed networks, TURN, cost and five-minute freshness | Not executed/measured | No release-wide green status is inferred. |
+
+## Fresh public-API exercise
+
+A fresh agent received only the packed public artifacts, their public docs and
+an empty authenticated local host fixture. It authored its own guarded task
+definition and workflow without reading the implementation, core fixtures or
+this cookbook's other consumers. The
+[complete independent exercise](../checks/fresh-peer-task/README.md),
+[DX record](../checks/fresh-peer-task/DX-RECORD.md),
+[raw successful run](../checks/fresh-peer-task/evidence/run-3.jsonl) and
+[summary](../checks/fresh-peer-task/evidence/summary.json) are preserved with the
+failed attempts and exact artifact hashes.
+
+The full run used clean Chronolog `fe752b7f`, clean Tendriller `2e8200a3`, and the
+clean fixture/consumer checkpoint `6fcd9bf`. Its three independent native stores
+ran in one process through public `connectApplications`; actual compact control
+HTTP ran through the packed Tendriller Worker. It published and discovered its
+schema, rejected a stale SQL guard without partial rows/events, retried an exact
+saved attempt after cancelling a result observation, and recovered prefix 3
+from previous head 4 after closing the original coordinator. Another author
+inspected the abandoned signed attempt and deliberately reapplied it with a new
+identity and link. The same selected SQL view and both applied/abandoned outcomes
+survived reopening the original device, with zero hosted requests during reopen.
+
+The final process reached its first useful command in **7.455 seconds** and
+finished in **21.209 seconds**. The earliest useful command in the preceding run
+occurred after **5.709 process seconds**, **17 minutes 32.247 seconds** from the
+study start. Total study-to-green time was **23 minutes 8.773 seconds**, including
+reading, infrastructure and correction. These are different measurements.
+
+The record identifies one SQL ownership API coaching intervention, one explicit
+local-transport scope direction and one environment intervention: the isolated
+command processes required the consumer and host to share one command network
+namespace. The agent independently corrected its own order-sensitive JSON
+fingerprint assertion. Full signed-object equality across two stores and a
+zero-fetch cached-reopen continuation established that no operation changed.
+The failed run is retained as failed. This is a coached public-API usability
+exercise, not an unaided pass, physical wire-loss test or browser/network gate.
+
+## Implemented operating limits
+
+The current profile retains at most **4,096 ordered records** and **64 MiB of
+serialized history**, including retained abandoned work. Limits fail explicitly;
+they do not silently delete a required recovery prefix. Network history travels
+in bounded pages of at most 32 commands within 1 MiB frames. The owned session
+permits eight held coherent read views; the page facade permits 64 pending calls
+and 16 pulled streams. Read views and streams must be released when no longer
+needed.
+
+Content uses encrypted 64 KiB chunks and an implemented 128 MiB object ceiling.
+The preserved browser run measured 32,768-byte and 131,095-byte objects, including
+partial transfer and reopen. It did not qualify operation at the ceiling.
+Native storage defaults to a 256 MiB byte-store quota and exclusive SQLite
+WAL/FULL ownership. Browser identity/history storage uses one Worker with OPFS
+and an exclusive Web Lock; SQL adds its verified engine pool. Exact record formats
+and engine hashes are in the manifest. These are prerelease formats with no
+migration or compatibility promise.
+
 ## Preserved development run
 
 The [2026-11-17 development report](evidence/2026-11-17-peer-generation-preview-report.json)

@@ -1,0 +1,601 @@
+{
+  "format": "tendriller-peer-release-qualification/v1",
+  "recordedAt": "2026-11-17T14:08:01.839638+00:00",
+  "overallStatus": "partially-qualified",
+  "releaseReady": false,
+  "interpretation": "Each gate applies only to its exact inputs and scope. No single green release gate is inferred across different revisions or unexecuted topologies.",
+  "profile": "peer-generation-v1",
+  "policy": "eligible-members-v1",
+  "currentPublicContract": {
+    "chronolog": {
+      "repository": "werg/chronolog-db",
+      "commit": "17a1b64ae0fae6954d9e094db19e17edfbedc7ac",
+      "tree": "c14a4ecc1f17d660f241eb38b3d43f43ca767285",
+      "dirty": false
+    },
+    "contrib": {
+      "repository": "werg/tendriller-contrib",
+      "commit": "3107cba13007633177b5003c379ff481b20e5481",
+      "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+      "dirty": false
+    },
+    "tendriller": {
+      "repository": "werg/tendriller",
+      "commit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
+      "tree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
+      "dirty": false
+    },
+    "completion": [
+      "applied",
+      "shared"
+    ],
+    "finality": false,
+    "recovery": "An authenticated selected prefix may abandon recent applied work; old attempts stay inspectable and reapplication creates a new linked attempt.",
+    "ordinaryTraffic": "Commands, queries, history, signals and content use peer connections; hosted compact control is needed for publication/discovery/enrollment and selection.",
+    "automaticExternalEffectDispatcher": false,
+    "nativeBootstrap": "openApplicationSession / openNativeSqlSession",
+    "browserBootstrap": "connectApplicationWorkerHost + openApplicationSession / openBrowserSqlSession + serveApplicationWorker",
+    "networkLifecycle": "maintainNativeApplicationWebRtc / maintainWorkerApplicationWebRtc",
+    "sqlPreparation": "flat public definition/schema/executionManifestDigest/schemaAdministrator; no alternate binding-shape support"
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g784414c9-rtc",
+      "sha256": "79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c",
+      "sourceCommit": "784414c95e77f797083866f9c314c1ecd4183661",
+      "sourceTree": "9dce09719e51b11d3d875fb36f08b7e6b195ef07",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g572fded7-rtc",
+      "sha256": "0c40d7ecf5c010fcbc8014d5bfd135bf7018f2c2d30d7ad4161bd962dd46cb71",
+      "sourceCommit": "572fded79a41d5aeda670d60f0e022d08b85c51a",
+      "sourceTree": "aca326927f169c972f1af9a1581367e65fa8b5a6",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g572fded7-rtc",
+      "sha256": "9dbcf32ba7ef88cdcf8c9f8aa1efad5e40b5395edcf783c15cf06a779eac8dde",
+      "sourceCommit": "572fded79a41d5aeda670d60f0e022d08b85c51a",
+      "sourceTree": "aca326927f169c972f1af9a1581367e65fa8b5a6",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@tendriller/core",
+      "version": "0.3.0-rc.9",
+      "file": "tendriller-sdk-0.3.0-rc.9.tgz",
+      "sha256": "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614",
+      "sourceCommit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
+      "sourceTree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
+      "sourceDirty": false,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-tendriller-2e8200a3-provenance.json",
+        "sha256": "8f85d4c380d347560b785d8eaa924f39650d3d2056184b844548fa20c289eba6"
+      },
+      "repository": "werg/tendriller"
+    },
+    {
+      "name": "@tendriller/engine",
+      "version": "0.3.0-rc.9",
+      "file": "tendriller-engine-0.3.0-rc.9.tgz",
+      "sha256": "05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468",
+      "sourceCommit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
+      "sourceTree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
+      "sourceDirty": false,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-tendriller-2e8200a3-provenance.json",
+        "sha256": "8f85d4c380d347560b785d8eaa924f39650d3d2056184b844548fa20c289eba6"
+      },
+      "repository": "werg/tendriller"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gc685d393-sql",
+      "sha256": "da43bcf731c85aa95d007e2b8b2cd2b2e0e66fb230469a18fe012b8db3dd95e4",
+      "sourceCommit": "c685d393e900828278ca401285fded2c17ab1753",
+      "sourceTree": "a5509737c9276657f9be8ddb4dc277c2cb9fe445",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gfe752b7f-sql",
+      "sha256": "c19b6f806c39873c79a94613c107f0fcdf3979f2221f7beb700da2e52f9b58b2",
+      "sourceCommit": "fe752b7f6fd7095b6f45c61a176e34b6f37d0674",
+      "sourceTree": "e1fb126210b09ff87bfea826509a8e83fcb7efe2",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gb05979c6-rtc-sql-wasm",
+      "sha256": "de92302a48d4397d5c5320bc75d4f183219a9b76e8ad1ee5b35951820c69aa23",
+      "sourceCommit": "b05979c6407de9dc8c8a73a2866cb026a5ad172b",
+      "sourceTree": "1226c83a0e4c4d88499d3c0c12b8eac2a98b3847",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gfe752b7f-rtc-sql-wasm",
+      "sha256": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
+      "sourceCommit": "fe752b7f6fd7095b6f45c61a176e34b6f37d0674",
+      "sourceTree": "e1fb126210b09ff87bfea826509a8e83fcb7efe2",
+      "sourceDirty": false,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-fe752b7f-provenance.json",
+        "sha256": "a4bedc301c88ed0d8fdc93c9c209101d4004a324be9a58171181c538beb93b4b"
+      },
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@tendriller/runtime",
+      "version": "0.3.0-rc.9",
+      "file": "tendriller-runtime-0.3.0-rc.9.tgz",
+      "sha256": "290d84f76ac7dd3a3f1746f6f4f6142f193a5d112451fdbc42e85ac7c5b3db9c",
+      "sourceCommit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
+      "sourceTree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
+      "sourceDirty": false,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-tendriller-2e8200a3-provenance.json",
+        "sha256": "8f85d4c380d347560b785d8eaa924f39650d3d2056184b844548fa20c289eba6"
+      },
+      "repository": "werg/tendriller"
+    },
+    {
+      "repository": "werg/chronolog-db",
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g76129c3c-sql",
+      "sha256": "a3c9ec7046c880a8d0c5f0b6b127b4f8d7b8e76767e07efee98713f745c40a27",
+      "sourceCommit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
+      "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
+      "sourceDirty": false
+    }
+  ],
+  "engines": {
+    "artifact": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
+    "native": {
+      "implementation": "@dolthub/doltlite@0.11.29",
+      "platform": "linux",
+      "architecture": "x64",
+      "node": "v24.22.1",
+      "manifest": {
+        "doltliteVersion": "0.11.29",
+        "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+        "sqliteVecVersion": "0.1.9",
+        "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+        "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+        "fts5": true,
+        "json1": true,
+        "rtree": true,
+        "dynamicExtensions": false
+      },
+      "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+    },
+    "wasm": {
+      "directory": "browser-engine",
+      "manifest": {
+        "format": 1,
+        "toolchain": "emscripten-4.0.20",
+        "nativeManifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "runtimeVersions": {
+          "doltlite": "doltlite-amalgamation",
+          "sqlite": "3.54.0",
+          "vec": "v0.1.9"
+        },
+        "portabilityPatches": [
+          "chunk-store-optional-sector-size-v1",
+          "chunk-store-optional-has-moved-v1",
+          "vfs-identity-forwarding-v1"
+        ],
+        "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+        "wasmSha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+        "wasmBytes": 2761242
+      }
+    },
+    "nativeBinarySha256": "291e75ef09c0e07482f2a2f6030eaf588127c62db1d4444cd914f60ea43e27e2",
+    "wasmBinarySha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+    "manifestIdentityEqual": true,
+    "scope": "Actual native/WASM conformance is a separate gate; packed engine identity alone does not qualify browser OPFS recovery."
+  },
+  "storageContract": {
+    "source": "17a1b64ae0fae6954d9e094db19e17edfbedc7ac",
+    "ownedDeviceRecord": "peer-session/device/v1",
+    "ownedDeviceBinding": "peer-session/device-binding/v1",
+    "bootstrapCache": "peer-session/application/v1/<applicationId>",
+    "bootstrapJournal": "peer-session/creation/v1/<applicationId>",
+    "transitionJournal": "peer-session/transitions/v1/<applicationId>",
+    "generationReplicaHeadVersion": 2,
+    "eventHeadFormat": "chronolog/event-head/v2",
+    "eventRecordFormat": "chronolog/event-record/v1",
+    "browserByteEnvelopeVersion": 1,
+    "nativeByteStore": {
+      "table": "agent_values",
+      "journal": "WAL",
+      "synchronous": "FULL",
+      "ownership": "exclusive SQLite writer lock"
+    },
+    "browserByteStore": {
+      "owner": "dedicated Worker",
+      "storage": "OPFS",
+      "ownership": "exclusive Web Lock"
+    },
+    "sqlStoreVersioning": "Execution manifest and authenticated signed application schema bind the materialized database.",
+    "migrationPolicy": "Prerelease formats; no compatibility or migration guarantee is added by these recipes."
+  },
+  "operatingBounds": {
+    "source": "17a1b64ae0fae6954d9e094db19e17edfbedc7ac",
+    "scope": "Implemented limits, not a capacity qualification. Abandoned retained work counts toward storage; limits fail explicitly rather than silently pruning required history.",
+    "retainedOrderedRecords": 4096,
+    "serializedHistoryBytes": 67108864,
+    "nativeStoreDefaultQuotaBytes": 268435456,
+    "nativeStoreDefaultMaxValueBytes": 134217728,
+    "networkFrameBytes": 1048576,
+    "historyPageMaxCommands": 32,
+    "concurrentReadViews": 8,
+    "workerPendingCalls": 64,
+    "workerStreams": 16,
+    "operationSubscriptions": 16,
+    "contentChunkBytes": 65536,
+    "contentObjectMaxBytes": 134217728,
+    "retainedCoverage": "One strongest claim per current reader identity; reset on generation recovery.",
+    "measuredContentSizesBytes": [
+      32768,
+      131095
+    ],
+    "fiveMinuteRecoveryAge": "Objective only; not measured by these short scenarios."
+  },
+  "topologies": [
+    {
+      "kind": "native to native direct in-process transport",
+      "qualification": "Independent SQL/event guards, recovery and reopen; G3 uses separate stores in one process."
+    },
+    {
+      "kind": "native to native WebRTC over explicit loopback",
+      "qualification": "Actual ICE/DTLS/SCTP with portable controls and separately actual workerd rendezvous."
+    },
+    {
+      "kind": "Chromium Worker/OPFS to native WebRTC over loopback",
+      "qualification": "Events/content/recovery passed at572; current full SQL recovery pending."
+    },
+    {
+      "kind": "managed browser/native lifecycle against deployed host; Internet/TURN",
+      "qualification": "Implemented composition; deployed topology not qualified by these reports."
+    }
+  ],
+  "gates": [
+    {
+      "id": "G0-core-session-3187",
+      "status": "producer-reported-pass",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "3187d9dfeadf6f6500ae714f8b39367f0e539e5f",
+        "tree": "70769bc06ee248d5b4d6249ae4fff04d17a4264b",
+        "dirty": false
+      },
+      "testFiles": 25,
+      "tests": 149,
+      "scope": "Focused core/session/RTC/Tendriller regression.",
+      "evidenceAvailability": "Original durable log unavailable; result reported by the producing agent. This is not an independently preserved acceptance report."
+    },
+    {
+      "id": "G0-native-wasm-3187",
+      "status": "passed-stage",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "3187d9dfeadf6f6500ae714f8b39367f0e539e5f",
+        "tree": "70769bc06ee248d5b4d6249ae4fff04d17a4264b",
+        "dirty": false
+      },
+      "tests": 7,
+      "scope": "Actual native/WASM deterministic execution, including authenticated peer order, earlier-prefix recovery and reopen. WASM ran under Node.",
+      "evidence": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-native-wasm-3187d9df-stage.log",
+        "sha256": "28418f5de643ecce8c5a05fdf205c5e4712312a28d5269229546c60470dd8b50"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44094651519",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44094651519/job/134078459902",
+      "workflowOverall": "failed later at independent browser bundle isolation; this entry qualifies only the named engine stage.",
+      "limitations": [
+        "This stage did not exercise Worker-owned OPFS."
+      ]
+    },
+    {
+      "id": "G1-native-rtc-784414",
+      "status": "passed",
+      "scope": "Independent packed native stores, actual authenticated RTC, retry and selected-prefix recovery.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "8d308a6e5cfb12de4fe3eb6d7da6c2132407a039",
+        "tree": "1c15bae24f9ad48d12777ae715b178582a1158e0",
+        "dirty": false
+      },
+      "artifacts": [
+        "79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-rtc-clean-report.json",
+        "sha256": "3630825ac125e18121966fbab7aa3c52b9af7b519e9f029b765d9653f46db41e"
+      },
+      "limitations": [
+        "Portable control boundary; no actual Tendriller host.",
+        "Local explicit-loopback topology; no Internet/TURN or deployed login qualification.",
+        "Logical application-frame counters exclude RTC, SCTP, DTLS and IP overhead."
+      ]
+    },
+    {
+      "id": "G1-browser-events-572",
+      "status": "passed",
+      "scope": "Actual Chromium dedicated Worker, OPFS ownership, native RTC, key enrollment, exact saved attempts, host-blocked events/content, prefix recovery and reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "8d390fc5ae43175e201c46bdae2a1547c6a7ae86",
+        "tree": "fd5ae204e03f09088de97d40e8143a49b42878f6",
+        "dirty": false
+      },
+      "artifacts": [
+        "0c40d7ecf5c010fcbc8014d5bfd135bf7018f2c2d30d7ad4161bd962dd46cb71"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-clean-report.json",
+        "sha256": "d998f3e7b004167ca775cb1fd8866e071c545459660d716f7a7836fa99252c73"
+      },
+      "limitations": [
+        "Events-only execution; no SQL or actual Tendriller control routes.",
+        "Abrupt termination followed an observed durable apply; no interrupted-write crash or quota/eviction claim.",
+        "Local explicit-loopback topology; no Internet/TURN or deployed login qualification.",
+        "Logical application-frame counters exclude RTC, SCTP, DTLS and IP overhead."
+      ],
+      "workflow": "https://github.com/werg/tendriller-contrib/actions/runs/44091858762"
+    },
+    {
+      "id": "G1-workerd-native-rtc-572-2e",
+      "status": "passed",
+      "scope": "Actual public Tendriller workerd control and rendezvous, native RTC, zero command-correlated hosted traffic, older-prefix takeover and reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "004b8b26731c6fbe4f872e05ed074319f2467986",
+        "tree": "fd5ae204e03f09088de97d40e8143a49b42878f6",
+        "dirty": false
+      },
+      "artifacts": [
+        "9dbcf32ba7ef88cdcf8c9f8aa1efad5e40b5395edcf783c15cf06a779eac8dde",
+        "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614",
+        "05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-host-clean-report.json",
+        "sha256": "07667378f7704291f5b68c05d109ec03cd0cb99f2823815986c652f468b6b3c3"
+      },
+      "limitations": [
+        "Synthetic authenticated accounts; introductions and recovery faults explicitly controlled.",
+        "No browser or deployed managed-discovery lifecycle qualification.",
+        "Local explicit-loopback topology; no Internet/TURN or deployed login qualification.",
+        "Logical application-frame counters exclude RTC, SCTP, DTLS and IP overhead."
+      ]
+    },
+    {
+      "id": "G1-native-sql-c685",
+      "status": "passed",
+      "scope": "Independent cookbook native SQL/event guards, coherent prefix recovery, shared creator departure, linked reapply and keyring reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "164e35d607bce2bef7d344c9e7af3d62882f5f97",
+        "tree": "b038dfda4e250c110b8f4c40562a56d1f67a9ca3",
+        "dirty": false
+      },
+      "artifacts": [
+        "da43bcf731c85aa95d007e2b8b2cd2b2e0e66fb230469a18fe012b8db3dd95e4"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-task-clean-report.json",
+        "sha256": "03a5fa7c0a61e0c82a61821fd1a11a9371387c48389031ffc878a747c7b3a169"
+      },
+      "limitations": [
+        "Direct connectApplications transport and portable control registry; no browser or network routing claim."
+      ]
+    },
+    {
+      "id": "G1-native-sql-fe752",
+      "status": "passed",
+      "scope": "Same complete cookbook native SQL domain through its actual fe752 preparation contract.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "bf140dbdb0c13365a05b2a24896ed6637082e680",
+        "tree": "a95fca6c901ffe8b604eee9f660f9247670409b9",
+        "dirty": false
+      },
+      "artifacts": [
+        "c19b6f806c39873c79a94613c107f0fcdf3979f2221f7beb700da2e52f9b58b2"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-task-fe752b7f-report.json",
+        "sha256": "bc6f40b02362e80427dd8c0c127f5c342cbab965ae98e951610ea025b5e4b221"
+      },
+      "limitations": [
+        "Direct connectApplications transport and portable control registry.",
+        "Historical fe752 preparation shape; current code accepts the flat17a shape only."
+      ]
+    },
+    {
+      "id": "G1-browser-sql-b059",
+      "status": "failed",
+      "scope": "Partial real Chromium SQL/OPFS runtime: guarded forms, two-author same-view claim race, atomic events and key enrollment.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "1029c7cfb69a16a0f7b403a9e654b962b0304260",
+        "tree": "f87d073ca7169f44c1e086764ff09b5a04506ffa",
+        "dirty": false
+      },
+      "artifacts": [
+        "de92302a48d4397d5c5320bc75d4f183219a9b76e8ad1ee5b35951820c69aa23"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-task-ci-b05979c6-report.json",
+        "sha256": "a036901861528fc3ede44c93705112a6257054a20ecbf3b0b177633fa7bb1a7d"
+      },
+      "limitations": [
+        "Overall failed on a host-blocked task operation-row timeout.",
+        "No completed browser SQL recovery qualification from this report."
+      ],
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44095421612"
+    },
+    {
+      "id": "G1-producer-packed-native-sql-fe752",
+      "status": "passed",
+      "scope": [
+        "signed schema bootstrap",
+        "real SQL constraints",
+        "earlier prefix recovery",
+        "shared rows after creator closes",
+        "native reopen identity and outcomes"
+      ],
+      "artifact": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-producer-sql-fe752b7f-report.json",
+        "sha256": "86b41f4e9eb1550760c98ae6880301409d58b8b288a777686d1d86022e045ef1"
+      },
+      "limitations": [
+        "Producer-owned packed consumer; distinct from independently authored G3.",
+        "Native SQL and explicit local transport only."
+      ]
+    },
+    {
+      "id": "G3-fresh-native-sql-fe752-2e",
+      "status": "passed",
+      "scope": "Fresh agent authored a guarded task application from public artifacts/docs, using actual Tendriller workerd controls and three independent native stores in one process.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "6fcd9bf94fde98713667e4a1676100bcc4223a68",
+        "tree": "31f23ab85ec29b36c68999accd9a4d9909746f72",
+        "dirty": false
+      },
+      "scriptSha256": "67a91b3ef16e0e6f498332470cde8e397b00b0faea34f14b2a844dcea3ae5a6e",
+      "artifacts": [
+        "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
+        "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614",
+        "05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468"
+      ],
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/summary.json",
+        "sha256": "616af704d07481cb8d405599c2cd23851caa5aa5ec83dcae1ccb623bdfe30da9"
+      },
+      "report": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/run-3.jsonl",
+        "sha256": "faa4cfef4039b8ff410531737df6cc6446f69e14543b57a3dafffd751ad87c50"
+      },
+      "sourceReceipt": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/run-3-source.json",
+        "sha256": "d89b2eb6bb77a1b5b0ec04784ead25bed0b2d4aa929564ce5ddc2a06b80bfe66"
+      },
+      "executionReceipt": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/host-run-3-consumer.json",
+        "sha256": "3cd0398660db26b76f764836dc11ef0a8e144f221a2522e02129ceb56eec3cf6"
+      },
+      "hostEvidence": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/host-run-3-artifacts.json",
+        "sha256": "f35c17c6f29a28e0e137553580620872793f6f79642df563797804bbcf21923c"
+      },
+      "coaching": {
+        "sqlApi": 1,
+        "testingScopeDirection": 1,
+        "infrastructureEnvironment": 1
+      },
+      "consumerMistakes": {
+        "jsonObjectOrderFingerprintAssertion": 1,
+        "recoveryModel": 0
+      },
+      "firstUsefulProcessMs": 5709,
+      "firstUsefulStudyMs": 1052247,
+      "finalRunFirstUsefulProcessMs": 7455,
+      "finalRunProcessMs": 21209,
+      "studyToGreenMs": 1388773,
+      "retainedFailures": [
+        {
+          "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/run-1.jsonl",
+          "sha256": "6a3495ea9106b42324979201274c00d754f448f2b5c11ff50955cfed3b99987b"
+        },
+        {
+          "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/run-2.jsonl",
+          "sha256": "b0b60520e2c1949d56df81c74d95faa4a213ec2d1f902306c25f48f52ded43ec"
+        }
+      ],
+      "cachedReopenContinuation": {
+        "path": "cookbooks/run-a-peer-application/checks/fresh-peer-task/evidence/reopen-continuation.jsonl",
+        "sha256": "4ceaef8d46a23be3f9601e2cb3089b71d03c7e76a10e806b50903c1ebec3caa3"
+      },
+      "limitations": [
+        "Result observation cancellation, not actual wire reply loss.",
+        "No physical RTC/browser or host-blocked workload in this independent exercise.",
+        "One SQL API coaching intervention, one test-scope direction and one environment intervention; not an unaided first attempt."
+      ]
+    },
+    {
+      "id": "G1-native-sql-flat-76129",
+      "status": "passed",
+      "scope": "Independent native cookbook task scenario with the flat public SQL configuration shape.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+        "dirty": false
+      },
+      "artifacts": [
+        "a3c9ec7046c880a8d0c5f0b6b127b4f8d7b8e76767e07efee98713f745c40a27"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-task-76129c3c-report.json",
+        "sha256": "487e35f652265e2185fb093ed588eec99ed3f7758c21319a185f7cf5cceab166"
+      },
+      "limitations": [
+        "Direct local transport and portable controls; no current browser SQL acceptance from this native result."
+      ]
+    },
+    {
+      "id": "G1-current-browser-sql",
+      "status": "not-yet-qualified",
+      "scope": "Canonical Worker host bridge, flat17a public configuration, current operation-state notifications, SQL forms and full recovery.",
+      "requiredConsumerCommit": "aa7a445b968a752df17a7860e98f1008283a6750",
+      "limitations": [
+        "A passing complete current real-browser SQL report has not yet been preserved in this manifest."
+      ]
+    },
+    {
+      "id": "G4-deployed-operation",
+      "status": "not-executed",
+      "scope": [
+        "Home/mobile/restrictive networks and TURN",
+        "Deployed authentication and actual managed lifecycle under host outages",
+        "Suspension, eviction, quota pressure and interrupted-write crashes",
+        "Five-minute recovery-age objective with a second suitable peer",
+        "Comparable deployed provider usage/cost including guarantee differences"
+      ],
+      "limitations": [
+        "Unknown metrics remain unknown; no zero-cost, universal loss-bound or deployed readiness claim."
+      ]
+    }
+  ]
+}
