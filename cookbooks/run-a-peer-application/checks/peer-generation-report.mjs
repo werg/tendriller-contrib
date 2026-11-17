@@ -21,6 +21,7 @@ export function validatePeerGenerationReport(report) {
   same(report?.format, 'peer-generation-consumer/v1', 'Wrong report format');
   same(report.mode, 'runtime', 'A build cannot qualify runtime behavior');
   same(report.profile, 'peer-generation-v1', 'A different profile cannot qualify tolerant recovery');
+  hex(report.executionManifestDigest, 64, 'Missing exact execution manifest');
   same(report.topology, 'independent-packed-peers', 'Report the actual execution topology');
   same(report.passed, true, 'The consumer did not pass');
   nonempty(report.runtime?.node, 'Missing actual Node version');
@@ -108,6 +109,7 @@ export function validatePeerGenerationReport(report) {
   return {
     format: 'peer-generation-consumer-summary/v1',
     profile: report.profile,
+    executionManifestDigest: report.executionManifestDigest,
     topology: report.topology,
     source: report.source,
     artifacts: report.artifacts,

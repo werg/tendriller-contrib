@@ -18,6 +18,11 @@ const storeRoot = join(dirname(reportPath), 'stores');
 await mkdir(storeRoot);
 const sessions = new Set(), devices = new Set(), links = new Set();
 const timeout = () => AbortSignal.timeout(15_000);
+const checkpoint = async name => {
+  report.stage = name;
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  console.log(`Peer-generation consumer: ${name}`);
+};
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const database = name => join(storeRoot, name, 'device.sqlite');
 const openDevice = async (name, create = false) => {
@@ -48,14 +53,14 @@ try {
   await assert.rejects(openNativeDevice({ path: database('missing') }), /APPLICATION_DEVICE_NOT_FOUND/);
   report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
   const applicationId = randomBytes(32).toString('hex');
-  const execution = await executionManifestArtifacts(await eventExecutionManifest());
+  const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
   const descriptor = await signApplicationDescriptor({
     applicationId, historyId: 'independent-peer-conversation', profile: 'peer-generation-v1', policy: 'eligible-members-v1',
     controlPublicKey: hostDevice.identity.publicKey,
     // This events-only application explicitly pins its durable control identity for schema administration.
     schemaAdministrator: hostDevice.identity.publicKey,
     executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
-    definitionDigest: await applicationDefinitionDigest(conversation),
+    definitionDigest: await applicationDefinitionDigest(conversation), schemaDigest: null,
   }, hostDevice.identity);
   const control = await signControlRevision({
     applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
@@ -82,6 +87,7 @@ try {
   assert.equal(a.describe().capabilities.finality, false);
   assert.equal(a.describe().capabilities.automaticExternalEffects, false);
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
+  await checkpoint('opened independent native sessions');
   await post(a, 'anchor-a', 'A retained message');
   let ab = await connect(a, b);
 
@@ -118,6 +124,8 @@ try {
     orderedRecords: { before: orderedBeforeRetry.point.sequence, after: orderedAfterRetry.point.sequence },
   };
 
+  await checkpoint('recovered exact operation after lost reply');
+
   // Bootstrap/control calls are counted separately. The public session receives
   // cached verified authority and must never invoke this host while commanding.
   hostBlocked = true;
@@ -140,6 +148,7 @@ try {
     applicationBodyBytes: { before: beforeBodies, after: hostedApplicationBodyBytes }, finalityCapability: a.capabilities.finality,
     liveSignalsObserved: 1, peerReplicationObserved: true };
 
+  await checkpoint('continued with control host blocked');
   const retainedOperation = await b.operations.get('reply-lost');
   const adopted = await b.recoveryPoint();
   ab.close();
@@ -166,6 +175,7 @@ try {
   const coherentB = await query(b);
   assert.equal(coherentB.revision.generation, selected.id);
   assert.equal(coherentB.value.messages.some(message => message.operationId === 'abandoned-a'), false);
+  await checkpoint('selected older prefix on survivor');
   const c = await open(deviceC);
   const bc = await connect(b, c);
   await bc.synchronize();
@@ -198,6 +208,8 @@ try {
     digestBefore: hash(beforeReturn.value), digestAfter: hash(afterReturn.value),
     oldAttemptReadmitted: false, excludedAncestorReadopted: false, thirdGenerationChecked: false,
   };
+
+  await checkpoint('isolated returning abandoned branch');
 
   // Review both the input and current view. The old branch's captured revision
   // cannot be reused as if its abandoned preconditions were still current.
@@ -238,6 +250,7 @@ try {
   const afterReopen = await reopened.operations.get('reapplied-a');
   assert.deepEqual(afterReopen, beforeReopen);
   report.reopen = { identityBefore, identityAfter: reopened.deviceId, operationBefore: beforeReopen, operationAfter: afterReopen };
+  report.stage = 'passed';
   report.passed = true;
   console.log('Independent packed peer sessions preserved identity, exact retry and selected-prefix recovery.');
 } catch (error) {

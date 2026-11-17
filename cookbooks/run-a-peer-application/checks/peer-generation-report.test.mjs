@@ -7,7 +7,7 @@ function syntheticReport() {
   const receipt = { generation: 'g1', sequence: 2, root: 'a'.repeat(64) };
   return {
     format: 'peer-generation-consumer/v1', mode: 'runtime', profile: 'peer-generation-v1',
-    topology: 'independent-packed-peers', passed: true,
+    topology: 'independent-packed-peers', passed: true, executionManifestDigest: 'a'.repeat(64),
     runtime: { node: 'v24.0.0', platform: 'linux' },
     source: { commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: true },
     artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-test', sha256: 'c'.repeat(64),
@@ -49,6 +49,7 @@ test('peer-generation evidence retains actual source cleanliness and exact recov
 test('a build, historical finalized profile or source checkout cannot qualify the packed peer session', () => {
   rejects(value => { value.mode = 'build-only'; });
   rejects(value => { value.profile = 'signed-inclusion-v2'; });
+  rejects(value => { delete value.executionManifestDigest; });
   rejects(value => { value.source.commit = 'feat/portable-peer-core'; });
   rejects(value => { delete value.artifacts[0].sourceDirty; });
   rejects(value => { value.publicBoundary.siblingSourceImports = 1; });
