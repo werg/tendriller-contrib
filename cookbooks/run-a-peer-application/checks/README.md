@@ -71,6 +71,14 @@ bytes increase. Test accounts are synthetic; no result is a deployed-login or
 Internet-route qualification. The runner has no private host imports or second
 application command queue.
 
+Bootstrap, definition reads and generation selection use the public Chronolog
+participant transport at `peers/participant`. Its control-participant policy
+filters `database.submit`, `content.chunk` and `ephemeral.signal` before any HTTP
+request. The fixture also bypasses the client policy with valid peer envelopes
+and requires the actual host to reject those categories. The evidence validator
+requires both observations; a route rename alone cannot qualify a light control
+participant. Supply archives containing this protocol on both sides.
+
 For browser ownership and the maintained page/Worker application facade, run:
 
 ```sh

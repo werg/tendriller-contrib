@@ -68,6 +68,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
       },
     });
     const descriptor = host.descriptor;
+    if (host.qualifyParticipant) report.host.participant = await host.qualifyParticipant();
     const transition = async (requester, coordinator, expectedGeneration, base, transitionId, reason = 'takeover') => signTransitionRequest({
       applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
       transitionId, expectedGeneration, coordinator: coordinator.identity.publicKey, requester: requester.identity.publicKey,

@@ -61,6 +61,12 @@ export function validatePeerGenerationReport(report) {
     same(rtc, true, 'A real hosted gate also requires real peer transport');
     same(report.host?.runtime, 'workerd', 'A mocked host cannot qualify HTTP controls');
     same(report.host.identity, 'synthetic authenticated test accounts', 'Identity scope must be explicit');
+    same(report.host.participant?.protocol, 'chronolog-participant-v1', 'Host control must use the shared participant protocol');
+    same(report.host.participant.route, 'peers/participant', 'Separate ad hoc control routes do not qualify participant routing');
+    same(report.host.participant.transport, 'public-chronolog-participant', 'The consumer must use the public selective transport');
+    same(report.host.participant.clientFiltered, ['database.submit', 'content.chunk', 'ephemeral.signal'], 'Client filtering must exclude ordinary data and live UI traffic');
+    same(report.host.participant.hostRejected, report.host.participant.clientFiltered, 'The host must reject bypassed disallowed updates');
+    same(report.host.participant.clientFilteredHttpRequests, 0, 'Filtered updates must not reach the hosted transport');
     same(report.host.publicImports, ['@tendriller/core/peers', '@tendriller/engine/testing'], 'Host fixture must consume public packages');
     hex(report.host.fixtureSha256, 64, 'Missing exact workerd fixture');
     hex(report.host.dependencies?.lockSha256, 64, 'Missing host dependency lock');

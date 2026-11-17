@@ -2,12 +2,14 @@
 // This one-off SDP mailbox is test infrastructure; it carries no application data.
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
+import * as participantProtocol from '@chronolog/peer-session';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
 import { runPeerGenerationScenario } from './peer-generation-scenario.mjs';
 import { createHostedFixture } from './peer-generation-host-client.mjs';
 
 const connections = [];
-const host = process.env.PEER_GENERATION_HOST_BRIDGE ? createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE) : null;
+const host = process.env.PEER_GENERATION_HOST_BRIDGE ? createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE,
+  participantProtocol) : null;
 const connectSessions = async (a, b) => {
   const introduction = host ? await host.signalingPair(a, b) : signalingPair();
   const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceAdditionalHostAddresses: ['127.0.0.1'],

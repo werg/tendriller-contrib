@@ -91,6 +91,7 @@ make a dirty package source clean.
 | Scenario | Required observation |
 | --- | --- |
 | Current-generation host outage | A real host probe fails while ordinary commands complete. Complete request counters stay unchanged; hosted application bodies remain zero. |
+| Selective hosted participant | Bootstrap and controls use `chronolog-participant-v1` through `peers/participant`. Ordinary database, content and live-signal updates are suppressed before HTTP, and bypassing that suppression still receives an explicit host rejection. |
 | Lost reply after persistence | The original operation, ordered receipt and record count survive exact retry. |
 | Coordinator loss | Remove its process/store from usable recovery sources. Another peer adopts a complete earlier prefix. |
 | Coherent recovery | SQL/events/outcomes switch together; a fresh peer reconstructs the same selected state. |

@@ -135,7 +135,7 @@ async function createBridge() {
       if (blocked) return json(res, 503, { error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } });
       if (url.pathname.startsWith('/api/')) {
         const path = url.pathname.slice(5);
-        assert.ok(['peers/application', 'peers/generations', 'peers/definition'].includes(path), 'Only public compact control routes belong to this fixture');
+        assert.equal(path, 'peers/participant', 'The host participates through the shared protocol transport');
         const response = await enqueue({ kind: 'api', method: req.method, path, body });
         return json(res, response.status, response.value);
       }

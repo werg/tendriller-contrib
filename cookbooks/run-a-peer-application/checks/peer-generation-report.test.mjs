@@ -144,6 +144,9 @@ function syntheticHostedReport() {
   report.hostOutage.boundary = 'tendriller-workerd-http';
   report.rtc.signalingBoundary = 'tendriller-workerd-rendezvous';
   report.host = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
+    participant: { protocol: 'chronolog-participant-v1', route: 'peers/participant', transport: 'public-chronolog-participant',
+      clientFiltered: ['database.submit', 'content.chunk', 'ephemeral.signal'],
+      hostRejected: ['database.submit', 'content.chunk', 'ephemeral.signal'], clientFilteredHttpRequests: 0 },
     publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
     dependencies: { lockSha256: '6'.repeat(64) }, artifacts: ['@tendriller/core', '@tendriller/engine'].map(name => ({
       ...report.artifacts[0], name,
@@ -170,6 +173,10 @@ test('actual host qualification refuses missing HTTP counters, hidden signaling 
     value => { value.hostOutage.observations.before.worker.rendezvous[0].closed = false; },
     value => { delete value.host.artifacts[0].sourceDirty; },
     value => { value.rtc.signalingBoundary = 'one-off-in-process-sdp-mailbox'; },
+    value => { delete value.host.participant; },
+    value => { value.host.participant.route = 'peers/generations'; },
+    value => { value.host.participant.hostRejected = []; },
+    value => { value.host.participant.clientFilteredHttpRequests = 1; },
   ]) {
     const report = syntheticHostedReport(); mutate(report);
     assert.throws(() => validatePeerGenerationReport(report));
