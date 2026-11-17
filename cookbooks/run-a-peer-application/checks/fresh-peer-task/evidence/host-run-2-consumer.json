@@ -1,0 +1,11 @@
+{
+  "format": "independent-control-consumer/v1",
+  "scriptSha256": "7e4784414586209ee2c0766a83bf3c0e0334e782e87ce7762e7159224794508e",
+  "node": "v24.22.1",
+  "scriptUnchanged": true,
+  "exitCode": 1,
+  "signalCode": null,
+  "logSha256": "b0b60520e2c1949d56df81c74d95faa4a213ec2d1f902306c25f48f52ded43ec",
+  "hostEvidence": "host-artifacts.json",
+  "boundary": "Independent native consumer and actual workerd control fixture share one command network namespace."
+}
