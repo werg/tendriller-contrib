@@ -93,18 +93,47 @@ test('invalid numbers, fabricated zeros, missing provenance and incomplete workl
   assert.throws(() => calculateCosts(extra, pricebook()), /Unknown cost boundary/);
 });
 
-test('native summaries preserve encoded boundaries without adding inline envelopes twice', () => {
-  const raw = { format: 'chronolog-membership-cost/v1', passed: true, phases: [], source: {}, topology: {}, limits: [], final: {
+function compactMembershipReport() {
+  return { format: 'chronolog-membership-cost/v2', passed: true,
+    phases: ['schema-and-prime', 'four-small', 'four-large', 'eight-small', 'warm-empty-sync'].map((name, index) => ({
+      name, progress: { verifiedThrough: 2, receiptThrough: 5 + index * 4 },
+      traffic: { candidateDescriptorBytes: 0, applicationEnvelopeBytesToAdministrator: 0 },
+      administrator: { durablePutCalls: 1, durableValueBytesWritten: 1500, after: { retainedValueBytes: 1500 } },
+      nativeStorage: { after: { bytes: 10000 } }, resources: {}, elapsedMs: 50,
+    })), source: {}, topology: {}, limits: [], final: {
+    verifiedThrough: 6, receiptThrough: 30, checkpointThrough: 31,
     traffic: { applicationEnvelopeBytesToAdministrator: 0, unexpectedAdministratorRequests: 0,
-      candidateDescriptorBytes: 568, inlineControlDescriptorBytes: 1352, inlineControlEnvelopeBytes: 1056 },
+      candidateDescriptorBytes: 0, inlineControlDescriptorBytes: 1352, inlineControlEnvelopeBytes: 1056, closureRecordBytes: 400 },
   } };
+}
+
+test('native summaries require compact proof traffic without adding inline envelopes twice', () => {
+  const raw = compactMembershipReport();
   const summary = summarizeNativeMembership(raw, 'f'.repeat(64));
-  assert.equal(summary.traffic.descriptorBytesIncludingInlineControls, 1920);
+  assert.equal(summary.format, 'peer-membership-cost-summary/v2');
+  assert.equal(summary.traffic.descriptorBytesIncludingInlineControls, 1352);
+  assert.equal(summary.controlProof.workloadControlCount, 2);
   assert.equal(summary.providerCosts, null); assert.equal(summary.hostedPeerSavings, null);
   raw.final.traffic.applicationEnvelopeBytesToAdministrator = 1;
   assert.throws(() => summarizeNativeMembership(raw, 'f'.repeat(64)), /Administrator received/);
   raw.passed = false;
   assert.throws(() => summarizeNativeMembership(raw, 'f'.repeat(64)), /passing native/);
+});
+
+test('native compact-proof summaries refuse scanned history, unknown traffic and growing control state', () => {
+  for (const change of [
+    raw => { raw.format = 'chronolog-membership-cost/v1'; },
+    raw => { raw.final.traffic.candidateDescriptorBytes = 1; },
+    raw => { delete raw.final.traffic.candidateDescriptorBytes; },
+    raw => { delete raw.final.traffic.closureRecordBytes; },
+    raw => { raw.phases[2].traffic.candidateDescriptorBytes = 1; },
+    raw => { raw.phases[2].progress.verifiedThrough++; },
+    raw => { raw.phases[2].progress.receiptThrough = raw.phases[1].progress.receiptThrough; },
+    raw => { raw.phases.splice(2, 1); },
+  ]) {
+    const raw = compactMembershipReport(); change(raw);
+    assert.throws(() => summarizeNativeMembership(raw, 'f'.repeat(64)));
+  }
 });
 
 test('published reference rates remain dated inputs instead of overriding unknown measurements', async () => {

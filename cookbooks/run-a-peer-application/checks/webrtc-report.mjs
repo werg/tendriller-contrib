@@ -25,11 +25,15 @@ function immutableOutcome({ proposalId, outcome }) {
 }
 
 export function validateWebRtcReport(report) {
-  assert.equal(report?.format, 'chronolog-webrtc-qualification/v1', 'A current WebRTC qualification report is required');
+  assert.equal(report?.format, 'chronolog-webrtc-qualification/v2', 'A current public resident/reconnect qualification report is required');
   assert.equal(report.passed, true, 'Build-only, failed and incomplete runs cannot qualify WebRTC');
   assert(!report.error, 'A report with an error cannot pass');
-  const source = report.source?.chronolog;
-  assert(source && /^[a-f0-9]{40}$/.test(source.head) && typeof source.dirty === 'boolean', 'Exact source commit and dirty state are required');
+  for (const name of ['chronolog', 'contrib']) {
+    const source = report.source?.[name];
+    assert(source && /^[a-f0-9]{40}$/.test(source.head) && typeof source.dirty === 'boolean', `Exact ${name} source commit and dirty state are required`);
+  }
+  assert(sha256(report.artifacts?.residentRecipeSha256) && sha256(report.artifacts?.residentBundleSha256),
+    'The actual public resident recipe and emitted bundle digests are required');
   assert(nonempty(report.runtime?.node) && nonempty(report.runtime?.browser), 'Actual Node and browser versions are required');
   assert(/^werift@\d+\.\d+\.\d+(?:[-+].+)?$/.test(report.runtime?.native), 'The exact native RTC implementation version is required');
   assert.equal(report.topology?.transport, 'webrtc', 'A WSS or relay report cannot qualify an RTC data channel');
@@ -41,10 +45,12 @@ export function validateWebRtcReport(report) {
     assert(nonempty(check.id) && check.passed === true && !ids.has(check.id), 'Every uniquely named runtime check must pass');
     ids.add(check.id);
   }
+  assert(ids.has('public-resident-supervisor-reconnects-once-and-preserves-original-operations'),
+    'The public recipe must complete its actual reconnect scenario');
 
   const metrics = report.metrics;
   assert(metrics && typeof metrics === 'object', 'Observed RTC metrics are required');
-  assert.equal(counter(metrics.signalingMessages, 'signalingMessages'), 2, 'One complete offer and answer are required');
+  assert.equal(counter(metrics.signalingMessages, 'signalingMessages'), 4, 'Cold start and one recovered session each require a complete offer and answer');
   counter(metrics.signalingBytes, 'signalingBytes', { positive: true });
   assert.equal(metrics.signalingClosed, true, 'Signaling must be disposed before the measured peer exchange');
   assert.equal(counter(metrics.signalingMessagesAfterClosed, 'signalingMessagesAfterClosed'), 0, 'Warm work must not send another signaling message');
@@ -88,12 +94,46 @@ export function validateWebRtcReport(report) {
   assert.equal(outcomes.native?.final, true, 'The original native operation must reach finality');
   assert.equal(outcomes.native?.outcome?.type, 'accepted', 'The original native operation must be accepted');
 
-  return { format: 'peer-webrtc-evidence-summary/v1', source: report.source, runtime: report.runtime,
+  const reconnect = metrics.reconnect;
+  assert.equal(reconnect?.readiness, 'authenticated', 'Recovery must await authenticated Worker attachment');
+  assert(Number.isFinite(reconnect.elapsedMs) && reconnect.elapsedMs >= 0, 'The actual recovery duration is required');
+  assert(Array.isArray(reconnect.introductions) && reconnect.introductions.length === 2, 'Exactly two observed public resident introductions are required');
+  for (const introduction of reconnect.introductions) {
+    assert.equal(introduction.requests, 1, 'A connection must use one direct introduction POST');
+    assert.equal(introduction.closed, true, 'Every completed introduction must retire signaling');
+    counter(introduction.requestBytes, 'resident introduction request bytes', { positive: true });
+    counter(introduction.responseBytes, 'resident introduction response bytes', { positive: true });
+  }
+  assert.deepEqual(immutableOutcome(reconnect.retry), immutableOutcome(reconnect.original),
+    'Automatic recovery must retain the original operation identity and immutable decision');
+  assert.notEqual(reconnect.original.proposalId, outcomes.browser.proposalId, 'The recovery and host-outage operations must be independently observed');
+  assert(Array.isArray(reconnect.browserAuthoredBefore) && reconnect.browserAuthoredBefore.length > 0 && reconnect.browserAuthoredBefore.every(nonempty),
+    'Original authored records before recovery are required');
+  assert.deepEqual(reconnect.browserAuthoredBefore, [...new Set(reconnect.browserAuthoredBefore)].sort(), 'Recovery record identities must be unique and sorted');
+  assert.deepEqual(reconnect.browserAuthoredAfter, reconnect.browserAuthoredBefore, 'Recovery retry must not author a replacement record');
+  assert.equal(metrics.introduction?.accepted, 2, 'Both actual resident sessions must authenticate');
+  assert.equal(metrics.introduction.pending, 0, 'No introduction may remain pending');
+  assert.equal(metrics.introduction.active, 1, 'Only the recovered resident session may remain live');
+  assert(Array.isArray(reconnect.expectedTerminations) && reconnect.expectedTerminations.length <= 1 &&
+    reconnect.expectedTerminations.every(value => ['WEBRTC_CONNECTION_ENDED', 'WEBRTC_CONNECTION_CLOSED'].includes(value)),
+  'Only the single injected interruption may have an attributed normal termination');
+  assert.equal(metrics.introduction.failed, reconnect.expectedTerminations.length, 'Every terminal handler failure must be attributed');
+  assert(Array.isArray(reconnect.routes) && reconnect.routes.length === 2, 'Actual route observations for both sessions are required');
+  for (const route of reconnect.routes) {
+    assert(['direct', 'relay', 'unknown'].includes(route.route), 'Physical routing must remain measured or explicitly unknown');
+    for (const type of [route.localCandidateType, route.remoteCandidateType]) assert(type === null || ['host', 'srflx', 'prflx', 'relay'].includes(type), 'Candidate types must be explicit observations');
+    if (route.route === 'relay') assert([route.localCandidateType, route.remoteCandidateType].includes('relay'), 'Relay classification requires a selected relay candidate');
+    if (route.route === 'direct') assert(route.localCandidateType !== null && route.remoteCandidateType !== null &&
+      ![route.localCandidateType, route.remoteCandidateType].includes('relay'), 'Direct classification requires two observed non-relay candidates');
+  }
+
+  return { format: 'peer-webrtc-evidence-summary/v2', source: report.source, artifacts: report.artifacts, runtime: report.runtime,
     topology: report.topology, checks: [...ids],
     signaling: { messages: metrics.signalingMessages, bytes: metrics.signalingBytes,
       closedBeforeExchange: true, messagesAfterClosed: 0 },
     fixtureHost: host, peerBytesAfterIntroduction: traffic, records, history: metrics.history, payload,
     originalOperations: { browser: outcomes.browser, retry: outcomes.retry, native: outcomes.native }, retryAuthoredRecords: retry,
+    reconnect,
     retryComparison: 'Compare proposal identity, transaction identity, phase, decision, order key, admissibility and finality. Preserve raw observation timestamps, replay flags and replica revisions without requiring them to remain unchanged.',
     qualification: 'Actual browser/native RTC, converged signed history, intact detached payload and original final operations after the fixture host stops.',
     limits: ['The report validator checks declared observations; it does not execute the scenario or authenticate the report.',

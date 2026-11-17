@@ -4,9 +4,9 @@ const nonempty = value => typeof value === 'string' && value.trim().length > 0;
 const sha256 = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 const counter = (value, name, minimum = 0) => assert(Number.isSafeInteger(value) && value >= minimum, `${name} must be an observed safe integer`);
 
-/** Reject historical HTTP application streams and build-only output as RTC evidence. */
+/** Require compact authenticated control bootstrap and actual RTC application transfer. */
 export function validateMembershipReport(report) {
-  assert.equal(report?.format, 'chronolog-thin-membership/v2', 'The current RTC membership report is required');
+  assert.equal(report?.format, 'chronolog-thin-membership/v3', 'The current compact-proof RTC membership report is required');
   assert.equal(report.passed, true, 'The actual membership runtime scenarios must pass');
   assert.equal(report.status, 'passed', 'A build-only membership graph is not runtime evidence');
   assert(!report.error, 'A report with an error cannot pass');
@@ -38,6 +38,9 @@ export function validateMembershipReport(report) {
     'rtcSignalingRequestBytes', 'rtcSignalingResponseBytes', 'rtcSdpBytes']) counter(traffic?.[field], field, 1);
   assert.equal(traffic.rtcSignalingDescriptions, 6, 'The three introductions require exactly three complete offer/answer pairs');
   assert.equal(traffic.applicationEnvelopeBytesToAdministrator, 0, 'The administrator must not receive application envelope bytes');
+  assert.equal(traffic.candidateDescriptorBytes, 0, 'The administrator must not receive application descriptors');
+  counter(traffic.inlineControlDescriptorBytes, 'authenticated control descriptor bytes', 1);
+  counter(traffic.closureRecordBytes, 'signed compact checkpoint bytes', 1);
   assert.equal(traffic.unexpectedAdministratorRequests, 0, 'The administrator must not call application endpoints');
   return true;
 }

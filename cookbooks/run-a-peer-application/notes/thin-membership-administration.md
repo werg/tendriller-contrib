@@ -9,11 +9,16 @@ administrator. The actual Worker runs in a local workerd harness with synthetic
 authenticated accounts. Deployed Cloudflare authentication, public-network routes,
 provider cost and operational recovery remain separate qualification work.
 
-The measurements below describe the earlier receipt-order implementation. The
-current follow-up keeps application execution in deterministic signed author-time
-order and gives the native provider only inclusion and closed-frontier duties.
-Signed closure markers now accompany receipt descriptors; fresh artifact-bound
-qualification is required for that change. Historical reports remain unchanged.
+The historical measurements below describe earlier receipt and descriptor-scan
+implementations. The current protocol is `signed-inclusion-v2`: each native
+closure commits the complete finalized control projection, and the administrator
+receives controls plus one signed checkpoint. It downloads **zero application
+descriptors and zero application bodies**. Full replicas independently audit that
+projection against the original complete receipt ledger. Application execution
+remains deterministic signed author-time order; the native authority owns
+inclusion and closed time. Current qualification requires membership report v3
+and native cost report v2. Historical reports remain unchanged and do not qualify
+these new formats.
 
 ## Put membership administration on Cloudflare by default
 
@@ -27,7 +32,7 @@ more than one of them in the same process.
 
 | Participant | Retains and verifies | Executes or authorizes |
 | --- | --- | --- |
-| Cloudflare membership administrator | Signed descriptor history, inclusion/closure evidence, small capability/epoch records and durable membership decisions | Enrollment, grants, revocations and key distribution at proved author-time boundaries |
+| Cloudflare membership administrator | Complete signed control projection, one closure checkpoint and durable membership decisions | Enrollment, grants, revocations and key distribution at proved author-time boundaries |
 | Native finality provider and full replica | Descriptor history, inclusion/closure evidence and required detached application envelopes | Inclusion and closed-frontier certificates; canonical application replay and designated resident services |
 | Authorized browser full replica | The same required application history and its own durable device operations | Local application execution, coherent reads and authorized signed changes |
 | Relay or payload source | The explicitly configured bytes and transport state | Transport and exact content retrieval; no implied membership or finality authority |
@@ -49,13 +54,15 @@ from that same signed schema key. The native schema owner can create application
 tables without making the Cloudflare root an application writer, group member or
 SQL executor. A fixture-specific local root override is not a valid substitute.
 
-## Certify small descriptors and fetch payloads through peers
+## Certify controls and keep application history on peers
 
 The implementation replaces opaque, payload-sized log entries with canonical typed descriptors.
 Each application candidate commits its exact signed envelope hash and length,
 group, record type and epoch. Small signed capability and epoch envelopes travel
-inline, so an administrator can verify membership history without downloading
-application candidates. Full replicas fetch detached application envelopes from
+inline. Their cumulative signed projection lets the administrator verify
+membership history without downloading intervening application descriptors.
+The projection binds each control's original receipt and first activation cutoff;
+an unsigned server-side filter cannot establish completeness. Full replicas fetch detached application envelopes from
 their authorized peer path and verify them against the committed descriptor
 before using them.
 
@@ -64,9 +71,14 @@ parallel histories or a second page-owned proposal queue. Existing public
 application operations keep their meaning: one durable signed operation, exact
 retry, one ordered history and one application result.
 
+The membership `after` cursor counts controls. The signed checkpoint separately
+reports application receipt coverage and closed author time, so application-only
+activity advances neither retained control history nor its cursor. A fresh device
+verifies that proof to restore grants and keys before authenticating a WebRTC
+peer; original application history then arrives over that connection.
+
 Descriptor verification and ordering are distinct from payload availability and
-application execution. An administrator can advance its verified roster across
-an application descriptor without interpreting its SQL or event contents. A full
+application execution. A full
 replica missing the corresponding body, decryption key or execution support must
 not label that application prefix applied final, emit its events or advance a
 processed event cursor beyond the unresolved input. It can continue to show its
@@ -104,9 +116,9 @@ request under that operation ID must fail explicitly. Portability uses the same
 administrator core and identity/history contract in another supported host; it
 does not imply automatic failover or two simultaneously active root stores.
 
-## Latest qualification after review
+## Historical qualification after the earlier review
 
-The [new source/artifact pairing](qualification-review-43957113710.md) passed in
+The [earlier source/artifact pairing](qualification-review-43957113710.md) passed in
 [workflow 43957113710](https://github.com/werg/chronolog-db/actions/runs/43957113710),
 using public Tendriller source `283f210c`, membership `cc18d15e` and contrib
 `8449017`. It retains seven thin runtime assertions plus the build/import audit,
@@ -202,9 +214,11 @@ instrumented; a fake roster or an unconnected stub cannot prove exclusion.
 
 Use two independent measurements: hold the number of candidates constant while
 increasing body sizes, and hold body sizes constant while increasing the number
-of candidates. The first exposes accidental payload transfer; the second records
-the expected descriptor-history growth. “Thin” does not mean zero traffic or
-constant storage for an unbounded retained history.
+of candidates. The first exposes accidental payload transfer; the second now
+requires zero administrator application-descriptor transfer and unchanged
+retained control state. Participant changes still grow control history and key
+wraps. The historical descriptor-scan measurements above must not be relabeled
+as results for the compact-proof implementation.
 
 ## Keep evidence and deployment claims separate
 

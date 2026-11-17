@@ -4,7 +4,7 @@ import { validateMembershipReport } from './membership-report.mjs';
 
 // Synthetic format-validator inputs do not qualify browser membership behavior.
 function report() {
-  return { format: 'chronolog-thin-membership/v2', passed: true, status: 'passed', error: '', browser: 'fixture-browser-version', pageErrors: [],
+  return { format: 'chronolog-thin-membership/v3', passed: true, status: 'passed', error: '', browser: 'fixture-browser-version', pageErrors: [],
     revisions: { chronolog: { head: 'a'.repeat(40), dirty: false } },
     artifacts: { sdk: { sha256: 'b'.repeat(64) }, engine: { sha256: 'c'.repeat(64) }, browserWorkerSha256: 'd'.repeat(64), browserPageSha256: 'e'.repeat(64) },
     checks: [{ name: 'public package build', evidence: {} }, { name: 'actual browser membership', evidence: {} }],
@@ -15,7 +15,8 @@ function report() {
         ({ requests: 1, requestBytes: 600, responseBytes: 600, closed: true })) } },
       traffic: { membershipRequests: 10, peerInboundBytes: 10000, peerOutboundBytes: 1000000,
         rtcSignalingRequests: 3, rtcSignalingRequestBytes: 1800, rtcSignalingResponseBytes: 1800, rtcSdpBytes: 3000,
-        rtcSignalingDescriptions: 6, applicationEnvelopeBytesToAdministrator: 0, unexpectedAdministratorRequests: 0 } } };
+        rtcSignalingDescriptions: 6, applicationEnvelopeBytesToAdministrator: 0, candidateDescriptorBytes: 0,
+        inlineControlDescriptorBytes: 8000, closureRecordBytes: 1200, unexpectedAdministratorRequests: 0 } } };
 }
 function reject(changes) {
   for (const change of changes) { const value = report(); change(value); assert.throws(() => validateMembershipReport(value)); }
@@ -26,6 +27,7 @@ test('current runtime evidence requires both Worker and native RTC observations'
 test('historical HTTP reports, build-only output and missing source/artifact identities fail closed', () => {
   reject([
     value => { value.format = 'chronolog-thin-membership/v1'; },
+    value => { value.format = 'chronolog-thin-membership/v2'; },
     value => { value.passed = false; },
     value => { value.status = 'built; workerd and browser scenarios not run'; },
     value => { delete value.browser; },
@@ -52,6 +54,10 @@ test('unknown byte boundaries or counters cannot be treated as zero administrato
     value => { value.final.traffic.peerOutboundBytes = 0; },
     value => { delete value.final.traffic.applicationEnvelopeBytesToAdministrator; },
     value => { value.final.traffic.applicationEnvelopeBytesToAdministrator = 1; },
+    value => { delete value.final.traffic.candidateDescriptorBytes; },
+    value => { value.final.traffic.candidateDescriptorBytes = 1; },
+    value => { delete value.final.traffic.closureRecordBytes; },
+    value => { value.final.traffic.inlineControlDescriptorBytes = 0; },
     value => { value.final.traffic.unexpectedAdministratorRequests = 1; },
   ]);
 });

@@ -34,10 +34,14 @@ runtime scenario; new reports must identify the actual peers and selected route.
 
 The portable membership administrator remains an explicit trust boundary. It
 retains the keys needed to authorize readers and wrap epoch keys. Participant
-operations synchronize authenticated descriptor/control history; this still
-costs work proportional to history since the administrator's last synchronized
-position. There is no claimed sparse membership proof. The important operational
-boundary is that ordinary application writes do not trigger administrator work.
+operations synchronize a complete compact control projection whose count/root
+is committed by the signed finality closure. Each entry binds its original
+receipt and activation cutoff. The administrator verifies controls and their
+checkpoint without application descriptors or bodies; full replicas recompute
+the commitment while verifying the entire ledger. Retained administrative work
+scales with governance changes, and ordinary application writes do not trigger
+administrator work. New devices verify grants/keys from that proof before
+connecting, then fetch and verify application history over RTC.
 Measure participant operations separately from a warm interval containing only
 application activity.
 
@@ -97,35 +101,62 @@ writer for the same local durable store.
 ## Compose the public APIs
 
 The page-owned [resident connection recipe](../snippets/connect-resident-worker.mjs)
-composes `createHttpWebRtcSignaling` and `negotiateWebRtc`. Bundle it with
-`@chronolog/transport-webrtc` and the actual deployment assets. It reads the
-explicit endpoint supplied by the caller and closes signaling on negotiation
-failure. It adds no reconnect loop, durable queue or application identity.
+composes the core session supervisor with direct HTTP signaling and WebRTC
+negotiation. Bundle it with `@chronolog/transport-webrtc` and the deployment
+assets. The initial runtime includes an immutable `tendril.peers.initialBootstrap`
+snapshot: `{version: 2, endpoints: [{url: 'https://resident.example/introduce'}]}`.
+Selecting one of these endpoints performs no discovery read. An operator can
+explicitly refresh or replace hints through the host API when necessary.
 
 After opening the exclusive replica Worker, a deployment can use:
 
 ```js
 import { connectResidentWorker } from './connect-resident-worker.mjs';
 
-const connectionLifetime = new AbortController();
-const session = await connectResidentWorker({
-  endpoint: deployment.residentIntroductionUrl,
+const resident = tendril.peers.initialBootstrap.endpoints[0];
+if (!resident) throw new Error('This page has no configured resident introduction');
+const workerLifetime = new AbortController();
+const connection = connectResidentWorker({
+  endpoint: resident.url,
   headers: deployment.introductionHeaders,
   configuration: rtcConfiguration,
-  signal: connectionLifetime.signal,
-  handoff(channel) {
-    replicaWorker.postMessage({ type: 'peer-channel', channel }, [channel]);
+  signal: workerLifetime.signal,
+  retry: { initialDelayMs: 500, maxDelayMs: 8000, maxAttempts: 6 },
+  attach(channel, attemptSignal) {
+    // This application port transfers immediately and acknowledges only after
+    // the Worker has framed, authenticated and attached the actual peer.
+    return attachPeerChannel(replicaWorker, channel, attemptSignal);
   },
 });
+await connection.ready;
 
-// End this lifetime before replacing the replica Worker or leaving the page.
-// connectionLifetime.abort();
-// await session.close();
+// Abort before replacing the Worker or leaving the page. Late acknowledgements
+// cannot install a replacement session or restart the stopped supervisor.
+// workerLifetime.abort();
+// await connection.close();
 ```
 
-The message shape is chosen by the deployment. Transfer inside `handoff`
+`attachPeerChannel` is the deployment's Worker RPC port, not a new Chronolog
+identity or writer. It calls `postMessage` with the channel transfer list before
+returning its authentication acknowledgement promise. The promise resolves to
+`{signal, close}` for that authenticated Worker connection. The signal ends when
+the peer link ends, even if ICE remains connected. The recipe supervises both
+lifetimes and closes both on retirement. The RPC port rejects pending replies
+when the attempt signal aborts; the Worker also fences asynchronous attachment
+against a replaced connection or closed replica.
+
+The core `supervisePeerSession` owns one attempt and one established session. It
+cancels stale attempts, closes late results and retries with the explicit bounded
+backoff policy. A healthy connection has no supervisor timer, ping or discovery
+poll. Brief success does not reset the failure budget; a sufficiently stable
+session resets it only when that session ends. After exhaustion, a deliberate
+new supervisor starts a new budget. `waitForSession()` waits for the current or
+next authenticated attachment. That readiness does not assert that retained
+history has finished replaying or that a finality provider is available.
+
+The message shape is chosen by the deployment. Transfer inside `attach`
 synchronously, without awaiting, attaching a listener or wrapping the channel
-first. An asynchronous callback cannot safely transfer it later. Introduction
+first. Its acknowledgement promise may settle later, after Worker authentication. Introduction
 admission does not authorize a group read or change the durable signing identity.
 
 In the receiving Worker, use public `frameRtcDataChannel(channel)` from
@@ -141,8 +172,11 @@ The [native resident task](../snippets/serve-resident-webrtc.mjs) supplies a rea
 HTTPS listener through `AgentApplication.tasks`. Its `createResidentWebRtcTask`
 accepts the existing native application context, explicit endpoint/listen/TLS
 configuration, introduction authorization, page origins and RTC configuration.
-It creates native peer connections through `@chronolog/transport-webrtc/native`
-and passes framed connections to `context.connectPeer`. The daemon's existing
+The thin task delegates its HTTPS listener and shutdown ownership to
+`createWebRtcHttpsListener` from the Node-only
+`@chronolog/transport-webrtc/resident` entry point and passes framed connections
+to `context.connectPeer`. Chronolog owns request cancellation, listener limits,
+TLS adaptation and native connection cleanup in one reusable implementation. The daemon's existing
 context performs the current group/read-grant handshake and owns replication.
 Keep the native module out of browser bundles.
 
@@ -196,16 +230,18 @@ waits. Host independence cannot make an unavailable finality authority available
 Do not silently substitute the hosted backend or issue a new operation identity.
 
 If the RTC connection fails, preserve pending proposals and report the connection
-state. A new connection attempt makes a fresh direct offer or obtains a new
-coordinated rendezvous session, then performs the authenticated handshake again.
+state. The supervisor makes a fresh direct offer under its bounded retry policy, then
+performs the authenticated handshake again. A coordinated rendezvous remains an
+explicit alternative when both endpoints can join the intended attempt.
 No hidden HTTP or Cloudflare payload relay
 is a fallback. Configure an explicit alternative route only when its provider,
 authorization, byte accounting and availability policy are acceptable.
 
 ICE may select a direct candidate pair or a TURN relay. Both use the same
-Chronolog protocol, but they have different traffic and cost boundaries. Record
+Chronolog protocol, but they have different traffic and cost boundaries. Use `session.getRoute()` to record
 the selected candidate types when the implementation exposes them; unavailable
-route information remains unknown. An RTC connection by itself is not proof of
+route information remains `unknown`. A configured ICE server or arbitrary route
+label cannot stand in for a selected-candidate observation. An RTC connection by itself is not proof of
 a direct path. A configured STUN or TURN service is an explicit deployment
 dependency, independent of the page host.
 

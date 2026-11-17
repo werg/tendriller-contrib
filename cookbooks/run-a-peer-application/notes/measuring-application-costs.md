@@ -26,8 +26,11 @@ request and body-byte counters while authenticated peer bytes and real
 application outcomes progress. Stop the host after establishment and repeat
 the operation before claiming independence. A zero hosted application-write
 counter alone does not exclude host event sockets, health polls or relayed
-payloads. Participant operations may still scan intervening descriptors; no
-sparse membership proof or constant participant-update cost is assumed.
+payloads. The compact membership protocol commits the complete control
+projection in each signed closure. Participant operations fetch control changes
+and a bounded checkpoint, without application descriptors or bodies. Their cost
+still depends on governance history, key wraps and participant decisions; it is
+not a claim that every participant update has a fixed cost.
 
 ## Run the native measurement
 
@@ -37,7 +40,8 @@ In an exact Chronolog checkout with its pinned dependencies and native engine:
 node --import tsx tools/membership-cost.ts --output /new/membership-cost-evidence
 ```
 
-The output directory must be new. The runner checkpoints `report.json` after
+The current report format is `chronolog-membership-cost/v2`. The output directory
+must be new. The runner checkpoints `report.json` after
 each phase and writes a failed result on error. It records source head, dirty
 paths, measurement/fixture source hashes, Node/OS/architecture, commands and
 timestamps. It requires native loopback HTTP and SQLite/DoltLite, but neither a
@@ -74,8 +78,12 @@ node cookbooks/run-a-peer-application/checks/cost-report.mjs \
   --output /new/membership-cost-summary.json
 ```
 
-The summary hashes the exact raw report, preserves per-phase traffic/storage and
-sets `providerCosts` and `hostedPeerSavings` to `null`.
+The `peer-membership-cost-summary/v2` summary hashes the exact raw report,
+preserves per-phase traffic/storage and sets `providerCosts` and
+`hostedPeerSavings` to `null`. Its validator requires zero administrative
+application descriptor/body bytes in every application workload phase and an
+unchanged verified control count while application receipt coverage advances.
+Old descriptor-scan reports cannot qualify the compact protocol.
 
 ## Prepare comparable deployment samples
 

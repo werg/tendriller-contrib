@@ -2,6 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { validateWebRtcReport } from './webrtc-report.mjs';
 
@@ -16,7 +17,8 @@ const chronolog = resolve(values.chronolog), output = resolve(values.output);
 const runner = join(chronolog, 'tools/test-browser-webrtc.ts');
 if (!existsSync(runner)) throw Error('The supplied Chronolog revision does not provide its browser/native WebRTC qualification CLI');
 if (existsSync(output)) throw Error('Use a new output directory so earlier WebRTC evidence cannot be reused');
-const args = ['--import', 'tsx', runner, '--output', output];
+const contrib = resolve(fileURLToPath(new URL('../../../', import.meta.url)));
+const args = ['--import', 'tsx', runner, '--contrib', contrib, '--output', output];
 if (values['build-only']) args.push('--build-only');
 const result = spawnSync(process.execPath, args, { cwd: chronolog, stdio: 'inherit',
   env: { ...process.env, ...(values.browser ? { CHRONOLOG_CHROMIUM_EXECUTABLE: resolve(values.browser) } : {}) } });

@@ -345,9 +345,11 @@ has a separate gate because the two-layout application fixture pregrants its
 devices. The membership gate consumes the built public SDK and engine packages,
 runs their default membership provider in the real workerd test harness, and
 connects an actual Chromium/OPFS device to a separate native SQL peer.
-The current `chronolog-thin-membership/v2` runner uses a direct native HTTP
+The current `chronolog-thin-membership/v3` runner uses a direct native HTTP
 offer/answer endpoint and Worker-owned RTC for application history, while
 participant operations continue through the packaged Cloudflare administrator.
+Its compact control proof authenticates completeness and activation cutoffs
+without transferring intervening application descriptors to that administrator.
 
 ```sh
 npm run test:peer-membership -- \
@@ -375,9 +377,11 @@ genesis; a local materializer override would make replicas disagree.
 
 Encoded descriptor/control traffic and detached application bytes have separate
 counters. Equal candidate counts with substantially different SQL payload sizes
-must still deliver zero application envelope bytes to the administrator. Keep
+must deliver zero application descriptor and envelope bytes to the administrator.
+The control commitment remains unchanged across application-only workloads,
+while separately reported application receipt coverage advances. Keep
 the observed byte report, source/artifact identities and per-stage outcomes.
-The v2 RTC peer counters measure logical frame payloads, excluding transport
+The v3 RTC peer counters measure logical frame payloads, excluding transport
 headers and credits. Native introduction JSON request/response bytes, description
 counts and SDP bytes remain separately named counters. Do not compare them with
 the HTTP application-stream byte boundaries of the historical v1 reports below
@@ -432,3 +436,19 @@ The same focused review covers normalization versus the original editor snapshot
 observed-missing reference removal at the review-list limit, and refusal to
 discard unresolved, actively submitted, queued or provisional operations. The
 page's recheck action only uses the existing public operation lookup/subscription.
+
+### Public resident recovery gate
+
+The current WebRTC report is `chronolog-webrtc-qualification/v2`. Its runner
+bundles the exact supplied contrib `connect-resident-worker` recipe and records
+both its source and emitted bundle digests. A browser Worker authors an original
+operation, the connection is interrupted, and the public supervisor establishes
+one new direct introduction and waits for authenticated attachment. Exact retry
+must keep the original proposal, final decision and authored record identities.
+The report attributes the injected connection termination and records the actual
+selected ICE candidate types, including `unknown` when unavailable.
+
+Only then does the runner stop the page/introduction listener and exercise the
+existing finality, detached-body integrity, full signed-history convergence and
+original-retry assertions. No host or introduction counters may increase during
+that phase. A historical v1 report cannot qualify the new recovery contract.
