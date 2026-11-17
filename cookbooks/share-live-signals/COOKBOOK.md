@@ -61,6 +61,10 @@ belong to the channel; the application still validates its payload schema.
 A hosted page can use `tendril.signals` directly. A peer bootstrap installs
 `tendril.signals.install(client.signals)`; it does not also send through the hosted
 channel. A standalone bootstrap can install its own `SignalChannel` instead.
+An application can also explicitly select the hosted live channel with
+`connectHostedSignals` or a native host client's `connectSignals`, including
+when its durable history is peer-owned. That choice uses host accounts and
+credentials; it does not grant Chronolog membership or change the durable backend.
 Installation is separate from `tendril.application.install()`. If it happens asynchronously,
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
