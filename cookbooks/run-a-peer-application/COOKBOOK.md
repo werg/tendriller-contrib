@@ -55,7 +55,8 @@ older immutable-prefix implementation and the original scope of its reports.
 An agent can use any path. Its presence does not require a durable transaction
 for every preview or a fixed native authority for ordinary collaboration.
 Choose one application backend and one authenticated profile. Unavailable peers
-never trigger an automatic switch to hosted JSON state or a stronger profile.
+never select a second command API or journal. Stronger guarantees are explicit
+capabilities on the same session contract.
 
 The [owned Worker page recipe](notes/peer-session-pages.md) provides two layouts
 using domain commands, coherent queries and explicit recovery notices. Its build

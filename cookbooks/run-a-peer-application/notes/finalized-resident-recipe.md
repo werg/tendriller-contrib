@@ -1,5 +1,7 @@
 
 # Run an explicitly finalized resident application
+**Historical evidence only.** Use the [current public session](../COOKBOOK.md) and its [qualification guide](../checks/README.md). This archived source describes a retired resident composition; its connection snippets and runners remain available at the exact linked source snapshot.
+
 
 Use this approach when an application has a native agent peer that must keep
 working while an LLM is idle, thinking, or restarting. A browser keeps a local
@@ -319,9 +321,9 @@ protect the timer transition; they do not grant private tool access.
 
 Use the [WebRTC peer architecture](peer-network.md). The initial page
 configuration declares the resident's reachable HTTPS introduction endpoint.
-[`connectResidentWorker`](../snippets/connect-resident-worker.mjs) sends one bounded
+[`connectResidentWorker`](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/snippets/connect-resident-worker.mjs) sends one bounded
 offer and receives one answer from the independently running
-[native resident task](../snippets/serve-resident-webrtc.mjs), then closes signaling.
+[native resident task](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/snippets/serve-resident-webrtc.mjs), then closes signaling.
 Chronolog's authenticated framed connection carries application traffic between
 peers. Optional Tendriller rendezvous requires both endpoints to join the same
 attempt; it is a separate coordinated introduction path. Bind application

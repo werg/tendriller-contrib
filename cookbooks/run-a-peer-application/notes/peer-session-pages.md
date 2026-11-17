@@ -63,8 +63,10 @@ reapply an excluded attempt against a fresh view with a new operation identity.
 Removing a reviewed reference only changes this device's list.
 
 The UI exposes no automatic external-action dispatcher. A deployment adding an
-agent effect must define which authenticated participant and resources it may
-act for and how its effects reconcile across recovery. A task claim, live signal
+irreversible action must select an explicit protected-action capability or
+durable external-action service and define which authenticated participant and
+resources it may act for. Provider idempotency and reconciliation do not make
+an ordinary applied event irreversible. A task claim, live signal
 or payload label cannot supply those permissions.
 
 ## Evidence boundary

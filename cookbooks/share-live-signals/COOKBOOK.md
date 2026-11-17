@@ -276,9 +276,9 @@ signal must never grant itself additional rights through its payload.
 
 Use a durable event for submitted chat, a request that must reach a worker, a
 permission change or an accepted outcome. Use a transaction when a condition and
-its mutation must agree, such as claiming the last available resource. Dispatch
-irreversible external work from a final durable intent. A live progress signal
-can accompany that work while its final result remains the source of truth.
+its mutation must agree, such as claiming the last available resource. Use an explicitly configured protected action for irreversible external work.
+An ordinary applied event can be abandoned during recovery. Live progress can
+accompany the action while its durable service result remains authoritative.
 
 These choices do not require a durable record for every harmless transient
 interaction. A preview command, a local attention cue, a disposable reaction or
@@ -286,16 +286,16 @@ a live control suggestion can use signals when loss, expiry and duplication
 have an acceptable application meaning. Keep Stop and local mute effective on
 the device, even when no remote signal is delivered.
 
-The [implemented finalized peer guide](../../guides/finalized-peer-applications.md) connects
-these decisions to finality, rollback, redo and effect handling. The
-[peer task/chat specimen](../run-a-peer-application/checks/README.md) combines
-ephemeral typing with durable messages and final agent results.
+The [application guarantee guide](../../guides/application-primitives.md) connects
+these decisions to applied outcomes, recovery and protected actions. The
+[public session checks](../run-a-peer-application/checks/README.md) combine
+ephemeral typing with retained messages through the same session API.
 
 ## Verify the live behavior
 
 | Scenario | Expected observation |
 | --- | --- |
-| Send signals while the finality provider is unavailable | An established authorized signal path still works without new durable records. |
+| Send signals while the hosted control participant is unavailable | An established authorized signal path still works without new durable records. |
 | Stop sending without a goodbye packet | The UI expires the sender's indication on time. |
 | Two senders type; one stops or expires first | Only that sender's indication disappears. |
 | End or abort the subscription | The live view clears and no timer repaints it. |

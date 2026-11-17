@@ -1,5 +1,7 @@
 # Keep application traffic between peers
 
+**Historical evidence only.** Use the [current public session](../COOKBOOK.md) and its [qualification guide](../checks/README.md). This archived source describes a retired resident composition; its connection snippets and runners remain available at the exact linked source snapshot.
+
 The peer application has one durable write owner: Chronolog. Tendriller serves
 the initial page and authenticates participant administration. A reachable
 resident peer accepts a bounded HTTPS introduction directly; deployment places
@@ -108,7 +110,7 @@ writer for the same local durable store.
 
 ## Compose the public APIs
 
-The page-owned [resident connection recipe](../snippets/connect-resident-worker.mjs)
+The page-owned [resident connection recipe](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/snippets/connect-resident-worker.mjs)
 composes the core session supervisor with direct HTTP signaling and WebRTC
 negotiation. Bundle it with `@chronolog/transport-webrtc` and the deployment
 assets. The initial runtime includes an immutable `tendril.peers.initialBootstrap`
@@ -180,7 +182,7 @@ Install `createChronologApplicationBackend` through the selected
 `tendril.application` interface after the actual replica is ready, and install
 `client.signals` independently through `tendril.signals.install()`.
 
-The [native resident task](../snippets/serve-resident-webrtc.mjs) supplies a real
+The [native resident task](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/snippets/serve-resident-webrtc.mjs) supplies a real
 HTTPS listener through `AgentApplication.tasks`. Its `createResidentWebRtcTask`
 accepts the existing native application context, explicit endpoint/listen/TLS
 configuration, introduction authorization, page origins and RTC configuration.
@@ -226,7 +228,7 @@ grant. The task's shutdown closes its listener and its peer lifetimes; ordinary
 HTTP introduction completion does neither to the application session.
 
 When both peers explicitly coordinate through the page host, the separate
-[Tendriller introduction recipe](../snippets/introduce-peer-worker.mjs) accepts
+[Tendriller introduction recipe](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/snippets/introduce-peer-worker.mjs) accepts
 `peers`, `channel` and a fresh optional endpoint ID, waits for the assigned role,
 then calls the same transport negotiation and Worker handoff. Both peers must
 join the intended channel. Its routing identifier is unrelated to a signing key.

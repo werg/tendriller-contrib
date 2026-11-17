@@ -72,10 +72,34 @@ not a prerequisite for ordinary applications. The adopted model has one selected
 history and explicit recovery; stronger settlement is a separately declared
 capability.
 
-An application uses one backend and authenticated selected history. A lost peer
-never triggers an automatic hosted fallback. Existing certificates and author
+All participants use one public session, command/query vocabulary and journal.
+Storage, transport and declared capability policies supply different roles; they
+do not introduce incompatible application stacks. A lost peer never triggers an
+automatic hosted fallback. Existing certificates and author
 timestamps retain their original meanings; they are not a way to fabricate
 generation ordering.
+
+## One protocol with participant-specific interests
+
+All participants use the same bounded Chronolog envelope. Transports declare
+which facets and actions they carry; routing interest never grants application
+authority. The public session owns one journal and coherent view regardless of
+whether the participant runs in a browser, native process or hosted adapter.
+
+| Exchange | Facet | Default hosted participation |
+| --- | --- | --- |
+| Membership, keys policy and generation selection | Control | Small signed monotonic records; verify each role through the shared authority rules. |
+| Application definition, page HTML and code assets | Publication | Authorized signed revision and exact asset hashes; publication does not rewrite database history or executable semantics. |
+| Available routes and compact recovery hints | Discovery | Authenticated, expiring and coalesced; hints are not grants or retained-history proof. |
+| Invitations and connection introductions | Ephemeral | Only declared introduction actions; short lifetime and bounded traffic. |
+| Typing, cursors and other live UI signals | Ephemeral | Peer transport; filtered before hosted delivery and rejected at host ingress. |
+| Commands, ordered history and retention coverage | Database | Peer transport; no mandatory hosted append, body, acknowledgement or certificate. |
+| Retained attachments and content chunks | Content | Peer transport by default; explicit providers may add separately qualified retention. |
+
+The control transport checks its interests before HTTP and validates scoped
+responses. The host checks the same rules at ingress. Adding a stronger service
+changes an explicit capability and transport policy within the common session;
+it does not introduce another command API, outbox or incompatible replay path.
 
 ## Keep authority roles separate
 
@@ -116,7 +140,7 @@ Neither promises that an operation survives a later permitted recovery.
 | Shared | A named independent peer retained a complete usable prefix; reachability may change. |
 | Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
 
-Reserve `final` for a profile that actually provides irrevocable settlement.
+Reserve `final` for an explicitly supported irrevocable-settlement capability.
 Do not alias a final wait to `applied()` or leave it pending in this profile.
 
 Applied outcomes are stable while their position remains in the selected

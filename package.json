@@ -5,8 +5,19 @@
   "type": "module",
   "description": "Adaptable decision guides and verification specimens for Tendriller pages",
   "repository": "https://github.com/werg/tendriller-contrib",
-  "engines": { "node": ">=22.15.0" },
-  "files": ["cookbooks", "guides", "catalog.json", "index.html", "agent.md", "llms.txt", "README.md", "PROVENANCE.md"],
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "files": [
+    "cookbooks",
+    "guides",
+    "catalog.json",
+    "index.html",
+    "agent.md",
+    "llms.txt",
+    "README.md",
+    "PROVENANCE.md"
+  ],
   "scripts": {
     "build": "node distribution/build.mjs",
     "check:generated": "node distribution/build.mjs --check",
@@ -14,10 +25,8 @@
     "test": "node --test test/*.test.mjs cookbooks/*/checks/*.test.mjs",
     "check": "npm run check:generated && npm run check:content && npm test",
     "test:pilots": "node test/pilot-browser.mjs",
-    "test:peer-application": "node cookbooks/run-a-peer-application/checks/run.mjs",
-    "test:peer-membership": "node cookbooks/run-a-peer-application/checks/run-membership.mjs",
-    "test:peer-webrtc": "node cookbooks/run-a-peer-application/checks/run-webrtc.mjs",
     "test:peer-generation": "node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs",
-    "test:peer-browser": "node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs"
+    "test:peer-browser": "node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs",
+    "test:peer-host": "node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs"
   }
 }

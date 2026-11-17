@@ -3,13 +3,19 @@
 The pilot guides separate shared semantic guarantees from layout choices. Executable
 specimens are evidence for adaptation and failure behavior, not stable page packages.
 
-The new [resident-peer task-board/chat specimen](../cookbooks/run-a-peer-application/checks/README.md)
-has two layouts and focused deterministic page/model checks. It consumes the public
-application-backend boundary, an explicitly supplied public Chronolog bundle, and
-a real deployment bootstrap. `npm run test:peer-application` invokes the paired
-Chronolog qualification CLI with explicit runtime/WASM artifacts; it builds both
-complete graphs and records exact digests. Actual qualification runs in CI;
-local Chromium launch is blocked by this workspace's socket restriction.
+The current [peer application checks](../cookbooks/run-a-peer-application/checks/README.md)
+exercise one public session with native events, SQL, browser Worker, native RTC
+and hosted-control adapters. Use `test:peer-generation`, `test:peer-browser` and
+`test:peer-host` with exact supplied archives. Their reports record the actual
+scenarios and runtime boundaries; stronger capabilities do not select another
+application API or journal.
+
+## Historical resident observations
+
+The following records describe earlier source snapshots. They preserve what ran,
+not an alternate maintained recipe. Their exact source commits retain the former
+resident runners and connection snippets.
+
 The [reviewed pairing in run 43957113710](../cookbooks/run-a-peer-application/notes/qualification-review-43957113710.md)
 passed nine application checks: build, the native captured-generation reset
 recipe and seven browser/runtime assertions across both layouts. It recorded one
