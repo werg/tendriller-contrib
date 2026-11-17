@@ -24,7 +24,6 @@
     "check:content": "node distribution/check.mjs",
     "test": "node --test test/*.test.mjs cookbooks/*/checks/*.test.mjs",
     "check": "npm run check:generated && npm run check:content && npm test",
-    "test:pilots": "node test/pilot-browser.mjs",
     "test:peer-generation": "node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs",
     "test:peer-browser": "node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs",
     "test:peer-host": "node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs"

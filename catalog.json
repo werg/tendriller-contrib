@@ -167,10 +167,10 @@
         "Local draft lifetime and late rejection behavior"
       ],
       "capabilities": [
-        "captures",
+        "application content",
         "durable commands"
       ],
-      "evidence": "exercised",
+      "evidence": "explained",
       "related": [
         "discover-capabilities",
         "annotate-a-frame",
@@ -306,11 +306,11 @@
         "Reviewed aggregate and atomic round reset"
       ],
       "capabilities": [
-        "explicit trusted extension",
-        "private records",
-        "transactions"
+        "application membership",
+        "guarded commands",
+        "coherent queries"
       ],
-      "evidence": "exercised",
+      "evidence": "explained",
       "related": [
         "review-exact-proposal",
         "choose-data-model",
@@ -1285,9 +1285,10 @@
         "Downstream idempotency and uncertain outcomes"
       ],
       "capabilities": [
-        "explicit trusted extension"
+        "application commands",
+        "explicit protected actions"
       ],
-      "evidence": "exercised",
+      "evidence": "explained",
       "related": [
         "recover-outdated-work",
         "observe-long-running-process",
