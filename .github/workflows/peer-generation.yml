@@ -26,12 +26,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: 'a66b3e7b7578a2b3541b86246714cf0e360d7b07'
+        default: '0fe878db70a8a78b8219f32b269031125efc150c'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: 'c5054c396e5edc7f72a552bbcb61db466c600b48'
+        default: '1585da600df9186638e09205db59dcd419faaac9'
 permissions:
   contents: read
 concurrency:
@@ -41,11 +41,19 @@ jobs:
   public-session:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      CHRONOLOG_REF: ${{ inputs.chronolog_ref || '0fe878db70a8a78b8219f32b269031125efc150c' }}
+      HOST_REF: ${{ inputs.tendriller_ref || '1585da600df9186638e09205db59dcd419faaac9' }}
     strategy:
       fail-fast: false
       matrix:
         transport: [direct, native-rtc, browser-native, native-sql, hosted, relay, browser-relay]
     steps:
+      - name: Require immutable companion commits
+        shell: bash
+        run: |
+          [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
+          [[ "$HOST_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -56,8 +64,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || 'a66b3e7b7578a2b3541b86246714cf0e360d7b07' }}
+          ref: ${{ env.CHRONOLOG_REF }}
           path: .chronolog-build
+          persist-credentials: false
+      - name: Verify Chronolog source
+        run: test "$(git -C .chronolog-build rev-parse HEAD)" = "$CHRONOLOG_REF"
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
         run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && '--ignore-scripts' || '' }}
@@ -68,8 +79,12 @@ jobs:
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         with:
           repository: werg/tendriller
-          ref: ${{ inputs.tendriller_ref || 'c5054c396e5edc7f72a552bbcb61db466c600b48' }}
+          ref: ${{ env.HOST_REF }}
           path: .tendriller-build
+          persist-credentials: false
+      - name: Verify hosted source
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
+        run: test "$(git -C .tendriller-build rev-parse HEAD)" = "$HOST_REF"
       - name: Build the actual public hosted participant
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         working-directory: .tendriller-build
