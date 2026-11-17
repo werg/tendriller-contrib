@@ -1,0 +1,444 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-packed-peers",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "5512b5c6de3d02b1ee250f19c1349057f2a6d9bd",
+    "tree": "73fb745985e352c5d5d5fc7896434a28b098a9db",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g08ee9f2a-sql",
+      "sha256": "d691daa96083aaa6e286b474312b6530f6c715577baa337db32849745b0a6388",
+      "sourceCommit": "08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c",
+      "sourceTree": "e57a4edb0df84ebfe69f70c3ba83b2e3878bed76",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-consumer.mjs",
+      "sha256": "7731cc7ef438093b48c0cb256e6e684640813d1847e78cf4d11b7455eb07de9d"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-scenario.mjs",
+      "sha256": "379c3a3b427f77c764795f9fae27f552bf1cfdc08e794ad783259960d243698a"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-fault.mjs",
+      "sha256": "05494342791d253960bc27fd51a45d940d0338fe81f9774620785ba4a267864f"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-participation.mjs",
+      "sha256": "9c083daf823e43662b923c243478043a5440c3482505f4ef791b435883e0cf52"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": null,
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "nativeOwnership": {
+    "secondOwnerRefused": true,
+    "implicitIdentityCreationRefused": true
+  },
+  "controlParticipant": {
+    "owner": "application-session",
+    "role": "control",
+    "attachRequests": 0,
+    "definitionVerified": true,
+    "recovery": {
+      "injectedAfterSelection": true,
+      "journalSavedBeforeRetry": true,
+      "originalRequest": "fc410e752c40c67a570789d8f2396a0eaee4d67875b9fdd38ce5b591f8b5e58a",
+      "retriedRequest": "fc410e752c40c67a570789d8f2396a0eaee4d67875b9fdd38ce5b591f8b5e58a",
+      "originalSelection": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "retriedSelection": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "recoveryNoticeObserved": true
+    }
+  },
+  "executionManifestDigest": "bec3e62bedaf33320f4b379163498f73ba8388a707ca6c9de9ec7aa4a49266d0",
+  "stage": "passed",
+  "retention": {
+    "peers": [
+      "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec"
+    ],
+    "storageIds": [
+      "719a0378-9e38-450b-837b-a82d1e988d92"
+    ]
+  },
+  "lostReply": {
+    "injectedAfterPersistence": true,
+    "originalOperationId": "reply-lost",
+    "retriedOperationId": "reply-lost",
+    "originalReceipt": {
+      "payload": {
+        "applicationId": "e3546e951265a50a66d9b45dac0dd9c95d82e1d64fd55e3f66e4c3b6661e4683",
+        "profile": "peer-generation-v1",
+        "generation": "94e0ed0a36f9615d398c316dde4e4f92a0ad0a4e5fb59a9bf9ef501622471bf1",
+        "sequence": 2,
+        "previousRoot": "3f5a61e36062f368455d10b88ece575c5c566ee4a0b889cfa2ec24cf9428023b",
+        "attemptId": "17fa3c4232358c638e8319cdee097d426adbc287489896c8ed4362a1732ce1c9",
+        "author": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "operationId": "reply-lost",
+        "bodyHash": "c2faf366eaf59303a8ad79b2c03eccbc9a1005ece1b3d09b056507fdb9af7ecb",
+        "bodyBytes": 1570
+      },
+      "signature": "f1b10ff0e0e3b7f463feadf09afd132194d5afd6704aab7fe3e00cef84a3f7f550bd60f85657fc6da468c8983cecb605808ccf16cdfd8e2b79e63e661c9fe102",
+      "root": "0b922d07a11729647f95864ecd1560e339ebd8fbab4e4a0e92e2522bdc8695d6"
+    },
+    "retriedReceipt": {
+      "payload": {
+        "applicationId": "e3546e951265a50a66d9b45dac0dd9c95d82e1d64fd55e3f66e4c3b6661e4683",
+        "profile": "peer-generation-v1",
+        "generation": "94e0ed0a36f9615d398c316dde4e4f92a0ad0a4e5fb59a9bf9ef501622471bf1",
+        "sequence": 2,
+        "previousRoot": "3f5a61e36062f368455d10b88ece575c5c566ee4a0b889cfa2ec24cf9428023b",
+        "attemptId": "17fa3c4232358c638e8319cdee097d426adbc287489896c8ed4362a1732ce1c9",
+        "author": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "operationId": "reply-lost",
+        "bodyHash": "c2faf366eaf59303a8ad79b2c03eccbc9a1005ece1b3d09b056507fdb9af7ecb",
+        "bodyBytes": 1570
+      },
+      "signature": "f1b10ff0e0e3b7f463feadf09afd132194d5afd6704aab7fe3e00cef84a3f7f550bd60f85657fc6da468c8983cecb605808ccf16cdfd8e2b79e63e661c9fe102",
+      "root": "0b922d07a11729647f95864ecd1560e339ebd8fbab4e4a0e92e2522bdc8695d6"
+    },
+    "orderedRecords": {
+      "before": 2,
+      "after": 2
+    }
+  },
+  "hostOutage": {
+    "boundary": "portable-control-port",
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "requests": {
+      "before": 4,
+      "after": 4
+    },
+    "applicationBodyBytes": {
+      "before": 0,
+      "after": 0
+    },
+    "observations": {
+      "before": {
+        "requests": 4,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 4,
+        "applicationBodyBytes": 0
+      }
+    },
+    "finalityCapability": false,
+    "liveSignalsObserved": 1,
+    "peerReplicationObserved": true
+  },
+  "recovery": {
+    "previousGeneration": "94e0ed0a36f9615d398c316dde4e4f92a0ad0a4e5fb59a9bf9ef501622471bf1",
+    "selectedGeneration": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "sourceRemoved": true,
+    "coherentReset": true,
+    "recoveredDigest": "1b4d48c000cb672c01f49570cbeded69ac4db336eabce732294ab4874da2aced",
+    "freshPeerDigest": "1b4d48c000cb672c01f49570cbeded69ac4db336eabce732294ab4874da2aced",
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ],
+    "inheritedIdentityPreserved": true,
+    "abandonedEvidencePreserved": true,
+    "unknownLoss": true
+  },
+  "returningBranch": {
+    "generationBefore": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+    "generationAfter": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+    "digestBefore": "1b4d48c000cb672c01f49570cbeded69ac4db336eabce732294ab4874da2aced",
+    "digestAfter": "1b4d48c000cb672c01f49570cbeded69ac4db336eabce732294ab4874da2aced",
+    "oldAttemptReadmitted": false,
+    "excludedAncestorReadopted": false,
+    "thirdGenerationChecked": true,
+    "thirdGeneration": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b"
+  },
+  "reapply": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "741a587b6108a495a2e8b745eb50ea3deab9da54ae57efe52d4125e914a5cb7a",
+    "newAttemptId": "58624850b99a77e657fcf7a22d1904a40ef60916b5b238264c6d745732438c36",
+    "reapplyOf": "741a587b6108a495a2e8b745eb50ea3deab9da54ae57efe52d4125e914a5cb7a",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "reopen": {
+    "identityBefore": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+    "identityAfter": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+    "operationBefore": {
+      "status": "applied",
+      "attemptId": "58624850b99a77e657fcf7a22d1904a40ef60916b5b238264c6d745732438c36",
+      "operationId": "reapplied-a",
+      "author": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+      "generation": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "operationAfter": {
+      "status": "applied",
+      "attemptId": "58624850b99a77e657fcf7a22d1904a40ef60916b5b238264c6d745732438c36",
+      "operationId": "reapplied-a",
+      "author": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+      "generation": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    }
+  },
+  "participation": {
+    "owner": "application-session",
+    "entry": "session.participate",
+    "automaticConnections": true,
+    "observedPeerIdentities": [
+      "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+      "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836"
+    ],
+    "hostOutage": {
+      "blocked": true,
+      "blockedProbeRejected": true,
+      "commandsApplied": 1,
+      "before": {
+        "requests": 17,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 17,
+        "applicationBodyBytes": 0
+      }
+    },
+    "automaticRecovery": {
+      "previousGeneration": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+      "selectedGeneration": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+      "adopted": {
+        "generation": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+        "sequence": 2,
+        "root": "49920c94b9c2cb45370992a8005af16679239ccb94baca1ab184b98eea451c63"
+      },
+      "graceMs": 150,
+      "elapsedMs": 1050,
+      "freshnessBudgetMs": 300000
+    },
+    "broaderRecovery": {
+      "reason": "freshness-unknown",
+      "ageMs": null,
+      "approvalRequired": true,
+      "staleApprovalRejected": true,
+      "proposalId": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+      "adopted": {
+        "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+        "sequence": 0,
+        "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+      },
+      "selectedGeneration": "331353987763ad73b9282a767b0d62c340e13092f558526cf2b9b81c7a81bc03",
+      "commandApplied": true
+    },
+    "statuses": [
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "approval-required",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "1101881bd6738665175f84e59a04208129aaafbf7f5c7349a9068301e0c61330",
+          "coordinator": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "point": {
+            "generation": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+            "sequence": 0,
+            "root": "2a17e855293e6d88faef597dc1bf139d062f2ec07ad06e1041bf4859626a48e9"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "following",
+        "connectedPeers": [
+          "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "approval-required",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+          "coordinator": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+          "point": {
+            "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+            "sequence": 0,
+            "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+          "coordinator": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+          "point": {
+            "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+            "sequence": 0,
+            "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      }
+    ],
+    "transport": {
+      "boundary": "in-process-fixture-discovery",
+      "pendingIntroductions": 0,
+      "connections": [
+        {
+          "owner": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+          "peer": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "closed": true
+        },
+        {
+          "owner": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "peer": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+          "closed": true
+        }
+      ]
+    }
+  }
+}
