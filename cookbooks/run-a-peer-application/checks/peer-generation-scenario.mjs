@@ -11,6 +11,7 @@ import {
 } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
 import { conversation } from './peer-generation-definition.mjs';
+import { isNextPublishedCommand } from './peer-generation-fault.mjs';
 
 export async function runPeerGenerationScenario({ path, connectSessions, createControl = createPortableControl }) {
   const reportPath = resolve(path);
@@ -83,15 +84,22 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     await post(a, 'anchor-a', 'A retained message');
     let ab = await connect(a, b);
 
-    // The coordinator publishes a revision only after storing the command. Drop
-    // the link then, before its order reply can reach the originating follower.
+    // Only reply-lost is submitted after this point. Ignore repeated coverage
+    // invalidations, then cut at its durable publication before the order reply.
+    const beforeLostReply = (await a.recoveryPoint()).point;
     const watchAbort = new AbortController();
     const updates = a.changes({ signal: AbortSignal.any([watchAbort.signal, timeout()]) })[Symbol.asyncIterator]();
     await updates.next();
     const cut = (async () => {
-      const update = await updates.next();
-      assert.equal(update.done, false);
-      await ab.close();
+      for (;;) {
+        const update = await updates.next();
+        assert.equal(update.done, false);
+        if (!isNextPublishedCommand(update.value, beforeLostReply)) continue;
+        // No awaited query/get here: close fences both transport owners before
+        // the coordinator's order-result continuation can transmit its reply.
+        await ab.close();
+        return;
+      }
     })();
     const lost = await b.command('postMessage', { messageId: 'reply-lost', text: 'Stored before a lost reply' }, { operationId: 'reply-lost' });
     await cut;

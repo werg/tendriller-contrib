@@ -84,7 +84,7 @@ try {
     [entry, join(here, entry)],
     ...(browser ? ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs'].map(name => [name, join(here, name)]) : []),
     ...(rtc && !browser ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
-    ...(!browser ? [['peer-generation-scenario.mjs', join(here, 'peer-generation-scenario.mjs')]] : []),
+    ...(!browser ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
     ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
   ]) {
     const bytes = await readFile(path);
@@ -94,7 +94,8 @@ try {
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
         ...(browser ? ['@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', 'playwright'] : []),
-        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs',
+        './peer-generation-fault.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
     await copyFile(path, join(consumer, name));
