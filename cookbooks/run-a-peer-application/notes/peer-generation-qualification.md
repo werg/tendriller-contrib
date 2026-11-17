@@ -23,12 +23,136 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Latest complete composition: `5581a475`
+## Qualified composition: `e82163de`
+
+All five public-package consumers, the strict composition assembler and artifact
+upload passed in [core CI run 44126997819](https://github.com/werg/chronolog-db/actions/runs/44126997819).
+This checkpoint includes inherited-ancestor recovery, current-role admission
+before journaling a new selection, protected recovery floors, author-scoped
+operation tools and the host's durable control-owner check. The exact emitted
+[composition](evidence/2026-11-17-ci-composition-e82163de/composition.json)
+and [origin record](evidence/2026-11-17-ci-composition-e82163de/origin.json)
+bind the following retained inputs:
+
+| Gate | Passing report | Observed contract |
+| --- | --- | --- |
+| Native events | [Direct](evidence/2026-11-17-ci-composition-e82163de/direct/report.json) | Common session, durable projections, exact retry, inherited ancestry and protected-floor rejection. |
+| Native RTC | [Native RTC](evidence/2026-11-17-ci-composition-e82163de/native-rtc/report.json) | The same application/recovery checks through actual native ICE/DTLS/SCTP. |
+| Browser Worker | [Chromium/OPFS](evidence/2026-11-17-ci-composition-e82163de/browser/report.json) | Actual dedicated Worker ownership, OPFS/Web Locks, peer data exchange, fresh replay and graceful/abrupt reopen. |
+| Native SQL | [Guarded tasks](evidence/2026-11-17-ci-composition-e82163de/native-sql/report.json), [public archive boundary](evidence/2026-11-17-ci-composition-e82163de/native-sql/public-boundary-report.json) | Actual patched native engine, original-author transactional guards, coherent SQL/events recovery and durable identity. |
+| Hosted participant | [Actual workerd/native RTC](evidence/2026-11-17-ci-composition-e82163de/hosted/report.json) | Public host transport, signed code publication, explicit publisher permission, inherited recovery and local/raw-host floor enforcement. |
+
+### Exact sources and retrieved bytes
+
+The workflow head is Chronolog
+`c562a997517e5c420e51c08dc962a639a2889d19`. The actual clean checkout and
+packed source is PR merge `e82163dee1d79ce70c566ca6db60fa95d403cda4`.
+Both have exactly the same tree,
+`e5e58418398b572d36686838537ad74c9bfc7f9f`. Every consumer records clean
+contrib `1d46947b2f86a5cbbb2c95b3e358b343768d5aa8`, tree
+`9c222fe3993f2a080627a1fecd97a6da2f448b96`. The hosted lane records clean
+Tendriller `ed2509358c01a2a1a7c9db7691f4775347bb27c0`, tree
+`ee38b3c2bea94d9b88032003219ecd773d69dfb1`.
+
+GitHub artifact `application-44126997819-1`, ID `14346919661`, was downloaded
+and its 9,079,086 bytes verified against ZIP SHA-256
+`773c89628db722427ce76457633c45d02bbf0faa83111e61a4683f0356a1a9e7`.
+The unmodified `1d46947b` validators reproduce all five summaries and the
+emitted composition exactly. Its SHA-256 is
+`f8adc65ee011ef82da57e06bc58ae77144989520fee3a7cce75c94e9c3d755b4`.
+
+| Downloaded package | Verified archive SHA-256 |
+| --- | --- |
+| Chronolog RTC | `45cd5b492800813e99b6ecb8d00b5f904df67a50d3a2bdd7df209949a5116661` |
+| Chronolog native SQL | `6009ddd84c29e08412d082a6623e19907ff53cc5351997ea9cbb1b587803a468` |
+| Tendriller SDK | `613f87f98e0170a19f0c6874be00f01de87192b8c9f636c6c1222bf1b365fffe` |
+| Tendriller engine | `8c3d5aa8510611d2af2340037a053d0dd28c02dbb00b04fed06370f68ec4a1e3` |
+| Tendriller runtime | `2c10cde3226c90b84c071730b55a272cd1a0b6ce2388cc57f9fff0a9437bb2d2` |
+
+All 99 RTC and 130 SQL file digests were checked directly against the downloaded
+archives, including the actual native engine binary. All three host archive
+digests and the engine's seven named file digests were checked as well. Retained
+[RTC](evidence/2026-11-17-ci-composition-e82163de/provenance/session-rtc.json),
+[SQL](evidence/2026-11-17-ci-composition-e82163de/provenance/session-sql.json),
+[host release](evidence/2026-11-17-ci-composition-e82163de/provenance/host.json),
+[host engine](evidence/2026-11-17-ci-composition-e82163de/provenance/host-engine.json)
+and [embedded verifier](evidence/2026-11-17-ci-composition-e82163de/provenance/embedded-control.json)
+provenance preserves their distinct source and content identities.
+
+### Inherited recovery and protected authority
+
+The direct, RTC and hosted scenarios begin with selected generation 2 and a
+survivor that has only the complete inherited generation-0 prefix at sequence 4.
+They reject an empty survivor and refuse incomplete-view reads. Preparing a
+recovery proposal does not publish a usable view, and the incomplete survivor
+cannot turn this into a planned handover. Generation 3 then adopts the exact
+verified ancestor. The inherited operation keeps its original author, attempt
+identity and accepted outcome; excluded suffix work stays absent. Fresh replay
+matches the retained digest, and commands resume on the selected successor.
+
+A deliberately lost persisted selection reply retries the identical saved
+request and returns the same selected generation. Recovery still reports
+`unknownLoss: true` where unseen abandoned work cannot be counted. After a
+protected floor is established, both the local recovery API and the raw host
+refuse the older prefix. The rejected local proposal leaves its transition
+journal unchanged and does not expose an incomplete view.
+
+The current-role guard runs before saving or sending a new selection intent.
+It can first read the latest signed authority from the host; this is not a
+claim that transition preparation makes no host request. The ordinary command
+path remains separately measured below.
+
+The [earlier `adc477e7`/`10f53f11` failure](evidence/2026-11-17-ancestor-baseline-10f53f11-report.json)
+is preserved as the baseline that stopped at the incomplete-prefix check. This
+new passing source exercises the subsequent inherited-ancestor and floor cases;
+the older reports and their weaker fixture identity are not relabeled.
+
+### Bounded workload, browser and quality results
+
+Each events lane applies 32 commands with 1,024-byte text through ordinary
+`applied()` completion, then makes one coverage observation from an independent
+store. All 32 original-author outcomes survive the selected takeover:
+
+| Exact CI workload | Prefix age at disconnect | Takeover readiness | Known lost commands |
+| --- | --- | --- | --- |
+| Direct events | 154.07 ms | 360.32 ms | 0 |
+| Native RTC | 157.37 ms | 356.25 ms | 0 |
+| Actual hosted participant | 153.29 ms | 427.54 ms | 0 |
+
+These separate bounded CI runs satisfy the declared 300,000 ms target for that
+workload. They are neither a controlled transport-performance comparison nor a
+universal maximum loss guarantee. Unknown freshness still requires explicit
+approval. During the hosted controller's blocked-host window, bridge requests
+remain 129 and body bytes remain 55,577; Worker HTTP requests remain 90 and body
+bytes remain 44,461. Invitation/rendezvous counters are unchanged and required
+host application-body bytes remain zero. The actual workerd scenario passes
+1/1, with 12.59 s test time and 13.87 s total duration.
+
+Chromium 158.0.8127.18 runs the actual dedicated Worker and OPFS with exclusive
+Web Locks. The browser gate checks peer commands/signals/content, exact operation
+identity, fresh replay and graceful/abrupt Worker reopen. It remains distinct
+from native SQL and from the separate native/WASM engine comparison.
+
+The [quality verification job](https://github.com/werg/chronolog-db/actions/runs/44126997574/job/134193516356)
+passed 542 tests with 6 ordinary-suite WASM skips, across 63 passed files and 1
+skipped file. Coverage is 91.74% statements, 85.87% branches and 90.26%
+functions. The complete [quality workflow](https://github.com/werg/chronolog-db/actions/runs/44126997574)
+also passed Linux and macOS conformance and the portable digest comparison.
+The [dedicated native/WASM run](https://github.com/werg/chronolog-db/actions/runs/44126997621)
+passed all 6 actual comparisons, separately accounting for those skips.
+
+This is a complete exact-source local public-package composition. Deployed
+authentication, Internet/home/mobile/restrictive networks and TURN, sustained
+suspension/quota, browser SQL integration, provider/device cost and unassisted
+fresh-agent installation/enrollment remain the separate acceptance boundaries
+listed below.
+
+## Separate contrib CI composition: `5581a475`
 
 All five independent public-package gates and strict composition assembly passed
 again after the recovery-authority admission change, in
 [contrib CI run 44126931363](https://github.com/werg/tendriller-contrib/actions/runs/44126931363).
-The exact [latest manifest](evidence/2026-11-17-ci-composition-5581a475/composition.json)
+The exact [contrib CI manifest](evidence/2026-11-17-ci-composition-5581a475/composition.json)
 has SHA-256
 `717f92a2b064332eae85f43819c456bb9dd7f0d40eda5afb584c43ae55822879`.
 Its [origin record](evidence/2026-11-17-ci-composition-5581a475/origin.json)
@@ -623,10 +747,10 @@ study is not erased by combining their results.
 
 | Plan gate | Implemented and observed | Remaining acceptance boundary |
 | --- | --- | --- |
-| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. Shared verification fences grants, excluded ancestry and recovery floors; actual SQL checks original-signer authorization. Core security/quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
+| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `e82163de` composition verifies complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
 | G1 — Remove hosted steady-state commands | Native, actual workerd/native RTC and real Chromium gates pass host-blocked work. The host enforces its participant facet policy; required ordinary application-body bytes stay off its transport. | Deployed routes, TURN and provider traffic/cost require direct measurement. |
-| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `482c4a4c` direct/RTC lanes measure a 32-command, 1,024-byte two-peer burst, retain all its accepted commands, and recover below the five-minute target. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
-| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. Actual SQL, host and Chromium gates pass. A fresh agent completes the bounded public-tools business workflow and a final-artifact repeat preserves its results. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified. The recorded assistance must remain visible. |
+| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `e82163de` direct/RTC/hosted lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
+| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `e82163de` SQL, host and Chromium gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
 | G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, TURN, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
 ## Public consumer and evidence boundary

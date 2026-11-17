@@ -1,0 +1,747 @@
+{
+  "format": "peer-generation-browser/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "browser-worker-opfs-native-rtc",
+  "passed": true,
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "1d46947b2f86a5cbbb2c95b3e358b343768d5aa8",
+    "tree": "9c222fe3993f2a080627a1fecd97a6da2f448b96",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-ge82163de-rtc",
+      "sha256": "45cd5b492800813e99b6ecb8d00b5f904df67a50d3a2bdd7df209949a5116661",
+      "sourceCommit": "e82163dee1d79ce70c566ca6db60fa95d403cda4",
+      "sourceTree": "e5e58418398b572d36686838537ad74c9bfc7f9f",
+      "sourceDirty": false,
+      "provenance": {
+        "sha256": "11d65508254e8bb3f2424b7e504e3a6015d0f64bcefd665bfe6222fe78b90fd4",
+        "profile": "peer-generation-v1",
+        "optionalNativeRtc": true,
+        "sqlEngines": [],
+        "files": {
+          "index.mjs": "89ecd588e2f193ffde2a7d35d051e2dab3b27bf0f1899ecf18902a35ba855041",
+          "native.mjs": "ef777df3dba3abc89974228a8dbe74404b3236d97b13ca587cd5813ef3bb7c7e",
+          "browser.mjs": "9f6631e411adfd22fc839d68bfd607c1b03e9bfb48efc2004d783a75bb7bfbd8",
+          "chunks/chunk-3GMYKQAD.mjs": "1c1b1a7b06d71836d8a08b96f85a3b164eb8b35c98e20aa75a6d0156ff5b20ef",
+          "webrtc.mjs": "8238a90e534517ab2b614888e0bbe8a3300d1155a0cd6da062a4a749e60d9180",
+          "tendriller.mjs": "1c02f6a19f82d0ad8233f2661a0eb34f38e1e2aa4422979b7ee416ceac6d4bb8",
+          "webrtc-native.mjs": "20bc963a133c64a06532eae02e61502ce95654f4626613bc5ab10e12376a4033",
+          "chunks/chunk-TXI2NSHV.mjs": "e62417c6dda5690ec5186f7a51f0209e3921098489b84d13b9ec1711451760f7",
+          "chunks/chunk-KSC4KBWO.mjs": "1700c38a0fe03ed93d264020956c9f5016c9bad7d7a795734c6dec2496c69b37",
+          "types/packages/canonical/src/errors.d.ts": "699bba8ca4c0bc5aa21f95448af912c79c879fcb83757bba00049314ae81c436",
+          "types/packages/canonical/src/bytes.d.ts": "9ff352000caac03202027d8d94f7caa405a7b14d9fa89eaa5d09480e02e21c2d",
+          "types/packages/canonical/src/cbor.d.ts": "5439b5ef50801db3f61c0fdeab85c543ffa29055316b4095e97ae8959eb22e27",
+          "types/packages/canonical/src/fixed.d.ts": "cd2418642d9c3e444dd148c91fefbc6029ce0ba22a2666835131e78cc485d458",
+          "types/packages/canonical/src/hash.d.ts": "c8ad6b370d74952ae60e8a3c44fd212bca91daa4d77c1174ac4eeb12d432219f",
+          "types/packages/canonical/src/sync-hash.d.ts": "edec6f3b5abacc552e29b3e8c17b930bb8b19e97b8b896d5b2df7da7a3f24e73",
+          "types/packages/canonical/src/schema.d.ts": "9440d6107130155a33eb1e580e082b8dcbce67989c04949e2226dbe1b6107468",
+          "types/packages/canonical/src/index.d.ts": "2fe464b7ca9dfeeacffa12c8a6200eeaf51b35f42769446d2c279ed9ad37bcc1",
+          "types/packages/protocol/src/errors.d.ts": "2afd36962b7523642f7d58f53fedcabe687ba5275c5c8b44bdb868f6918c058d",
+          "types/packages/protocol/src/bytes.d.ts": "8f69c0cb4d26a75b406a832b92a660bc5e72cc921ca90a4cf077f6bdbade0919",
+          "types/packages/protocol/src/cbor.d.ts": "560befdd06f602f86a5d7bbedd87a186c823826382041de88bc681b2eeff9bf7",
+          "types/packages/protocol/src/schema.d.ts": "a97b39dbe16d9de9e63e04d7f7a2d61d7134ad0181b292463cbb284f57498baf",
+          "types/packages/protocol/src/sql.d.ts": "640165c786c820693bf4d653e412dde58f9b66bb754fdb04a44f3d8ce58b158e",
+          "types/packages/protocol/src/sealed.d.ts": "d6e883b1919546f4a24745290989e1be785a5ff694b5586c80373a217a14c526",
+          "types/packages/protocol/src/platform.d.ts": "ce83286b8fad2c3b0acd1ce811cc336b101b0600ffddf34374db3cef00ae0b75",
+          "types/packages/protocol/src/program.d.ts": "07cb38cf2d1d49c5cbdebbb3f4b4deabc3dad688087d28265e3d3cb35614cd47",
+          "types/packages/protocol/src/messages.d.ts": "ff266aa91e13d536d671cfd7c2cc5974503a03174c85f83de25bfb0b5b4b3056",
+          "types/packages/protocol/src/primitives.d.ts": "8de134c228aec345688b24cfcc38be87e014208df37b8d76e031c2fc0bde0b32",
+          "types/packages/protocol/src/events.d.ts": "d9c5498cdd1cc399822ee45628ebe5a58259fce66e27f31ceeadcb907ed0d9c6",
+          "types/packages/protocol/src/views.d.ts": "2d2ae85aaff148da26b4035ec753ff123ea33e0c7a19bb740994e60ca8b165e4",
+          "types/packages/protocol/src/row-key.d.ts": "8419d43e2b3f9d1dbc5d2fc413a381d7401579f98e08d4627bdecf31fb2c5476",
+          "types/packages/protocol/src/index.d.ts": "74d0cd305b545d520f6871c6ecf741dd6e5b1bc8cc051a53549ed30c27520997",
+          "types/packages/records/src/bytes-store.d.ts": "988a363381f69e886c82ab6e46e9fff09acfffdad499aba3e72836b615efc80a",
+          "types/packages/records/src/connection.d.ts": "225c46f490c057874b3a6e2d5c433835b1b92b1657b5cf8f932ea39937702699",
+          "types/packages/records/src/stream.d.ts": "4098de15026c4243f50e09489cf763c5a2bf364b60e090b0f79c4ad61660f467",
+          "types/packages/records/src/index.d.ts": "4b8e6b96f69e56d5165a60484a651453b0e1a9d17ff0b7c1be01c9408543a28a",
+          "types/packages/peer-generation/src/control-types.d.ts": "057db5eae3c0e70920e4dc5daa8a1a2d1ed786629e6b656ba45f4d843d6b66d5",
+          "types/packages/peer-generation/src/codec.d.ts": "4b0164b14e1d7fe3e9299430af82007eef17c990e7db372c38014195d65ab395",
+          "types/packages/peer-generation/src/definition.d.ts": "a373415a49bc51f2b36f53e61955c4655c8e05ce465b7d337643fb873909abc9",
+          "types/packages/peer-generation/src/schema.d.ts": "27db25818b2f3bef197e12d0f43d031b18ce439c9e16f3c091337a5e4b6c1f56",
+          "types/packages/peer-generation/src/participant.d.ts": "9773c05cfcac4305118fa0fa4597237a191fb2f8058421895313e75e60feda03",
+          "types/packages/peer-generation/src/publication.d.ts": "110c7a9f02af29a035deca2f288397da81cb912db3a09ff4d1436c5c065d7e2c",
+          "types/packages/peer-generation/src/control.d.ts": "3c587382b8df3b30326ae95122aedfc2ab6dbc59767d8332fb511d05c3cdda46",
+          "types/packages/peer-session/src/definition.d.ts": "898f0e16dc24c60eb37361d053cc66d11718625b5e944797f46be98c9c3ffe75",
+          "types/packages/materializer/src/types.d.ts": "3777a0e6f62193a7dd2218fb8296c237ad40d16c4c2a32cd8021b8b98e508777",
+          "types/packages/materializer/src/runtime.d.ts": "a481a9ac1c50a4eb6c63f024ec9ab6a20a3fd72c91f041d9ace9fd9f27df76bd",
+          "types/packages/materializer/src/event-store.d.ts": "b4e633fdde1855f44c476bab83e80e68753aea7485b124a5920efab5f8fb18cd",
+          "types/packages/materializer/src/events.d.ts": "a2e04d193ab4cbb4213cd48dfb4abd23dc10255b01e671de4481ed5fc5f5b9dc",
+          "types/packages/materializer/src/index.d.ts": "1b10801767a75c1f9ec5f200c30fa78a85d62f6fed65afa0761cef89fa06bc7b",
+          "types/packages/peer-generation/src/types.d.ts": "44499163a650150093c96ba6bee21673c7c3ed59aee8c1be86b1be103cc0697a",
+          "types/packages/crypto/src/hpke.d.ts": "a7f52f448245242dd6d983ed7f834eda7d9317f670ef57311657a5efe914faef",
+          "types/packages/crypto/src/epoch.d.ts": "f97132658b7ecbe5ba29a84619c784695f467e865cb78d07a399d0822ed34b40",
+          "types/packages/crypto/src/keystore.d.ts": "35e0f0bf4bb3a993d868fa6ec931bb4fe85992d1bea966dc3ead6d82830ae9d5",
+          "types/packages/crypto/src/sealed.d.ts": "dedea8d7c7f5f5a2ea9b40c191e916ad2ea2bce33b525208e2225296b8e7f176",
+          "types/packages/crypto/src/index.d.ts": "04dfb3a63092750e5f940fac0445c9bcb624e1e25984653b1a74cf75bd880f1f",
+          "types/packages/peer-generation/src/attempt.d.ts": "eacb77dfb8d2d76f7e8154693c1a467a912e0fe3603f42c404f7cdf27f96d129",
+          "types/packages/peer-generation/src/replica.d.ts": "fe9bbeea1ca7072d638290476854d54c18511a9750a500a2166cd0a900d1cb59",
+          "types/packages/peer-generation/src/index.d.ts": "9098989b27a1150200c9a38343de3896569b91f75d617a4980d0d88fd5e05195",
+          "types/packages/signals/src/payload.d.ts": "a7ef25bb5a99ba5186fd30d78a1e93264c80ce65a646577f8ac2d8c512b6630a",
+          "types/packages/signals/src/index.d.ts": "18730f64abe9046f7b101ac884a1cb5cf9a74949724a23acc7799caed7f227fb",
+          "types/packages/peer-session/src/lifetime.d.ts": "bbd7d399151421f2321a90a083e18ae6765bdf07b0870cfcb36bdba2df89691c",
+          "types/packages/peer-session/src/recovery.d.ts": "6c5c245af40f61b2a10cddce0a97d7aad0ff8aac84b5339ffbd955b4d5bc6abb",
+          "types/packages/peer-session/src/content.d.ts": "98b3748fa22f758471414a8acef523885682897bd1d0589aeb012af6f09e0ea6",
+          "types/packages/peer-session/src/device.d.ts": "04588afa738aabd41e64c94a2a828c59011a2bc1a2bd0b028a7550a2d9c61ba3",
+          "types/packages/peer-session/src/keys.d.ts": "b73cc01be1da810f84e1ccb436847dfd8ba67ff4ae7703827572126ec86c4fa8",
+          "types/packages/peer-session/src/projection.d.ts": "58e653ca6dbfc6c661af90c39f3e14cc1c4d06f256dc1ffe6b65d2634d2390df",
+          "types/packages/peer-session/src/control-participant.d.ts": "88cdd2aec0a612d82be2f4c4fe8d17229d453e0d76fab255bfa65b1370468db6",
+          "types/packages/peer-session/src/network-wire.d.ts": "369b7b062ff05b2ea0d4e65b9fb2dd680a70b7b834bf0aefaabc680ce137bc77",
+          "types/packages/peer-session/src/network.d.ts": "3df9c1b31c7e1dca44037b9f187277e3ed326bf6b82885be48903ba2813899ea",
+          "types/packages/peer-session/src/participation-types.d.ts": "42ead0cacf590505114ef1c53249482b8e96a4a4595e52e76c692b74c23ab5a7",
+          "types/packages/peer-session/src/participation.d.ts": "6dd9e2a4f783f0b37ed3bf6d1cd9984299d216427485824f4e55eee55a5995c0",
+          "types/packages/peer-session/src/session.d.ts": "9d739e597a7a356d05393732d683a8fb44d1f3a66341e3ee1e97931dea3edde8",
+          "types/packages/peer-session/src/runtime.d.ts": "fbf9d3e207c639264ffabde6adf2210c323069d62df87dd8f74604b1a707921a",
+          "types/packages/peer-session/src/tools.d.ts": "dae5bf06a542e75958c23e944d7db2a594ebe2c9ac848dd95b0e24ab7b1e46df",
+          "types/packages/peer-session/src/index.d.ts": "98ae47d061c3b2727c837a8384719896b5ec347554c6adb4d2bde37770bbc4d1",
+          "types/packages/records/src/native.d.ts": "7e8e3e12cbf5095724b0b205ef66c987d9c32da6de4c459496f2eca9341e63b4",
+          "types/packages/peer-session/src/native.d.ts": "763805b4c14a06ff30081b2cc5f2ae1acd58512666e9b2477f77cf031fbc8199",
+          "types/packages/records/src/browser.d.ts": "3000f724d33e1591179ed0222b2adfdd985f67609268805918fb3ab9c4b2244d",
+          "types/packages/transport-webrtc/src/types.d.ts": "c3fec8b5f827865a41cd7c84b69523537f71fa0cab3e7c2fa0967ca68322e814",
+          "types/packages/transport-webrtc/src/live.d.ts": "647e9226dbf4d59f90618d2c6e5579d6371b2348546beb98d64ddfb5e5dbea1d",
+          "types/packages/transport-webrtc/src/channel.d.ts": "4a54ea6ffc646aaf6a6ce898916ee1179752ae66f58503d8c32c6923d21c6f42",
+          "types/packages/transport-webrtc/src/route.d.ts": "d109f7fa2cf599d5db172673048f7f3179e0b6fe2f94a81ee7e2d51c1f7d3975",
+          "types/packages/transport-webrtc/src/negotiation.d.ts": "3add1e2e44c0c47762245b4364063b7b0cc57921be750460e0e9fa4340baf6a9",
+          "types/packages/transport-webrtc/src/http.d.ts": "ce4c72a1d7cbe46e07179825bf58929e45b58ed7a6d3329b7fe02da095f9be75",
+          "types/packages/transport-webrtc/src/index.d.ts": "22eb724e67fb1c604a85f5b71f0aab292c2cd719565592725217e99b794a9f4f",
+          "types/packages/peer-session/src/worker-transport.d.ts": "713add13afb2e66b02bad44c02c3af064010a1912cc32be011d543c8060bc6af",
+          "types/packages/peer-session/src/worker-application.d.ts": "adac0d32ed3ba1309fff8ee51e1c19613551feff52cacb9da9836b13094ac73a",
+          "types/packages/peer-session/src/browser.d.ts": "c9b3820812fbdea58aeab477e6214a761675ee743a0425164d31dcac4fdb8413",
+          "types/packages/peer-session/src/webrtc.d.ts": "f25159e2a2f8ff22c9d6aa823053ca66fb5a01e3219b51cf428d36b184c2c3f8",
+          "types/packages/peer-session/src/tendriller.d.ts": "1891240d2a4d9a02926ccc05e33a436b2b623c45500c01307a11289cfdb0ebc2",
+          "types/packages/transport-webrtc/src/native.d.ts": "e2eea57e4291d1f0144fb5617dfe739c68447186bd1fae7acc35b1cdea517377",
+          "types/packages/peer-session/src/webrtc-native.d.ts": "7ecf125e0af19a3560f3e504b85ff6ef5c598028dc72c230a3d3d61ab222e9e7",
+          "index.d.ts": "051e8080a57f42102bb1b5f1a764bfef708342421cc8d583ee6117de030bb201",
+          "native.d.ts": "ce3c892d2757c873ee8f1e6e08d99ba39f077acfb28f7b004f0fc0b3ab001fb2",
+          "browser.d.ts": "673ea804747cb6ca18b3594f941dd27f3ccfc00ef23e57229d507339e1c6ce43",
+          "webrtc.d.ts": "e552d088490ac9ff9ecb457736ef47eda083a3595f517ab07abf900a9fcba1d2",
+          "tendriller.d.ts": "eb17e47e01bd92541f526b6b42f7c94e4dad7cda9c0c9196cd1d3ded866f7c4c",
+          "webrtc-native.d.ts": "c26c6f8fdd4fdb3db1020a0ab8f8fa98d1f3254d0a5fac453f32abb3370b7e43",
+          "README.md": "aead1e37aa6412211b12475d4e45956d76d8e2de3f70915516156f3575bd05af",
+          "package.json": "91878ee55fc20d6005fd60542191c56817a8c2d4095c2f23eafe3d618a259bfe"
+        }
+      }
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-consumer.mjs",
+      "sha256": "2ca6a67916f6e882e9b837137cf7c7917acd3dd61c92856e19f4a356c17d66c5"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-page.mjs",
+      "sha256": "b590bba78b8203fc68c8d0aa6427f591d5cc010e7e0e8712077a0e4dda851f43"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-worker.mjs",
+      "sha256": "19e103346e5369ea38a8f0ee78f9b24ece1ca0d2a8542aaacd51c89d4fb0faa1"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "73e5a9dde224403938b31b0c84072a8bcecc66ae159ad0973bc59fbb748b0c36"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/board.html",
+      "sha256": "ac03488ef3f116d12e63fe5f2ab83382b048a3c7d70b343122d483e059d3058b"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/compact.html",
+      "sha256": "087f00bcec57763bad44d01f1274d0017ed2177eda8095fdc4c40907193f0efe"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/style.css",
+      "sha256": "8474c917190b0777cd76d3c9919b8b1ef09b6e1026841f1bbb5ccc9dc0a999b5"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/app.mjs",
+      "sha256": "e47477719b1efe2717d260650cb0bc3d95e9ec723cb7b712cd5ffdfa048654f6"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/recovery-choice.mjs",
+      "sha256": "0b5d307ff758a38e9a38f19661257e53355bd775d8029d44dca94f0460efea15"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/shared/typing.mjs",
+      "sha256": "44de2d5704c6b89d51ec57e92fec1eb9ea04d88988771c82e305fd2366ec0a0f"
+    }
+  ],
+  "error": null,
+  "runtime": {
+    "node": "v24.22.2",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "9e6ad6e8f374a3ca39fca681e08e713081e55f1c8ad824351f68d40d1eae8c14",
+      "packages": [
+        {
+          "path": "node_modules/@esbuild/aix-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-kXXoiPVVGQcnIYGOeaovwOURpniDBpSq4A03qkQ+BMQqtGG6HYap3xne9C1O1yo4TR3qxlCX5IqqmX6fFo2Lqg=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-5YfKeeI8qWfBZIX+u2xZC3Zlb3Os/gLS2sbEKM+I4ZOcsWmHS2WLysCcQZDAFRslDUU5Oiq44gf6PYN1vGwG5A=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-O387ite7SzUyCcy3JQX4P4bLtEA7bLLkx+esve5JHnyYfNTxcVpXZo9jhdB0lTKN44gztELTdU7nS8Nr16Fs1Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n4KqkOQrraxHJcgjM1RvwbigfQKIKJVpM7xp+KsxiyUSrRdIXnt73VhrPAx0fV44hgfmIVKjxMN9J1t5jySVkw=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-uq6suIWYP37qzGddBKPw5QEQPi6HiLGsO7UmkpfyaYNQ3D+rN6w6WfwH+nuqcGXWvawGwxOEroO4YGnFh95azw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n+I0BTSRIoy+d6RPKnEVwql5UwBJolytvY4mAOIEJorKlqgPII8ix6slVVrfZ5Tnj7glIZvloylbB/EJPMWEXw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-78XJTJkvPs0kz2w61301PJjXl4g7q3JqiYMZ/M/yVI73EHBrCRTgkhu9oqG7vPqq+a/yadEW8aD+agKlk5xrmg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-XlDnu2q5yoqems+xay6wSAcg9DDD7K9RLKZEBOMZm3ckNpJBvOX20tSfby8KfrrhINDyv9V2YVZKY/SpoGJI8w=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-pW4AC0P3it8c7do9MVM4p51FzHzdM/TZrerurgRcHJ2WTa1VQ1CIq18xncfpBJw4ojkiZZrKW2yIBWBP92j6Ug=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-CYbnj78HsIeA+DhgUKgFCfvNsTHFhMMrinUrMZpDXJXKN8T3XViTZ/+wtHeVxEWY8ewSzTFN+nRmSwO2tZaLUQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-loong64",
+          "version": "0.28.2",
+          "integrity": "sha512-buwkd8nsph4R+ajRvw0qM5Hja/TXQow3ptzWO2EbG/cqcIkHloRrdlBtQlshyYGTNFvfkfJ5tpPLVkY4DtsPfQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-mips64el",
+          "version": "0.28.2",
+          "integrity": "sha512-ZVykbDyk7519VwiNb9Lcj9m8XM6v5V9uKPvrEMkkEedVewf+0itkhahp4HDpgERXhwLRpWFypsGbG/J8s0QjJA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-CAXl+Dtd9UUuJd8pKKdwh6MLm3MUMiqMPmhZ3tTSXPqfyQ3vDl6R5hZdZ/kYojK4ofXtdfSv1tFq8XzWx3heNQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-riscv64",
+          "version": "0.28.2",
+          "integrity": "sha512-GeXCej4IQtU1B+QlDV8W/RRvbzI3O/Stss+/bCXv4lZls5WGRtu2a+3JkA3i4qIUlMXpcHebWpF8AkJhATowuA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-s390x",
+          "version": "0.28.2",
+          "integrity": "sha512-3H1weTYZPxt/WOhByszQZybS9w5lKzUn1FDMsgEChbHWQwHYQQRfBxgCcZvPhjHfKyJjIievvMmEUawJrdY9Dg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-4xTZr1FUmSoQW4XIWmit3tzQrUTZM+N3P0XV8xROKYF50XfI7xeO90+1bZvNwxIufQ9hDQVRJH5YhgPVF8A/HQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-sSATRjPeDBg3pdgHoQfoYBob11Kk1FGa9lui5RIHZCoCkJa9QKlvl3/vKz2usCmYYjs7ymJR/2Nnsqe+Hjt5nw=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-lqnzCV+mM0gIADaKihiCg6ifgfU2L3h5E33rNQBN1Y4MaVGnzryzmvvf7UHxprpQdE8hpqLolJ9Rl+SkIRDpyw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-AL2qJILH7lNjrDmCQDvdxMfAUIv8KMNZOvrwAQ8i8//ntL9FflhOyMJ8OZSMBb8/AWXe3/5v5S20y3zCoZWKoQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-QtiuPytchRyC4rwUKhexJdQKvDuZ6hWloi3igqPQNUJCS1/v9EiO3UTOXR6A3FoMo4fnAKbWJdqaIwhOzh8qEw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openharmony-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-WkhYDmpTjLvGlScA1rwjRUmhl4k8oXR3cIbtqWmELgU/dFeHHlEllxDvdWcNJV9rbzCexB5vz8gtNewWLgCT7Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/sunos-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-GPMSkTOtMnv2U2F8gxe4Io6qmVs+YKyp832Etqqxr0hFngmXQ3rzwytelm3GIn7T4VviRUlf3sOgBOiTdvaf7g=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-PIhhEkE9uPBleRBrQEJpUn7MBnibZzbGzYWPmY3x+YoVg/95zbjB4CxPPOQ8l5tYYM4mMaCthF8/1DIfBQQyWQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-YmJbfTlvU7Sdn9BB+4PRES4oB6pxgS37MAONj+hBr/cpXS1aBPKXxNnDbu+QCWPj0o9dgyxeq79g6c5P8KeuYA=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="
+        },
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/esbuild",
+          "version": "0.28.2",
+          "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/playwright",
+          "version": "1.65.0",
+          "integrity": "sha512-F3AMWcR44qMBt4kq+6Kb6mX7bjGXshktKFOPULd7reED6ZJWevjbNRqysP7q+AATE9kdPEZBibex1BYsvpVoeA=="
+        },
+        {
+          "path": "node_modules/playwright-core",
+          "version": "1.65.0",
+          "integrity": "sha512-vNSKgH6YqtN7cdT/L334zo0a+YwkrpicyrHJlWWPIm/Q+Nn2SWInil01oT0mbu96U4GgoRtCYQD9CzJQgju+lA=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/browser",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc",
+      "@chronolog/peer-session/webrtc-native"
+    ],
+    "testTools": [
+      "esbuild",
+      "playwright"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRpcMaps": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "browserAssets": [
+    {
+      "file": "app.mjs",
+      "sha256": "17aafe258ad98d7ec20b2d4cbb6630a0c7681aff3f295e34c7683a04186e0c2f"
+    },
+    {
+      "file": "board.html",
+      "sha256": "ac03488ef3f116d12e63fe5f2ab83382b048a3c7d70b343122d483e059d3058b"
+    },
+    {
+      "file": "chunk-ZEMRME45.mjs",
+      "sha256": "f78772b62ad51fbe80d3273c21339a3151b651fb3057c21efd777b9b0913ea7b"
+    },
+    {
+      "file": "compact.html",
+      "sha256": "087f00bcec57763bad44d01f1274d0017ed2177eda8095fdc4c40907193f0efe"
+    },
+    {
+      "file": "style.css",
+      "sha256": "8474c917190b0777cd76d3c9919b8b1ef09b6e1026841f1bbb5ccc9dc0a999b5"
+    },
+    {
+      "file": "worker.mjs",
+      "sha256": "90ab1034683805eab844ccde2ba7171b1d53e930d9a6daedb30e7c696895df91"
+    }
+  ],
+  "browserBundleInputs": [
+    "app.mjs",
+    "deployment/bootstrap.mjs",
+    "node_modules/@chronolog/peer-session/browser.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-3GMYKQAD.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-KSC4KBWO.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-TXI2NSHV.mjs",
+    "node_modules/@chronolog/peer-session/index.mjs",
+    "node_modules/@chronolog/peer-session/webrtc.mjs",
+    "peer-generation-browser-page.mjs",
+    "peer-generation-browser-worker.mjs",
+    "peer-generation-definition.mjs",
+    "recovery-choice.mjs",
+    "typing.mjs"
+  ],
+  "browser": {
+    "implementation": "chromium",
+    "version": "158.0.8127.18",
+    "headless": true,
+    "transportOwner": "dedicated-worker",
+    "storage": "opfs-with-exclusive-web-lock",
+    "transportComposition": {
+      "page": "serveWorkerWebRtcConnections",
+      "worker": "openWorkerWebRtcConnection",
+      "authentication": "session.connectPeer",
+      "fixtureControls": [
+        "connect",
+        "inspect",
+        "disconnect"
+      ],
+      "qualification": "explicit-transport-faults",
+      "applicationQueue": "owned-session-only"
+    },
+    "signalingBoundary": "loopback-fixture-http",
+    "controlBoundary": "chronolog-participant-over-loopback-http",
+    "nativeCandidateSource": "explicit-loopback-only",
+    "interfaceEnumeration": "disabled-by-native-options",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "observations": {
+      "notices": [],
+      "statuses": [
+        {
+          "phase": "ready",
+          "role": "coordinator",
+          "generation": "8d15c8e1df947ba628a70337c2e5d896fb028fc61855e7b31d2462800c3336e3",
+          "coordinator": "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08",
+          "connectedPeers": 0
+        }
+      ],
+      "secureContext": true,
+      "storage": true,
+      "locks": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36"
+    }
+  },
+  "executionManifestDigest": "bec3e62bedaf33320f4b379163498f73ba8388a707ca6c9de9ec7aa4a49266d0",
+  "ownership": {
+    "workerOnly": true,
+    "secondOwnerRefused": true,
+    "secondTabRefused": true,
+    "unsupportedStorageRefused": true,
+    "unsupportedFault": "Worker navigator.storage.getDirectory removed by the fixture",
+    "initialDeviceId": "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08",
+    "initialStorageId": "0ed3b967-5c31-45b7-ba9b-54a2c92ec13e",
+    "pagePrivateKeys": 0,
+    "freshDeviceAwaitedKeys": true,
+    "controlParticipant": {
+      "owner": "application-session",
+      "attachRequests": 0
+    },
+    "gracefulReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "storedKeysReused": true
+    },
+    "abruptWorkerReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "durableOperation": true,
+      "attempts": 1
+    }
+  },
+  "stage": "fresh peer replay and graceful plus abrupt Worker reopening passed",
+  "operations": {
+    "cancelledWaitPreservedAttempt": true,
+    "resumedExactAttempt": true,
+    "operationId": "129483c7-b2fd-46e9-b11f-9ff96145125e",
+    "attemptId": "faf83358006d3ad49990b3e16b17dace6c5e1e52a73cace95e5ca30379c08024",
+    "receiptPeer": "9024bc5ed754b839dc78ab4a30bfb99f173476cc80c7fabd5dc47f9c0481b073",
+    "enrolledFromPeer": true
+  },
+  "hostOutage": {
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "before": {
+      "controlRequests": 1,
+      "controlBodyBytes": 220,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1190
+    },
+    "after": {
+      "controlRequests": 1,
+      "controlBodyBytes": 220,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1190
+    },
+    "transport": {
+      "before": {
+        "reliable": {
+          "sentBytes": 59803,
+          "receivedBytes": 59803
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1102,
+          "closed": true
+        }
+      },
+      "after": {
+        "reliable": {
+          "sentBytes": 184866,
+          "receivedBytes": 184866
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1102,
+          "closed": true
+        }
+      }
+    },
+    "liveSignalsObserved": 1,
+    "content": {
+      "bytes": 32768,
+      "sha256": "430bd38d577dfb4bd51305a66571c4beb19bbc210b338e53df1702f5c04d8542",
+      "retainedByBrowser": true
+    },
+    "disposablePathsDidNotAppend": true,
+    "coherentReadView": true
+  },
+  "contentRecovery": {
+    "bytes": 131095,
+    "interruptedAfter": 65536,
+    "partialRetentionRefused": true,
+    "partialSurvivedRestart": true,
+    "unavailableRemainderRefused": true,
+    "completeAfterReconnect": true,
+    "retainedBy": "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08",
+    "retentionSignature": "6c861c70b51a2d84eb9dd671c860e42330b60c3cee21b23c493173f158d38dd98f18db49baafea800122c6805c33b83b153d81b2733e1076a1ac87182c0fa70c"
+  },
+  "recovery": {
+    "originatorClosed": true,
+    "originatorStoreUnavailable": true,
+    "priorHead": {
+      "generation": "2acd5388a65af88bd1ff4ff45be6ad3f82f00785ef0d50b2328b650313a9b031",
+      "sequence": 6,
+      "root": "8a0f0918e7f727fd8562388ec20009fd84777cca2aff06c94e63da44c8e041d0"
+    },
+    "adoptedPrefix": {
+      "generation": "2acd5388a65af88bd1ff4ff45be6ad3f82f00785ef0d50b2328b650313a9b031",
+      "sequence": 4,
+      "root": "f9bbea67f26c661f93f137e297e34565b4d9ea9c7d8a6b6fb003738f1e752f1e"
+    },
+    "selectedGeneration": "8d15c8e1df947ba628a70337c2e5d896fb028fc61855e7b31d2462800c3336e3",
+    "originalAttempt": {
+      "status": "needsReapply",
+      "attemptId": "b7a6092fd82954292b5c4777ef5689cb8aa28d1caff1db1d181751a9b8de9516",
+      "operationId": "edefb042-96a0-412e-965c-3e22f7411462",
+      "generation": "2acd5388a65af88bd1ff4ff45be6ad3f82f00785ef0d50b2328b650313a9b031",
+      "selectedGeneration": "8d15c8e1df947ba628a70337c2e5d896fb028fc61855e7b31d2462800c3336e3",
+      "previous": null
+    },
+    "reapplied": {
+      "status": "applied",
+      "attemptId": "00d46362fce0eb9341faf58fd592668899dcbf550a6a3ad234297663b3711751",
+      "operationId": "f7b26125-59c3-4954-b881-e5c144e7f577",
+      "author": "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08",
+      "generation": "8d15c8e1df947ba628a70337c2e5d896fb028fc61855e7b31d2462800c3336e3",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "capturedViewPreserved": true,
+    "staleCursorError": "RecoveredViewError",
+    "reapplyOf": "b7a6092fd82954292b5c4777ef5689cb8aa28d1caff1db1d181751a9b8de9516",
+    "currentGuardsChecked": true,
+    "noticesPersisted": 1,
+    "transitionJournalEntries": 1
+  },
+  "ui": {
+    "pages": [
+      "board.html",
+      "compact.html"
+    ],
+    "domain": "events",
+    "sessionFacade": "connectApplicationWorker",
+    "sentThroughForms": 3,
+    "reapplicationConfirmed": true,
+    "recoveryNoticeVisible": true,
+    "draftBeforeRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRecovery": "An unsent draft must survive page replacement and recovery.",
+    "originalReviewPreserved": true
+  },
+  "freshPeer": {
+    "deviceId": "a1f5c2a531c8f36a4c96367526b1abd1b27d0c387e286d199454fc1cb4890e27",
+    "joinedAfterOriginatorLoss": true,
+    "enrolledFromBrowser": true,
+    "generation": "8d15c8e1df947ba628a70337c2e5d896fb028fc61855e7b31d2462800c3336e3",
+    "browserViewSha256": "3aafa428c1f2a4678b07f8f836c31615cbfd4bdc86ae4f80e1aab173b9f07f14",
+    "nativeViewSha256": "3aafa428c1f2a4678b07f8f836c31615cbfd4bdc86ae4f80e1aab173b9f07f14"
+  },
+  "connections": [
+    {
+      "peers": [
+        "9024bc5ed754b839dc78ab4a30bfb99f173476cc80c7fabd5dc47f9c0481b073",
+        "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 165.70297900000003,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1102,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "9024bc5ed754b839dc78ab4a30bfb99f173476cc80c7fabd5dc47f9c0481b073",
+        "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 111.23607099999981,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1102,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "9024bc5ed754b839dc78ab4a30bfb99f173476cc80c7fabd5dc47f9c0481b073",
+        "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 106.15935400000012,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1103,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "a1f5c2a531c8f36a4c96367526b1abd1b27d0c387e286d199454fc1cb4890e27",
+        "20c46f66436e6ad83724aa1e3ed6b446d093e8560c31e586de62e7e834d4fd08"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 339.31602900000007,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1130,
+        "closed": true
+      },
+      "nativeClosed": true
+    }
+  ]
+}
