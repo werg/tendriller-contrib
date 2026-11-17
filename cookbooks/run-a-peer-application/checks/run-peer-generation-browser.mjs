@@ -71,7 +71,8 @@ try {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         '@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
-        './peer-generation-definition.mjs', './deployment/bootstrap.mjs', './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-definition.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
+        './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
       if (['playwright', 'esbuild'].includes(specifier)) tools.add(specifier);
     }
