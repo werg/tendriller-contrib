@@ -8,7 +8,7 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/482c4a4c079345d990bd4d97e42cb947dec6778a/packages/peer-session/README.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/bc281a356d387cf9b7b67cb1798ca8337ee54ef8/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
@@ -38,7 +38,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/482c4a4c079345d990bd4d97e42cb947dec6778a/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/bc281a356d387cf9b7b67cb1798ca8337ee54ef8/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
@@ -67,13 +67,16 @@ requires a public session package and complete real deployment assets.
 
 1. **Create or resume a device explicitly.** Enrollment establishes its grants and
    supplies authorized keys. Opening a missing or busy store must not silently
-   create a replacement identity. A second tab or process either reuses a
-   qualified storage owner or shows an explicit busy/handoff state.
+   create a replacement identity. Browser tabs can share the stable protocol
+   identity without opening application storage. The first data request acquires
+   its exclusive storage lock; another durable owner receives an explicit busy error.
 2. **Join the selected generation.** The session verifies cached authority and
    authenticates peers. A route advertisement is a discovery hint, not a grant.
-   Wait for a complete usable view before treating the application as ready.
-3. **Read coherently.** The conversation query returns its messages and one
-   revision. Keep that revision with any intent based on the displayed state.
+   Control, publication and live signals can operate while `status.database` is
+   `idle`.
+3. **Read coherently.** The first conversation query loads the durable component
+   and returns its messages with one coherent revision. Concurrent first queries
+   share initialization. Keep that revision with any intent based on the displayed state.
 4. **Post.** Submit one schema-validated domain command with a stable operation
    ID. The session persists the exact signed attempt before sending it. Applied
    accepted means that the selected sequence executed it; it does not promise

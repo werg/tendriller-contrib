@@ -11,9 +11,10 @@ applied work; the current session exposes no `final()` wait.
 The [peer application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
 uses packed public artifacts directly. Its
 [independent qualification record](../cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
-records exact clean native RTC, SQL and hosted runs and identifies the remaining
-browser, SDK recovery-policy and deployed-operation gates. An implementation or
-method name alone does not establish those additional qualifications.
+records exact clean native RTC, SQL, hosted and browser runs, together with the
+scope of each recovery and transport check. Deployed operating limits need
+their own observations. An implementation or method name alone does not
+establish those qualifications.
 The [historical implementation guide](finalized-peer-applications.md) preserves
 older source-specific results; their runtime fixtures and compatibility paths
 are not part of the supported composition.
@@ -40,6 +41,19 @@ application needs no SQL engine. Add SQL when assertions and relational updates
 make the domain simpler. Neither an agent nor a native process makes SQL or
 strong finality necessary.
 
+Opening the session starts its authenticated protocol participant. Identity,
+membership, control exchange, code publication and live signals use the same
+verified authority without opening application data. The first command, query,
+content request or durable observation loads the session's one data component.
+In the browser, small identity/control metadata uses IndexedDB; OPFS, its
+exclusive lock and any SQL/WASM engine wait for that data demand. Inspecting
+status or subscribing to status changes does not initialize the database.
+
+Protocol authorization belongs to the participant. The database consumes that
+verified authority and enforces the command's execution and domain guards.
+Database failure can make data operations unavailable while the authenticated
+control and live connection remain usable.
+
 ## Follow the authenticated selected history
 
 An authorized coordinating peer orders commands during one session generation. Other peers retain the original
@@ -48,10 +62,12 @@ coordinator is a temporary role. The creator and a native process are ordinary
 participants with explicit capabilities.
 
 Cloudflare publishes assets and supplies discovery, enrollment and occasional
-control/generation transitions. A healthy current generation keeps working with
-all host endpoints unavailable. Ordinary commands, queries, signals and peer
-replication have no hosted request, append, certificate or backup-acknowledgement
-requirement. If both the coordinator and control host are unavailable, keep
+control/generation transitions. Established direct peer connections keep a
+healthy current generation working while host endpoints are unavailable.
+WebSocket-relayed connections require the host's relay and consume its bandwidth;
+blocking control HTTP and blocking relay delivery are distinct faults. Ordinary
+commands and replication require no hosted append, certificate or backup
+acknowledgement. If both the coordinator and control host are unavailable, keep
 local drafts and wait to select a new generation.
 
 A recovery can adopt an earlier **complete prefix of the currently selected
