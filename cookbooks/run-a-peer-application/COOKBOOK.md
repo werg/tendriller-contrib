@@ -207,9 +207,10 @@ restore broader access through an old SQL snapshot.
 
 The events-only package check does not prove SQL replay or native/WASM
 conformance. The SQL path needs its own exact engine/profile/artifact evidence.
-The earlier [board/chat specimen](checks/README.md) remains a regression for the
-historical chronological implementation; relabeling its outcomes would not qualify SQL under
-`peer-generation-v1`.
+The [independent guarded-task gate](checks/README.md#sql-and-guarded-domain-commands)
+uses that public session and a packed native engine. Native SQL evidence does
+not qualify browser/WASM execution; each exact engine artifact needs its own
+conformance result.
 
 ## Keep live signals and external work separate
 

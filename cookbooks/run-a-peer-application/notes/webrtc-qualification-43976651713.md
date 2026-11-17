@@ -9,7 +9,7 @@ operations after the loopback introduction/page host had stopped.
 The [raw report](evidence/2026-11-16-43976651713-webrtc.json) is an exact byte copy
 from the downloaded workflow artifact. The
 [derived summary](evidence/2026-11-16-43976651713-webrtc-summary.json) passed the
-strict contrib [RTC evidence validator](../checks/webrtc-report.mjs). It preserves
+strict contrib [RTC evidence validator](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/checks/webrtc-report.mjs). It preserves
 the raw report hash, actual source/runtime identities, original operations and
 the precise scope of the observations.
 
