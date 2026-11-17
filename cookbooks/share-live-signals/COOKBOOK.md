@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/7d1baf3461a4d84a24a45867d448acb84e3515b7/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -69,6 +69,13 @@ Installation is separate from `tendril.application.install()`. If it happens asy
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
 
+The hosted channel is for authenticated owner devices and the configured agent.
+Guests and display sessions do not subscribe or publish. The host supplies the
+scope, authenticated author, session, sequence and freshness timestamps; it
+stores no signal payload or per-message durable metadata and never wakes a
+conversational agent for these messages. The connected agent explicitly listens
+when it needs live interaction.
+
 ```js
 await tendril.signals.send('typing', { typing: true }, { ttlMs: 2500 });
 
@@ -127,7 +134,7 @@ of implementing capability checks in application code.
 
 The standalone package is supplied as a dependency-free archive built from an
 exact Chronolog checkout; it is not yet published to npm. Follow the
-[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/7d1baf3461a4d84a24a45867d448acb84e3515b7/packages/signals/README.md#build-and-consume-the-standalone-package)
+[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/README.md#build-and-consume-the-standalone-package)
 and install that archive into the consuming application. Construct
 `new SignalChannel({ scope, identity, authorize })`; `generateSignalIdentity()`
 can create a fresh standalone identity. Keeping an identity across restarts is
@@ -157,6 +164,9 @@ the original frame to other live routes without rewriting the signature,
 identity or expiry. Closing a route cancels its pending sends. Closing the channel ends
 subscriptions; an unattached send fails immediately. The module provides no
 database, proposal, capability-log or finality dependency to configure.
+
+Publish fresh observations when capacity returns; never keep a durable retry
+queue for discarded signals.
 
 An agent can participate in the same way as another live endpoint. A disposable
 preview request, attention cue or immediate local Stop can be governed by its

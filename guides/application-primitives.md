@@ -43,13 +43,11 @@ the peer history does not automatically connect hosted signals; live transport
 composition remains an independent choice.
 
 Signed operations, immutable operation identity, timestamp ordering and
-deterministic replay are the reusable foundation. A collaboration policy decides
-which operations participate. The live policy adds finality and workers that
-consume final intents. A future asynchronous branch/merge policy can select and
-merge operations without any finality concept, API or operation states. Do not
-model a branch tip as finality or impose the live worker contract on it. Such a
-mode needs its own explicit execution/effect policy; it is not implemented or
-selected by the live recipes here.
+deterministic replay are the foundation of this shipped profile. Its selected
+finality provider closes a prefix, and effect workers consume accepted intent
+from that prefix. The page's immutable backend selection is explicit: omitting
+it selects Tendriller's hosted Cloudflare backend, not a peer replica. Neither
+selection changes the independent live-signal contract.
 
 For the current live profile, an offline proposal can become too old to enter an
 already closed prefix. Preserve that original proposal and its rejection. Retry
@@ -136,6 +134,11 @@ base64url identities; signed author time is a decimal string. A null writer
 grant denotes an explicitly configured static membership resolver, not an
 implicit privilege. Keep the authenticated origin intact across checkpoints.
 
+Chronolog's durable worker also retains the origin in its dispatch checkpoint,
+so recovery cannot lose the authenticated requester while preserving only their
+text. The origin describes historical publication rights; application policy
+still decides current instruction authority and holds actual tool credentials.
+
 Select a finality provider for the durable history independently of the page host
 and effect worker. The fixed native provider is an implementation of that role,
 not a requirement that every signal, page or agent action pass through one
@@ -167,6 +170,9 @@ for the immutable result. Both return accepted or rejected outcomes. Inspect
 Dependent work requires an accepted result from `final()`; handle its final
 rejection explicitly and preserve the reviewed draft.
 A provisional success never releases dependent work or an irreversible effect.
+The public operation type reflects this directly: queued has no outcome, while
+provisional and final require one. An exact retry can immediately return its
+original final receipt; it does not restart the lifecycle.
 
 An inclusion receipt alone cannot establish either final application outcome.
 A final accepted operation also does not establish that another peer has a

@@ -55,6 +55,7 @@ test('job replay preserves the authenticated requester separately from its resul
   const completed = jobResult(2, request);
   completed.origin = { ...completed.origin, authorId: 'resident-worker' };
   completed.payload.requestOrigin = { authorId: 'spoofed-owner' };
+  completed.payload.result.authorId = 'forged-operator';
   const source = batch([request, completed]);
   const job = reduceBatch(emptyProjection(), source).jobs[0];
   assert.deepEqual(job.requestOrigin, request.origin);

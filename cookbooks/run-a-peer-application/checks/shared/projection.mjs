@@ -17,7 +17,7 @@ const advance = (state, update = {}, omitted = false) => ({
 });
 
 export function reduceEvent(state, event) {
-  // Task rows come from the captured SQL query; these events only wake that read.
+  // Task rows come from the captured SQL query; view invalidation drives reads.
   if (event.topic === 'tasks') return advance(state);
   const data = event.payload;
   // Topic grants authorize publication, not this page's application vocabulary.

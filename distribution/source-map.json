@@ -396,7 +396,7 @@
     {
       "id": "share-live-signals",
       "sources": [
-        "https://github.com/werg/chronolog-db/blob/7d1baf3461a4d84a24a45867d448acb84e3515b7/packages/signals/src/index.ts"
+        "https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/src/index.ts"
       ]
     },
     {
