@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import {
-  AbandonedOperationError, applicationDefinitionDigest, bytesDigest,
+  AbandonedOperationError, applicationDescriptionDigest, bytesDigest,
   createGenerationRegistry, describeApplication, eventExecutionManifest,
   executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest,
 } from '@chronolog/peer-session';
@@ -59,8 +59,8 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
       configuration: {
         historyId: 'independent-peer-conversation',
         executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
-        definitionDigest: await applicationDefinitionDigest(conversation), definition: describeApplication(conversation),
-        schemaAdministrator: hostDevice.identity.publicKey, schemaDigest: null,
+        definition: describeApplication(conversation),
+        schemaAdministrator: hostDevice.identity.publicKey, schema: null,
         epoch: 0, keyDigest: await bytesDigest(epochKey),
         members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC }) })),
       },
@@ -264,8 +264,10 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
 }
 
 async function createPortableControl({ applicationId, hostDevice, configuration }) {
-  const { definition: _definition, members, epoch, keyDigest, ...description } = configuration;
+  const { definition, schema, members, epoch, keyDigest, ...description } = configuration;
+  assert.equal(schema, null, 'This independent conversation uses the events profile');
   const descriptor = await signApplicationDescriptor({ ...description, applicationId,
+    definitionDigest: await applicationDescriptionDigest(definition), schemaDigest: null,
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: hostDevice.identity.publicKey,
   }, hostDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,

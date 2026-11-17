@@ -56,7 +56,7 @@ try {
   }, controlDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
     revision: 0, previous: null, epoch: 0, keyDigest: await bytesDigest(epochKey), recoveryFloor: null,
-    grants: [workerDevice.deviceId, device.identity.publicKey].map(key => participantGrant(key, { administrator: true })) }, controlDevice.identity);
+    grants: [workerDevice.deviceId, device.identity.publicKey].map(key => participantGrant(key, { dataRole: 'member', administrator: true })) }, controlDevice.identity);
   const registry = await createGenerationRegistry({ store: controlDevice.store, descriptor, controls: [control], signer: controlDevice.identity });
   const select = async (coordinator, expectedGeneration, base, transitionId, reason = 'takeover') => registry.select(await signTransitionRequest({
     applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
@@ -97,7 +97,7 @@ try {
   const bytesAfter = link.native.stats.sentBytes + link.native.stats.receivedBytes;
   assert.ok(bytesAfter > bytesBefore);
   report.hostOutage = { boundary: 'loopback-static-page-and-sdp', blockedProbeStatus: 503,
-    requests: { before: requestsBefore, after: host.requests }, applicationBodyBytes: 0,
+    requests: { before: requestsBefore, after: host.requests }, applicationBodyBytes: host.applicationBodyBytes,
     commandsApplied: 2, liveSignalsObserved: 1, reliableBytes: { before: bytesBefore, after: bytesAfter },
     signalingClosed: introductions.every(value => value.closed()) };
   host.blocked = false;
@@ -144,12 +144,15 @@ try {
   const nativeRecovered = await native.query('conversation', {});
   assert.notEqual(beforeRecovery.revision.generation, recovered.revision.generation);
   assert.deepEqual(recovered.value, nativeRecovered.value);
+  assert.deepEqual(await call('operation', { id: 'browser-retained' }), beforeRestart);
   assert.equal((await call('operation', { id: 'browser-abandoned' })).status, 'abandoned');
   await assert.rejects(call('retry', { id: 'browser-abandoned' }), /abandoned|Abandoned|ABANDONED/u);
   link = await connect(); await synchronize(link);
   assert.deepEqual((await query()).value, recovered.value, 'Returning Worker must not import its excluded tail');
   const reapplied = await call('reapply', { originalId: 'browser-abandoned', id: 'browser-reapplied', text: 'Explicitly reviewed after recovery' });
   assert.equal(reapplied.outcome, 'accepted'); assert.notEqual(reapplied.attemptId, abandoned.attemptId);
+  const reapplication = await call('inspectOperation', { id: 'browser-reapplied' });
+  assert.equal(reapplication.attempt.payload.header.reapplyOf, abandoned.attemptId);
   const retention = await call('retain', { reference });
   assert.equal(retention.payload.peer, workerDevice.deviceId);
   assert.equal(retention.payload.storageId, workerDevice.storageId);
@@ -159,7 +162,8 @@ try {
     adoptedPosition: retained.point.sequence, recoveredDigest: hash(recovered.value), nativeDigest: hash(nativeRecovered.value),
     coherentReset: true, inheritedIdentityPreserved: true, abandonedOperationId: abandoned.operationId,
     abandonedAttemptId: abandoned.attemptId, returningTailExcluded: true, retryRefused: true,
-    reappliedOperationId: reapplied.operationId, reappliedAttemptId: reapplied.attemptId };
+    reappliedOperationId: reapplied.operationId, reappliedAttemptId: reapplied.attemptId,
+    reapplyOf: reapplication.attempt.payload.header.reapplyOf };
   await synchronize(link);
   assert.deepEqual((await query()).value, (await native.query('conversation', {})).value);
   assert.equal(report.browser.runtimeErrors.length, 0);
@@ -211,7 +215,7 @@ async function closeLink(link) {
 async function writeReport() { await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`); }
 
 async function serve() {
-  let requests = 0, blocked = false, sequence = 0;
+  let requests = 0, applicationBodyBytes = 0, blocked = false, sequence = 0;
   const sessions = new Map();
   const replacements = new Map([['@chronolog/peer-session/browser', '/package/browser.mjs'],
     ['@chronolog/peer-session/webrtc', '/package/webrtc.mjs'], ['@chronolog/peer-session', '/package/index.mjs']]);
@@ -219,13 +223,14 @@ async function serve() {
   const server = createServer(async (request, response) => {
     requests++;
     try {
-      if (blocked) { response.writeHead(503).end('Host unavailable'); return; }
       const path = new URL(request.url, 'http://localhost').pathname;
       const signal = /^\/signaling\/(\d+)\/(send|next|close)$/u.exec(path);
+      const chunks = []; let size = 0;
+      for await (const chunk of request) { size += chunk.length; assert.ok(size < 65_536); chunks.push(chunk); }
+      if (!signal) applicationBodyBytes += size;
+      if (blocked) { response.writeHead(503).end('Host unavailable'); return; }
       if (signal) {
         const item = sessions.get(signal[1]); assert.ok(item);
-        const chunks = []; let size = 0;
-        for await (const chunk of request) { size += chunk.length; assert.ok(size < 65_536); chunks.push(chunk); }
         let value;
         if (signal[2] === 'send') { item.send(1, JSON.parse(Buffer.concat(chunks).toString())); value = { sent: true }; }
         else if (signal[2] === 'next') value = await item.receive(1);
@@ -244,6 +249,7 @@ async function serve() {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   return { url: `http://127.0.0.1:${server.address().port}`, get requests() { return requests; },
+    get applicationBodyBytes() { return applicationBodyBytes; },
     set blocked(value) { blocked = value; },
     introduction() {
       const id = `${++sequence}`, incoming = [deferred(), deferred()], closed = [false, false];

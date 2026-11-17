@@ -17,6 +17,9 @@ export function createHostedFixture(base) {
     async createControl({ applicationId, configuration }) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });
       const configured = await request('/api/peers/application', { method: 'PUT', body: configuration });
+      const published = await request('/api/peers/definition');
+      assert.deepEqual(published.definition, configuration.definition);
+      assert.deepEqual(published.schema, configuration.schema);
       return {
         descriptor: configured.descriptor, boundary: 'tendriller-workerd-http',
         read: () => request('/api/peers/application'),

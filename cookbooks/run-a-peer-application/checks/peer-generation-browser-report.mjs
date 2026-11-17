@@ -49,6 +49,7 @@ export function validatePeerBrowserReport(report) {
   assert.notEqual(recovery.reappliedOperationId, recovery.abandonedOperationId);
   hex(recovery.abandonedAttemptId, 64); hex(recovery.reappliedAttemptId, 64);
   assert.notEqual(recovery.reappliedAttemptId, recovery.abandonedAttemptId);
+  assert.equal(recovery.reapplyOf, recovery.abandonedAttemptId);
   const content = report.content;
   assert.ok(Number.isSafeInteger(content?.bytes) && content.bytes > 65_536);
   assert.equal(content.interruptedAfter, 65_536);

@@ -31,6 +31,7 @@ async function handle(action, args) {
       return operation.applied({ signal: AbortSignal.timeout(15_000) });
     }
     case 'operation': return session.operations.get(args.id);
+    case 'inspectOperation': return session.operations.inspect(args.id);
     case 'retry': await session.retry(args.id); return session.operations.get(args.id);
     case 'point': return session.recoveryPoint();
     case 'signTransition': return signTransitionRequest(args, device.identity);
