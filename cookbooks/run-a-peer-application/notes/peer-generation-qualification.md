@@ -9,6 +9,27 @@ independent package gate. Its [small synthetic tests](../checks/peer-generation-
 check whether incomplete or contradictory evidence is refused. Passing those
 tests is not evidence that a peer session, browser, network or deployment ran.
 
+## Preserved development run
+
+The [2026-11-17 development report](evidence/2026-11-17-peer-generation-preview-report.json)
+and its [checked summary](evidence/2026-11-17-peer-generation-preview-summary.json)
+record a successful independent native/events execution using the packed public
+session. They cover exact retry after a lost reply, two commands with the portable
+control port blocked, recovery from sequence 6 to a retained prefix at sequence 4,
+a fresh peer replay, returning old-branch isolation, deliberate linked reapplication,
+a third-generation ancestry check, and reopening the same durable device.
+
+Both source checkouts were dirty in that run. Its package archive SHA-256 is
+`f8dffca220e8b0aaa57e0e3e616cda48ab7cd2922fada6750afbbcf89c3c49c1`.
+This preserves the observed development result; it does not qualify a clean
+release artifact, actual HTTP control routes, physical WebRTC, browser storage,
+deployed networks, or a recovery-age bound. Those scopes need their own execution.
+
+The manually dispatched `Independent peer-generation consumer` workflow builds
+an exact Chronolog source revision and runs the same isolated public consumer.
+It uploads its artifact, provenance, raw report and checked summary even when a
+later assertion fails. Its existence is not a claim that CI has run.
+
 ## Public consumer boundary
 
 The runtime consumer must install an explicitly supplied `@chronolog/peer-session`

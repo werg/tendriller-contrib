@@ -1,0 +1,51 @@
+name: Independent peer-generation consumer
+on:
+  workflow_dispatch:
+    inputs:
+      chronolog_ref:
+        description: Exact Chronolog source commit containing the public peer-session package
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: peer-generation-${{ github.head_ref || github.ref_name }}-${{ inputs.chronolog_ref }}
+  cancel-in-progress: true
+jobs:
+  public-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.12.4'
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/chronolog-db
+          ref: ${{ inputs.chronolog_ref }}
+          path: .chronolog-build
+      - name: Install pinned build dependencies without lifecycle scripts
+        working-directory: .chronolog-build
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build clean public session archive
+        working-directory: .chronolog-build
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session
+      - name: Exercise independent application through the packed public API
+        shell: bash
+        run: |
+          archives=(.chronolog-build/artifacts/peer-session/chronolog-peer-session-*.tgz)
+          test "${#archives[@]}" -eq 1
+          node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --output test-results/peer-generation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-peer-generation-evidence
+          path: |
+            test-results/peer-generation/report.json
+            test-results/peer-generation/summary.json
+            .chronolog-build/artifacts/peer-session/*.tgz
+            .chronolog-build/artifacts/peer-session/package/provenance.json
