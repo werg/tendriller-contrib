@@ -23,6 +23,124 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
+## Lazy data and protocol authorization: `ed10bceb`
+
+The complete seven-gate composition passed in
+[core run 44165092053](https://github.com/werg/chronolog-db/actions/runs/44165092053),
+job `134328887826`, including the strict composition assembler. The unchanged
+[composition](evidence/2026-11-17-ci-composition-ed10bceb/composition.json) and
+[origin index](evidence/2026-11-17-ci-composition-ed10bceb/origin.json) bind this
+checkpoint to the following clean sources:
+
+| Source | Qualified commit | Verified tree |
+| --- | --- | --- |
+| Chronolog actual CI merge | `ed10bceb25f2befc33b4354180b7fa1a291bb616` | `a6b7ab1b8c89e1f2117317e50fe128011a8404d7` |
+| Chronolog branch head | `b6e3f2774bb82d52755359df3a415133f3018f07` | The same exact tree as the CI merge |
+| Tendriller | `7a6187213ebdaeaf676a3d1e2804b0281f76588c` | `2137762f8bc126978e114a40df6bda33f54e26fb` |
+| Independent consumer | `e90096809fa1fed4abf4f2fa57ce87a07307a9ac` | `be90b26bc105b3f5256cfbe5eabd5bfc8b04fe3d` |
+
+The protocol participant starts immediately. Identity, verified membership,
+control, signed code publication and live exchange belong to that participant.
+The one durable component loads on a real command, query, content request or
+durable observation and consumes the same verified authority. The public SQL
+opening API accepts a `createEngine` factory, invoked at that first data demand.
+Database execution and domain guards remain part of applying commands. These
+are component lifetimes inside the common session, not application profiles.
+The [public session contract](https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/packages/peer-session/README.md)
+documents the boundary and the distinct protocol/data status fields.
+
+| Gate | Actual observed boundary | Raw evidence |
+| --- | --- | --- |
+| Native events | Public session, exact retry, inherited recovery and owned participation | [Report](evidence/2026-11-17-ci-composition-ed10bceb/native-events/report.json) |
+| Native RTC | The same application over actual native loopback RTC | [Report](evidence/2026-11-17-ci-composition-ed10bceb/native-rtc/report.json) |
+| Browser RTC | Chromium Worker/OPFS, protocol before data, concurrent first queries, content and recovery | [Report](evidence/2026-11-17-ci-composition-ed10bceb/browser-worker/report.json) |
+| Native SQL | Actual native engine, guarded task commands, coherent views and recovery | [Report](evidence/2026-11-17-ci-composition-ed10bceb/native-sql/report.json) and [SQL public boundary](evidence/2026-11-17-ci-composition-ed10bceb/native-sql/public-boundary-report.json) |
+| Hosted participant | Workerd controls, facet filtering, signed code publication, restart and direct peers | [Report](evidence/2026-11-17-ci-composition-ed10bceb/hosted-participant/report.json) |
+| Native WebSocket relay | Forced direct failure, automatic relay selection, reconnect and retained recovery | [Report](evidence/2026-11-17-ci-composition-ed10bceb/hosted-websocket-relay/report.json) |
+| Browser WebSocket relay | The same real Worker/OPFS application through actual relay sockets | [Report](evidence/2026-11-17-ci-composition-ed10bceb/browser-websocket-relay/report.json) |
+
+### Observed browser loading boundary
+
+Both browser gates used Chromium `158.0.8127.18`. Before data demand, they
+verified the application definition, published and read the signed code
+manifest, checked the served code digest, and exchanged live messages in both
+directions. A small native IndexedDB store retained the identity and protocol
+metadata. The measured durable-module set comes from the emitted package graph
+and actual browser requests, so the check covers code loading as well as storage
+calls.
+
+| Observation in each browser gate | Protocol and live exchange | Three concurrent first queries |
+| --- | --- | --- |
+| Owning Workers | 1 | The same 1 |
+| Identity metadata stores opened | 1 | The same 1 |
+| Durable modules requested | 0 | 3 |
+| OPFS roots opened | 0 | 1 |
+| Exclusive database locks requested | 0 | 1 |
+| Database status | `idle` | `opening`, then `ready` |
+| Device identity | Established protocol signer | Unchanged |
+
+The real concurrent fresh-tab case also verified one winning signer and one
+signed publication. Unsupported OPFS and a competing durable owner fail at the
+actual data request. Closing an unused participant leaves application storage
+unopened; closing the active participant releases its lock. The
+[RTC summary](evidence/2026-11-17-ci-composition-ed10bceb/browser-worker/summary.json)
+and [relay summary](evidence/2026-11-17-ci-composition-ed10bceb/browser-websocket-relay/summary.json)
+retain these assertions. The browser relay fixture supplies explicit transport
+connections; the native relay gate separately exercises automatic fallback.
+
+### Concurrent metadata regression and correction
+
+The earlier `bc281a35` source failed during simultaneous fresh browser starts
+with `APPLICATION_DEVICE_KEYS_MISSING`. Its
+[unchanged failed report and origin](evidence/2026-11-17-device-metadata-race-24962743/origin.json)
+remain a separate baseline. Atomic initialization could commit between the
+signer read and the immutable binding read. The correction confirms the signer
+once when that binding has appeared; genuinely missing keys still fail.
+
+The [before-fix regression log](evidence/2026-11-17-device-metadata-race-24962743/reproduced.log)
+records the exact error for both explicit creation and resume. The
+[focused corrected run](evidence/2026-11-17-device-metadata-race-24962743/fixed.log)
+passes all 30 device/session cases. The final browser fixtures still start both
+fresh Workers concurrently, and both final browser gates pass. This was a
+shared identity-storage race, not a WebSocket-specific execution path.
+
+### Integrity, verification and scope
+
+The downloaded CI artifact is 9,475,512 bytes with SHA-256
+`f8a779d37448d8fb4d28832ad88569b8fd0ca9eb304fb24a746aa06aa9ed7c3f`.
+All seven raw report hashes match the unchanged composition, SHA-256
+`5f0629e309c90af44c3b229c6f81c6c492c4bdad51987ba270aff72fd4861d83`.
+Independent local reassembly reproduces that composition exactly. Verification
+checked all 135 RTC package files, 168 SQL package files and seven host-engine
+files, along with all five archive digests and embedded control provenance.
+The [package verification index](evidence/2026-11-17-ci-composition-ed10bceb/provenance/verified-packages.json)
+retains those identities. Native and browser runners now use the same installed
+artifact verifier, including the complete emitted module graph; composition
+still rejects any unequal identity for the same package version.
+
+The separate clean `b6e3f277` combined package includes native RTC, native SQL
+and the browser SQL entry. Its
+[verification](evidence/2026-11-17-ci-composition-ed10bceb/local-combined-package/verification.json)
+and [provenance](evidence/2026-11-17-ci-composition-ed10bceb/local-combined-package/provenance.json)
+record 177 verified files and 30 emitted modules. Its eager-import graph and
+strict public declarations passed. This packaging check is separate from the
+seven executed application gates.
+
+[Core quality run 44165092122](https://github.com/werg/chronolog-db/actions/runs/44165092122)
+passed lint, types, documentation, build, coverage and public artifact checks:
+598 tests passed and six engine cases were skipped in the general run. Linux
+and macOS conformance and their portable digest comparison all passed.
+The remaining six native/WASM engine comparisons passed in
+[dedicated run 44165092083](https://github.com/werg/chronolog-db/actions/runs/44165092083).
+
+The actual browser application gates use the events runtime. Complete browser
+SQL/WASM application integration with an OPFS VFS remains separately
+unqualified; an external VFS provider retains its own pool-cleanup responsibility.
+Deployed authentication, real WSS/home/mobile/restrictive networks, sustained
+quota/suspension/churn, provider/device cost and a fresh unassisted deployment
+study remain outside this local composition. The earlier source-specific
+records below retain their original scope.
+
 ## WebSocket transport contract
 
 The accepted relay path is direct WebRTC with authenticated WebSocket fallback;
@@ -882,10 +1000,10 @@ study is not erased by combining their results.
 
 | Plan gate | Implemented and observed | Remaining acceptance boundary |
 | --- | --- | --- |
-| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `2209cd27` composition verifies the common encrypted channel across RTC/WebSocket and complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
-| G1 — Remove hosted steady-state commands | The `2209cd27` direct gates pass host-blocked work. The host enforces its control participant facet policy. Native automatic WebSocket fallback and actual browser Worker relay gates pass with explicit positive relay byte traffic; control HTTP remains separate. | Deployed direct/WSS relay routes and provider traffic/cost require measurement. The direct zero-host-byte result does not apply to relay transit. |
-| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `2209cd27` direct/RTC/hosted/relay lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
-| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `2209cd27` SQL, host, direct Chromium and browser relay gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
+| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `ed10bceb` composition verifies the common encrypted channel across RTC/WebSocket and complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
+| G1 — Remove hosted steady-state commands | The `ed10bceb` direct gates pass host-blocked work. The host enforces its control participant facet policy. Native automatic WebSocket fallback and actual browser Worker relay gates pass with explicit positive relay byte traffic; control HTTP remains separate. | Deployed direct/WSS relay routes and provider traffic/cost require measurement. The direct zero-host-byte result does not apply to relay transit. |
+| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `ed10bceb` direct/RTC/hosted/relay lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
+| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `ed10bceb` SQL, host, direct Chromium and browser relay gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
 | G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, WSS relay fallback, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
 ## Public consumer and evidence boundary

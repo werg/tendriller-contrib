@@ -1,0 +1,1479 @@
+{
+  "format": "peer-generation-consumer-summary/v1",
+  "profile": "peer-generation-v1",
+  "executionManifestDigest": "bec3e62bedaf33320f4b379163498f73ba8388a707ca6c9de9ec7aa4a49266d0",
+  "topology": "independent-packed-peers",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "e90096809fa1fed4abf4f2fa57ce87a07307a9ac",
+    "tree": "be90b26bc105b3f5256cfbe5eabd5bfc8b04fe3d",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-ged10bceb-sql",
+      "sha256": "a63abbf343ef1b010db330cbb1febb0e81339263582186e715ae476610cfb95e",
+      "sourceCommit": "ed10bceb25f2befc33b4354180b7fa1a291bb616",
+      "sourceTree": "a6b7ab1b8c89e1f2117317e50fe128011a8404d7",
+      "sourceDirty": false,
+      "provenance": {
+        "sha256": "da0a01f7fead170a58adddf5c66f12858ddf1c91d90dd8964724765aead9731c",
+        "profile": "peer-generation-v1",
+        "optionalNativeRtc": false,
+        "sqlEngines": [
+          "native"
+        ],
+        "runtimeModules": {
+          "sql-native.mjs": {
+            "inputs": [
+              "packages/materializer-doltlite/src/driver.ts",
+              "packages/materializer-doltlite/src/native.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-7GEZCIAL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-BWLS7RBL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-2WXPDPNS.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "#chronolog-peer-native-engine",
+                "kind": "import-statement",
+                "external": true
+              }
+            ]
+          },
+          "chunks/replica-SI55V3NA.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/replica.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/application-data-AUSTLEKZ.mjs": {
+            "inputs": [
+              "packages/peer-session/src/application-data.ts",
+              "packages/peer-session/src/content.ts",
+              "packages/peer-session/src/keys.ts",
+              "packages/peer-session/src/projection.ts",
+              "packages/peer-session/src/recovery.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-BWLS7RBL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-2WXPDPNS.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/browser-SW3X3CUF.mjs": {
+            "inputs": [
+              "packages/records/src/browser.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/browser-SRRLIHZS.mjs": {
+            "inputs": [
+              "packages/materializer-doltlite/src/load-engine.ts",
+              "packages/materializer-doltlite/src/wasm-engine.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-7GEZCIAL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-BWLS7RBL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-2WXPDPNS.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-7GEZCIAL.mjs": {
+            "inputs": [
+              "packages/materializer-doltlite/src/checkpoints.ts",
+              "packages/materializer-doltlite/src/database.ts",
+              "packages/materializer-doltlite/src/engine-manifest.ts",
+              "packages/materializer-doltlite/src/manifest.ts",
+              "packages/materializer-doltlite/src/materializer.ts",
+              "packages/materializer-doltlite/src/peer-controls.ts",
+              "packages/materializer-doltlite/src/platform/digest.ts",
+              "packages/materializer-doltlite/src/platform/schema.ts",
+              "packages/materializer-doltlite/src/platform/sealed.ts",
+              "packages/materializer-doltlite/src/platform/session.ts",
+              "packages/materializer-doltlite/src/platform/tables.ts",
+              "packages/materializer-doltlite/src/runtime-adapter.ts",
+              "packages/materializer-doltlite/src/snapshot-evidence.ts",
+              "packages/materializer-doltlite/src/sql-executor.ts",
+              "packages/materializer-doltlite/src/sql-profile.ts",
+              "packages/materializer-doltlite/src/sql-values.ts",
+              "packages/materializer-doltlite/src/system-log.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-BWLS7RBL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-BWLS7RBL.mjs": {
+            "inputs": [
+              "packages/materializer/src/event-store.ts",
+              "packages/materializer/src/events.ts",
+              "packages/materializer/src/runtime.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-2WXPDPNS.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "index.mjs": {
+            "inputs": [
+              "packages/peer-session/src/tools.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-2WXPDPNS.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-EO5AVAZY.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-2WXPDPNS.mjs": {
+            "inputs": [
+              "packages/materializer/src/manifest.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "native.mjs": {
+            "inputs": [
+              "packages/peer-session/src/native.ts",
+              "packages/records/src/native.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-EO5AVAZY.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "node:fs",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "node:path",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "node:sqlite",
+                "kind": "import-statement",
+                "external": true
+              }
+            ]
+          },
+          "browser.mjs": {
+            "inputs": [
+              "packages/peer-session/src/worker-application.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-TWP6P5ES.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "worker.mjs": {
+            "inputs": [
+              "packages/peer-session/src/browser-device.ts",
+              "packages/peer-session/src/browser-metadata.ts",
+              "packages/peer-session/src/worker-application-server.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-TWP6P5ES.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-EO5AVAZY.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/browser-SW3X3CUF.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-TWP6P5ES.mjs": {
+            "inputs": [
+              "packages/peer-session/src/worker-application-protocol.ts"
+            ],
+            "imports": []
+          },
+          "webrtc.mjs": {
+            "inputs": [
+              "packages/peer-session/src/webrtc.ts",
+              "packages/peer-session/src/worker-transport.ts",
+              "packages/transport-webrtc/src/channel.ts",
+              "packages/transport-webrtc/src/http.ts",
+              "packages/transport-webrtc/src/live.ts",
+              "packages/transport-webrtc/src/negotiation.ts",
+              "packages/transport-webrtc/src/route.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "websocket.mjs": {
+            "inputs": [
+              "packages/transport-websocket/src/index.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "tendriller.mjs": {
+            "inputs": [
+              "packages/peer-session/src/tendriller.ts"
+            ],
+            "imports": []
+          },
+          "sql.mjs": {
+            "inputs": [
+              "packages/peer-session/src/sql.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-EO5AVAZY.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/browser-SRRLIHZS.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-EO5AVAZY.mjs": {
+            "inputs": [
+              "packages/peer-session/src/control-participant.ts",
+              "packages/peer-session/src/deferred-stream.ts",
+              "packages/peer-session/src/definition.ts",
+              "packages/peer-session/src/device.ts",
+              "packages/peer-session/src/metadata.ts",
+              "packages/peer-session/src/network-wire.ts",
+              "packages/peer-session/src/network.ts",
+              "packages/peer-session/src/participation.ts",
+              "packages/peer-session/src/runtime.ts",
+              "packages/peer-session/src/secure-channel.ts",
+              "packages/peer-session/src/session-authority.ts",
+              "packages/peer-session/src/session.ts",
+              "packages/signals/src/index.ts",
+              "packages/signals/src/payload.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-SU37NNGG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-DWOJ27RL.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/application-data-AUSTLEKZ.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-SU37NNGG.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/index.ts",
+              "packages/peer-session/src/operation.ts",
+              "packages/peer-session/src/projection-types.ts",
+              "packages/peer-session/src/session-types.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/replica-SI55V3NA.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-DWOJ27RL.mjs": {
+            "inputs": [
+              "packages/crypto/src/epoch.ts",
+              "packages/crypto/src/hpke.ts",
+              "packages/peer-generation/src/attempt.ts",
+              "packages/peer-generation/src/control.ts",
+              "packages/peer-generation/src/participant.ts",
+              "packages/peer-generation/src/publication.ts",
+              "packages/peer-generation/src/schema.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-J7KQNIDE.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-TLZH7OYA.mjs": {
+            "inputs": [
+              "packages/peer-session/src/errors.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-J7KQNIDE.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/codec.ts",
+              "packages/peer-generation/src/control-types.ts",
+              "packages/peer-generation/src/definition.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-3XAYEGPO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-3XAYEGPO.mjs": {
+            "inputs": [
+              "packages/protocol/src/bytes.ts",
+              "packages/protocol/src/cbor.ts",
+              "packages/protocol/src/errors.ts",
+              "packages/protocol/src/messages.ts",
+              "packages/protocol/src/platform.ts",
+              "packages/protocol/src/primitives.ts",
+              "packages/protocol/src/program.ts",
+              "packages/protocol/src/row-key.ts",
+              "packages/protocol/src/schema.ts",
+              "packages/protocol/src/sealed.ts",
+              "packages/protocol/src/sql.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-G37HV3SX.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-G37HV3SX.mjs": {
+            "inputs": [
+              "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/_md.js",
+              "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha2.js",
+              "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha256.js",
+              "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/utils.js",
+              "packages/canonical/src/bytes.ts",
+              "packages/canonical/src/cbor.ts",
+              "packages/canonical/src/errors.ts",
+              "packages/canonical/src/hash.ts",
+              "packages/canonical/src/sync-hash.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-KSC4KBWO.mjs": {
+            "inputs": [
+              "packages/peer-session/src/lifetime.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-PFEHSVTG.mjs": {
+            "inputs": [
+              "packages/records/src/bytes-store.ts",
+              "packages/records/src/live-channel.ts",
+              "packages/records/src/message-channel.ts"
+            ],
+            "imports": []
+          }
+        },
+        "files": {
+          "engine/index.cjs": "e1ac713858686514647f04829f6521f40c49d710981f636c4346c67006136b65",
+          "engine/index.d.ts": "3046ef74de4b863ba0d842f435594679afbe8bd043f8807e946285f6e2488232",
+          "engine/package.json": "fd0d39b5eaf85664346ec00d803b0c5f5eee7c0b3684c68e302899a385a10636",
+          "engine/build/Release/doltlite.node": "cca093a1ca607b5d8478515f04ae27c03893af0a91ce91a9c566c6aa4fe961d4",
+          "sql-native.mjs": "30ef0b7687d5f9a197407cd80216684581f9404a3ec4dfb037036ce597f6ef42",
+          "chunks/replica-SI55V3NA.mjs": "cfe5a53b6d8af0a4ebcbdd34511e0baf194da7c43a5bf82436144d4a481f4d3d",
+          "chunks/application-data-AUSTLEKZ.mjs": "b90e22e5eb07c23e6f8f1f3b98cd9d11bf5b97a43572cccde4874a7ef9b183c6",
+          "chunks/browser-SW3X3CUF.mjs": "51d92e5e837a75e857e6691a7ad6280bdef5c3a4323eff57c6502793c676cc51",
+          "chunks/browser-SRRLIHZS.mjs": "29650827473ef4244184418cedad964f7ec8a0009f8ecfebcf4c712e0acfcc3a",
+          "chunks/chunk-7GEZCIAL.mjs": "cf476b74df90cc6864c8876d04f29c0281752bfd4d857a8cec0076f6978892cc",
+          "chunks/chunk-BWLS7RBL.mjs": "534c5a689e5cd035b01fb188003d6a4ba8b0a471fb84a2c6d2bb6b0f2893ac83",
+          "index.mjs": "dcc6c43206f1cc95f45f989b6342622e1a822854fac275801659f212a5beec80",
+          "chunks/chunk-2WXPDPNS.mjs": "72eca68b8f63732cf92270749f8d38d0ba93e90f7aaa363766cf49eea9e1d24f",
+          "native.mjs": "a1990179b9105bd6c27a8dbf11d6dab124c398163bdb3730f97c3c1e5c69117a",
+          "browser.mjs": "a5036bfa7412eba621e1eb31287a4a761f53f9dae9dd12aef5e8c734ed325b34",
+          "worker.mjs": "6eb6149eb472b18e8ef417ee26b9a7403b113b746f9cb8cfb72c1d361d6af384",
+          "chunks/chunk-TWP6P5ES.mjs": "1a3d2e9cbff826098d5427bc4c34afc91d8bfae8eb6617214d750843fe6aa493",
+          "webrtc.mjs": "d2bee1403b8bb029686d3331b7eb453db417d99b23e6b7afb8faa2d1b403cdef",
+          "websocket.mjs": "b632f20d2b2110a4ef3b0dc866d1469ad77a42bb98a939a9d35fbdfa978e1e8d",
+          "tendriller.mjs": "1c02f6a19f82d0ad8233f2661a0eb34f38e1e2aa4422979b7ee416ceac6d4bb8",
+          "sql.mjs": "d05e8cb815c6e9409db03fc317f5112570b94b063470a4c57391a50170bc320c",
+          "chunks/chunk-EO5AVAZY.mjs": "715b821065a84b5720ec9d81e6f34b3674b049e63ac8acd23d2f34acf9895fac",
+          "chunks/chunk-SU37NNGG.mjs": "f771b0e2b18bdf5e307138b4b98bed1c51d08d3f0fab5b6b28712ea6d1d8a520",
+          "chunks/chunk-DWOJ27RL.mjs": "0d8d576351955e8e2a6dcd47e1aac8b61089d2f8842603b7d9a25f46f7219f17",
+          "chunks/chunk-TLZH7OYA.mjs": "c26d86b5b0263e21d74f979cd92e3a4eddb42547abdd4b951a6842c45d787758",
+          "chunks/chunk-J7KQNIDE.mjs": "6d6f430ff5dd6b2ad13a58a5261868397a42889e22e085868bc21be86c074fde",
+          "chunks/chunk-3XAYEGPO.mjs": "512610abd57ccb5c72067b9896bf22eef6d69931cbd4c802b71efb998bd1099c",
+          "chunks/chunk-G37HV3SX.mjs": "fc22b9feff246dae51263af4f4c2a7c6a7efaf042cca230ba2cac3065ea39077",
+          "chunks/chunk-KSC4KBWO.mjs": "1700c38a0fe03ed93d264020956c9f5016c9bad7d7a795734c6dec2496c69b37",
+          "chunks/chunk-PFEHSVTG.mjs": "5533f9c06463f7e7f3d59336285ff8be8c111473abd179ede8602b0c81dd0b23",
+          "types/packages/canonical/src/errors.d.ts": "699bba8ca4c0bc5aa21f95448af912c79c879fcb83757bba00049314ae81c436",
+          "types/packages/canonical/src/bytes.d.ts": "9ff352000caac03202027d8d94f7caa405a7b14d9fa89eaa5d09480e02e21c2d",
+          "types/packages/canonical/src/cbor.d.ts": "5439b5ef50801db3f61c0fdeab85c543ffa29055316b4095e97ae8959eb22e27",
+          "types/packages/canonical/src/fixed.d.ts": "cd2418642d9c3e444dd148c91fefbc6029ce0ba22a2666835131e78cc485d458",
+          "types/packages/canonical/src/hash.d.ts": "c8ad6b370d74952ae60e8a3c44fd212bca91daa4d77c1174ac4eeb12d432219f",
+          "types/packages/canonical/src/sync-hash.d.ts": "edec6f3b5abacc552e29b3e8c17b930bb8b19e97b8b896d5b2df7da7a3f24e73",
+          "types/packages/canonical/src/schema.d.ts": "9440d6107130155a33eb1e580e082b8dcbce67989c04949e2226dbe1b6107468",
+          "types/packages/canonical/src/index.d.ts": "2fe464b7ca9dfeeacffa12c8a6200eeaf51b35f42769446d2c279ed9ad37bcc1",
+          "types/packages/protocol/src/errors.d.ts": "2afd36962b7523642f7d58f53fedcabe687ba5275c5c8b44bdb868f6918c058d",
+          "types/packages/protocol/src/bytes.d.ts": "8f69c0cb4d26a75b406a832b92a660bc5e72cc921ca90a4cf077f6bdbade0919",
+          "types/packages/protocol/src/cbor.d.ts": "560befdd06f602f86a5d7bbedd87a186c823826382041de88bc681b2eeff9bf7",
+          "types/packages/protocol/src/schema.d.ts": "a97b39dbe16d9de9e63e04d7f7a2d61d7134ad0181b292463cbb284f57498baf",
+          "types/packages/protocol/src/sql.d.ts": "640165c786c820693bf4d653e412dde58f9b66bb754fdb04a44f3d8ce58b158e",
+          "types/packages/protocol/src/sealed.d.ts": "d6e883b1919546f4a24745290989e1be785a5ff694b5586c80373a217a14c526",
+          "types/packages/protocol/src/platform.d.ts": "ce83286b8fad2c3b0acd1ce811cc336b101b0600ffddf34374db3cef00ae0b75",
+          "types/packages/protocol/src/program.d.ts": "07cb38cf2d1d49c5cbdebbb3f4b4deabc3dad688087d28265e3d3cb35614cd47",
+          "types/packages/protocol/src/messages.d.ts": "ff266aa91e13d536d671cfd7c2cc5974503a03174c85f83de25bfb0b5b4b3056",
+          "types/packages/protocol/src/primitives.d.ts": "8de134c228aec345688b24cfcc38be87e014208df37b8d76e031c2fc0bde0b32",
+          "types/packages/protocol/src/events.d.ts": "d9c5498cdd1cc399822ee45628ebe5a58259fce66e27f31ceeadcb907ed0d9c6",
+          "types/packages/protocol/src/views.d.ts": "2d2ae85aaff148da26b4035ec753ff123ea33e0c7a19bb740994e60ca8b165e4",
+          "types/packages/protocol/src/row-key.d.ts": "8419d43e2b3f9d1dbc5d2fc413a381d7401579f98e08d4627bdecf31fb2c5476",
+          "types/packages/protocol/src/index.d.ts": "74d0cd305b545d520f6871c6ecf741dd6e5b1bc8cc051a53549ed30c27520997",
+          "types/packages/records/src/bytes-store.d.ts": "988a363381f69e886c82ab6e46e9fff09acfffdad499aba3e72836b615efc80a",
+          "types/packages/records/src/connection.d.ts": "225c46f490c057874b3a6e2d5c433835b1b92b1657b5cf8f932ea39937702699",
+          "types/packages/records/src/stream.d.ts": "4098de15026c4243f50e09489cf763c5a2bf364b60e090b0f79c4ad61660f467",
+          "types/packages/records/src/live-channel.d.ts": "e916d0a657c195861dfdf3fe0c7e4609b50ff58563ddd633c4d6b41dd1070cc9",
+          "types/packages/records/src/message-channel.d.ts": "abbbcf87227df379c82f1f1d9c2633e7ae6580d0729f3b3f9793270ca51fb437",
+          "types/packages/records/src/index.d.ts": "a8c6ab98ad190b0da17070db07d171ed3b87346878d9425054dd9faeda1b3302",
+          "types/packages/peer-generation/src/control-types.d.ts": "057db5eae3c0e70920e4dc5daa8a1a2d1ed786629e6b656ba45f4d843d6b66d5",
+          "types/packages/peer-generation/src/codec.d.ts": "4b0164b14e1d7fe3e9299430af82007eef17c990e7db372c38014195d65ab395",
+          "types/packages/peer-generation/src/definition.d.ts": "a373415a49bc51f2b36f53e61955c4655c8e05ce465b7d337643fb873909abc9",
+          "types/packages/peer-generation/src/schema.d.ts": "27db25818b2f3bef197e12d0f43d031b18ce439c9e16f3c091337a5e4b6c1f56",
+          "types/packages/peer-generation/src/participant.d.ts": "9773c05cfcac4305118fa0fa4597237a191fb2f8058421895313e75e60feda03",
+          "types/packages/peer-generation/src/publication.d.ts": "110c7a9f02af29a035deca2f288397da81cb912db3a09ff4d1436c5c065d7e2c",
+          "types/packages/peer-generation/src/control.d.ts": "3c587382b8df3b30326ae95122aedfc2ab6dbc59767d8332fb511d05c3cdda46",
+          "types/packages/peer-session/src/definition.d.ts": "898f0e16dc24c60eb37361d053cc66d11718625b5e944797f46be98c9c3ffe75",
+          "types/packages/materializer/src/types.d.ts": "3777a0e6f62193a7dd2218fb8296c237ad40d16c4c2a32cd8021b8b98e508777",
+          "types/packages/materializer/src/runtime.d.ts": "a481a9ac1c50a4eb6c63f024ec9ab6a20a3fd72c91f041d9ace9fd9f27df76bd",
+          "types/packages/materializer/src/event-store.d.ts": "b4e633fdde1855f44c476bab83e80e68753aea7485b124a5920efab5f8fb18cd",
+          "types/packages/materializer/src/manifest.d.ts": "4f89d0eddc2ffdf57f5f7604a1e34c2d2eb455ae9fe35a993823a25f8f3f08f2",
+          "types/packages/materializer/src/events.d.ts": "3f0b06ec7593cbd143d04274edfda06ad063f43a27ab3c748f98f4a163df6998",
+          "types/packages/materializer/src/index.d.ts": "1b10801767a75c1f9ec5f200c30fa78a85d62f6fed65afa0761cef89fa06bc7b",
+          "types/packages/peer-generation/src/types.d.ts": "c5991a5cfcba900a5c4d27ca5ce53a7c3fd3886de7c591dec4ef5bba3148e38a",
+          "types/packages/crypto/src/hpke.d.ts": "c4d09758352e57c39555d3ae55b1a98dbab49d9c09c003cb6398b6d8de7b87d3",
+          "types/packages/crypto/src/epoch.d.ts": "f97132658b7ecbe5ba29a84619c784695f467e865cb78d07a399d0822ed34b40",
+          "types/packages/crypto/src/keystore.d.ts": "35e0f0bf4bb3a993d868fa6ec931bb4fe85992d1bea966dc3ead6d82830ae9d5",
+          "types/packages/crypto/src/sealed.d.ts": "dedea8d7c7f5f5a2ea9b40c191e916ad2ea2bce33b525208e2225296b8e7f176",
+          "types/packages/crypto/src/index.d.ts": "04dfb3a63092750e5f940fac0445c9bcb624e1e25984653b1a74cf75bd880f1f",
+          "types/packages/peer-generation/src/attempt.d.ts": "eacb77dfb8d2d76f7e8154693c1a467a912e0fe3603f42c404f7cdf27f96d129",
+          "types/packages/peer-generation/src/replica.d.ts": "fe9bbeea1ca7072d638290476854d54c18511a9750a500a2166cd0a900d1cb59",
+          "types/packages/peer-generation/src/index.d.ts": "4953063222c125970439193871aaa2187e6473a0847eb7ec6069d7284a38acbe",
+          "types/packages/signals/src/payload.d.ts": "a7ef25bb5a99ba5186fd30d78a1e93264c80ce65a646577f8ac2d8c512b6630a",
+          "types/packages/signals/src/index.d.ts": "18730f64abe9046f7b101ac884a1cb5cf9a74949724a23acc7799caed7f227fb",
+          "types/packages/peer-session/src/device.d.ts": "34edbc4b74fcb9c145dc058bff949f481044a5aa497b1f5a71e8a9bed6b73483",
+          "types/packages/peer-session/src/metadata.d.ts": "68c11c1e6365298efeeb9df37fad04762301bd064294498ee96d3e735d860ba0",
+          "types/packages/peer-session/src/session-authority.d.ts": "1902c03180a9ac347f035a77174c3cb918c93c43702b11821e59447474b75a2f",
+          "types/packages/peer-session/src/runtime.d.ts": "42fb778c1d24e37f1d1f2597c98b88906c5023c2a567a84b2d5d72d34a0746f1",
+          "types/packages/peer-session/src/lifetime.d.ts": "bbd7d399151421f2321a90a083e18ae6765bdf07b0870cfcb36bdba2df89691c",
+          "types/packages/peer-session/src/content.d.ts": "98b3748fa22f758471414a8acef523885682897bd1d0589aeb012af6f09e0ea6",
+          "types/packages/peer-session/src/keys.d.ts": "b73cc01be1da810f84e1ccb436847dfd8ba67ff4ae7703827572126ec86c4fa8",
+          "types/packages/peer-session/src/errors.d.ts": "662cba5116be6392fb4b7aed3df33dfad1f928998a65d14092a334f778628844",
+          "types/packages/peer-session/src/recovery.d.ts": "7f664e8bae46419291ccafe8ad7ef795d4afec2cfafe47290fc72e861a193aad",
+          "types/packages/peer-session/src/participant-types.d.ts": "5f05930d5e9cd528d03f03b2f4d650f3d11849c8654dfbd40fe35e57bf259d7e",
+          "types/packages/peer-session/src/session-types.d.ts": "70ba2fab7acc22430d8d67870c0f08325ac973289624a96e7075757eb9f56c01",
+          "types/packages/peer-session/src/operation.d.ts": "d3f2a04e98b0acaefad50658faf9358bac7912ea8cdaa4ad520a822ab9604c20",
+          "types/packages/peer-session/src/projection-types.d.ts": "454048fc17ed6c3793a1baeb15c22eb173e99a6ca95d73f9dd93e6f135d1eaa5",
+          "types/packages/peer-session/src/projection.d.ts": "bd3878fd9fdec3dbbe24fdd9cd9a2f5877293a671a227ab670c8f3f65f194125",
+          "types/packages/peer-session/src/application-data.d.ts": "50dff8ad170573992c7b5ab647b987a2340ddb35eefc97681537b9df8febbc1c",
+          "types/packages/peer-session/src/control-participant.d.ts": "48ed4429af5524af19e01c20c942981bf3876cf5ff9019a57566c24c98af2805",
+          "types/packages/peer-session/src/network-wire.d.ts": "369b7b062ff05b2ea0d4e65b9fb2dd680a70b7b834bf0aefaabc680ce137bc77",
+          "types/packages/peer-session/src/secure-channel.d.ts": "916922fef7dd9448c853287c2638d7868ac549a45b4b2bcad57840bb845f838f",
+          "types/packages/peer-session/src/network.d.ts": "9388043ab0cb6e96ed5d03e1889b6ed10459546fb803f1e4b2f6f469e285798d",
+          "types/packages/peer-session/src/participation-types.d.ts": "a44a1fa1f669540128b57db70b622109596b2f0918ad34789b8f5ffc1de11464",
+          "types/packages/peer-session/src/participation.d.ts": "c9c1808bb0b374e9cc2131ebec0a8d1cc47155d8a015612a2a2edf2f06684975",
+          "types/packages/peer-session/src/deferred-stream.d.ts": "b2b331bc8545f8fc19c43c054e140b7697ff8f4ba9016ac094456c621d86b203",
+          "types/packages/peer-session/src/session.d.ts": "b337847170d5c9a67c38b96fb966a03d89a8b5a7b21420c6e764ca21aed6e04d",
+          "types/packages/peer-session/src/tools.d.ts": "dae5bf06a542e75958c23e944d7db2a594ebe2c9ac848dd95b0e24ab7b1e46df",
+          "types/packages/peer-session/src/index.d.ts": "9742a43e0ded03ea00cb40067f7a1b1343438d2419537cb912e9e9dd5a33a4fc",
+          "types/packages/records/src/native.d.ts": "7e8e3e12cbf5095724b0b205ef66c987d9c32da6de4c459496f2eca9341e63b4",
+          "types/packages/peer-session/src/native.d.ts": "763805b4c14a06ff30081b2cc5f2ae1acd58512666e9b2477f77cf031fbc8199",
+          "types/packages/peer-generation/src/metadata.d.ts": "b0ec41cb7a2054b7eabf0e8739395fadda459e1a2de0695204e33704c4171278",
+          "types/packages/transport-webrtc/src/types.d.ts": "11ca59d711a46d08334456872b5630a47224654f432e63bbb2d50233c13955e8",
+          "types/packages/transport-webrtc/src/live.d.ts": "6463ad861ad05b4c1d6db4786265041ede6fb5a2777b24dbc17ffa19d47bdba9",
+          "types/packages/transport-webrtc/src/channel.d.ts": "95acd1ef3635d151add936c9db25daece12c24a264f20bebf0ba3b922558dd53",
+          "types/packages/transport-webrtc/src/route.d.ts": "d109f7fa2cf599d5db172673048f7f3179e0b6fe2f94a81ee7e2d51c1f7d3975",
+          "types/packages/transport-webrtc/src/negotiation.d.ts": "3add1e2e44c0c47762245b4364063b7b0cc57921be750460e0e9fa4340baf6a9",
+          "types/packages/transport-webrtc/src/http.d.ts": "ce4c72a1d7cbe46e07179825bf58929e45b58ed7a6d3329b7fe02da095f9be75",
+          "types/packages/transport-webrtc/src/index.d.ts": "22eb724e67fb1c604a85f5b71f0aab292c2cd719565592725217e99b794a9f4f",
+          "types/packages/peer-session/src/worker-transport.d.ts": "713add13afb2e66b02bad44c02c3af064010a1912cc32be011d543c8060bc6af",
+          "types/packages/peer-session/src/worker-application-protocol.d.ts": "0cbf75c61ce0c9976062e5dab9c16732a6c1f8732bf7ab0aa4ec8acbcd77d4eb",
+          "types/packages/peer-session/src/worker-application.d.ts": "38240cfeb5096bc83e49ed471282d07313fdcd43f35023fb44950f0927535985",
+          "types/packages/peer-session/src/browser.d.ts": "070b36a94d0bbde6b581dbb96e964e5d9cc0e89eb9f2d8a9e1f032b6f8478b80",
+          "types/packages/peer-session/src/browser-metadata.d.ts": "ed95d2eeae60719007a1dbf682e82db9994c56611b470e9c96efc98cf6a8e939",
+          "types/packages/records/src/browser.d.ts": "3000f724d33e1591179ed0222b2adfdd985f67609268805918fb3ab9c4b2244d",
+          "types/packages/peer-session/src/browser-device.d.ts": "abfde00cfad1300217b2f63888507bdf8fe6251a5cbfb4b3b70a2ed90e69f5b8",
+          "types/packages/peer-session/src/worker-application-server.d.ts": "58ceaf92a676fa16a099d4735f7d0689dd4450ac074893e18c5360c531dc651d",
+          "types/packages/peer-session/src/worker.d.ts": "d295e82e465cef57321296ea69bd88e8819f98ba8472710802c38da0421a4ee0",
+          "types/packages/peer-session/src/webrtc.d.ts": "f25159e2a2f8ff22c9d6aa823053ca66fb5a01e3219b51cf428d36b184c2c3f8",
+          "types/packages/transport-websocket/src/index.d.ts": "0421799400c546fe38fdbd4ce22ba396a82788c684a4601aa8d531f0d039b15b",
+          "types/packages/peer-session/src/websocket.d.ts": "033fcc8bbfb1ebb1b8a8ea3438200587692f5848dec68f0f2de9d20e96f8235c",
+          "types/packages/peer-session/src/tendriller.d.ts": "a87011080074d2d54fc1ab2d573f573126c11f71ae658d032adbecfa9fcb6d69",
+          "types/packages/materializer-doltlite/src/types.d.ts": "14fecbbc273a66dd0e7d8e5a9a74dc54598fb48b844ff0d7fa6d63bed967b278",
+          "types/packages/materializer-doltlite/src/checkpoints.d.ts": "5f54578851116bd10d3eccc4c7129bd92ba19d710b1f2c9154dd06f9b7dceb69",
+          "types/packages/materializer-doltlite/src/sql-profile.d.ts": "9f34e9f31401130869ee60d559f62b27f7bd5725b6939a4d7424aa0a4797d211",
+          "types/packages/materializer-doltlite/src/peer-controls.d.ts": "7395f2de74e4385b5bb1b712ddaa4c18d7b3c4aced742268350e097d7cff0246",
+          "types/packages/materializer-doltlite/src/platform/tables.d.ts": "d44799742d243ffa77073c69a4afd9363dd140c419ec4203fe72e3df73523d3c",
+          "types/packages/materializer-doltlite/src/platform/sealed.d.ts": "98e963b0ea1342769d9e0516e49af997d8ba3ea08888fa45cf3864c163253db2",
+          "types/packages/materializer-doltlite/src/platform/schema.d.ts": "93e329418daddb63b9877e0105057d7cb8796dfde889be1a16a8f9081116bf7a",
+          "types/packages/materializer-doltlite/src/platform/session.d.ts": "6aff0340651b5023f362793d2db9bf2d084c3604f6b0bb3b006d31bb6fde4874",
+          "types/packages/materializer-doltlite/src/sql-executor.d.ts": "2930d0001ef5d3d8acf425c34a6d58ff1c337e3349876beddb9ff991a3a99d20",
+          "types/packages/materializer-doltlite/src/sql-values.d.ts": "4573632df8fa702af3b9b438fd62b0904eace9b863e6400cf0e07d50f5d9f8f6",
+          "types/packages/materializer-doltlite/src/system-log.d.ts": "9765c206c4f87ba617e672228e7beeda6b7aff73eb25520576cb05c40b18d2c7",
+          "types/packages/materializer-doltlite/src/snapshot-evidence.d.ts": "c7692d7666964a35022f7635933608ad3c5bf131c71c1384290e513fd4170bd5",
+          "types/packages/materializer-doltlite/src/platform/digest.d.ts": "c552bcc448c5326989693ab4af9be88f3997e5aadb5a8399d257aaee408ff1bb",
+          "types/packages/materializer-doltlite/src/materializer.d.ts": "5010c4cc7c330f5e81467c2d5afda32212303244a4c56013b77cd858dc4a0b28",
+          "types/packages/materializer-doltlite/src/runtime-adapter.d.ts": "d75baac6e54b9578076ba0ea86ad7ed3a4ddd76ed3d58cab5112062ace4b823e",
+          "types/packages/materializer-doltlite/src/engine-manifest.d.ts": "02254e30686e28a7a887f17caca515e2aa61b9dccd0f8cc79a3d4d1d05e93314",
+          "types/packages/materializer-doltlite/src/manifest.d.ts": "bd8ca336c5cded6b3c2ba4ba1ed2fa78e1dc6aea76c7cbe0436077534f9336b9",
+          "types/packages/materializer-doltlite/src/database.d.ts": "ec548ed0ddaf5c99a40f9ca66f39c18f9059f8663d48fb0ee8fcdc50cc614853",
+          "types/packages/materializer-doltlite/src/wasm-engine.d.ts": "c607509cb2144d5fbb9a51d87bb167f4db248c2ddad48cc983ba4b76fddaeb94",
+          "types/packages/materializer-doltlite/src/load-engine.d.ts": "6a05b04d4939a210364c041770dc519e71902133efc09e890ebaad44e3d0d6fc",
+          "types/packages/materializer-doltlite/src/browser.d.ts": "13f7389471f895197249075efe96d08706d4366aefbc459b30c283c236c5dc33",
+          "types/packages/peer-session/src/sql.d.ts": "bcb8c6610f3fb17d6f3e6ef9914a57f23e8e25d9fcfdb7cf961201593c322bb5",
+          "types/packages/materializer-doltlite/src/driver.d.ts": "51ff7214ad87f034b122c4870b54d690ab7be4489897ae16b2c9c39ac4a84682",
+          "types/packages/materializer-doltlite/src/native.d.ts": "9c4d86a2e9cf0ea39583dff79dbc1ce809691a8b381e6416e01b5a68b6a94e16",
+          "types/packages/materializer-doltlite/src/index.d.ts": "4f7629adcad75439a8ef4f818fc74610841ad7a9e500c65b24eef388b7041526",
+          "types/packages/peer-session/src/sql-native.d.ts": "9bf9bffc4e30a89053480e333f3a534e88d8edfa38754a020f2a6b56d76581d5",
+          "index.d.ts": "051e8080a57f42102bb1b5f1a764bfef708342421cc8d583ee6117de030bb201",
+          "native.d.ts": "ce3c892d2757c873ee8f1e6e08d99ba39f077acfb28f7b004f0fc0b3ab001fb2",
+          "browser.d.ts": "673ea804747cb6ca18b3594f941dd27f3ccfc00ef23e57229d507339e1c6ce43",
+          "worker.d.ts": "9e7e7d30737aa5e45f5a23e49594a0efaf63cca5fc4bee16b164344c16ba81c5",
+          "webrtc.d.ts": "e552d088490ac9ff9ecb457736ef47eda083a3595f517ab07abf900a9fcba1d2",
+          "websocket.d.ts": "35c79cb50da1b137d3cd2c7f7fd0161aab6445eba5a081f4da50d44388cd73d8",
+          "tendriller.d.ts": "eb17e47e01bd92541f526b6b42f7c94e4dad7cda9c0c9196cd1d3ded866f7c4c",
+          "sql.d.ts": "5b4ad583a13224bf08e4a569d29786db34aacc217bfdf2f3bdc47ae8008e216c",
+          "sql-native.d.ts": "d5159159319f985140b1f753a27801fee52fac2e51442eb165579077ef1e2fa1",
+          "README.md": "6f323757dc19bf15b9cead11a205622c8facacdda517a46596cdb02c894d2a8e",
+          "package.json": "aa59b2ef1ea86bd73da71b9d0b21057ee0e17516834fe224e1e9728c517f1230"
+        }
+      }
+    }
+  ],
+  "controlParticipant": {
+    "owner": "application-session",
+    "role": "control",
+    "attachRequests": 0,
+    "definitionVerified": true,
+    "recovery": {
+      "injectedAfterSelection": true,
+      "journalSavedBeforeRetry": true,
+      "originalRequest": "6dd2be25c63aa8f14f5dedf5c52a6a4869b240e1b22143e089926e90217ead32",
+      "retriedRequest": "6dd2be25c63aa8f14f5dedf5c52a6a4869b240e1b22143e089926e90217ead32",
+      "originalSelection": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+      "retriedSelection": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+      "recoveryNoticeObserved": true
+    }
+  },
+  "participation": {
+    "owner": "application-session",
+    "entry": "session.participate",
+    "automaticConnections": true,
+    "observedPeerIdentities": [
+      "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+      "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c"
+    ],
+    "hostOutage": {
+      "blocked": true,
+      "blockedProbeRejected": true,
+      "commandsApplied": 33,
+      "before": {
+        "requests": 30,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 30,
+        "applicationBodyBytes": 0
+      }
+    },
+    "automaticRecovery": {
+      "previousGeneration": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+      "selectedGeneration": "eb4b2bb863925aabd99042a8fb78810c1f04a0349e4d3d4222638cbce4223113",
+      "adopted": {
+        "generation": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+        "sequence": 34,
+        "root": "f07cddc0254d23da3b8acc1eac5227e0a8e061c0c4c68504238277077e382249"
+      },
+      "graceMs": 150,
+      "elapsedMs": 383.671296,
+      "freshnessBudgetMs": 300000,
+      "workload": {
+        "commands": 32,
+        "textBytesPerCommand": 1024,
+        "completion": "applied",
+        "retentionWaits": 1,
+        "clock": "performance.now",
+        "startedAtMs": 2330.539929,
+        "appliedAtMs": 2955.767503,
+        "retainedAtMs": 3076.591354,
+        "disconnectedAtMs": 3076.821383,
+        "recoveredAtMs": 3460.492679,
+        "lastOperationId": "freshness-31",
+        "lastAppliedAtMs": 2955.767503,
+        "observedAdoptedAgeMs": 121.05387999999994,
+        "recoveryReadyMs": 383.671296,
+        "targetMs": 300000,
+        "retained": {
+          "payload": {
+            "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+            "generation": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+            "peer": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+            "point": {
+              "generation": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+              "root": "f07cddc0254d23da3b8acc1eac5227e0a8e061c0c4c68504238277077e382249",
+              "sequence": 34
+            },
+            "retainedAt": 1794945825854,
+            "storageId": "753f7511-db92-4034-b9f0-1ee8dbf83683"
+          },
+          "signature": "e98de6ff78f62ae60a6c8aec338d896e2b478688c8380020f73c229b2750acf939ff25ad62e26bee965134d598f09ffa7b04ff025fffd15d4892f1f78e49e808"
+        },
+        "coordinatorStorageId": "4626537f-2d3c-43a0-bc70-56026f0b572f",
+        "independentStorageId": "753f7511-db92-4034-b9f0-1ee8dbf83683",
+        "adopted": {
+          "generation": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+          "sequence": 34,
+          "root": "f07cddc0254d23da3b8acc1eac5227e0a8e061c0c4c68504238277077e382249"
+        },
+        "knownLostCommands": 0,
+        "scope": "32-command two-peer burst; observed prefix age, not a universal loss bound"
+      }
+    },
+    "broaderRecovery": {
+      "reason": "freshness-unknown",
+      "ageMs": null,
+      "approvalRequired": true,
+      "staleApprovalRejected": true,
+      "proposalId": "d2e253a1d888bfe79a2a29771dff516f7e78988fa667dba1155d9a6d12ef93e9",
+      "adopted": {
+        "generation": "eb4b2bb863925aabd99042a8fb78810c1f04a0349e4d3d4222638cbce4223113",
+        "sequence": 0,
+        "root": "ac856aca1da0d5cb7f2bc44b9be1be7ad6e57c733d89bf1f0c0b19de4305266c"
+      },
+      "selectedGeneration": "70cf38aa767fa50d0d648b35470748a5f5426dd8f291d7f21c34aa2c04b4a3dd",
+      "commandApplied": true
+    },
+    "statuses": [
+      {
+        "device": "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "following",
+        "connectedPeers": [
+          "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+        "phase": "approval-required",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "d2e253a1d888bfe79a2a29771dff516f7e78988fa667dba1155d9a6d12ef93e9",
+          "coordinator": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+          "point": {
+            "generation": "eb4b2bb863925aabd99042a8fb78810c1f04a0349e4d3d4222638cbce4223113",
+            "sequence": 0,
+            "root": "ac856aca1da0d5cb7f2bc44b9be1be7ad6e57c733d89bf1f0c0b19de4305266c"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "d2e253a1d888bfe79a2a29771dff516f7e78988fa667dba1155d9a6d12ef93e9",
+          "coordinator": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+          "point": {
+            "generation": "eb4b2bb863925aabd99042a8fb78810c1f04a0349e4d3d4222638cbce4223113",
+            "sequence": 0,
+            "root": "ac856aca1da0d5cb7f2bc44b9be1be7ad6e57c733d89bf1f0c0b19de4305266c"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "62d2990bc2a7c24003989390d554209bcb7f47bbc5c47fcb440ab3d4f17a479a",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      }
+    ],
+    "transport": {
+      "boundary": "in-process-fixture-discovery",
+      "pendingIntroductions": 0,
+      "connections": [
+        {
+          "owner": "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+          "peer": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+          "closed": true
+        },
+        {
+          "owner": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+          "peer": "80b66cdf7539e6464cadb10e6ad6fb4224ff9425bf6ea0a20d41e79715d76630",
+          "closed": true
+        }
+      ]
+    }
+  },
+  "projection": {
+    "owner": "application-session",
+    "id": "conversation-counts",
+    "version": "1",
+    "first": {
+      "revision": {
+        "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+        "historyId": "independent-peer-conversation",
+        "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+        "point": {
+          "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+          "sequence": 1,
+          "root": "beb64f81c21f17abf0aa6eddca6be122e81ff556d4fb23510e471b0c766a80e4"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "1"
+      },
+      "state": {
+        "messages": 1
+      },
+      "reset": null
+    },
+    "initialReducerCalls": 1,
+    "unchangedReadReducerCalls": 0,
+    "excluded": {
+      "revision": {
+        "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+        "historyId": "independent-peer-conversation",
+        "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+        "point": {
+          "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+          "sequence": 6,
+          "root": "0619da9ad065efa60c25c1c5ba768dbde91a3ea7fbd6f2cdc031f2597af7a099"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "6"
+      },
+      "state": {
+        "messages": 6
+      },
+      "reset": null
+    },
+    "excludedCheckpointReopened": true,
+    "recovered": {
+      "revision": {
+        "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+        "historyId": "independent-peer-conversation",
+        "generation": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+        "point": {
+          "generation": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+          "sequence": 0,
+          "root": "8124fea3d597059f8e4bc7a5380796fdcbf54d12846436b74cace3a7022e10a2"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "7"
+      },
+      "state": {
+        "messages": 4
+      },
+      "reset": {
+        "reason": "recovery",
+        "previousRevision": {
+          "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+          "controlRevision": 0,
+          "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+          "historyId": "independent-peer-conversation",
+          "materializationRevision": "6",
+          "point": {
+            "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+            "root": "0619da9ad065efa60c25c1c5ba768dbde91a3ea7fbd6f2cdc031f2597af7a099",
+            "sequence": 6
+          }
+        }
+      }
+    },
+    "reopened": {
+      "before": {
+        "revision": {
+          "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+          "historyId": "independent-peer-conversation",
+          "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+          "point": {
+            "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+            "sequence": 0,
+            "root": "a444911c77314fc152892fe6d354992f3da9842d4eb94a4262534a5ef2f8e1b4"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "8"
+        },
+        "state": {
+          "messages": 5
+        },
+        "reset": {
+          "reason": "recovery",
+          "previousRevision": {
+            "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+            "historyId": "independent-peer-conversation",
+            "generation": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+            "point": {
+              "generation": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+              "sequence": 0,
+              "root": "8124fea3d597059f8e4bc7a5380796fdcbf54d12846436b74cace3a7022e10a2"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "7"
+          }
+        }
+      },
+      "after": {
+        "revision": {
+          "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+          "controlRevision": 0,
+          "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+          "historyId": "independent-peer-conversation",
+          "materializationRevision": "8",
+          "point": {
+            "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+            "root": "a444911c77314fc152892fe6d354992f3da9842d4eb94a4262534a5ef2f8e1b4",
+            "sequence": 0
+          }
+        },
+        "state": {
+          "messages": 5
+        },
+        "reset": null
+      },
+      "reducerCalls": 0
+    },
+    "definitionReset": {
+      "snapshot": {
+        "revision": {
+          "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+          "historyId": "independent-peer-conversation",
+          "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+          "point": {
+            "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+            "sequence": 0,
+            "root": "a444911c77314fc152892fe6d354992f3da9842d4eb94a4262534a5ef2f8e1b4"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "8"
+        },
+        "state": {
+          "messages": 5
+        },
+        "reset": {
+          "reason": "definition",
+          "previousRevision": {
+            "applicationId": "a74f6cff8a9d02da55c2fd725c342aed05fd12988f4030c2f4431623e90033a4",
+            "controlRevision": 0,
+            "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+            "historyId": "independent-peer-conversation",
+            "materializationRevision": "8",
+            "point": {
+              "generation": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+              "root": "a444911c77314fc152892fe6d354992f3da9842d4eb94a4262534a5ef2f8e1b4",
+              "sequence": 0
+            }
+          }
+        }
+      },
+      "reducerCalls": 5
+    }
+  },
+  "inheritedRecovery": {
+    "owner": "application-session",
+    "previousGeneration": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+    "previousNumber": 2,
+    "ancestorNumber": 0,
+    "ancestor": {
+      "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+      "sequence": 4,
+      "root": "e4ecb48fff14c2c019736bcf1348f919945c17e5c861932dff5a3aa97fa56207"
+    },
+    "selectedGeneration": "ccac9edf86b0baccca716b245bdcb2d868a7441f3b611734bee961c6715bc62f",
+    "selectedNumber": 3,
+    "adopted": {
+      "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+      "root": "e4ecb48fff14c2c019736bcf1348f919945c17e5c861932dff5a3aa97fa56207",
+      "sequence": 4
+    },
+    "sourceRemoved": true,
+    "incompleteViewRejected": true,
+    "proposalDidNotPublishView": true,
+    "emptyPeerRejected": true,
+    "plannedHandoverRejected": true,
+    "originalRequest": "20e9064fb5681f0e09048fe4ca66fc1cd00fe2df5daa0f91554e9b73f0e8ca25",
+    "retriedRequest": "20e9064fb5681f0e09048fe4ca66fc1cd00fe2df5daa0f91554e9b73f0e8ca25",
+    "expectedGeneration": "de9ec470531d33c9ad0873c46889235cae85062b336db5a2d25ddba2bbac562b",
+    "journalSavedBeforeRetry": true,
+    "originalSelection": "ccac9edf86b0baccca716b245bdcb2d868a7441f3b611734bee961c6715bc62f",
+    "retriedSelection": "ccac9edf86b0baccca716b245bdcb2d868a7441f3b611734bee961c6715bc62f",
+    "retainedDigest": "ebc4c1113cbeff5a72cb4a070025ea0172165fc46f5073b3534469cd0260897a",
+    "restoredDigest": "ebc4c1113cbeff5a72cb4a070025ea0172165fc46f5073b3534469cd0260897a",
+    "freshPeerDigest": "ebc4c1113cbeff5a72cb4a070025ea0172165fc46f5073b3534469cd0260897a",
+    "inheritedOperationBefore": {
+      "status": "applied",
+      "attemptId": "3b9c93cf586234c235026ff16e4b4461ede83370e3920e6177e5406a59017a24",
+      "operationId": "reply-lost",
+      "author": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+      "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+      "sequence": 2,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "inheritedOperationAfter": {
+      "status": "applied",
+      "attemptId": "3b9c93cf586234c235026ff16e4b4461ede83370e3920e6177e5406a59017a24",
+      "operationId": "reply-lost",
+      "author": "49f3cfa5356b1061db795df53d44a9acf25af736fa0df4e05ea01d73ef8a993c",
+      "generation": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+      "sequence": 2,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "excludedSuffixAbsent": true,
+    "unknownLoss": true,
+    "commandResumed": true,
+    "floor": {
+      "point": {
+        "generation": "ccac9edf86b0baccca716b245bdcb2d868a7441f3b611734bee961c6715bc62f",
+        "sequence": 1,
+        "root": "bed14d2b541c2bd1e4e3f1a58af054ca9bffee17af005c0380ba76cbeae6ebe2"
+      },
+      "selectedGeneration": "027e5afe53939f96ad0df17f4787af4c176006f3aa589a8d476e91cc0081ae8a",
+      "localRejected": true,
+      "hostRejected": true,
+      "journalUnchanged": true,
+      "incompleteViewRejected": true
+    }
+  },
+  "commandsWithHostBlocked": 2,
+  "hostRequestsDuringCommands": 0,
+  "hostedControlApplicationBodyBytes": 0,
+  "recovery": {
+    "previousGeneration": "f131841a787b4657cfdf865ff88a414b499e3bf2afa5dd1dabcf3a9b6e4b78e7",
+    "selectedGeneration": "a97bc9236f7897b25486299a10f3b06a132243654e33a2b74c8ffb6a5f74f3f2",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ]
+  },
+  "reapplication": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "1b4c5e102f9acdab66c4d3029e92b0c7d537d3ef1b4675aa9af4b578bf4658dd",
+    "newAttemptId": "6049462f89dcd3053ce7c02313042d79991ffd2b364a0be48b9b6a6ef9592102",
+    "reapplyOf": "1b4c5e102f9acdab66c4d3029e92b0c7d537d3ef1b4675aa9af4b578bf4658dd",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "limitations": [
+    "Independent packed runtime execution; this is not a deployed-network or browser qualification.",
+    "Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.",
+    "No physical route, provider cost, universal loss bound or unavailable optional service is inferred."
+  ],
+  "reportSha256": "0d0edae64ee99074cdb9841ec6effd2df41e6da01366a7e74f6074ee6e0e4310"
+}

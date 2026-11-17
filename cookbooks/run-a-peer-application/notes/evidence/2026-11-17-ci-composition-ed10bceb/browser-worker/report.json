@@ -1,0 +1,2414 @@
+{
+  "format": "peer-generation-browser/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "browser-worker-opfs-native-rtc",
+  "passed": true,
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "e90096809fa1fed4abf4f2fa57ce87a07307a9ac",
+    "tree": "be90b26bc105b3f5256cfbe5eabd5bfc8b04fe3d",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-ged10bceb-rtc",
+      "sha256": "1eb6e7045d1b42b87b3e09f7c1eaa7a85314ad10e96d2910cd7bd4e912bfbf8f",
+      "sourceCommit": "ed10bceb25f2befc33b4354180b7fa1a291bb616",
+      "sourceTree": "a6b7ab1b8c89e1f2117317e50fe128011a8404d7",
+      "sourceDirty": false,
+      "provenance": {
+        "sha256": "736d2ec4d1d830b0b158358803728c4c000cf564c3ff1c0bf2028518f893ea06",
+        "profile": "peer-generation-v1",
+        "optionalNativeRtc": true,
+        "sqlEngines": [],
+        "runtimeModules": {
+          "chunks/replica-CH2AI7LK.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/replica.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/application-data-WPFDBA7M.mjs": {
+            "inputs": [
+              "packages/materializer/src/event-store.ts",
+              "packages/materializer/src/events.ts",
+              "packages/materializer/src/runtime.ts",
+              "packages/peer-session/src/application-data.ts",
+              "packages/peer-session/src/content.ts",
+              "packages/peer-session/src/keys.ts",
+              "packages/peer-session/src/projection.ts",
+              "packages/peer-session/src/recovery.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-ED33HBHG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-NSHSZH3K.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/browser-ZR2BZCLK.mjs": {
+            "inputs": [
+              "packages/records/src/browser.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "index.mjs": {
+            "inputs": [
+              "packages/peer-session/src/tools.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-ED33HBHG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-QHC7XSCD.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-NSHSZH3K.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-ED33HBHG.mjs": {
+            "inputs": [
+              "packages/materializer/src/manifest.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "native.mjs": {
+            "inputs": [
+              "packages/peer-session/src/native.ts",
+              "packages/records/src/native.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-QHC7XSCD.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-NSHSZH3K.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "node:fs",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "node:path",
+                "kind": "import-statement",
+                "external": true
+              },
+              {
+                "path": "node:sqlite",
+                "kind": "import-statement",
+                "external": true
+              }
+            ]
+          },
+          "browser.mjs": {
+            "inputs": [
+              "packages/peer-session/src/worker-application.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-TWP6P5ES.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "worker.mjs": {
+            "inputs": [
+              "packages/peer-session/src/browser-device.ts",
+              "packages/peer-session/src/browser-metadata.ts",
+              "packages/peer-session/src/worker-application-server.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-QHC7XSCD.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-NSHSZH3K.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TWP6P5ES.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-TLZH7OYA.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/browser-ZR2BZCLK.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-QHC7XSCD.mjs": {
+            "inputs": [
+              "packages/peer-session/src/control-participant.ts",
+              "packages/peer-session/src/deferred-stream.ts",
+              "packages/peer-session/src/definition.ts",
+              "packages/peer-session/src/device.ts",
+              "packages/peer-session/src/metadata.ts",
+              "packages/peer-session/src/network-wire.ts",
+              "packages/peer-session/src/network.ts",
+              "packages/peer-session/src/participation.ts",
+              "packages/peer-session/src/runtime.ts",
+              "packages/peer-session/src/secure-channel.ts",
+              "packages/peer-session/src/session-authority.ts",
+              "packages/peer-session/src/session.ts",
+              "packages/signals/src/index.ts",
+              "packages/signals/src/payload.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-NSHSZH3K.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-UP5XO6ZJ.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/application-data-WPFDBA7M.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-NSHSZH3K.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/index.ts",
+              "packages/peer-session/src/operation.ts",
+              "packages/peer-session/src/projection-types.ts",
+              "packages/peer-session/src/session-types.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/replica-CH2AI7LK.mjs",
+                "kind": "dynamic-import",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-UP5XO6ZJ.mjs": {
+            "inputs": [
+              "packages/crypto/src/epoch.ts",
+              "packages/crypto/src/hpke.ts",
+              "packages/peer-generation/src/attempt.ts",
+              "packages/peer-generation/src/control.ts",
+              "packages/peer-generation/src/participant.ts",
+              "packages/peer-generation/src/publication.ts",
+              "packages/peer-generation/src/schema.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-6RGB3FLI.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-TWP6P5ES.mjs": {
+            "inputs": [
+              "packages/peer-session/src/worker-application-protocol.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-TLZH7OYA.mjs": {
+            "inputs": [
+              "packages/peer-session/src/errors.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-6RGB3FLI.mjs": {
+            "inputs": [
+              "packages/peer-generation/src/codec.ts",
+              "packages/peer-generation/src/control-types.ts",
+              "packages/peer-generation/src/definition.ts",
+              "packages/protocol/src/bytes.ts",
+              "packages/protocol/src/cbor.ts",
+              "packages/protocol/src/errors.ts",
+              "packages/protocol/src/messages.ts",
+              "packages/protocol/src/platform.ts",
+              "packages/protocol/src/primitives.ts",
+              "packages/protocol/src/program.ts",
+              "packages/protocol/src/schema.ts",
+              "packages/protocol/src/sealed.ts",
+              "packages/protocol/src/sql.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-ZYVCMK3N.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-ZYVCMK3N.mjs": {
+            "inputs": [
+              "packages/canonical/src/bytes.ts",
+              "packages/canonical/src/cbor.ts",
+              "packages/canonical/src/errors.ts",
+              "packages/canonical/src/hash.ts"
+            ],
+            "imports": []
+          },
+          "webrtc.mjs": {
+            "inputs": [],
+            "imports": [
+              {
+                "path": "chunks/chunk-LK44BQ5A.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "websocket.mjs": {
+            "inputs": [
+              "packages/transport-websocket/src/index.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "tendriller.mjs": {
+            "inputs": [
+              "packages/peer-session/src/tendriller.ts"
+            ],
+            "imports": []
+          },
+          "webrtc-native.mjs": {
+            "inputs": [
+              "packages/peer-session/src/webrtc-native.ts",
+              "packages/transport-webrtc/src/native.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-LK44BQ5A.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "werift",
+                "kind": "import-statement",
+                "external": true
+              }
+            ]
+          },
+          "chunks/chunk-LK44BQ5A.mjs": {
+            "inputs": [
+              "packages/peer-session/src/webrtc.ts",
+              "packages/peer-session/src/worker-transport.ts",
+              "packages/transport-webrtc/src/channel.ts",
+              "packages/transport-webrtc/src/http.ts",
+              "packages/transport-webrtc/src/live.ts",
+              "packages/transport-webrtc/src/negotiation.ts",
+              "packages/transport-webrtc/src/route.ts"
+            ],
+            "imports": [
+              {
+                "path": "chunks/chunk-KSC4KBWO.mjs",
+                "kind": "import-statement",
+                "external": false
+              },
+              {
+                "path": "chunks/chunk-PFEHSVTG.mjs",
+                "kind": "import-statement",
+                "external": false
+              }
+            ]
+          },
+          "chunks/chunk-KSC4KBWO.mjs": {
+            "inputs": [
+              "packages/peer-session/src/lifetime.ts"
+            ],
+            "imports": []
+          },
+          "chunks/chunk-PFEHSVTG.mjs": {
+            "inputs": [
+              "packages/records/src/bytes-store.ts",
+              "packages/records/src/live-channel.ts",
+              "packages/records/src/message-channel.ts"
+            ],
+            "imports": []
+          }
+        },
+        "files": {
+          "chunks/replica-CH2AI7LK.mjs": "49540f876b53a0565bb6a47dc78c0b71225a27ef130ae92d721218859a9e29f4",
+          "chunks/application-data-WPFDBA7M.mjs": "cf8a7b8e175a103b255b5b5973ecb32cc4e8eea61b16b08981a4aee4579bf992",
+          "chunks/browser-ZR2BZCLK.mjs": "f11fb2c8e89dbe6e2615845232b5b69fa3c6198612b463656ad801ba73b31d91",
+          "index.mjs": "61697d529f620f9a6a77f81e81361c395336a28a329a66598e1c603182d69879",
+          "chunks/chunk-ED33HBHG.mjs": "9f925460c1063b1e8c634a218a3789e557ee7ba8baf6c838de7de133e0f410fe",
+          "native.mjs": "898dab91af718dd459ee9c28307998a9cbd911769107881b2f94813e76770c11",
+          "browser.mjs": "16337a2284f823fba5d253e959251490b5baf1e3eb7fa9322243a0dbcb31af0f",
+          "worker.mjs": "27ac2d8a913a951835c54f686ae3b868468673f7380e4a13f36b9696ec78768c",
+          "chunks/chunk-QHC7XSCD.mjs": "aab758570d1191d2a0ce0b706b68a3b0517facf3434872797d5c4b64d3e6390c",
+          "chunks/chunk-NSHSZH3K.mjs": "97a53901d877134b9506fec8f636c006f01065842267c25dc661e7b2473949ff",
+          "chunks/chunk-UP5XO6ZJ.mjs": "9c1e77cf2b237d2fa7bcfd8a05f224f04828bfbafa6b4a3d61394f90a17ed10d",
+          "chunks/chunk-TWP6P5ES.mjs": "1a3d2e9cbff826098d5427bc4c34afc91d8bfae8eb6617214d750843fe6aa493",
+          "chunks/chunk-TLZH7OYA.mjs": "c26d86b5b0263e21d74f979cd92e3a4eddb42547abdd4b951a6842c45d787758",
+          "chunks/chunk-6RGB3FLI.mjs": "b4f926449ee34efd690a0fd601f28e1a0acdda2ed1e6ac461ea635c8629891ed",
+          "chunks/chunk-ZYVCMK3N.mjs": "09854fb75c2829102c975969016d91a9c84d4f41997a8fb1c304df08a7259b7b",
+          "webrtc.mjs": "eed6b24c12602e069f0e3274e1d93a1efabda1c2c084227fcbde17a781978de7",
+          "websocket.mjs": "b632f20d2b2110a4ef3b0dc866d1469ad77a42bb98a939a9d35fbdfa978e1e8d",
+          "tendriller.mjs": "1c02f6a19f82d0ad8233f2661a0eb34f38e1e2aa4422979b7ee416ceac6d4bb8",
+          "webrtc-native.mjs": "23b0c3cc9bea347b1256bf05066e99ceb0f0b8b0c98df4967cb67a1c0ac1be18",
+          "chunks/chunk-LK44BQ5A.mjs": "0a12c520a3820553afd694c7a7414bfe46fde742afca8b38306eace0e55ccc8d",
+          "chunks/chunk-KSC4KBWO.mjs": "1700c38a0fe03ed93d264020956c9f5016c9bad7d7a795734c6dec2496c69b37",
+          "chunks/chunk-PFEHSVTG.mjs": "5533f9c06463f7e7f3d59336285ff8be8c111473abd179ede8602b0c81dd0b23",
+          "types/packages/canonical/src/errors.d.ts": "699bba8ca4c0bc5aa21f95448af912c79c879fcb83757bba00049314ae81c436",
+          "types/packages/canonical/src/bytes.d.ts": "9ff352000caac03202027d8d94f7caa405a7b14d9fa89eaa5d09480e02e21c2d",
+          "types/packages/canonical/src/cbor.d.ts": "5439b5ef50801db3f61c0fdeab85c543ffa29055316b4095e97ae8959eb22e27",
+          "types/packages/canonical/src/fixed.d.ts": "cd2418642d9c3e444dd148c91fefbc6029ce0ba22a2666835131e78cc485d458",
+          "types/packages/canonical/src/hash.d.ts": "c8ad6b370d74952ae60e8a3c44fd212bca91daa4d77c1174ac4eeb12d432219f",
+          "types/packages/canonical/src/sync-hash.d.ts": "edec6f3b5abacc552e29b3e8c17b930bb8b19e97b8b896d5b2df7da7a3f24e73",
+          "types/packages/canonical/src/schema.d.ts": "9440d6107130155a33eb1e580e082b8dcbce67989c04949e2226dbe1b6107468",
+          "types/packages/canonical/src/index.d.ts": "2fe464b7ca9dfeeacffa12c8a6200eeaf51b35f42769446d2c279ed9ad37bcc1",
+          "types/packages/protocol/src/errors.d.ts": "2afd36962b7523642f7d58f53fedcabe687ba5275c5c8b44bdb868f6918c058d",
+          "types/packages/protocol/src/bytes.d.ts": "8f69c0cb4d26a75b406a832b92a660bc5e72cc921ca90a4cf077f6bdbade0919",
+          "types/packages/protocol/src/cbor.d.ts": "560befdd06f602f86a5d7bbedd87a186c823826382041de88bc681b2eeff9bf7",
+          "types/packages/protocol/src/schema.d.ts": "a97b39dbe16d9de9e63e04d7f7a2d61d7134ad0181b292463cbb284f57498baf",
+          "types/packages/protocol/src/sql.d.ts": "640165c786c820693bf4d653e412dde58f9b66bb754fdb04a44f3d8ce58b158e",
+          "types/packages/protocol/src/sealed.d.ts": "d6e883b1919546f4a24745290989e1be785a5ff694b5586c80373a217a14c526",
+          "types/packages/protocol/src/platform.d.ts": "ce83286b8fad2c3b0acd1ce811cc336b101b0600ffddf34374db3cef00ae0b75",
+          "types/packages/protocol/src/program.d.ts": "07cb38cf2d1d49c5cbdebbb3f4b4deabc3dad688087d28265e3d3cb35614cd47",
+          "types/packages/protocol/src/messages.d.ts": "ff266aa91e13d536d671cfd7c2cc5974503a03174c85f83de25bfb0b5b4b3056",
+          "types/packages/protocol/src/primitives.d.ts": "8de134c228aec345688b24cfcc38be87e014208df37b8d76e031c2fc0bde0b32",
+          "types/packages/protocol/src/events.d.ts": "d9c5498cdd1cc399822ee45628ebe5a58259fce66e27f31ceeadcb907ed0d9c6",
+          "types/packages/protocol/src/views.d.ts": "2d2ae85aaff148da26b4035ec753ff123ea33e0c7a19bb740994e60ca8b165e4",
+          "types/packages/protocol/src/row-key.d.ts": "8419d43e2b3f9d1dbc5d2fc413a381d7401579f98e08d4627bdecf31fb2c5476",
+          "types/packages/protocol/src/index.d.ts": "74d0cd305b545d520f6871c6ecf741dd6e5b1bc8cc051a53549ed30c27520997",
+          "types/packages/records/src/bytes-store.d.ts": "988a363381f69e886c82ab6e46e9fff09acfffdad499aba3e72836b615efc80a",
+          "types/packages/records/src/connection.d.ts": "225c46f490c057874b3a6e2d5c433835b1b92b1657b5cf8f932ea39937702699",
+          "types/packages/records/src/stream.d.ts": "4098de15026c4243f50e09489cf763c5a2bf364b60e090b0f79c4ad61660f467",
+          "types/packages/records/src/live-channel.d.ts": "e916d0a657c195861dfdf3fe0c7e4609b50ff58563ddd633c4d6b41dd1070cc9",
+          "types/packages/records/src/message-channel.d.ts": "abbbcf87227df379c82f1f1d9c2633e7ae6580d0729f3b3f9793270ca51fb437",
+          "types/packages/records/src/index.d.ts": "a8c6ab98ad190b0da17070db07d171ed3b87346878d9425054dd9faeda1b3302",
+          "types/packages/peer-generation/src/control-types.d.ts": "057db5eae3c0e70920e4dc5daa8a1a2d1ed786629e6b656ba45f4d843d6b66d5",
+          "types/packages/peer-generation/src/codec.d.ts": "4b0164b14e1d7fe3e9299430af82007eef17c990e7db372c38014195d65ab395",
+          "types/packages/peer-generation/src/definition.d.ts": "a373415a49bc51f2b36f53e61955c4655c8e05ce465b7d337643fb873909abc9",
+          "types/packages/peer-generation/src/schema.d.ts": "27db25818b2f3bef197e12d0f43d031b18ce439c9e16f3c091337a5e4b6c1f56",
+          "types/packages/peer-generation/src/participant.d.ts": "9773c05cfcac4305118fa0fa4597237a191fb2f8058421895313e75e60feda03",
+          "types/packages/peer-generation/src/publication.d.ts": "110c7a9f02af29a035deca2f288397da81cb912db3a09ff4d1436c5c065d7e2c",
+          "types/packages/peer-generation/src/control.d.ts": "3c587382b8df3b30326ae95122aedfc2ab6dbc59767d8332fb511d05c3cdda46",
+          "types/packages/peer-session/src/definition.d.ts": "898f0e16dc24c60eb37361d053cc66d11718625b5e944797f46be98c9c3ffe75",
+          "types/packages/materializer/src/types.d.ts": "3777a0e6f62193a7dd2218fb8296c237ad40d16c4c2a32cd8021b8b98e508777",
+          "types/packages/materializer/src/runtime.d.ts": "a481a9ac1c50a4eb6c63f024ec9ab6a20a3fd72c91f041d9ace9fd9f27df76bd",
+          "types/packages/materializer/src/event-store.d.ts": "b4e633fdde1855f44c476bab83e80e68753aea7485b124a5920efab5f8fb18cd",
+          "types/packages/materializer/src/manifest.d.ts": "4f89d0eddc2ffdf57f5f7604a1e34c2d2eb455ae9fe35a993823a25f8f3f08f2",
+          "types/packages/materializer/src/events.d.ts": "3f0b06ec7593cbd143d04274edfda06ad063f43a27ab3c748f98f4a163df6998",
+          "types/packages/materializer/src/index.d.ts": "1b10801767a75c1f9ec5f200c30fa78a85d62f6fed65afa0761cef89fa06bc7b",
+          "types/packages/peer-generation/src/types.d.ts": "c5991a5cfcba900a5c4d27ca5ce53a7c3fd3886de7c591dec4ef5bba3148e38a",
+          "types/packages/crypto/src/hpke.d.ts": "c4d09758352e57c39555d3ae55b1a98dbab49d9c09c003cb6398b6d8de7b87d3",
+          "types/packages/crypto/src/epoch.d.ts": "f97132658b7ecbe5ba29a84619c784695f467e865cb78d07a399d0822ed34b40",
+          "types/packages/crypto/src/keystore.d.ts": "35e0f0bf4bb3a993d868fa6ec931bb4fe85992d1bea966dc3ead6d82830ae9d5",
+          "types/packages/crypto/src/sealed.d.ts": "dedea8d7c7f5f5a2ea9b40c191e916ad2ea2bce33b525208e2225296b8e7f176",
+          "types/packages/crypto/src/index.d.ts": "04dfb3a63092750e5f940fac0445c9bcb624e1e25984653b1a74cf75bd880f1f",
+          "types/packages/peer-generation/src/attempt.d.ts": "eacb77dfb8d2d76f7e8154693c1a467a912e0fe3603f42c404f7cdf27f96d129",
+          "types/packages/peer-generation/src/replica.d.ts": "fe9bbeea1ca7072d638290476854d54c18511a9750a500a2166cd0a900d1cb59",
+          "types/packages/peer-generation/src/index.d.ts": "4953063222c125970439193871aaa2187e6473a0847eb7ec6069d7284a38acbe",
+          "types/packages/signals/src/payload.d.ts": "a7ef25bb5a99ba5186fd30d78a1e93264c80ce65a646577f8ac2d8c512b6630a",
+          "types/packages/signals/src/index.d.ts": "18730f64abe9046f7b101ac884a1cb5cf9a74949724a23acc7799caed7f227fb",
+          "types/packages/peer-session/src/device.d.ts": "34edbc4b74fcb9c145dc058bff949f481044a5aa497b1f5a71e8a9bed6b73483",
+          "types/packages/peer-session/src/metadata.d.ts": "68c11c1e6365298efeeb9df37fad04762301bd064294498ee96d3e735d860ba0",
+          "types/packages/peer-session/src/session-authority.d.ts": "1902c03180a9ac347f035a77174c3cb918c93c43702b11821e59447474b75a2f",
+          "types/packages/peer-session/src/runtime.d.ts": "42fb778c1d24e37f1d1f2597c98b88906c5023c2a567a84b2d5d72d34a0746f1",
+          "types/packages/peer-session/src/lifetime.d.ts": "bbd7d399151421f2321a90a083e18ae6765bdf07b0870cfcb36bdba2df89691c",
+          "types/packages/peer-session/src/content.d.ts": "98b3748fa22f758471414a8acef523885682897bd1d0589aeb012af6f09e0ea6",
+          "types/packages/peer-session/src/keys.d.ts": "b73cc01be1da810f84e1ccb436847dfd8ba67ff4ae7703827572126ec86c4fa8",
+          "types/packages/peer-session/src/errors.d.ts": "662cba5116be6392fb4b7aed3df33dfad1f928998a65d14092a334f778628844",
+          "types/packages/peer-session/src/recovery.d.ts": "7f664e8bae46419291ccafe8ad7ef795d4afec2cfafe47290fc72e861a193aad",
+          "types/packages/peer-session/src/participant-types.d.ts": "5f05930d5e9cd528d03f03b2f4d650f3d11849c8654dfbd40fe35e57bf259d7e",
+          "types/packages/peer-session/src/session-types.d.ts": "70ba2fab7acc22430d8d67870c0f08325ac973289624a96e7075757eb9f56c01",
+          "types/packages/peer-session/src/operation.d.ts": "d3f2a04e98b0acaefad50658faf9358bac7912ea8cdaa4ad520a822ab9604c20",
+          "types/packages/peer-session/src/projection-types.d.ts": "454048fc17ed6c3793a1baeb15c22eb173e99a6ca95d73f9dd93e6f135d1eaa5",
+          "types/packages/peer-session/src/projection.d.ts": "bd3878fd9fdec3dbbe24fdd9cd9a2f5877293a671a227ab670c8f3f65f194125",
+          "types/packages/peer-session/src/application-data.d.ts": "50dff8ad170573992c7b5ab647b987a2340ddb35eefc97681537b9df8febbc1c",
+          "types/packages/peer-session/src/control-participant.d.ts": "48ed4429af5524af19e01c20c942981bf3876cf5ff9019a57566c24c98af2805",
+          "types/packages/peer-session/src/network-wire.d.ts": "369b7b062ff05b2ea0d4e65b9fb2dd680a70b7b834bf0aefaabc680ce137bc77",
+          "types/packages/peer-session/src/secure-channel.d.ts": "916922fef7dd9448c853287c2638d7868ac549a45b4b2bcad57840bb845f838f",
+          "types/packages/peer-session/src/network.d.ts": "9388043ab0cb6e96ed5d03e1889b6ed10459546fb803f1e4b2f6f469e285798d",
+          "types/packages/peer-session/src/participation-types.d.ts": "a44a1fa1f669540128b57db70b622109596b2f0918ad34789b8f5ffc1de11464",
+          "types/packages/peer-session/src/participation.d.ts": "c9c1808bb0b374e9cc2131ebec0a8d1cc47155d8a015612a2a2edf2f06684975",
+          "types/packages/peer-session/src/deferred-stream.d.ts": "b2b331bc8545f8fc19c43c054e140b7697ff8f4ba9016ac094456c621d86b203",
+          "types/packages/peer-session/src/session.d.ts": "b337847170d5c9a67c38b96fb966a03d89a8b5a7b21420c6e764ca21aed6e04d",
+          "types/packages/peer-session/src/tools.d.ts": "dae5bf06a542e75958c23e944d7db2a594ebe2c9ac848dd95b0e24ab7b1e46df",
+          "types/packages/peer-session/src/index.d.ts": "9742a43e0ded03ea00cb40067f7a1b1343438d2419537cb912e9e9dd5a33a4fc",
+          "types/packages/records/src/native.d.ts": "7e8e3e12cbf5095724b0b205ef66c987d9c32da6de4c459496f2eca9341e63b4",
+          "types/packages/peer-session/src/native.d.ts": "763805b4c14a06ff30081b2cc5f2ae1acd58512666e9b2477f77cf031fbc8199",
+          "types/packages/peer-generation/src/metadata.d.ts": "b0ec41cb7a2054b7eabf0e8739395fadda459e1a2de0695204e33704c4171278",
+          "types/packages/transport-webrtc/src/types.d.ts": "11ca59d711a46d08334456872b5630a47224654f432e63bbb2d50233c13955e8",
+          "types/packages/transport-webrtc/src/live.d.ts": "6463ad861ad05b4c1d6db4786265041ede6fb5a2777b24dbc17ffa19d47bdba9",
+          "types/packages/transport-webrtc/src/channel.d.ts": "95acd1ef3635d151add936c9db25daece12c24a264f20bebf0ba3b922558dd53",
+          "types/packages/transport-webrtc/src/route.d.ts": "d109f7fa2cf599d5db172673048f7f3179e0b6fe2f94a81ee7e2d51c1f7d3975",
+          "types/packages/transport-webrtc/src/negotiation.d.ts": "3add1e2e44c0c47762245b4364063b7b0cc57921be750460e0e9fa4340baf6a9",
+          "types/packages/transport-webrtc/src/http.d.ts": "ce4c72a1d7cbe46e07179825bf58929e45b58ed7a6d3329b7fe02da095f9be75",
+          "types/packages/transport-webrtc/src/index.d.ts": "22eb724e67fb1c604a85f5b71f0aab292c2cd719565592725217e99b794a9f4f",
+          "types/packages/peer-session/src/worker-transport.d.ts": "713add13afb2e66b02bad44c02c3af064010a1912cc32be011d543c8060bc6af",
+          "types/packages/peer-session/src/worker-application-protocol.d.ts": "0cbf75c61ce0c9976062e5dab9c16732a6c1f8732bf7ab0aa4ec8acbcd77d4eb",
+          "types/packages/peer-session/src/worker-application.d.ts": "38240cfeb5096bc83e49ed471282d07313fdcd43f35023fb44950f0927535985",
+          "types/packages/peer-session/src/browser.d.ts": "070b36a94d0bbde6b581dbb96e964e5d9cc0e89eb9f2d8a9e1f032b6f8478b80",
+          "types/packages/peer-session/src/browser-metadata.d.ts": "ed95d2eeae60719007a1dbf682e82db9994c56611b470e9c96efc98cf6a8e939",
+          "types/packages/records/src/browser.d.ts": "3000f724d33e1591179ed0222b2adfdd985f67609268805918fb3ab9c4b2244d",
+          "types/packages/peer-session/src/browser-device.d.ts": "abfde00cfad1300217b2f63888507bdf8fe6251a5cbfb4b3b70a2ed90e69f5b8",
+          "types/packages/peer-session/src/worker-application-server.d.ts": "58ceaf92a676fa16a099d4735f7d0689dd4450ac074893e18c5360c531dc651d",
+          "types/packages/peer-session/src/worker.d.ts": "d295e82e465cef57321296ea69bd88e8819f98ba8472710802c38da0421a4ee0",
+          "types/packages/peer-session/src/webrtc.d.ts": "f25159e2a2f8ff22c9d6aa823053ca66fb5a01e3219b51cf428d36b184c2c3f8",
+          "types/packages/transport-websocket/src/index.d.ts": "0421799400c546fe38fdbd4ce22ba396a82788c684a4601aa8d531f0d039b15b",
+          "types/packages/peer-session/src/websocket.d.ts": "033fcc8bbfb1ebb1b8a8ea3438200587692f5848dec68f0f2de9d20e96f8235c",
+          "types/packages/peer-session/src/tendriller.d.ts": "a87011080074d2d54fc1ab2d573f573126c11f71ae658d032adbecfa9fcb6d69",
+          "types/packages/transport-webrtc/src/native.d.ts": "e2eea57e4291d1f0144fb5617dfe739c68447186bd1fae7acc35b1cdea517377",
+          "types/packages/peer-session/src/webrtc-native.d.ts": "7ecf125e0af19a3560f3e504b85ff6ef5c598028dc72c230a3d3d61ab222e9e7",
+          "index.d.ts": "051e8080a57f42102bb1b5f1a764bfef708342421cc8d583ee6117de030bb201",
+          "native.d.ts": "ce3c892d2757c873ee8f1e6e08d99ba39f077acfb28f7b004f0fc0b3ab001fb2",
+          "browser.d.ts": "673ea804747cb6ca18b3594f941dd27f3ccfc00ef23e57229d507339e1c6ce43",
+          "worker.d.ts": "9e7e7d30737aa5e45f5a23e49594a0efaf63cca5fc4bee16b164344c16ba81c5",
+          "webrtc.d.ts": "e552d088490ac9ff9ecb457736ef47eda083a3595f517ab07abf900a9fcba1d2",
+          "websocket.d.ts": "35c79cb50da1b137d3cd2c7f7fd0161aab6445eba5a081f4da50d44388cd73d8",
+          "tendriller.d.ts": "eb17e47e01bd92541f526b6b42f7c94e4dad7cda9c0c9196cd1d3ded866f7c4c",
+          "webrtc-native.d.ts": "c26c6f8fdd4fdb3db1020a0ab8f8fa98d1f3254d0a5fac453f32abb3370b7e43",
+          "README.md": "6f323757dc19bf15b9cead11a205622c8facacdda517a46596cdb02c894d2a8e",
+          "package.json": "c339aa2e9c47815fffb17f705c50526fcb036880186c160281fe8f966de063eb"
+        }
+      }
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-consumer.mjs",
+      "sha256": "7af446b5d7bbeb0ab1c782ff60f313dc454f43c2fcac254dcc6273236381b370"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-page.mjs",
+      "sha256": "f30f113e68040e82036946af36c1499cd40e05fe80d880b61bbc1a982bd914d6"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-worker.mjs",
+      "sha256": "0eac743bca856574da9699e8e6dfdea801fa9f3ba03a164ae524eff6e82a551e"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-resources.mjs",
+      "sha256": "6c9eeedc0c349f60ff218fd7dd16288bbd408999562109a9628b8bbac4e0da09"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-rtc-transport.mjs",
+      "sha256": "359b6c0875643980e65f82f4bb2420cd84e4553686fd4b9b5c9acabf454c286d"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-native-rtc-transport.mjs",
+      "sha256": "341028dff65b5a3f947df0086a4a9b5d03c8da7a57c76c63000c5983aeaf7aab"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "73e5a9dde224403938b31b0c84072a8bcecc66ae159ad0973bc59fbb748b0c36"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/board.html",
+      "sha256": "ac03488ef3f116d12e63fe5f2ab83382b048a3c7d70b343122d483e059d3058b"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/compact.html",
+      "sha256": "087f00bcec57763bad44d01f1274d0017ed2177eda8095fdc4c40907193f0efe"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/style.css",
+      "sha256": "8474c917190b0777cd76d3c9919b8b1ef09b6e1026841f1bbb5ccc9dc0a999b5"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/app.mjs",
+      "sha256": "0c4668eac4f21f61a410c61d9e600740b012db4692cf9859bbc96c46974c263a"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/recovery-choice.mjs",
+      "sha256": "0b5d307ff758a38e9a38f19661257e53355bd775d8029d44dca94f0460efea15"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/shared/typing.mjs",
+      "sha256": "44de2d5704c6b89d51ec57e92fec1eb9ea04d88988771c82e305fd2366ec0a0f"
+    }
+  ],
+  "error": null,
+  "runtime": {
+    "node": "v24.22.2",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "d9548fb09cee1733c7f54f7f891ae0e4b7d25054df911b25d77846b7709de9fc",
+      "packages": [
+        {
+          "path": "node_modules/@esbuild/aix-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-kXXoiPVVGQcnIYGOeaovwOURpniDBpSq4A03qkQ+BMQqtGG6HYap3xne9C1O1yo4TR3qxlCX5IqqmX6fFo2Lqg=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-5YfKeeI8qWfBZIX+u2xZC3Zlb3Os/gLS2sbEKM+I4ZOcsWmHS2WLysCcQZDAFRslDUU5Oiq44gf6PYN1vGwG5A=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-O387ite7SzUyCcy3JQX4P4bLtEA7bLLkx+esve5JHnyYfNTxcVpXZo9jhdB0lTKN44gztELTdU7nS8Nr16Fs1Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n4KqkOQrraxHJcgjM1RvwbigfQKIKJVpM7xp+KsxiyUSrRdIXnt73VhrPAx0fV44hgfmIVKjxMN9J1t5jySVkw=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-uq6suIWYP37qzGddBKPw5QEQPi6HiLGsO7UmkpfyaYNQ3D+rN6w6WfwH+nuqcGXWvawGwxOEroO4YGnFh95azw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n+I0BTSRIoy+d6RPKnEVwql5UwBJolytvY4mAOIEJorKlqgPII8ix6slVVrfZ5Tnj7glIZvloylbB/EJPMWEXw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-78XJTJkvPs0kz2w61301PJjXl4g7q3JqiYMZ/M/yVI73EHBrCRTgkhu9oqG7vPqq+a/yadEW8aD+agKlk5xrmg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-XlDnu2q5yoqems+xay6wSAcg9DDD7K9RLKZEBOMZm3ckNpJBvOX20tSfby8KfrrhINDyv9V2YVZKY/SpoGJI8w=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-pW4AC0P3it8c7do9MVM4p51FzHzdM/TZrerurgRcHJ2WTa1VQ1CIq18xncfpBJw4ojkiZZrKW2yIBWBP92j6Ug=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-CYbnj78HsIeA+DhgUKgFCfvNsTHFhMMrinUrMZpDXJXKN8T3XViTZ/+wtHeVxEWY8ewSzTFN+nRmSwO2tZaLUQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-loong64",
+          "version": "0.28.2",
+          "integrity": "sha512-buwkd8nsph4R+ajRvw0qM5Hja/TXQow3ptzWO2EbG/cqcIkHloRrdlBtQlshyYGTNFvfkfJ5tpPLVkY4DtsPfQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-mips64el",
+          "version": "0.28.2",
+          "integrity": "sha512-ZVykbDyk7519VwiNb9Lcj9m8XM6v5V9uKPvrEMkkEedVewf+0itkhahp4HDpgERXhwLRpWFypsGbG/J8s0QjJA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-CAXl+Dtd9UUuJd8pKKdwh6MLm3MUMiqMPmhZ3tTSXPqfyQ3vDl6R5hZdZ/kYojK4ofXtdfSv1tFq8XzWx3heNQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-riscv64",
+          "version": "0.28.2",
+          "integrity": "sha512-GeXCej4IQtU1B+QlDV8W/RRvbzI3O/Stss+/bCXv4lZls5WGRtu2a+3JkA3i4qIUlMXpcHebWpF8AkJhATowuA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-s390x",
+          "version": "0.28.2",
+          "integrity": "sha512-3H1weTYZPxt/WOhByszQZybS9w5lKzUn1FDMsgEChbHWQwHYQQRfBxgCcZvPhjHfKyJjIievvMmEUawJrdY9Dg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-4xTZr1FUmSoQW4XIWmit3tzQrUTZM+N3P0XV8xROKYF50XfI7xeO90+1bZvNwxIufQ9hDQVRJH5YhgPVF8A/HQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-sSATRjPeDBg3pdgHoQfoYBob11Kk1FGa9lui5RIHZCoCkJa9QKlvl3/vKz2usCmYYjs7ymJR/2Nnsqe+Hjt5nw=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-lqnzCV+mM0gIADaKihiCg6ifgfU2L3h5E33rNQBN1Y4MaVGnzryzmvvf7UHxprpQdE8hpqLolJ9Rl+SkIRDpyw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-AL2qJILH7lNjrDmCQDvdxMfAUIv8KMNZOvrwAQ8i8//ntL9FflhOyMJ8OZSMBb8/AWXe3/5v5S20y3zCoZWKoQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-QtiuPytchRyC4rwUKhexJdQKvDuZ6hWloi3igqPQNUJCS1/v9EiO3UTOXR6A3FoMo4fnAKbWJdqaIwhOzh8qEw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openharmony-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-WkhYDmpTjLvGlScA1rwjRUmhl4k8oXR3cIbtqWmELgU/dFeHHlEllxDvdWcNJV9rbzCexB5vz8gtNewWLgCT7Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/sunos-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-GPMSkTOtMnv2U2F8gxe4Io6qmVs+YKyp832Etqqxr0hFngmXQ3rzwytelm3GIn7T4VviRUlf3sOgBOiTdvaf7g=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-PIhhEkE9uPBleRBrQEJpUn7MBnibZzbGzYWPmY3x+YoVg/95zbjB4CxPPOQ8l5tYYM4mMaCthF8/1DIfBQQyWQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-YmJbfTlvU7Sdn9BB+4PRES4oB6pxgS37MAONj+hBr/cpXS1aBPKXxNnDbu+QCWPj0o9dgyxeq79g6c5P8KeuYA=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="
+        },
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/esbuild",
+          "version": "0.28.2",
+          "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/playwright",
+          "version": "1.65.0",
+          "integrity": "sha512-F3AMWcR44qMBt4kq+6Kb6mX7bjGXshktKFOPULd7reED6ZJWevjbNRqysP7q+AATE9kdPEZBibex1BYsvpVoeA=="
+        },
+        {
+          "path": "node_modules/playwright-core",
+          "version": "1.65.0",
+          "integrity": "sha512-vNSKgH6YqtN7cdT/L334zo0a+YwkrpicyrHJlWWPIm/Q+Nn2SWInil01oT0mbu96U4GgoRtCYQD9CzJQgju+lA=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/browser",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc",
+      "@chronolog/peer-session/webrtc-native",
+      "@chronolog/peer-session/worker"
+    ],
+    "testTools": [
+      "esbuild",
+      "playwright"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRpcMaps": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "browserAssets": [
+    {
+      "file": "app.mjs",
+      "sha256": "fe01c4c2c9b6f709abb057bff3714ceb7483db15e37b0e2190a8b56c92aee34a"
+    },
+    {
+      "file": "application-data-WPFDBA7M-LHLJOTG4.mjs",
+      "sha256": "2e21514f43c0eddba88867cfb3e929983b26ca640cbaf5d06fd167934ab4ae65"
+    },
+    {
+      "file": "board.html",
+      "sha256": "ac03488ef3f116d12e63fe5f2ab83382b048a3c7d70b343122d483e059d3058b"
+    },
+    {
+      "file": "browser-ZR2BZCLK-SPT65ZTT.mjs",
+      "sha256": "1d8da7dcb13572a4918c0ade4a3a0fe6b7ca953514110a79ba18357561c11b91"
+    },
+    {
+      "file": "chunk-7OIX2XXE.mjs",
+      "sha256": "5764720a0d9ad3dbb7ca849e27505241bb210c1bd44c16e5fdd3730c8fcf9eeb"
+    },
+    {
+      "file": "chunk-D3P5IWXQ.mjs",
+      "sha256": "28a4c4cdeeac7605f609d89eb6aeadd990711d448be62de6aaef94e704b38ee6"
+    },
+    {
+      "file": "chunk-E4VA46ZE.mjs",
+      "sha256": "4ea00e1169e14215fa684f71eb4a5b860f72fc5f4fdfa1ed9c62f3b4e523f246"
+    },
+    {
+      "file": "chunk-FMK3WIOD.mjs",
+      "sha256": "ed5cd8f7e1e2316a15fcabf28136696e23b3b4f16574b8a31d54e4a5db2796e7"
+    },
+    {
+      "file": "chunk-HADVHY3S.mjs",
+      "sha256": "ee36b1825797863d6a13ab99ec6b03e5b0ac1cc757dcaa0db8799c9e000fa379"
+    },
+    {
+      "file": "chunk-I7WGFSGK.mjs",
+      "sha256": "86df04b39c1c19ba17ce622c1adb3ef046de9b43814c6acc1299272fed86521b"
+    },
+    {
+      "file": "chunk-LSXAKFFI.mjs",
+      "sha256": "f76a0bd8d30cb10835dd6fcbb5677d88c607198a62732b4486811beb2f0ed3aa"
+    },
+    {
+      "file": "chunk-RYEX4BPW.mjs",
+      "sha256": "c18db234111e5bbef41debc85945288605b579e3651b48d82a10c7ad8c397a76"
+    },
+    {
+      "file": "chunk-S4GEBUQA.mjs",
+      "sha256": "ae4939d09a2e26354b97fcd04ec657208ce7d7f828dc7a6213b0a485a1a492c6"
+    },
+    {
+      "file": "compact.html",
+      "sha256": "087f00bcec57763bad44d01f1274d0017ed2177eda8095fdc4c40907193f0efe"
+    },
+    {
+      "file": "replica-CH2AI7LK-6K6QAI52.mjs",
+      "sha256": "47aa2f400823ca5ee05fca0fcebaa7a6b2d34764478d8f3b4a0459a24cfbeac8"
+    },
+    {
+      "file": "style.css",
+      "sha256": "8474c917190b0777cd76d3c9919b8b1ef09b6e1026841f1bbb5ccc9dc0a999b5"
+    },
+    {
+      "file": "worker-UZZWE5I6.mjs",
+      "sha256": "8d67a2775d9531d4f94f96764c096aa5cabafe0bd2595e11158dc5635ef69166"
+    },
+    {
+      "file": "worker.mjs",
+      "sha256": "e2f95a074062ec3c71caebd447d9edeb6a9b0073ef87cfb628f108afdd70fcce"
+    }
+  ],
+  "browserBundleInputs": [
+    "app.mjs",
+    "deployment/bootstrap.mjs",
+    "node_modules/@chronolog/peer-session/browser.mjs",
+    "node_modules/@chronolog/peer-session/chunks/application-data-WPFDBA7M.mjs",
+    "node_modules/@chronolog/peer-session/chunks/browser-ZR2BZCLK.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-6RGB3FLI.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-ED33HBHG.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-KSC4KBWO.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-LK44BQ5A.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-NSHSZH3K.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-PFEHSVTG.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-QHC7XSCD.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-TLZH7OYA.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-TWP6P5ES.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-UP5XO6ZJ.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-ZYVCMK3N.mjs",
+    "node_modules/@chronolog/peer-session/chunks/replica-CH2AI7LK.mjs",
+    "node_modules/@chronolog/peer-session/index.mjs",
+    "node_modules/@chronolog/peer-session/webrtc.mjs",
+    "node_modules/@chronolog/peer-session/worker.mjs",
+    "peer-generation-browser-page.mjs",
+    "peer-generation-browser-resources.mjs",
+    "peer-generation-browser-transport.mjs",
+    "peer-generation-browser-worker.mjs",
+    "peer-generation-definition.mjs",
+    "recovery-choice.mjs",
+    "typing.mjs"
+  ],
+  "lazyDatabase": {
+    "moduleGraph": {
+      "sourceModules": [
+        "packages/materializer/src/event-store.ts",
+        "packages/materializer/src/events.ts",
+        "packages/materializer/src/runtime.ts",
+        "packages/peer-generation/src/replica.ts",
+        "packages/peer-session/src/application-data.ts",
+        "packages/peer-session/src/content.ts",
+        "packages/peer-session/src/keys.ts",
+        "packages/peer-session/src/projection.ts",
+        "packages/peer-session/src/recovery.ts",
+        "packages/records/src/browser.ts",
+        "packages/records/src/native.ts"
+      ],
+      "packageModules": [
+        "node_modules/@chronolog/peer-session/chunks/application-data-WPFDBA7M.mjs",
+        "node_modules/@chronolog/peer-session/chunks/browser-ZR2BZCLK.mjs",
+        "node_modules/@chronolog/peer-session/chunks/replica-CH2AI7LK.mjs",
+        "node_modules/@chronolog/peer-session/native.mjs"
+      ],
+      "browserModules": [
+        "application-data-WPFDBA7M-LHLJOTG4.mjs",
+        "browser-ZR2BZCLK-SPT65ZTT.mjs",
+        "replica-CH2AI7LK-6K6QAI52.mjs"
+      ]
+    },
+    "shell": {
+      "workers": 0,
+      "page": {
+        "indexedDbOpens": 0,
+        "opfsRoots": 0,
+        "writableFiles": 0,
+        "syncHandles": 0,
+        "lockRequests": 0,
+        "lockNames": []
+      },
+      "modulesRequested": [
+        "app.mjs",
+        "chunk-7OIX2XXE.mjs",
+        "chunk-D3P5IWXQ.mjs",
+        "chunk-HADVHY3S.mjs",
+        "chunk-I7WGFSGK.mjs",
+        "chunk-RYEX4BPW.mjs"
+      ],
+      "databaseModulesRequested": []
+    },
+    "identityRace": {
+      "workers": 2,
+      "participants": [
+        {
+          "deviceId": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "storageId": "0797e224-46f7-4021-a7ac-4ae2db2b4357",
+          "observation": {
+            "resources": {
+              "indexedDbOpens": 1,
+              "opfsRoots": 0,
+              "writableFiles": 0,
+              "syncHandles": 0,
+              "lockRequests": 0,
+              "lockNames": []
+            },
+            "protocol": {
+              "attachRequests": 0,
+              "exchanges": [
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "definition"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "publish"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                }
+              ],
+              "definitionVerified": true,
+              "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+              "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "publicationVersion": 1,
+              "database": "idle"
+            },
+            "database": "idle",
+            "revision": null,
+            "links": 0
+          }
+        },
+        {
+          "deviceId": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "storageId": "0797e224-46f7-4021-a7ac-4ae2db2b4357",
+          "observation": {
+            "resources": {
+              "indexedDbOpens": 1,
+              "opfsRoots": 0,
+              "writableFiles": 0,
+              "syncHandles": 0,
+              "lockRequests": 0,
+              "lockNames": []
+            },
+            "protocol": {
+              "attachRequests": 0,
+              "exchanges": [
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "definition"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "publish"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                }
+              ],
+              "definitionVerified": true,
+              "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+              "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "publicationVersion": 1,
+              "database": "idle"
+            },
+            "database": "idle",
+            "revision": null,
+            "links": 0
+          }
+        }
+      ],
+      "closed": [
+        {
+          "before": {
+            "resources": {
+              "indexedDbOpens": 1,
+              "opfsRoots": 0,
+              "writableFiles": 0,
+              "syncHandles": 0,
+              "lockRequests": 0,
+              "lockNames": []
+            },
+            "protocol": {
+              "attachRequests": 0,
+              "exchanges": [
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "definition"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "publish"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                }
+              ],
+              "definitionVerified": true,
+              "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+              "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "publicationVersion": 1,
+              "database": "idle"
+            },
+            "database": "idle",
+            "revision": null,
+            "links": 0
+          },
+          "heldLocks": []
+        },
+        {
+          "before": {
+            "resources": {
+              "indexedDbOpens": 1,
+              "opfsRoots": 0,
+              "writableFiles": 0,
+              "syncHandles": 0,
+              "lockRequests": 0,
+              "lockNames": []
+            },
+            "protocol": {
+              "attachRequests": 0,
+              "exchanges": [
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "definition"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "publish"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                },
+                {
+                  "facet": "control",
+                  "action": "read"
+                },
+                {
+                  "facet": "publication",
+                  "action": "read"
+                }
+              ],
+              "definitionVerified": true,
+              "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+              "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+              "publicationVersion": 1,
+              "database": "idle"
+            },
+            "database": "idle",
+            "revision": null,
+            "links": 0
+          },
+          "heldLocks": []
+        }
+      ]
+    },
+    "protocol": {
+      "workers": 1,
+      "page": {
+        "indexedDbOpens": 0,
+        "opfsRoots": 0,
+        "writableFiles": 0,
+        "syncHandles": 0,
+        "lockRequests": 0,
+        "lockNames": []
+      },
+      "modulesRequested": [
+        "app.mjs",
+        "chunk-7OIX2XXE.mjs",
+        "chunk-D3P5IWXQ.mjs",
+        "chunk-E4VA46ZE.mjs",
+        "chunk-FMK3WIOD.mjs",
+        "chunk-HADVHY3S.mjs",
+        "chunk-I7WGFSGK.mjs",
+        "chunk-LSXAKFFI.mjs",
+        "chunk-RYEX4BPW.mjs",
+        "chunk-S4GEBUQA.mjs",
+        "worker.mjs"
+      ],
+      "databaseModulesRequested": [],
+      "notices": [],
+      "statuses": [
+        {
+          "phase": "waiting",
+          "database": "idle",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 0
+        },
+        {
+          "phase": "ready",
+          "database": "idle",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 1
+        }
+      ],
+      "secureContext": true,
+      "storage": true,
+      "locks": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36",
+      "observation": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 0,
+          "lockNames": []
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "idle",
+        "revision": null,
+        "links": 1
+      },
+      "live": {
+        "browserToNative": true,
+        "nativeToBrowser": true,
+        "verifiedAuthors": [
+          "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9"
+        ]
+      }
+    },
+    "firstData": {
+      "workers": 1,
+      "page": {
+        "indexedDbOpens": 0,
+        "opfsRoots": 0,
+        "writableFiles": 0,
+        "syncHandles": 0,
+        "lockRequests": 0,
+        "lockNames": []
+      },
+      "modulesRequested": [
+        "app.mjs",
+        "application-data-WPFDBA7M-LHLJOTG4.mjs",
+        "browser-ZR2BZCLK-SPT65ZTT.mjs",
+        "chunk-7OIX2XXE.mjs",
+        "chunk-D3P5IWXQ.mjs",
+        "chunk-E4VA46ZE.mjs",
+        "chunk-FMK3WIOD.mjs",
+        "chunk-HADVHY3S.mjs",
+        "chunk-I7WGFSGK.mjs",
+        "chunk-LSXAKFFI.mjs",
+        "chunk-RYEX4BPW.mjs",
+        "chunk-S4GEBUQA.mjs",
+        "replica-CH2AI7LK-6K6QAI52.mjs",
+        "worker.mjs"
+      ],
+      "databaseModulesRequested": [
+        "application-data-WPFDBA7M-LHLJOTG4.mjs",
+        "browser-ZR2BZCLK-SPT65ZTT.mjs",
+        "replica-CH2AI7LK-6K6QAI52.mjs"
+      ],
+      "notices": [],
+      "statuses": [
+        {
+          "phase": "waiting",
+          "database": "idle",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 0
+        },
+        {
+          "phase": "ready",
+          "database": "idle",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 1
+        },
+        {
+          "phase": "ready",
+          "database": "opening",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 1
+        },
+        {
+          "phase": "awaiting-keys",
+          "database": "ready",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 1
+        },
+        {
+          "phase": "ready",
+          "database": "ready",
+          "role": "follower",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "coordinator": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+          "connectedPeers": 1
+        }
+      ],
+      "secureContext": true,
+      "storage": true,
+      "locks": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36",
+      "observation": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 1,
+          "writableFiles": 8,
+          "syncHandles": 0,
+          "lockRequests": 1,
+          "lockNames": [
+            "chronolog:peer-browser-bf2d8b72ea5436da"
+          ]
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "ready",
+        "revision": {
+          "applicationId": "2716b263fda328e64ea3bee5323e8d1cc67cd14a1ccbef5c79ce9812431a1021",
+          "historyId": "browser-peer-conversation",
+          "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+          "point": {
+            "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+            "sequence": 1,
+            "root": "2b25d3f294ea64748200f953ad6b8e6950716e7f4d2e18d2b172603dbfe08a90"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "1"
+        },
+        "links": 1
+      },
+      "requests": {
+        "method": "query",
+        "concurrent": 3,
+        "results": [
+          "03cea8a75a083dbfb699e474197e480c3958ee1b3dc84f97c4303665c130158f",
+          "03cea8a75a083dbfb699e474197e480c3958ee1b3dc84f97c4303665c130158f",
+          "03cea8a75a083dbfb699e474197e480c3958ee1b3dc84f97c4303665c130158f"
+        ]
+      },
+      "firstView": "03cea8a75a083dbfb699e474197e480c3958ee1b3dc84f97c4303665c130158f",
+      "sameIdentity": true,
+      "transitions": [
+        "idle",
+        "opening",
+        "ready"
+      ]
+    },
+    "secondOwner": {
+      "protocolOpened": true,
+      "deviceId": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+      "storageId": "0797e224-46f7-4021-a7ac-4ae2db2b4357",
+      "before": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 0,
+          "lockNames": []
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "idle",
+        "revision": null,
+        "links": 0
+      },
+      "error": "BROWSER_STORAGE_IN_USE",
+      "after": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 1,
+          "lockNames": [
+            "chronolog:peer-browser-bf2d8b72ea5436da"
+          ]
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "failed",
+        "revision": null,
+        "links": 0
+      }
+    },
+    "unsupportedStorage": {
+      "protocolOpened": true,
+      "deviceId": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+      "storageId": "0797e224-46f7-4021-a7ac-4ae2db2b4357",
+      "before": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 0,
+          "lockNames": []
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "idle",
+        "revision": null,
+        "links": 0
+      },
+      "error": "BROWSER_DURABLE_STORAGE_UNAVAILABLE",
+      "after": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 0,
+          "lockNames": []
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "failed",
+        "revision": null,
+        "links": 0
+      }
+    },
+    "dormantClose": {
+      "sameIdentity": true,
+      "before": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 0,
+          "writableFiles": 0,
+          "syncHandles": 0,
+          "lockRequests": 0,
+          "lockNames": []
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "idle",
+        "revision": null,
+        "links": 0
+      },
+      "heldLocks": [
+        "chronolog:peer-browser-bf2d8b72ea5436da"
+      ]
+    },
+    "activeClose": {
+      "before": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 1,
+          "writableFiles": 1,
+          "syncHandles": 0,
+          "lockRequests": 1,
+          "lockNames": [
+            "chronolog:peer-browser-bf2d8b72ea5436da"
+          ]
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "ready",
+        "revision": {
+          "applicationId": "2716b263fda328e64ea3bee5323e8d1cc67cd14a1ccbef5c79ce9812431a1021",
+          "historyId": "browser-peer-conversation",
+          "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+          "point": {
+            "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+            "sequence": 2,
+            "root": "6821134e1e19dcf74968619afed61b2ff7048269e22d3d55b9720f7e9fa214ac"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "6"
+        },
+        "links": 0
+      },
+      "heldLocks": []
+    }
+  },
+  "browser": {
+    "implementation": "chromium",
+    "version": "158.0.8127.18",
+    "headless": true,
+    "transportOwner": "dedicated-worker",
+    "storage": "opfs-with-exclusive-web-lock",
+    "transportComposition": {
+      "page": "serveWorkerWebRtcConnections",
+      "worker": "openWorkerWebRtcConnection",
+      "authentication": "session.connectPeer",
+      "fixtureControls": [
+        "connect",
+        "inspect",
+        "disconnect"
+      ],
+      "qualification": "explicit-transport-faults",
+      "applicationQueue": "owned-session-only"
+    },
+    "signalingBoundary": "loopback-fixture-http",
+    "controlBoundary": "chronolog-participant-over-loopback-http",
+    "nativeCandidateSource": "explicit-loopback-only",
+    "interfaceEnumeration": "disabled-by-native-options",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "observations": {
+      "notices": [],
+      "statuses": [
+        {
+          "phase": "ready",
+          "database": "idle",
+          "role": "coordinator",
+          "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+          "coordinator": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "connectedPeers": 0
+        },
+        {
+          "phase": "ready",
+          "database": "opening",
+          "role": "coordinator",
+          "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+          "coordinator": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "connectedPeers": 0
+        },
+        {
+          "phase": "ready",
+          "database": "ready",
+          "role": "coordinator",
+          "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+          "coordinator": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+          "connectedPeers": 0
+        }
+      ],
+      "secureContext": true,
+      "storage": true,
+      "locks": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36",
+      "observation": {
+        "resources": {
+          "indexedDbOpens": 1,
+          "opfsRoots": 1,
+          "writableFiles": 1,
+          "syncHandles": 0,
+          "lockRequests": 1,
+          "lockNames": [
+            "chronolog:peer-browser-bf2d8b72ea5436da"
+          ]
+        },
+        "protocol": {
+          "attachRequests": 0,
+          "exchanges": [
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "definition"
+            },
+            {
+              "facet": "publication",
+              "action": "publish"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            },
+            {
+              "facet": "control",
+              "action": "read"
+            },
+            {
+              "facet": "publication",
+              "action": "read"
+            }
+          ],
+          "definitionVerified": true,
+          "publicationId": "5cb561baaee79527ca838a80de15f52b1b75b638358a8a07bac4a418b867a812",
+          "codeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "servedCodeDigest": "5f8bc48df21c2b8bc86c0db26b73a01b3db82d61dde1899f2925b9d1090ff096",
+          "publicationVersion": 1,
+          "database": "idle"
+        },
+        "database": "ready",
+        "revision": {
+          "applicationId": "2716b263fda328e64ea3bee5323e8d1cc67cd14a1ccbef5c79ce9812431a1021",
+          "historyId": "browser-peer-conversation",
+          "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+          "point": {
+            "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+            "sequence": 2,
+            "root": "6821134e1e19dcf74968619afed61b2ff7048269e22d3d55b9720f7e9fa214ac"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "6"
+        },
+        "links": 0
+      }
+    }
+  },
+  "executionManifestDigest": "bec3e62bedaf33320f4b379163498f73ba8388a707ca6c9de9ec7aa4a49266d0",
+  "ownership": {
+    "workerOnly": true,
+    "secondOwnerRefused": true,
+    "secondTabRefused": true,
+    "unsupportedStorageRefused": true,
+    "unsupportedFault": "Worker navigator.storage.getDirectory removed by the fixture",
+    "initialDeviceId": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+    "initialStorageId": "0797e224-46f7-4021-a7ac-4ae2db2b4357",
+    "pagePrivateKeys": 0,
+    "freshDeviceStartedWithoutKeys": true,
+    "controlParticipant": {
+      "owner": "application-session",
+      "attachRequests": 0
+    },
+    "gracefulReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "storedKeysReused": true
+    },
+    "abruptWorkerReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "durableOperation": true,
+      "attempts": 1
+    }
+  },
+  "stage": "fresh peer replay and graceful plus abrupt Worker reopening passed",
+  "operations": {
+    "cancelledWaitPreservedAttempt": true,
+    "resumedExactAttempt": true,
+    "operationId": "cb988389-ad5d-4dea-9b8a-7b7e1de8bfe6",
+    "attemptId": "596dadc21593291d7bc10c41d27e874941cc06e75af75c12e6b8b677424b859f",
+    "receiptPeer": "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+    "enrolledFromPeer": true
+  },
+  "hostOutage": {
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "before": {
+      "controlRequests": 54,
+      "controlBodyBytes": 19378,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1200
+    },
+    "after": {
+      "controlRequests": 54,
+      "controlBodyBytes": 19378,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1200
+    },
+    "transport": {
+      "before": {
+        "reliable": {
+          "sentBytes": 60391,
+          "receivedBytes": 60391
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1107,
+          "closed": true
+        }
+      },
+      "after": {
+        "reliable": {
+          "sentBytes": 179946,
+          "receivedBytes": 179946
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1107,
+          "closed": true
+        }
+      }
+    },
+    "liveSignalsObserved": 1,
+    "content": {
+      "bytes": 32768,
+      "sha256": "a1b648236828311be2496b609efe1fb6960378858c9a8e059c0174396669a108",
+      "retainedByBrowser": true
+    },
+    "disposablePathsDidNotAppend": true,
+    "coherentReadView": true
+  },
+  "contentRecovery": {
+    "bytes": 131095,
+    "interruptedAfter": 65536,
+    "partialRetentionRefused": true,
+    "partialSurvivedRestart": true,
+    "unavailableRemainderRefused": true,
+    "completeAfterReconnect": true,
+    "retainedBy": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+    "retentionSignature": "f0e094e99d649d29f16340de40bea898de7d812c3177fd069c63a8908a1987824520acad3248eefe5a85537891ccad29859592056ec76b5526aadfb4f6e58802"
+  },
+  "recovery": {
+    "originatorClosed": true,
+    "originatorStoreUnavailable": true,
+    "priorHead": {
+      "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+      "sequence": 6,
+      "root": "00ba3065613b60c21c4451a879af4cc4737f5a04db30e1ff7ef423de1bbd7b42"
+    },
+    "adoptedPrefix": {
+      "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+      "sequence": 4,
+      "root": "244d13bffa6277b6fe86d404b393c50edebaa90d524e1ad432da7a4146dc122f"
+    },
+    "selectedGeneration": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+    "originalAttempt": {
+      "status": "needsReapply",
+      "attemptId": "2fc4803c5ba02a7db32a9eb2325482832b1556600261df15e836373f44353e40",
+      "operationId": "e501c362-a0c7-4c52-85af-a4da947ef4e7",
+      "generation": "b325d362ba890003ea1d22bd15a0dd76cf2238a08275667a85be4f1f269dabe2",
+      "selectedGeneration": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+      "previous": null
+    },
+    "reapplied": {
+      "status": "applied",
+      "attemptId": "122e88e3252471985d4ac3862cb4346f6224b9a84f918d2061b7502a55f09f17",
+      "operationId": "e70374dc-ec08-4beb-a5d8-72069c457289",
+      "author": "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc",
+      "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "capturedViewPreserved": true,
+    "staleCursorError": "RecoveredViewError",
+    "reapplyOf": "2fc4803c5ba02a7db32a9eb2325482832b1556600261df15e836373f44353e40",
+    "currentGuardsChecked": true,
+    "noticesPersisted": 1,
+    "transitionJournalEntries": 1
+  },
+  "ui": {
+    "pages": [
+      "board.html",
+      "compact.html"
+    ],
+    "domain": "events",
+    "sessionFacade": "connectApplicationWorker",
+    "sentThroughForms": 3,
+    "reapplicationConfirmed": true,
+    "recoveryNoticeVisible": true,
+    "draftBeforeRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRecovery": "An unsent draft must survive page replacement and recovery.",
+    "originalReviewPreserved": true
+  },
+  "freshPeer": {
+    "deviceId": "f9823ebfe18a4365ed9abbb6f13f4abc5c4d0a2b6fd00ed1e2698f805fcae3d7",
+    "joinedAfterOriginatorLoss": true,
+    "enrolledFromBrowser": true,
+    "generation": "c1fcad947fe55ce90e64ef236c58fc976e35949f3326b025857c12042cf9618c",
+    "browserViewSha256": "1bd07695829777637b05b9ed98f8d959f4bd436c27b746d09014c677e8989904",
+    "nativeViewSha256": "1bd07695829777637b05b9ed98f8d959f4bd436c27b746d09014c677e8989904"
+  },
+  "connections": [
+    {
+      "peers": [
+        "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+        "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 116.61700900000051,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1107,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+        "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 72.05335600000035,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1107,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "012b59e9384ad552907a46fc9daee3a06d00d9907962bcc1877873d036475af9",
+        "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 82.6262429999997,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1107,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "f9823ebfe18a4365ed9abbb6f13f4abc5c4d0a2b6fd00ed1e2698f805fcae3d7",
+        "6c6ec39d2c2daf6c1f98d280287619ce0b53c2401dfdbe767692b2244988affc"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 266.7801049999989,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1134,
+        "closed": true
+      },
+      "nativeClosed": true
+    }
+  ]
+}

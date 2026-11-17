@@ -1,0 +1,25 @@
+{
+  "variant": "combined",
+  "artifact": "/workspace/scratch/f3460a050d13/qualification/lazy-core-b6e3f277-artifacts/combined/chronolog-peer-session-b6e3f277-rtc-sql-wasm.tgz",
+  "bytes": 1842701,
+  "sha256": "d4c76187cefad6e9e45d20686214e2801d41ec84b36430778af0a214ca49024b",
+  "provenanceSha256": "7baeed61afb0791971995d97d5417f9dafdfa72d2053dcb457b45c3ae93cbbb7",
+  "source": "b6e3f2774bb82d52755359df3a415133f3018f07",
+  "sourceTree": "a6b7ab1b8c89e1f2117317e50fe128011a8404d7",
+  "dirty": false,
+  "verifiedFiles": 177,
+  "runtimeModules": 30,
+  "exports": [
+    ".",
+    "./native",
+    "./browser",
+    "./worker",
+    "./webrtc",
+    "./websocket",
+    "./tendriller",
+    "./webrtc-native",
+    "./sql",
+    "./sql-native",
+    "./sql-browser"
+  ]
+}
