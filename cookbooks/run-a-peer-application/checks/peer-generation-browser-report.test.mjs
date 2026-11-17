@@ -16,7 +16,7 @@ function fixture() {
     fixtures: Array.from({ length: 4 }, (_, index) => ({ path: `fixture-${index}.mjs`, sha256: digest })),
     browserAssets: [{ file: 'page.mjs', sha256: digest }, { file: 'worker.mjs', sha256: digest }],
     browserBundleInputs: ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs',
-      'peer-generation-definition.mjs', 'node_modules/@chronolog/peer-session/browser.mjs'],
+      'peer-generation-definition.mjs', 'recovery-choice.mjs', 'node_modules/@chronolog/peer-session/browser.mjs'],
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native',
       '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'], testTools: ['esbuild', 'playwright'],
       siblingSourceImports: 0, applicationRpcMaps: 0, applicationRetryQueues: 0, residentRequired: false },

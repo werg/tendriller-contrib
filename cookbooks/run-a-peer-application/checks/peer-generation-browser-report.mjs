@@ -25,7 +25,7 @@ export function validateBrowserPeerReport(report) {
   assert.ok(report.browserBundleInputs.length > 3);
   for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'deployment/bootstrap.mjs'].includes(input));
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs'].includes(input));
   assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
   for (const [name, version] of Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })) {
     assert.ok(report.runtime.dependencies.packages.some(item => item.path === `node_modules/${name}` && item.version === version && item.integrity));
