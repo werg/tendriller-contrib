@@ -167,8 +167,8 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     participation.onStatus(status => statuses.push({ device: session.deviceId, ...status }));
     return participation;
   };
-  const post = async (session, operationId) => {
-    const operation = await session.command('postMessage', { messageId: operationId, text: operationId }, { operationId });
+  const post = async (session, operationId, text = operationId) => {
+    const operation = await session.command('postMessage', { messageId: operationId, text }, { operationId });
     assert.equal((await operation.applied({ signal: timeout() })).outcome, 'accepted'); return operation;
   };
   try {
@@ -184,18 +184,40 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     const before = await host.traffic();
     await post(follower, 'controller-host-blocked');
     await waitRevision(coordinator, follower.revision);
+    // Measure a declared burst through the ordinary applied() path. The single
+    // coverage wait after the burst observes background retention; it is not a
+    // per-command durability barrier or a fabricated heartbeat loss estimate.
+    const workload = { commands: 32, textBytesPerCommand: 1024, completion: 'applied',
+      retentionWaits: 1, clock: 'performance.now', startedAtMs: performance.now() };
+    const payload = 'x'.repeat(workload.textBytesPerCommand);
+    let lastOperation, lastAppliedAtMs;
+    for (let index = 0; index < workload.commands; index++) {
+      lastOperation = await post(coordinator, `freshness-${index}`, payload);
+      lastAppliedAtMs = performance.now();
+    }
+    workload.appliedAtMs = lastAppliedAtMs;
+    const coverage = await lastOperation.shared({ signal: timeout() });
+    workload.retainedAtMs = performance.now();
+    const receipt = coverage.find(value => value.payload.peer === follower.deviceId);
+    assert.ok(receipt, 'The survivor must acknowledge the complete workload prefix');
+    assert.notEqual(receipt.payload.storageId, coordinator.storageId, 'The measured copy must have independent durable storage');
+    await waitRevision(follower, coordinator.revision);
+    assert.deepEqual(receipt.payload.point, follower.revision.point);
     const after = await host.traffic();
     assert.deepEqual(after, before, 'Ordinary controller-owned work must not contact the host');
     await host.block(false);
     const previousGeneration = follower.revision.generation, retained = follower.revision.point;
     stage = 'automatic-recovery-after-grace';
-    const disconnectedAt = Date.now();
+    const disconnectedAt = performance.now();
     await coordinator.close();
     const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration);
-    const recoveredAt = Date.now();
+    const recoveredAt = performance.now();
     const automaticAuthority = await followerControl.application();
     assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);
     assert.equal(automatic.recovery, null);
+    for (let index = 0; index < workload.commands; index++) {
+      assert.equal((await follower.operations.get(`freshness-${index}`)).outcome, 'accepted', 'The observed retained workload must survive takeover');
+    }
     assert.ok(recoveredAt - disconnectedAt >= graceMs, 'Takeover must honor reconnect grace');
 
     // Deliberate cold-observer fault setup: supply verified bytes through a
@@ -222,9 +244,15 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     await Promise.all(controllers.map(value => value.close()));
     return { owner: 'application-session', entry: 'session.participate', automaticConnections: true,
       observedPeerIdentities: [coordinator.deviceId, follower.deviceId],
-      hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1, before, after },
+      hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1 + workload.commands, before, after },
       automaticRecovery: { previousGeneration, selectedGeneration: automaticAuthority.generations.at(-1).id,
-        adopted: retained, graceMs, elapsedMs: recoveredAt - disconnectedAt, freshnessBudgetMs: 300_000 },
+        adopted: retained, graceMs, elapsedMs: recoveredAt - disconnectedAt, freshnessBudgetMs: 300_000,
+        workload: { ...workload, disconnectedAtMs: disconnectedAt, recoveredAtMs: recoveredAt,
+          lastOperationId: 'freshness-31', lastAppliedAtMs, observedAdoptedAgeMs: disconnectedAt - lastAppliedAtMs,
+          recoveryReadyMs: recoveredAt - disconnectedAt, targetMs: 300_000,
+          retained: receipt, coordinatorStorageId: coordinator.storageId,
+          independentStorageId: follower.storageId, adopted: retained, knownLostCommands: 0,
+          scope: '32-command two-peer burst; observed prefix age, not a universal loss bound' } },
       broaderRecovery: { reason: approval.recovery.reason, ageMs: approval.recovery.ageMs, approvalRequired: true,
         staleApprovalRejected: true, proposalId: approval.recovery.id, adopted: approval.recovery.point,
         selectedGeneration: finalAuthority.generations.at(-1).id, commandApplied: true },

@@ -58,6 +58,22 @@ interface discovery, Internet reachability, TURN or deployed discovery. Both
 record their exact measurement boundary rather than calling a loopback result a
 deployment test.
 
+### Measure complete-prefix freshness
+
+The owned participation exercise applies a fixed burst of 32 commands with 1 KiB
+of text each while the host is blocked. Each command waits only for `applied()`.
+After the burst, one `shared()` observation captures the survivor's signed
+retention of the exact complete prefix in a different storage owner. The fixture
+then closes the coordinator and measures automatic takeover after reconnect
+grace with a local monotonic clock.
+
+Reports retain workload size, completion times, the actual retention receipt,
+independent storage identities, adopted point, time to usable recovery and known
+lost commands. The initial five-minute freshness target is checked against the
+last command's observed apply time. This short burst qualifies only its recorded
+workload and topology. It does not establish a five-minute loss bound during a
+partition, sustained mobile operation or device suspension; those remain G4.
+
 ## SQL and guarded domain commands
 
 The [task-board definition](../snippets/peer-task-board.mjs) adds SQL guards and

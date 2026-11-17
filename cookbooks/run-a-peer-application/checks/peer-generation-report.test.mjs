@@ -37,7 +37,13 @@ function syntheticReport() {
       hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1,
         before: { requests: 9, applicationBodyBytes: 0 }, after: { requests: 9, applicationBodyBytes: 0 } },
       automaticRecovery: { previousGeneration: '3'.repeat(64), selectedGeneration: '4'.repeat(64),
-        adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, graceMs: 150, elapsedMs: 200, freshnessBudgetMs: 300_000 },
+        adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, graceMs: 150, elapsedMs: 200, freshnessBudgetMs: 300_000,
+        workload: { commands: 32, textBytesPerCommand: 1024, completion: 'applied', retentionWaits: 1, clock: 'performance.now',
+          startedAtMs: 100, appliedAtMs: 500, lastAppliedAtMs: 500, retainedAtMs: 510, disconnectedAtMs: 520, recoveredAtMs: 720,
+          lastOperationId: 'freshness-31', observedAdoptedAgeMs: 20, recoveryReadyMs: 200, targetMs: 300_000,
+          retained: { payload: { point: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, peer: '2'.repeat(64), storageId: 'survivor' }, signature: 'a'.repeat(128) },
+          coordinatorStorageId: 'coordinator', independentStorageId: 'survivor',
+          adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, knownLostCommands: 0, scope: 'synthetic boundary test' } },
       broaderRecovery: { selectedGeneration: '5'.repeat(64), adopted: { generation: '4'.repeat(64), sequence: 0, root: '7'.repeat(64) },
         reason: 'freshness-unknown', ageMs: null, approvalRequired: true, staleApprovalRejected: true, proposalId: '8'.repeat(64), commandApplied: true },
       transport: { boundary: 'in-process-fixture-discovery', pendingIntroductions: 0, connections: [{ closed: true }, { closed: true }] } },
@@ -141,6 +147,22 @@ test('owned participation requires actual connections, reconnect grace, explicit
     value => { value.participation.broaderRecovery.staleApprovalRejected = false; },
     value => { value.participation.transport.pendingIntroductions++; },
     value => { value.participation.transport.connections[0].closed = false; },
+  ]) rejects(mutate);
+});
+
+test('recovery freshness requires measured workload time and independent retained coverage', () => {
+  for (const mutate of [
+    value => { delete value.participation.automaticRecovery.workload; },
+    value => { value.participation.automaticRecovery.workload.commands = 0; },
+    value => { value.participation.automaticRecovery.workload.clock = 'author timestamp'; },
+    value => { value.participation.automaticRecovery.workload.completion = 'shared'; },
+    value => { value.participation.automaticRecovery.workload.retentionWaits = 32; },
+    value => { value.participation.automaticRecovery.workload.disconnectedAtMs = NaN; },
+    value => { value.participation.automaticRecovery.workload.observedAdoptedAgeMs = 0; },
+    value => { value.participation.automaticRecovery.workload.retained.payload.point.sequence++; },
+    value => { value.participation.automaticRecovery.workload.retained.payload.peer = '1'.repeat(64); },
+    value => { value.participation.automaticRecovery.workload.independentStorageId = 'coordinator'; },
+    value => { value.participation.automaticRecovery.workload.retained.signature = ''; },
   ]) rejects(mutate);
 });
 
