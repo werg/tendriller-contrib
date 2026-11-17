@@ -56,7 +56,9 @@ try {
   await writeFile(join(process.cwd(), 'deployment/bootstrap.mjs'), "export { applicationReady } from '../peer-generation-browser-page.mjs';\n");
   const bundle = await build({ entryPoints: { app: 'app.mjs', worker: 'peer-generation-browser-worker.mjs' },
     absWorkingDir: process.cwd(), outdir: assets, bundle: true, splitting: true, format: 'esm', platform: 'browser',
-    target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
+    // A consumer nested under a producer checkout must not inherit its source
+    // aliases. Resolve only this empty install's packed public dependencies.
+    tsconfigRaw: {}, target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
   for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
       'peer-generation-browser-runtime.mjs', 'peer-task-board.mjs', 'peer-conversation.mjs',
@@ -371,7 +373,9 @@ try {
   report.passed = true;
   await checkpoint('fresh peer replay and graceful plus abrupt Worker reopening passed');
 } catch (error) {
-  report.passed = false; report.error = error instanceof Error ? error.stack : String(error); throw error;
+  report.passed = false; report.error = error instanceof Error ? error.stack : String(error);
+  if (page && report.browser) report.browser.observations = await page.evaluate(() => globalThis.fixture?.observations()).catch(() => undefined);
+  throw error;
 } finally {
   report.connections = connections.map(connection => ({ ...connection.observed, signaling: connection.mailbox.snapshot(),
     nativeClosed: connection.native.signal.aborted }));

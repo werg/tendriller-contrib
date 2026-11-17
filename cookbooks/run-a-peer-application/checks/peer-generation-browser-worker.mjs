@@ -5,13 +5,18 @@ import { openApplication } from './peer-generation-browser-runtime.mjs';
 
 const parameters = new URL(self.location.href).searchParams;
 let device;
+const stage = value => self.postMessage({ type: 'fixture-stage', stage: value });
 try {
+  stage('opening owned browser device');
   if (parameters.get('unsupported') === 'true') Object.defineProperty(navigator, 'storage', { configurable: true, value: {} });
   device = await openBrowserDevice({ name: parameters.get('name'), ...(parameters.get('create') === 'true' ? { create: true } : {}) });
+  stage('requesting fixture authority');
   const bootstrap = await request('/fixture/bootstrap', { deviceId: device.identity.publicKey, storageId: device.storageId });
+  stage('opening public application runtime');
   // A fresh granted browser receives no plaintext epoch key from the page or
   // fixture host. Its maintained peer connection enrolls wrapped keys from A.
   const session = await openApplication({ device, authority: bootstrap.authority, schema: bootstrap.schema });
+  stage('serving public Worker session');
   serveApplicationWorker(session, self, { host: {
     application: () => request('/control/application'),
     selectGeneration: requestValue => request('/control/generations', requestValue),

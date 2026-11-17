@@ -7,10 +7,11 @@ let worker, application, name;
 let resolveApplication;
 export const applicationReady = new Promise(resolve => { resolveApplication = resolve; });
 const links = new Map();
-const notices = [], statuses = [], connectionFailures = [];
+const notices = [], statuses = [], connectionFailures = [], startup = [];
 const ready = candidate => new Promise((resolve, reject) => {
   const timer = setTimeout(() => finish(Error('FIXTURE_WORKER_START_TIMEOUT')), 30_000);
   const receive = event => {
+    if (event.data?.type === 'fixture-stage' && startup.length < 64) startup.push(event.data.stage);
     if (event.data?.type === 'fixture-ready') finish();
     if (event.data?.type === 'fixture-error') finish(Error(event.data.error));
   };
@@ -93,7 +94,7 @@ globalThis.fixture = {
     await application.close(); worker.terminate();
   },
   crash() { worker.terminate(); },
-  observations: () => ({ notices, statuses, connectionFailures, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
+  observations: () => ({ notices, statuses, connectionFailures, startup, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
     locks: !!navigator.locks, isolated: crossOriginIsolated, userAgent: navigator.userAgent }),
 };
 
