@@ -23,11 +23,15 @@ const run = (command, args) => execFileSync(command, args, { cwd: directory, std
 try {
   write('package.json', JSON.stringify({ private: true, type: 'module', dependencies: {
     '@tendriller/core': `file:${sdk}`, '@tendriller/engine': `file:${engine}`,
-    '@cloudflare/vitest-plugin': '1.8.1', vitest: '4.1.12',
+    '@cloudflare/vitest-plugin': '1.8.1', vitest: '4.1.12', typescript: '7.0.2',
   } }, null, 2));
   copyFileSync(join(here, '../snippets/private-responses.mjs'), join(directory, 'private-responses.mjs'));
   copyFileSync(join(root, 'cookbooks/review-exact-proposal/snippets/approval.mjs'), join(directory, 'approval.mjs'));
   copyFileSync(join(here, 'host.scenarios.mjs'), join(directory, 'host.test.mjs'));
+  for (const extension of ['mts', 'mjs']) copyFileSync(join(root, `test/public-signals.${extension}`), join(directory, `public-signals.${extension}`));
+  write('signals.tsconfig.json', JSON.stringify({ compilerOptions: { target: 'ES2023', module: 'NodeNext',
+    moduleResolution: 'NodeNext', strict: true, noEmit: true, lib: ['ES2023', 'DOM', 'DOM.Iterable'], types: [] },
+    files: ['public-signals.mts'] }, null, 2));
   const identity = path => createHash('sha256').update(readFileSync(path)).digest('hex');
   write('entry.mjs', `import { configureWorkflows } from '@tendriller/engine';
 import { privateResponses } from './private-responses.mjs';
@@ -54,12 +58,17 @@ const require = createRequire(import.meta.url);
 const migrations = await readD1Migrations(dirname(require.resolve('@tendriller/engine/accounts-schema')));
 export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:30000,provide:{d1Migrations:migrations}}});\n`);
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund']);
+  run(process.execPath, ['node_modules/typescript/bin/tsc', '-p', 'signals.tsconfig.json']);
+  const signals = JSON.parse(execFileSync(process.execPath, ['public-signals.mjs'], {
+    cwd: directory, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'],
+  }));
   run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.config.mjs', '--reporter=default', '--reporter=json', '--outputFile=vitest-results.json']);
   const testReport = JSON.parse(readFileSync(join(directory, 'vitest-results.json'), 'utf8'));
   const evidence = {
     evidence: 'exercised', date: new Date().toISOString(), host: 'real built Worker',
     source_commit: process.env.GITHUB_SHA || null, core_commit: process.env.CORE_CHECK_REF || null,
     sdk_sha256: identity(sdk), engine_sha256: identity(engine),
+    public_signals: { ...signals, types: 'passed' },
     private_reference_sha256: identity(join(directory, 'private-responses.mjs')), approval_reference_sha256: identity(join(directory, 'approval.mjs')),
     scenarios: testReport.testResults.flatMap(file => file.assertionResults.map(test => ({ name: test.fullName, status: test.status }))),
     limits: ['Synthetic test identities and text responses; private media and production deployment are not exercised.'],

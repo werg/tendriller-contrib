@@ -5,12 +5,14 @@ on:
       - 'cookbooks/**/checks/**'
       - 'cookbooks/**/snippets/**'
       - 'test/pilot-browser.mjs'
+      - 'test/public-signals.*'
       - '.github/workflows/pilot-integration.yml'
   pull_request:
     paths:
       - 'cookbooks/**/checks/**'
       - 'cookbooks/**/snippets/**'
       - 'test/pilot-browser.mjs'
+      - 'test/public-signals.*'
       - '.github/workflows/pilot-integration.yml'
   workflow_dispatch:
     inputs:
@@ -29,7 +31,7 @@ jobs:
     timeout-minutes: 15
     env:
       # A one-way test pairing, not a prose/release compatibility requirement.
-      CORE_CHECK_REF: ${{ inputs.core_ref || '7668af4ae59ae7dced87eba999bd040836f9fc06' }}
+      CORE_CHECK_REF: ${{ inputs.core_ref || '534e044c74589a2c19757386813c5627b9383b8d' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

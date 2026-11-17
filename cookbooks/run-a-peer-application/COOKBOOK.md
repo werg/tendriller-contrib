@@ -127,8 +127,9 @@ does not acquire SQL, membership, or finality authority.
 
 The Cloudflare membership root is a separate role. Signed genesis selects the
 application schema administrator independently, so native application setup does
-not require the host to become a SQL peer. The thin administrator follows small
-descriptors and inline capability/epoch records. It can establish roster progress
+not require the host to become a SQL peer. The thin administrator follows finalized
+governance controls and their signed cumulative checkpoint and certificate, without
+application descriptors or bodies. It can establish roster progress
 without establishing that an application replica has fetched or executed the
 corresponding payloads.
 
