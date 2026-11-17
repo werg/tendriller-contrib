@@ -1,8 +1,9 @@
 # Choose application primitives by their guarantees
 
 **Implementation status:** `peer-generation-v1` is the adopted target for new
-peer applications. Its implementation and qualification are in progress. The
-unified contract uses `local()` for a result applied here and `final()` for a
+peer applications. The encrypted replica, public session/native/browser entries,
+framed network transport and maintained RTC composition are implemented as a
+preview; qualification is in progress. The unified target contract uses `local()` for a result applied here and `final()` for a
 result committed and applied under the selected history. Explicit recovery may
 abandon a recent suffix, including work previously reported final. Design around
 that recovery exception and the effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
@@ -14,6 +15,12 @@ The [historical implementation guide](finalized-peer-applications.md) records th
 older packages' immutable-prefix guarantee. That guarantee comes from their
 implementation, not from the name `final()`, and their checks do not qualify
 generation recovery.
+
+The preserved package report uses separate native/events stores over an in-process
+link with dirty-source provenance. Maintained RTC code and its independent
+consumer now exist, but their exact-archive result, browser behavior and deployed
+Internet readiness require separate evidence. No declaration or method name
+promotes that earlier run to those qualifications.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application
@@ -86,8 +93,8 @@ generation ordering.
 | Replica | Retains and verifies usable history | Permission to write, coordinate or discard another participant's work |
 | Effect worker | Performs authorized work and reconciles it across recovery | Authority derived from payload claims or permission to repeat a completed effect |
 
-Chronolog owns shared authority verification. Tendriller hosts the control
-participant and provides account integration. Discovery advertisements, account
+In this composition, Chronolog owns shared authority verification; Tendriller
+hosts the control participant and provides account integration. Discovery advertisements, account
 login, connection success and possession of the newest database are not authority
 evidence. Application code does not decide which old branch becomes current.
 

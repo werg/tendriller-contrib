@@ -20,7 +20,7 @@ This recipe and its pinned evidence use the stronger finalized contract. The
 [new peer-generation recipe](../COOKBOOK.md) has replaceable coordinators and
 explicit tail abandonment; applied events do not inherit the guarantees below.
 
-Start with the [primitive and role decision guide](../../../guides/application-primitives.md).
+Start with the [finalized primitive and role guide](../../../guides/finalized-peer-applications.md).
 Durable events and transactions use this history. Live typing, presence, cursor
 motion and progress use the independent [signal channel](../../share-live-signals/COOKBOOK.md)
 and need neither SQL nor a finality service.
@@ -32,10 +32,10 @@ a choice of owner, availability, and recovery contract; it is not a competition
 between UI frameworks.
 
 The [paired implementation work](implementation-and-qualification.md) maps
-the public boundaries and the remaining deployment qualifications. The source
-pins above identify the portable foundation reviewed for this guide. A proposed
-scenario is not evidence that it passed; recorded checks name their actual
-artifacts and limits.
+the public boundaries and the remaining deployment qualifications. The linked qualification reports
+identify the portable foundation and artifacts exercised for this guide. A
+proposed scenario is not evidence that it passed; recorded checks name their
+actual artifacts and limits.
 
 The implementation places **portable membership administration on
 Cloudflare by default**, separately from native inclusion/finality, execution
@@ -225,8 +225,9 @@ the executed outcome (`accepted` or `rejected`). A terminal rejection is
 `{ status: 'final', outcome: 'rejected' }`. Native operation handles expose
 `local()` for the executed result at its current position and `final()` for its
 immutable result; both return accepted or rejected outcomes. Inspect
-`result.outcome.type` after `final()` before dependent work, and handle a final
-rejection explicitly. The browser adapter exposes the
+`result.outcome.type` after awaiting `final()` before dependent work. A final
+rejection returns normally; the application handles it explicitly and preserves
+the reviewed draft. The browser adapter exposes the
 same decision through `operations.subscribe`. Submission resolving is not by
 itself permission to proceed.
 
@@ -240,6 +241,11 @@ worker's durable checkpoint. A later retry keeps this original operation; it
 does not become newly authorized future work after a revocation.
 
 ## Subscribe to views without consuming work
+
+Chronological queries, live queries, React hooks, read views, changes and durable
+event reads default to the currently applied final prefix. A final read does not
+wait for pending writes; select `view: 'local'` explicitly for previews. Before
+dependent work, await the prerequisite's `final()` and inspect its accepted result.
 
 A display follows `backend.changes({ view, signal })`. It receives the current
 revision immediately and later coalesced invalidations, including SQL-only

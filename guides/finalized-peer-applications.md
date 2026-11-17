@@ -180,9 +180,10 @@ Submission returns the operation's current state. Subscribe to
 `application.operations` when the workflow needs its final outcome. Native
 Chronolog handles expose `local()` for the current executed result and `final()`
 for the immutable result. Both return accepted or rejected outcomes. Inspect
-`result.outcome.type`; waiting successfully does not mean the operation succeeded.
-Dependent work requires an accepted result from `final()`; handle its final
-rejection explicitly and preserve the reviewed draft.
+`result.outcome.type` after awaiting `final()` before dependent work. A final
+rejection returns normally; waiting successfully does not mean the operation
+succeeded. Dependent work requires an accepted result from `final()`; handle its
+final rejection explicitly and preserve the reviewed draft.
 A provisional success never releases dependent work or an irreversible effect.
 The public operation type reflects this directly: queued has no outcome, while
 provisional and final require one. An exact retry can immediately return its
@@ -195,8 +196,9 @@ backup, that a person read the result, or that an external provider acted.
 Author dependent work after observing the prerequisite's final accepted result,
 and retain the appropriate guards inside the new transaction. Chronolog advances
 its author clock past successfully applied history and verified closed time;
-merely receiving an unadmitted envelope does not advance that clock. Applications never
-calculate timestamps to order dependent work. An operation ID identifies one
+receiving proposal bytes alone does not advance that clock, while applying an
+authorized local preview does. Applications never calculate timestamps to order
+dependent work. An operation ID identifies one
 immutable request. Retry preserves its signed bytes and meaning; updating a
 guard or payload creates new intent and needs a new operation ID. The clock does
 not invent dependencies on work the replica has not observed.
@@ -292,3 +294,8 @@ from a live preview, or promote a UI checkpoint into a worker's handled cursor.
 This guide describes design choices. The individual cookbooks and source-pinned
 qualification reports state which implementations and failure scenarios were
 actually exercised.
+
+The current Chronolog [application contract](https://github.com/werg/chronolog-db/blob/4efa3546f930734328879bdca3984282bd19156b/docs/application-primitives.md)
+and [client API](https://github.com/werg/chronolog-db/blob/4efa3546f930734328879bdca3984282bd19156b/packages/client/README.md)
+are pinned source references for these APIs, not claims that a deployment or
+the peer-generation profile has been qualified for a particular deployment.

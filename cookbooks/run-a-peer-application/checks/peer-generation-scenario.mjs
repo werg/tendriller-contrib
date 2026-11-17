@@ -62,7 +62,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
         definitionDigest: await applicationDefinitionDigest(conversation), definition: describeApplication(conversation),
         schemaAdministrator: hostDevice.identity.publicKey, schemaDigest: null,
         epoch: 0, keyDigest: await bytesDigest(epochKey),
-        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { administrator: device !== deviceC }) })),
+        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC }) })),
       },
     });
     const descriptor = host.descriptor;

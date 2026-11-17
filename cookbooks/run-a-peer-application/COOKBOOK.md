@@ -8,14 +8,17 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/3567468a921d3968c606efdef942ddba2641d30d/docs/peer-application-architecture.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
 
 **Implementation preview:** This recipe targets the paired `@chronolog/peer-session`
-composition under active qualification. Its consumer and source APIs are developed
-together. No report here yet establishes browser/RTC or deployed readiness;
+composition under active qualification. The public encrypted session and
+maintained network/RTC composition are implemented. Its preserved native/events
+package report used an in-process link and dirty-source artifacts; the newer RTC
+consumer needs its own exact-archive result. Neither source code nor that older
+report establishes browser, Internet or deployed readiness;
 existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
 
 The unified target uses `local()` for applied-here results and `final()` for
@@ -35,7 +38,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.

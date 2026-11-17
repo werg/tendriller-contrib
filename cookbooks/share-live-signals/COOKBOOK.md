@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/4efa3546f930734328879bdca3984282bd19156b/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -134,7 +134,7 @@ of implementing capability checks in application code.
 
 The standalone package is supplied as a dependency-free archive built from an
 exact Chronolog checkout; it is not yet published to npm. Follow the
-[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/README.md#build-and-consume-the-standalone-package)
+[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/4efa3546f930734328879bdca3984282bd19156b/packages/signals/README.md#build-and-consume-the-standalone-package)
 and install that archive into the consuming application. Construct
 `new SignalChannel({ scope, identity, authorize })`; `generateSignalIdentity()`
 can create a fresh standalone identity. Keeping an identity across restarts is
@@ -286,7 +286,7 @@ a live control suggestion can use signals when loss, expiry and duplication
 have an acceptable application meaning. Keep Stop and local mute effective on
 the device, even when no remote signal is delivered.
 
-The [primitive and role guide](../../guides/application-primitives.md) connects
+The [implemented finalized peer guide](../../guides/finalized-peer-applications.md) connects
 these decisions to finality, rollback, redo and effect handling. The
 [peer task/chat specimen](../run-a-peer-application/checks/README.md) combines
 ephemeral typing with durable messages and final agent results.
