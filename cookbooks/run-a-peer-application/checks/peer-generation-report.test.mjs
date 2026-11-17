@@ -191,3 +191,16 @@ test('actual host qualification refuses missing HTTP counters, hidden signaling 
     assert.throws(() => validatePeerGenerationReport(report));
   }
 });
+
+test('public projection qualification requires durable reuse and explicit recovery and definition resets', () => {
+  for (const mutate of [
+    value => { delete value.projection; },
+    value => { value.projection.owner = 'consumer-checkpoint'; },
+    value => { value.projection.unchangedReadReducerCalls = 6; },
+    value => { value.projection.excludedCheckpointReopened = false; },
+    value => { value.projection.recovered.state.messages = 6; },
+    value => { value.projection.recovered.reset.reason = 'none'; },
+    value => { value.projection.reopened.reducerCalls = 5; },
+    value => { value.projection.definitionReset.snapshot.reset.reason = 'recovery'; },
+  ]) rejects(mutate);
+});

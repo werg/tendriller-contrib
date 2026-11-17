@@ -11,7 +11,7 @@ import {
   executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest,
 } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
-import { conversation } from './peer-generation-definition.mjs';
+import { conversation, conversationCounts } from './peer-generation-definition.mjs';
 import { isNextPublishedCommand } from './peer-generation-fault.mjs';
 
 export async function runPeerGenerationScenario({ path, connectSessions, qualifyParticipation, createControl = createPortableControl }) {
@@ -40,6 +40,12 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
   };
   const connect = async (a, b) => { const link = await connectSessions(a, b); links.add(link); return link; };
   const query = session => session.query('conversation', {});
+  const counts = (session, version = conversationCounts.version) => {
+    let calls = 0;
+    const projection = session.project({ ...conversationCounts, version,
+      reduce(state, event) { calls++; return conversationCounts.reduce(state, event); } });
+    return { projection, get calls() { return calls; } };
+  };
   const post = async (session, operationId, text, basedOn) => {
     const operation = await session.command('postMessage', { messageId: operationId, text }, {
       operationId, ...(basedOn === undefined ? {} : { basedOn }),
@@ -106,7 +112,16 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     assert.equal(a.describe().capabilities.automaticExternalEffects, false);
     report.executionManifestDigest = descriptor.payload.executionManifestDigest;
     await checkpoint('opened independent native sessions');
+    let projected = counts(a);
+    const emptyProjection = await projected.projection.read();
+    assert.deepEqual(emptyProjection.state, { messages: 0 });
     await post(a, 'anchor-a', 'A retained message');
+    const firstProjection = await projected.projection.read();
+    assert.equal(firstProjection.state.messages, 1); assert.equal(projected.calls, 1);
+    assert.deepEqual(await projected.projection.read(), firstProjection);
+    assert.equal(projected.calls, 1, 'An unchanged projection read must not replay history');
+    report.projection = { owner: 'application-session', id: conversationCounts.id, version: conversationCounts.version,
+      first: firstProjection, initialReducerCalls: 1, unchangedReadReducerCalls: 0 };
     let ab = await connect(a, b);
 
     // Only reply-lost is submitted after this point. Ignore repeated coverage
@@ -185,6 +200,8 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     const excludedView = (await query(a)).revision;
     await post(a, 'isolated-a', 'An additional isolated old-branch message');
     const oldHead = await a.recoveryPoint();
+    report.projection.excluded = await projected.projection.read();
+    assert.equal(report.projection.excluded.state.messages, (await query(a)).value.messages.length);
     assert.ok(oldHead.point.sequence > adopted.point.sequence);
     const previousTail = await a.operations.get('abandoned-a');
     const priorIdentity = a.deviceId;
@@ -230,6 +247,11 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     const returningDevice = await openDevice('a');
     a = await open(returningDevice, { ...authority, generations: authority.generations.slice(0, 1) });
     assert.equal(a.deviceId, priorIdentity);
+    projected = counts(a);
+    const persistedProjection = await projected.projection.read();
+    assert.deepEqual(persistedProjection.state, report.projection.excluded.state);
+    assert.equal(projected.calls, 0, 'Reopening must reuse the persisted projection checkpoint');
+    report.projection.excludedCheckpointReopened = true;
     const beforeReturn = await query(b);
     const notice = await a.adopt(authority);
     assert.ok(notice.abandoned.some(value => value.operationId === 'abandoned-a'));
@@ -240,6 +262,12 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     const afterReturn = await query(b);
     assert.deepEqual(afterReturn.value, beforeReturn.value);
     assert.equal((await a.operations.get('abandoned-a')).status, 'abandoned');
+    const recoveredProjection = await projected.projection.read();
+    assert.equal(recoveredProjection.reset.reason, 'recovery');
+    assert.deepEqual(recoveredProjection.reset.previousRevision, report.projection.excluded.revision);
+    assert.equal(recoveredProjection.state.messages, beforeReturn.value.messages.length);
+    assert.ok(recoveredProjection.state.messages < report.projection.excluded.state.messages);
+    report.projection.recovered = recoveredProjection;
     report.recovery = {
       previousGeneration: g1.id, selectedGeneration: selected.id,
       previousHead: oldHead.point.sequence, adoptedPosition: adopted.point.sequence,
@@ -288,6 +316,8 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     report.returningBranch.thirdGeneration = third.id;
 
     const beforeReopen = await a.operations.get('reapplied-a');
+    const projectionBeforeReopen = await projected.projection.read();
+    assert.equal(projectionBeforeReopen.state.messages, (await query(a)).value.messages.length);
     const identityBefore = a.deviceId;
     await a.close(); sessions.delete(a);
     const reopened = await open(await openDevice('a'));
@@ -295,6 +325,18 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     const afterReopen = await reopened.operations.get('reapplied-a');
     assert.deepEqual(afterReopen, beforeReopen);
     report.reopen = { identityBefore, identityAfter: reopened.deviceId, operationBefore: beforeReopen, operationAfter: afterReopen };
+    projected = counts(reopened);
+    const projectionAfterReopen = await projected.projection.read();
+    assert.deepEqual(projectionAfterReopen.state, projectionBeforeReopen.state);
+    assert.equal(projectionAfterReopen.reset, null); assert.equal(projected.calls, 0);
+    report.projection.reopened = { before: projectionBeforeReopen, after: projectionAfterReopen, reducerCalls: projected.calls };
+    await projected.projection.close();
+    projected = counts(reopened, '2');
+    const revisedProjection = await projected.projection.read();
+    assert.equal(revisedProjection.reset.reason, 'definition');
+    assert.deepEqual(revisedProjection.state, projectionAfterReopen.state);
+    assert.equal(projected.calls, revisedProjection.state.messages);
+    report.projection.definitionReset = { snapshot: revisedProjection, reducerCalls: projected.calls };
     await Promise.all([...links].map(link => link.close()));
     const observerControl = reopened.connectControlParticipant({ exchange: host.exchange });
     report.participation = await qualifyParticipation({ coordinator: c, follower: b, observer: reopened,

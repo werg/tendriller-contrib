@@ -180,6 +180,22 @@ export function validatePeerGenerationReport(report) {
   same(recovery.inheritedIdentityPreserved, true, 'Inherited attempts lost their original identity');
   same(recovery.abandonedEvidencePreserved, true, 'Abandoned signed evidence was discarded');
 
+  const projection = report.projection;
+  same(projection?.owner, 'application-session', 'A consumer-owned checkpoint does not qualify the public projection');
+  same(projection.id, 'conversation-counts'); same(projection.version, '1');
+  same(projection.initialReducerCalls, 1); same(projection.unchangedReadReducerCalls, 0);
+  same(projection.first?.state?.messages, 1);
+  same(projection.excludedCheckpointReopened, true, 'The excluded checkpoint must survive originator restart');
+  same(projection.recovered?.reset?.reason, 'recovery');
+  same(projection.recovered.reset.previousRevision, projection.excluded?.revision, 'Recovery must identify the excluded projection revision');
+  assert.ok(projection.excluded.state.messages > projection.recovered.state.messages, 'The projection retained abandoned state');
+  same(projection.recovered.revision.generation, recovery.selectedGeneration);
+  same(projection.reopened?.before?.state, projection.reopened?.after?.state, 'Reopening lost projection state');
+  same(projection.reopened.after.reset, null); same(projection.reopened.reducerCalls, 0, 'Unchanged reopening replayed old events');
+  same(projection.definitionReset?.snapshot?.reset?.reason, 'definition');
+  same(projection.definitionReset.snapshot.state, projection.reopened.after.state);
+  same(projection.definitionReset.reducerCalls, projection.definitionReset.snapshot.state.messages);
+
   const old = report.returningBranch;
   same(old?.generationBefore, old.generationAfter, 'The old branch replaced the selected generation');
   same(old.generationAfter, recovery.selectedGeneration, 'The returned peer did not follow selection');
@@ -292,6 +308,7 @@ export function validatePeerGenerationReport(report) {
     artifacts: report.artifacts,
     controlParticipant: report.controlParticipant,
     participation: report.participation,
+    projection: report.projection,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
     ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,

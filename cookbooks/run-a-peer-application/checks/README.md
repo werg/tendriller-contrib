@@ -58,6 +58,18 @@ interface discovery, Internet reachability, TURN or deployed discovery. Both
 record their exact measurement boundary rather than calling a loopback result a
 deployment test.
 
+### Durable derived views
+
+The conversation definition also exports the pure `conversationCounts` reducer.
+The consumer registers it through `session.project(...)`; Chronolog owns the
+checkpoint that binds state to its event filter, reducer version and selected
+history. Repeated reads process only newly relevant events. The independent
+scenario checks that an unchanged read and same-generation reopen run no reducer,
+that an excluded suffix produces an explicit recovery reset, and that changing
+the reducer version rebuilds the view. State and cursor are never saved separately
+by the application. A reducer must not dispatch external effects because recovery
+or a version change may execute it again.
+
 ### Measure complete-prefix freshness
 
 The owned participation exercise applies a fixed burst of 32 commands with 1 KiB
