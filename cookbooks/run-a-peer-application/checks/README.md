@@ -10,6 +10,25 @@ and synthetic tests remain separate from runtime qualification. The resident/bro
 checks below exercise explicitly finalized chronological profiles and retain
 their own original guarantees and source pins.
 
+The cookbook's guarded task domain has a separate packed native SQL gate:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs \
+  --artifact /exact/peer-session-with-native-sql.tgz \
+  --domain tasks --output /new/task-evidence
+```
+
+Build this archive with Chronolog's `tools/package-peer-session.mjs --sql-native`
+after compiling its exact patched engine. The gate installs offline in an empty
+consumer and checks the actual [task definition](../snippets/peer-task-board.mjs):
+two claimants cannot both succeed, another author cannot finish the claim, and
+an earlier selected prefix restores SQL rows and conversation events together.
+Reapplication records a fresh linked attempt and executes the current guards.
+Another member completes a shared task after its creator closes. Reopening
+retains the device, database, outcomes and owned epoch keys without supplying
+the keys again. This direct-transport native SQL result has its own evidence
+validator and does not imply browser WASM or RTC coverage.
+
 The same recovery scenario can use the public maintained native RTC composition:
 
 ```sh
