@@ -29,13 +29,18 @@ submit the same intent to both.
 
 ## Use the live collaboration profile by default
 
-Tendriller defaults to live collaboration: peers share one timestamp-ordered
+Chronolog's peer backend uses live collaboration: peers share one timestamp-ordered
 application history, may show a provisional local view, and observe final
 accepted or rejected outcomes when the selected provider closes a verified
 prefix. Keep that progression visible. Inclusion, deterministic execution and
 finality answer different questions; a receipt is not proof that SQL succeeded.
 Live signals remain independent of that progression and can start while durable
 history is catching up or finality is unavailable.
+
+A Tendriller page selects that peer backend explicitly. Without a backend
+selection, its durable application API uses hosted Cloudflare storage. Choosing
+the peer history does not automatically connect hosted signals; live transport
+composition remains an independent choice.
 
 Signed operations, immutable operation identity, timestamp ordering and
 deterministic replay are the reusable foundation. A collaboration policy decides
@@ -156,9 +161,11 @@ For application code, progress and outcome answer separate questions:
 
 Submission returns the operation's current state. Subscribe to
 `application.operations` when the workflow needs its final outcome. Native
-Chronolog handles expose `local()` for the current executed result and `final()`
+Chronolog handles expose `provisional()` for the current executed result and `final()`
 for the immutable result. Both return accepted or rejected outcomes. Inspect
 `result.outcome.type`; waiting successfully does not mean the operation succeeded.
+Use `accepted()` when dependent work requires immutable success and a final
+rejection should throw. It waits through provisional acceptance or rejection.
 A provisional success never releases dependent work or an irreversible effect.
 
 An inclusion receipt alone cannot establish either final application outcome.
@@ -180,6 +187,11 @@ preparing a new operation. Do not edit signed timestamps or refresh an existing
 operation's identity to hide that condition.
 
 ## Observe state or consume work
+
+Chronolog's `query`, `queryCompiled`, `liveQuery`, React query hooks, `readView`,
+`changes` and durable event reads default to the final applied prefix. A final
+read returns the current applied state; it does not wait for pending writes.
+Choose `view: 'local'` explicitly for previews that can change after replay.
 
 Use `application.changes({ view: 'final', signal })` to keep a confirmed view
 current, or select `view: 'local'` for provisional feedback. The stream yields
