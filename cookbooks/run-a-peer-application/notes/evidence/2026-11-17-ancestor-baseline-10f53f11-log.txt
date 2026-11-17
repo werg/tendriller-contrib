@@ -1,0 +1,43 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Peer-generation consumer: opened independent native sessions
+Peer-generation consumer: recovered exact operation after lost reply
+Peer-generation consumer: continued with control host blocked
+Peer-generation consumer: selected older prefix on survivor
+Peer-generation consumer: isolated returning abandoned branch
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PEER_RECOVERY_PREFIX_INCOMPLETE/. Input:
+
+'PeerGenerationError: PEER_RECOVERING'
+
+    at async runPeerGenerationScenario (file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/peer-generation-scenario.mjs:370:5)
+    at async file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/peer-generation-rtc-consumer.mjs:58:3 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: PeerGenerationError: PEER_RECOVERING
+      at check (file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/node_modules/@chronolog/peer-session/chunks/chunk-WBH22EF2.mjs:1485:25)
+      at #assertReady (file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/node_modules/@chronolog/peer-session/chunks/chunk-WBH22EF2.mjs:2906:5)
+      at file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/node_modules/@chronolog/peer-session/chunks/chunk-WBH22EF2.mjs:3381:24
+      at Serial.run (file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/node_modules/@chronolog/peer-session/chunks/chunk-WBH22EF2.mjs:1571:20)
+      at async waitForActual (node:assert:646:5)
+      at async strict.rejects (node:assert:769:25)
+      at async runPeerGenerationScenario (file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/peer-generation-scenario.mjs:370:5)
+      at async file:///workspace/scratch/f3460a050d13/qualification/ancestor-adc477e7/baseline-final-ci/consumer/peer-generation-rtc-consumer.mjs:58:3 {
+    code: 'PEER_RECOVERING'
+  },
+  expected: /PEER_RECOVERY_PREFIX_INCOMPLETE/,
+  operator: 'rejects',
+  diff: 'simple'
+}
+
+Node.js v24.22.1
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+Error: Consumer failed with exit code 1
+    at file:///workspace/scratch/f3460a050d13/qualification/contrib-adc477e7/cookbooks/run-a-peer-application/checks/run-peer-generation.mjs:139:34
+
+Node.js v24.22.1

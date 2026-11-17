@@ -105,6 +105,17 @@ checkpoint does not establish every later plan acceptance condition. The
 unassisted fresh-agent setup and deployed network/cost boundaries below also
 remain explicit.
 
+The [supplemental failed baseline](evidence/2026-11-17-ancestor-baseline-10f53f11-report.json)
+and its [process log](evidence/2026-11-17-ancestor-baseline-10f53f11-log.txt)
+run clean `adc477e7a9b5770fc882a4ca2d2ccd96615a2a32` against the exact
+downloaded `10f53f11` RTC archive named above. That run stops at the first
+incomplete-prefix recovery check: it receives `PEER_RECOVERING` where the new
+scenario requires `PEER_RECOVERY_PREFIX_INCOMPLETE`. The raw report records
+`passed: false`. Its later inherited-ancestor and protected-floor assertions
+were not reached, so this failed baseline is not presented as execution of
+those subsequent cases. The later runtime correction and its passing
+qualification require their own source-specific evidence.
+
 ## Earlier complete CI composition checkpoint: `ae9d95de`
 
 All five independent public-package gates passed in
