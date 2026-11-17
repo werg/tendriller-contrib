@@ -12,9 +12,11 @@ These are separate source pairings and qualifications. The thin membership
 scenario in the first workflow failed. The later source's thin membership gate
 has since [passed all ten checks](rtc-membership-qualification-43981821658.md).
 Its application step failed on a correctly rejected `FINALITY_TIMESTAMP_CLOSED`
-proposal in the delayed-reply fixture; fixture timing is being corrected and
-requires another application run. Neither the earlier application pass nor the
-later quick/membership passes are reported as one combined passing workflow.
+proposal in the delayed-reply fixture. A subsequently preserved
+[combined workflow](rtc-combined-qualification-43983079989.md) passed application
+and membership at its own `264e753c` source; this does not establish that the
+intermittent fixture timing has been corrected. The earlier application and
+quick/membership results below retain their exact separate source pairings.
 
 ## Preserved observations
 
@@ -155,14 +157,16 @@ admitted-but-ungranted negative case.
 The `c76789fd` thin membership report declares `passed: false`; it completed nine
 named checks and failed before the final fresh-device recovery result. The
 enrollment readiness, revocation and administrator-restart requirements remain
-part of that separate gate. The current-source full workflow
+part of that separate gate. The later `c3a7fd40` full workflow
 [43981821658](https://github.com/werg/chronolog-db/actions/runs/43981821658) has
 now completed the [thin membership gate](rtc-membership-qualification-43981821658.md)
 successfully. Its application step failed when the fixture's one-second finality
 cutoff advanced before the delayed-reply browser message was included. The
-resulting `FINALITY_TIMESTAMP_CLOSED` rejection is correct; the fixture timing
-needs correction and a new complete application run. This note preserves the
-earlier passed application report without promoting it to that later source.
+resulting `FINALITY_TIMESTAMP_CLOSED` rejection is correct. The subsequent
+[combined run at `264e753c`](rtc-combined-qualification-43983079989.md) passed both
+gates, while the accepted-case fixture race remains separately identified.
+This note preserves the earlier application report without promoting it to
+either later source or claiming that later fixture edits have been qualified.
 
 All peer-byte counters here measure logical authenticated frame payloads.
 They exclude RTC framing headers and credit messages plus IP/UDP/DTLS/SCTP

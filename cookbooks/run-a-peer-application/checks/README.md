@@ -208,13 +208,14 @@ measure logical authenticated frame payloads; RTC packet headers, credit
 messages and IP/UDP/DTLS/SCTP overhead are excluded. Host SDP JSON envelopes are
 counted separately, and these byte counters are not provider billing exports.
 
-The [recorded RTC application run](../notes/rtc-application-qualification-2026-11-16.md)
-passed all twelve task/chat checks with the packaged host, two browser replicas
-and a native authority. It preserves the raw application/v2 report and strict
-summary alongside a later current-source browser/resident quick gate. The thin
-membership rerun has since passed; the later application's correctly rejected
-closed-timestamp fixture case still requires a corrected complete run. These
-outcomes remain separately stated under their exact source pairings.
+The [combined RTC application and membership run](../notes/rtc-combined-qualification-43983079989.md)
+passed all twelve task/chat checks and all ten fresh-device membership checks
+at the same clean `264e753c` source pairing. Its application used the packaged
+host, two browser replicas and a native authority. Exact raw reports and strict
+summaries preserve both outcomes. The
+[earlier application and later browser/resident quick gates](../notes/rtc-application-qualification-2026-11-16.md)
+retain their own source pairings. The combined pass does not erase the earlier
+closed-timestamp fixture failure or qualify subsequent fixture corrections.
 
 Qualification covers these observations:
 
@@ -383,13 +384,15 @@ RTC observations for all three introductions, retired signaling and complete
 separate administrator/application counters. The small
 [membership report validator](membership-report.mjs) checks those recorded
 observations; its synthetic tests are not an enrollment qualification.
-The [recorded RTC membership run](../notes/rtc-membership-qualification-43981821658.md)
-passed all ten checks at the `c3a7fd40` source and preserves its exact raw report,
-checked summary and artifact digests. Its three introductions cover enrollment,
+The [combined RTC run](../notes/rtc-combined-qualification-43983079989.md)
+passed all ten membership checks alongside all twelve application checks at
+the same recorded `264e753c` source. Its three introductions cover enrollment,
 reconnect after writer revocation and a newly keyed reader after administrator
-restart; Worker replacement is a separate durable recovery assertion. The
-application step in the same workflow failed its closed-timestamp fixture case,
-so the membership pass does not imply a combined workflow pass.
+restart; Worker replacement is a separate durable recovery assertion. Exact raw
+reports, checked summaries and archive hashes are preserved. The earlier
+[membership pass at `c3a7fd40`](../notes/rtc-membership-qualification-43981821658.md)
+retains its separate scope: that workflow's application step failed its
+closed-timestamp fixture case.
 The initial complete gate passed in
 [CI run 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818):
 seven runtime assertions plus the public-package/bundle check in actual workerd

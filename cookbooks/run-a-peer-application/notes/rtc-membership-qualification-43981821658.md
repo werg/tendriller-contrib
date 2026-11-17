@@ -10,11 +10,13 @@ application-envelope bytes.
 This is a passed membership scenario within a workflow whose application step
 failed separately. The application failure was a correctly rejected
 `FINALITY_TIMESTAMP_CLOSED` proposal in the delayed-reply fixture: its one-second
-cutoff advanced before the intended browser message was included. That fixture
-timing is being corrected and requires another complete application run. The
-earlier [passed application and current quick gates](rtc-application-qualification-2026-11-16.md)
-retain their own source pairings; this note does not claim one combined passing
-workflow for all of them.
+cutoff advanced before the intended browser message was included. A later
+[combined workflow](rtc-combined-qualification-43983079989.md) passed both
+application and membership at its recorded `264e753c` source. That later success
+does not establish that the intermittent fixture timing has been corrected.
+The earlier [passed application and quick gates](rtc-application-qualification-2026-11-16.md)
+retain their own source pairings; this note preserves the membership pass and
+separate application failure in workflow `43981821658`.
 
 ## Exact reports and provenance
 
