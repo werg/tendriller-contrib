@@ -26,21 +26,24 @@ references live beside the cookbook that explains their policy.
 For architecture and agent implementation, start with
 [application primitives and roles](guides/application-primitives.md). It gives a
 short decision path through local state, ephemeral signals, durable events,
-transactions and final effects. [Live signals](cookbooks/share-live-signals/COOKBOOK.md)
+transactions, tolerant peer recovery and protected effects. [Live signals](cookbooks/share-live-signals/COOKBOOK.md)
 cover typing, presence, cursors, progress and transient messages without requiring
 a database or finality service.
 The [standalone composition check](cookbooks/share-live-signals/checks/README.md)
 uses an actual public signal module for live readings and token previews. For
-durable applications, `application.changes` refreshes current views while
-`events.subscribe` drives recoverable work. Authenticated event provenance and
-final accepted outcomes determine which work an agent may safely perform.
+peer applications, the selected profile defines whether an outcome is applied
+or final. Recovery may abandon a recent suffix in `peer-generation-v1`;
+authenticated provenance and separately protected decisions govern irreversible
+agent work.
 
-For an application with an always-running native agent, start with
-[Run a shared application with a resident agent](cookbooks/run-a-peer-application/COOKBOOK.md).
-It connects one SQL/event history to coherent page views, durable agent work,
-the public application-backend boundary, and a task-board/chat verification
-specimen. Its qualification checklist covers both paired core PRs and separates
-local correctness checks from real-network and cost evidence.
+For a shared application, start with the
+[peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md).
+The peer-first composition is being qualified around replaceable coordinating
+peers, coherent views and explicit recovery. The
+[finalized-profile guide](guides/finalized-peer-applications.md) and existing
+resident checks describe their separately selected stronger contract. Each
+qualification report names its exact source, public artifacts and measured
+boundary; historical results do not qualify the new profile.
 
 ## Use the collection
 
