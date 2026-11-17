@@ -54,7 +54,8 @@ try {
   await mkdir(join(process.cwd(), 'deployment'));
   await writeFile(join(process.cwd(), 'deployment/bootstrap.mjs'), "export { applicationReady } from '../peer-generation-browser-page.mjs';\n");
   const bundle = await build({ entryPoints: { app: 'app.mjs', worker: 'peer-generation-browser-worker.mjs' },
-    absWorkingDir: process.cwd(), outdir: assets, bundle: true, splitting: true, format: 'esm', platform: 'browser',
+    // The isolated install must not inherit a containing checkout's source aliases.
+    absWorkingDir: process.cwd(), tsconfigRaw: {}, outdir: assets, bundle: true, splitting: true, format: 'esm', platform: 'browser',
     target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
   for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
