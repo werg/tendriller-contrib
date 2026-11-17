@@ -22,7 +22,7 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '6bf1871c599ef924f60c48cf0909b15ba4914ba5'
+        default: '08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || '6bf1871c599ef924f60c48cf0909b15ba4914ba5' }}
+          ref: ${{ inputs.chronolog_ref || '08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c' }}
           path: .chronolog-build
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
