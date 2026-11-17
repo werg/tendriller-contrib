@@ -224,7 +224,10 @@ try {
   report.contentRecovery = { bytes: resumableBytes.length, interruptedAfter: 65_536, partialRetentionRefused: true,
     partialSurvivedRestart: true, unavailableRemainderRefused: true, completeAfterReconnect: true,
     retainedBy: completeRetention.payload.peer, retentionSignature: completeRetention.signature };
-  await page.evaluate(async () => { globalThis.capturedView = await application.readView(); });
+  const capturedBeforeRecovery = await page.evaluate(async () => {
+    globalThis.capturedView = await application.readView();
+    return capturedView.readEvents();
+  });
   await checkpoint('partial encrypted content survived Worker restart and completed after reconnect');
 
   const retainedPrefix = await page.evaluate(() => application.recoveryPoint());
@@ -238,16 +241,21 @@ try {
   await a.close();
   await rename(join(stores, 'a'), join(stores, 'a-unavailable'));
   blocked = false;
-  const recovered = await page.evaluate(async operationId => {
+  const recovered = await page.evaluate(async ({ operationId, cursor }) => {
     const notice = await application.recovery.takeover({ transitionId: 'browser-retained-prefix' });
-    let abandoned, staleView;
+    let abandoned, staleCursor;
     try { await application.operations.wait(operationId); } catch (error) { abandoned = { name: error.name, state: error.operation }; }
-    try { await capturedView.readEvents(); } catch (error) { staleView = error.name; }
+    // Captured views stay immutable. A new current view must reject a cursor
+    // from the previous generation instead of silently continuing its history.
+    const captured = await capturedView.readEvents();
     await capturedView.release();
+    const current = await application.readView();
+    try { await current.readEvents({ cursor }); } catch (error) { staleCursor = error.name; }
+    await current.release();
     const selected = await application.query('conversation', {});
-    return { notice, abandoned, staleView, selected,
+    return { notice, abandoned, captured, staleCursor, selected,
       journal: await application.recovery.inspect(), recovery: await application.inspectRecovery(), status: application.status };
-  }, excluded.operationId);
+  }, { operationId: excluded.operationId, cursor: capturedBeforeRecovery.cursor });
   await page.locator('#recovery').waitFor({ state: 'visible' });
   await page.waitForFunction(id => ['abandoned', 'needsReapply'].includes(document.querySelector(`[data-operation="${id}"]`)?.dataset.status), excluded.operationId);
   assert.equal(await page.locator('#message').inputValue(), draft);
@@ -261,7 +269,9 @@ try {
   assert.equal(recovered.status.role, 'coordinator');
   assert.equal(recovered.abandoned.name, 'AbandonedOperationError');
   assert.ok(['abandoned', 'needsReapply'].includes(recovered.abandoned.state.status));
-  assert.equal(recovered.staleView, 'RecoveredViewError');
+  assert.deepEqual(recovered.captured, capturedBeforeRecovery);
+  assert.notEqual(recovered.selected.revision.generation, capturedBeforeRecovery.revision.generation);
+  assert.equal(recovered.staleCursor, 'RecoveredViewError');
   assert.equal(recovered.applied.outcome, 'accepted');
   assert.equal(recovered.applied.operationId, reappliedId);
   assert.equal(recovered.inspected.attempt.payload.header.reapplyOf, recovered.abandoned.state.attemptId);
@@ -273,7 +283,8 @@ try {
   assert.ok(recovered.selected.value.messages.every(message => !message.operationId.startsWith('originator-tail-')));
   report.recovery = { originatorClosed: true, originatorStoreUnavailable: true, priorHead: lostHead.point,
     adoptedPrefix: retainedPrefix.point, selectedGeneration: recovered.status.generation,
-    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied, staleViewError: recovered.staleView,
+    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied,
+    capturedViewPreserved: true, staleCursorError: recovered.staleCursor,
     reapplyOf: recovered.inspected.attempt.payload.header.reapplyOf, currentGuardsChecked: true,
     noticesPersisted: recovered.recovery.length, transitionJournalEntries: recovered.journal.length };
   report.ui = { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',
