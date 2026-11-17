@@ -1,0 +1,420 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-native-rtc",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.2",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "d37d915b825d38cc20e7b2e19132cc983c7922a042b44311ed5fec72ccb57a1a",
+      "packages": [
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "3107cba13007633177b5003c379ff481b20e5481",
+    "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g7b9bd41d-rtc",
+      "sha256": "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-rtc-consumer.mjs",
+      "sha256": "dc86313e5ab5164805a846d8761e87d7b73184b7f0319fcae3033af6de94afb7"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-host-client.mjs",
+      "sha256": "03a02447797b8a75a68b3dd9960dfb0ad87b60367b729fa2deadb1d9e662977a"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-scenario.mjs",
+      "sha256": "b02804cd30807880004cf9fa4e04b3cb80434f9d1a23f69e9dec683240ed8814"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-fault.mjs",
+      "sha256": "05494342791d253960bc27fd51a45d940d0338fe81f9774620785ba4a267864f"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": null,
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "nativeOwnership": {
+    "secondOwnerRefused": true,
+    "implicitIdentityCreationRefused": true
+  },
+  "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+  "stage": "passed",
+  "retention": {
+    "peers": [
+      "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634"
+    ],
+    "storageIds": [
+      "47e30fad-988e-403f-a58c-ff8f2b693e6b"
+    ]
+  },
+  "lostReply": {
+    "injectedAfterPersistence": true,
+    "originalOperationId": "reply-lost",
+    "retriedOperationId": "reply-lost",
+    "originalReceipt": {
+      "payload": {
+        "applicationId": "d1f0d37acb7136b0d1a8449456ef5a05050371a82846a6816439d2dd4110a9f8",
+        "profile": "peer-generation-v1",
+        "generation": "0e3d84e671f5b81be67843a146d2af2e509e65c00e2bfecf3501e846cc58eeba",
+        "sequence": 2,
+        "previousRoot": "39875373c64be7181438294df22c218dcc97a08e07bb9d1eb07fb0901d7d36ee",
+        "attemptId": "11751bbee7bc39d6c7b86834a33b2c72ddb8da153cd4e8a70822f01dffdfed4a",
+        "author": "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c",
+        "operationId": "reply-lost",
+        "bodyHash": "e9a6c00d3c028f113490724dc766f231611c7d606900588df692d4d1e23510ed",
+        "bodyBytes": 1570
+      },
+      "signature": "ea239eeaa4ab3400c77aaa1b04ffb53b4d6d1f8b659a6063d18ca8b92d2e54b5032cf1181a7543c11091baa87b5912f0e5f677512613d6b34799626cd53de40c",
+      "root": "c214cf9cfb1896a8918a3997e0dc3e4439bcc74d34eca2d83108f1d3ad44efd6"
+    },
+    "retriedReceipt": {
+      "payload": {
+        "applicationId": "d1f0d37acb7136b0d1a8449456ef5a05050371a82846a6816439d2dd4110a9f8",
+        "profile": "peer-generation-v1",
+        "generation": "0e3d84e671f5b81be67843a146d2af2e509e65c00e2bfecf3501e846cc58eeba",
+        "sequence": 2,
+        "previousRoot": "39875373c64be7181438294df22c218dcc97a08e07bb9d1eb07fb0901d7d36ee",
+        "attemptId": "11751bbee7bc39d6c7b86834a33b2c72ddb8da153cd4e8a70822f01dffdfed4a",
+        "author": "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c",
+        "operationId": "reply-lost",
+        "bodyHash": "e9a6c00d3c028f113490724dc766f231611c7d606900588df692d4d1e23510ed",
+        "bodyBytes": 1570
+      },
+      "signature": "ea239eeaa4ab3400c77aaa1b04ffb53b4d6d1f8b659a6063d18ca8b92d2e54b5032cf1181a7543c11091baa87b5912f0e5f677512613d6b34799626cd53de40c",
+      "root": "c214cf9cfb1896a8918a3997e0dc3e4439bcc74d34eca2d83108f1d3ad44efd6"
+    },
+    "orderedRecords": {
+      "before": 2,
+      "after": 2
+    }
+  },
+  "hostOutage": {
+    "boundary": "portable-control-port",
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "requests": {
+      "before": 3,
+      "after": 3
+    },
+    "applicationBodyBytes": {
+      "before": 0,
+      "after": 0
+    },
+    "observations": {
+      "before": {
+        "requests": 3,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 3,
+        "applicationBodyBytes": 0
+      }
+    },
+    "finalityCapability": false,
+    "liveSignalsObserved": 1,
+    "peerReplicationObserved": true,
+    "transport": {
+      "before": {
+        "reliable": {
+          "sentBytes": 23107,
+          "receivedBytes": 23107
+        },
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        }
+      },
+      "after": {
+        "reliable": {
+          "sentBytes": 58738,
+          "receivedBytes": 58738
+        },
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        }
+      }
+    }
+  },
+  "recovery": {
+    "previousGeneration": "0e3d84e671f5b81be67843a146d2af2e509e65c00e2bfecf3501e846cc58eeba",
+    "selectedGeneration": "4e53bdade8e63ebfe1e258e56c9277685756994a70e164b7fd4239f355eda338",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "sourceRemoved": true,
+    "coherentReset": true,
+    "recoveredDigest": "65365c1746f362a098cfad4b9ef80bbd42dff8d4dfdd6d9e21915b7dfa37074b",
+    "freshPeerDigest": "65365c1746f362a098cfad4b9ef80bbd42dff8d4dfdd6d9e21915b7dfa37074b",
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ],
+    "inheritedIdentityPreserved": true,
+    "abandonedEvidencePreserved": true,
+    "unknownLoss": true
+  },
+  "returningBranch": {
+    "generationBefore": "4e53bdade8e63ebfe1e258e56c9277685756994a70e164b7fd4239f355eda338",
+    "generationAfter": "4e53bdade8e63ebfe1e258e56c9277685756994a70e164b7fd4239f355eda338",
+    "digestBefore": "65365c1746f362a098cfad4b9ef80bbd42dff8d4dfdd6d9e21915b7dfa37074b",
+    "digestAfter": "65365c1746f362a098cfad4b9ef80bbd42dff8d4dfdd6d9e21915b7dfa37074b",
+    "oldAttemptReadmitted": false,
+    "excludedAncestorReadopted": false,
+    "thirdGenerationChecked": true,
+    "thirdGeneration": "f0e9f78690627e93b2ea5ac471f28fe5bc8a0e9b3600dbb726e8d8d77346940d"
+  },
+  "reapply": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "fc8c663326cc771f62ee0ca76a9ccf33f6303dd61b90a690147dac3624f988da",
+    "newAttemptId": "d9b2bf70c12a7f59c57922e03401822f723eaf3dcdff34fe3744ef59631debd0",
+    "reapplyOf": "fc8c663326cc771f62ee0ca76a9ccf33f6303dd61b90a690147dac3624f988da",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "reopen": {
+    "identityBefore": "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+    "identityAfter": "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+    "operationBefore": {
+      "status": "applied",
+      "attemptId": "d9b2bf70c12a7f59c57922e03401822f723eaf3dcdff34fe3744ef59631debd0",
+      "operationId": "reapplied-a",
+      "author": "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+      "generation": "4e53bdade8e63ebfe1e258e56c9277685756994a70e164b7fd4239f355eda338",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "operationAfter": {
+      "status": "applied",
+      "attemptId": "d9b2bf70c12a7f59c57922e03401822f723eaf3dcdff34fe3744ef59631debd0",
+      "operationId": "reapplied-a",
+      "author": "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+      "generation": "4e53bdade8e63ebfe1e258e56c9277685756994a70e164b7fd4239f355eda338",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    }
+  },
+  "rtc": {
+    "implementation": "werift",
+    "version": "0.27.0",
+    "candidateSource": "explicit-loopback-only",
+    "interfaceEnumeration": "disabled-by-native-options",
+    "signalingBoundary": "one-off-in-process-sdp-mailbox",
+    "byteBoundary": "authenticated-reliable-application-frames",
+    "connections": [
+      {
+        "peers": [
+          "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+          "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c"
+        ],
+        "authenticated": true,
+        "connectedInMs": 202.085081,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 23961,
+          "receivedBytes": 23961
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+          "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c"
+        ],
+        "authenticated": true,
+        "connectedInMs": 160.20820499999996,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 58738,
+          "receivedBytes": 58738
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c",
+          "5706f6c34a138d7064f8f89289dccf8a43c319b5d43a315e8cace24ebbaf2db2"
+        ],
+        "authenticated": true,
+        "connectedInMs": 166.31157100000007,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 125340,
+          "receivedBytes": 125340
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "c3b42b4df19d6d8970a09732b868a8296a47d1eef1ef3df107163b2f35337634",
+          "f0c9183ea9eea55c18190f468c639d8f6fec5563dde791fa4cdbf929a397297c"
+        ],
+        "authenticated": true,
+        "connectedInMs": 152.66063599999995,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 78186,
+          "receivedBytes": 78186
+        },
+        "closed": true
+      }
+    ]
+  }
+}

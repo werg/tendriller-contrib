@@ -1,0 +1,30 @@
+{
+  "format": "github-workflow-evidence-retrieval/v1",
+  "repository": "werg/chronolog-db",
+  "workflowRun": 44101030661,
+  "jobId": 134100756310,
+  "artifactId": 14336267774,
+  "downloadedZipBytes": 243379,
+  "downloadedZipSha256": "3faceec09ac4e1b726c0a94e4bfeb97ef45f4d0f3a977cb016b1b7bec475872a",
+  "githubDigestMatched": true,
+  "archiveSha256": "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51",
+  "verifiedPublishedFiles": 108,
+  "reports": [
+    {
+      "file": "2026-11-17-peer-generation-rtc-7b9bd41d-report.json",
+      "sha256": "73551497b805fbdadcf82593ce53cd989ce523d6fbfa28f85514d0ac4ce43aca"
+    },
+    {
+      "file": "2026-11-17-peer-generation-rtc-7b9bd41d-summary.json",
+      "sha256": "0f635cd434a049e8763b7aebc2c35415891f3ac534744c25515d31d9aa1bff37"
+    },
+    {
+      "file": "2026-11-17-peer-generation-host-7b9bd41d-report.json",
+      "sha256": "e35ac92bbdf636c39961d0e9696da898d10a3db997bbf40530149f29ed46c80f"
+    },
+    {
+      "file": "2026-11-17-peer-generation-host-7b9bd41d-summary.json",
+      "sha256": "5288c007e9c3480b4982b1615afb108f1a7297aa0181407d096024ce70632546"
+    }
+  ]
+}

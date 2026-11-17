@@ -1,0 +1,53 @@
+{
+  "format": "github-workflow-evidence-retrieval/v1",
+  "repository": "werg/chronolog-db",
+  "workflowRun": 44101030662,
+  "jobId": 134100755943,
+  "artifactId": 14336173662,
+  "artifactName": "browser-peer-44101030662-1",
+  "downloadedZipBytes": 3392181,
+  "downloadedZipSha256": "dca59dd55276d249675057d0dd041dc7be538274b0c329bfbe3434c71342f944",
+  "githubDigestMatched": true,
+  "reports": [
+    {
+      "file": "2026-11-17-peer-browser-events-7b9bd41d-report.json",
+      "sha256": "3217ea248ba7701c26db247803945f0bd51975ca44bc7514819b48d75f8b95e1"
+    },
+    {
+      "file": "2026-11-17-peer-browser-events-7b9bd41d-summary.json",
+      "sha256": "d44e54e5f7e2323a00c681abac86a9cbc07e4fc7d9dddacd59d2921c16822636"
+    },
+    {
+      "file": "2026-11-17-peer-browser-tasks-7b9bd41d-report.json",
+      "sha256": "d592cbd47c40192670773164b79d87768a02956ecb75b78194d19b07a2f8f8cf"
+    },
+    {
+      "file": "2026-11-17-peer-browser-tasks-7b9bd41d-summary.json",
+      "sha256": "6caa128a1c6e9d719819f884e4cb9a920702df2b95f509d2fd71ba1fb71952fb"
+    }
+  ],
+  "archives": [
+    {
+      "file": "chronolog-peer-session-7b9bd41d-rtc.tgz",
+      "sha256": "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51",
+      "bytes": 154779,
+      "source": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "dirty": false,
+      "provenanceFile": "2026-11-17-peer-browser-events-7b9bd41d-provenance.json",
+      "provenanceSha256": "5ec12a3cce8afaf0cc3393f17e5ab710b773ecb844fc36bc7f9f9922a62a0f72",
+      "verifiedPublishedFiles": 108
+    },
+    {
+      "file": "chronolog-peer-session-7b9bd41d-rtc-sql-wasm.tgz",
+      "sha256": "a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986",
+      "bytes": 3172784,
+      "source": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "dirty": false,
+      "provenanceFile": "2026-11-17-peer-browser-tasks-7b9bd41d-provenance.json",
+      "provenanceSha256": "101eb4b9ed8cebc3f858eede1b558f55b1aa10880118cfac6a50226f492fc6be",
+      "verifiedPublishedFiles": 148
+    }
+  ]
+}

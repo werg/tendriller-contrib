@@ -1,0 +1,169 @@
+{
+  "format": "peer-generation-browser-summary/v1",
+  "passed": true,
+  "qualification": "clean-source-pair",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "3107cba13007633177b5003c379ff481b20e5481",
+    "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g7b9bd41d-rtc-sql-wasm",
+      "sha256": "a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false
+    }
+  ],
+  "ui": {
+    "pages": [
+      "board.html",
+      "compact.html"
+    ],
+    "domain": "tasks",
+    "sessionFacade": "connectApplicationWorker",
+    "sentThroughForms": 3,
+    "reapplicationConfirmed": true,
+    "recoveryNoticeVisible": true,
+    "draftBeforeRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRecovery": "An unsent draft must survive page replacement and recovery.",
+    "originalReviewPreserved": true
+  },
+  "browser": {
+    "version": "158.0.8127.18",
+    "transportOwner": "dedicated-worker",
+    "storage": "opfs-with-exclusive-web-lock"
+  },
+  "sql": {
+    "native": {
+      "implementation": "@dolthub/doltlite@0.11.29",
+      "platform": "linux",
+      "architecture": "x64",
+      "node": "v24.22.2",
+      "manifest": {
+        "doltliteVersion": "0.11.29",
+        "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+        "sqliteVecVersion": "0.1.9",
+        "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+        "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+        "fts5": true,
+        "json1": true,
+        "rtree": true,
+        "dynamicExtensions": false
+      },
+      "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+    },
+    "browser": {
+      "directory": "browser-engine",
+      "manifest": {
+        "format": 1,
+        "toolchain": "emscripten-4.0.20",
+        "nativeManifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "runtimeVersions": {
+          "doltlite": "doltlite-amalgamation",
+          "sqlite": "3.54.0",
+          "vec": "v0.1.9"
+        },
+        "portabilityPatches": [
+          "chunk-store-optional-sector-size-v1",
+          "chunk-store-optional-has-moved-v1",
+          "vfs-identity-forwarding-v1"
+        ],
+        "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+        "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+        "wasmBytes": 2761242
+      }
+    }
+  },
+  "tasks": {
+    "definitionId": "shared-peer-task-board",
+    "signedSchemaDigest": "ecd35d3475b69667579b6cc6426d9d934ecffb6740b42044cca4158854b7c5de",
+    "board": {
+      "created": true,
+      "claimed": true,
+      "finished": true
+    },
+    "competingClaim": "rejected",
+    "unauthorizedFinish": "rejected",
+    "sameViewRace": {
+      "basedOn": {
+        "applicationId": "c9f3dbbb9224e37318b81d4e43afcffe481c6c63ad0fa722d880981fa73a2b8b",
+        "historyId": "browser-peer-conversation",
+        "generation": "1a4d608843e3c0a4618ce2ab3f73f12653be7f322a52644e37e6acaeba2d5f51",
+        "point": {
+          "generation": "1a4d608843e3c0a4618ce2ab3f73f12653be7f322a52644e37e6acaeba2d5f51",
+          "sequence": 8,
+          "root": "31212666b6e0f88a9daf79e2910328f207c65adb57fc035ca21f158b5b380e77"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "8"
+      },
+      "winner": {
+        "status": "applied",
+        "attemptId": "ba6ed08ee07f5731ca5eb7f088f32f342ee20232ca26744a07c69323bd38c61e",
+        "operationId": "race-native",
+        "author": "c0291f014c9f8cb4ee22b25e96706e4264cc05fa85abcf8dd87472aa9c696664",
+        "generation": "1a4d608843e3c0a4618ce2ab3f73f12653be7f322a52644e37e6acaeba2d5f51",
+        "sequence": 9,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "loser": {
+        "status": "applied",
+        "attemptId": "e33a441faac54c8a7e44d96293c6b799d9bf57d9e193dac22b6a5caa067a7859",
+        "operationId": "race-browser",
+        "author": "c5f7e3cac20e60491f4187664fb66576777f34d0465fba833106662eb6468d36",
+        "generation": "1a4d608843e3c0a4618ce2ab3f73f12653be7f322a52644e37e6acaeba2d5f51",
+        "sequence": 10,
+        "outcome": "rejected",
+        "rejectionCode": "assert:task_unavailable"
+      },
+      "claimedBy": "c0291f014c9f8cb4ee22b25e96706e4264cc05fa85abcf8dd87472aa9c696664",
+      "atomicEffectiveEvents": true
+    },
+    "commandsWithHostBlocked": 3,
+    "unsharedOriginatorClaim": "unshared-originator-claim",
+    "unsharedClaimExcluded": true,
+    "compact": {
+      "claimed": true,
+      "finished": true
+    },
+    "sharedTaskCompletedAfterCreatorClosed": true,
+    "sqlAndEventsSelectedTogether": true,
+    "retainedTasksSha256": "c16bd497772132f48ce2d3342f635170adc0e8239394d6c1157d7573d5e3f6dd",
+    "recoveredTasksSha256": "c16bd497772132f48ce2d3342f635170adc0e8239394d6c1157d7573d5e3f6dd"
+  },
+  "hostRequestsDuringCommands": 0,
+  "signalingRequestsDuringCommands": 0,
+  "recovery": {
+    "previousHead": 19,
+    "adoptedPrefix": 16,
+    "abandonedOperationId": "293ddf9b-c1df-41ca-888b-0135c2c3b2f3",
+    "reappliedOperationId": "c9f38226-e9b6-43c3-b261-f1f7c487375f"
+  },
+  "identityReopened": {
+    "graceful": true,
+    "abruptWorker": true
+  },
+  "limitations": [
+    "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+    "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+    "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+    "The task domain used both packaged SQL engines; this result applies to the recorded native platform and browser build."
+  ],
+  "reportSha256": "d592cbd47c40192670773164b79d87768a02956ecb75b78194d19b07a2f8f8cf"
+}
