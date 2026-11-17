@@ -7,6 +7,7 @@ on:
       - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
       - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
       - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
   pull_request:
     paths:
       - '.github/workflows/peer-generation.yml'
@@ -14,6 +15,7 @@ on:
       - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
       - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
       - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
   workflow_dispatch:
     inputs:
       chronolog_ref:
@@ -29,11 +31,11 @@ concurrency:
 jobs:
   public-session:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        transport: [direct, native-rtc, browser-native]
+        transport: [direct, native-rtc, browser-native, native-sql]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,12 +49,12 @@ jobs:
           repository: werg/chronolog-db
           ref: ${{ inputs.chronolog_ref || '2e81d56f685881f0cb0d7ce118a2797dc4e2c70b' }}
           path: .chronolog-build
-      - name: Install pinned build dependencies without lifecycle scripts
+      - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && '--ignore-scripts' || '' }}
       - name: Build clean public session archive
         working-directory: .chronolog-build
-        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ matrix.transport != 'direct' && '--native-rtc' || '' }}
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
       - name: Install pinned Chromium and browser system dependencies
         if: ${{ matrix.transport == 'browser-native' }}
         run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
@@ -63,6 +65,8 @@ jobs:
           test "${#archives[@]}" -eq 1
           if [ "${{ matrix.transport }}" = browser-native ]; then
             node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs --artifact "${archives[0]}" --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = native-sql ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --domain tasks --output test-results/peer-generation
           else
             node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --transport "${{ matrix.transport }}" --output test-results/peer-generation
           fi
