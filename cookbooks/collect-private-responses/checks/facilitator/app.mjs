@@ -21,7 +21,7 @@ async function load(epoch = authEpoch) {
     return;
   }
   try {
-    const result = await api.request('workflows/private-responses/review', { method: 'POST', body: { cid: crypto.randomUUID(), expected_generations: {}, data: {} } });
+    const result = await api.host.request('workflows/private-responses/review', { method: 'POST', body: { cid: crypto.randomUUID(), expected_generations: {}, data: {} } });
     if (!valid()) return;
     current = result;
     $('#round').textContent = `${current.round.label} · reviewed revision ${current.round.revision}`;
@@ -57,7 +57,7 @@ async function publish() {
   $('#retry').hidden = true;
   $('#review-current').hidden = true;
   try {
-    const result = await api.request('workflows/private-responses/publish', { method: 'POST', body: snapshot.body });
+    const result = await api.host.request('workflows/private-responses/publish', { method: 'POST', body: snapshot.body });
     if (epoch !== authEpoch) return;
     $('#published').textContent = `Published: ${result.summary.text}`;
     if (edits === snapshot.edits && $('#summary').value === snapshot.body.data.summary) $('#summary').value = '';

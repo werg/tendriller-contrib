@@ -109,7 +109,7 @@ writer for the same local durable store.
 The page-owned [resident connection recipe](../snippets/connect-resident-worker.mjs)
 composes the core session supervisor with direct HTTP signaling and WebRTC
 negotiation. Bundle it with `@chronolog/transport-webrtc` and the deployment
-assets. The initial runtime includes an immutable `tendril.peers.initialBootstrap`
+assets. The initial runtime includes an immutable `tendril.host.peers.initialBootstrap`
 snapshot: `{version: 2, endpoints: [{url: 'https://resident.example/introduce'}]}`.
 Selecting one of these endpoints performs no discovery read. An operator can
 explicitly refresh or replace hints through the host API when necessary.
@@ -119,7 +119,7 @@ After opening the exclusive replica Worker, a deployment can use:
 ```js
 import { connectResidentWorker } from './connect-resident-worker.mjs';
 
-const resident = tendril.peers.initialBootstrap.endpoints[0];
+const resident = tendril.host.peers.initialBootstrap.endpoints[0];
 if (!resident) throw new Error('This page has no configured resident introduction');
 const workerLifetime = new AbortController();
 const connection = connectResidentWorker({

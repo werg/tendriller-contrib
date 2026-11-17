@@ -1,7 +1,7 @@
 // The selected server policy owns privacy; this form renders only its projection.
 const runtime = window.tendril, $ = selector => document.querySelector(selector);
 let assignment = null, pending = null, draftRevision = crypto.randomUUID(), authEpoch = 0, started = false, resumeNeedsAuth = false, key = '';
-const read = () => runtime.request('workflows/private-responses/mine', {
+const read = () => runtime.host.request('workflows/private-responses/mine', {
   method: 'POST', body: { cid: crypto.randomUUID(), expected_generations: {}, data: {} },
 });
 
@@ -76,7 +76,7 @@ async function send() {
   $('#retry').hidden = true;
   $('#review-current').hidden = true;
   try {
-    const result = await runtime.request('workflows/private-responses/submit', { method: 'POST', body: sent.body });
+    const result = await runtime.host.request('workflows/private-responses/submit', { method: 'POST', body: sent.body });
     if (!current()) return;
     assignment.response = result;
     $('#receipt').hidden = false;
