@@ -33,14 +33,84 @@ forwards opaque application frames without storing or executing their contents.
 Relayed application traffic does consume server bandwidth and depends on relay
 availability. Historical zero-host-data observations below apply to direct paths.
 
-The current runners add native and browser relay gates to the five original
-composition gates. They reuse the same application and Worker scenarios,
-exercise actual Workerd relay sockets through real loopback WebSockets, and
-separate blocked control HTTP from relay byte counters. The presence of these
-runners and passing synthetic report tests does not qualify runtime behavior;
-new exact-source relay reports must be retained before claiming a seven-gate
-composition. Deployed authentication, real WSS networks and provider/device
-cost remain separate observations.
+The seven-gate composition below adds native and browser relay gates to the five original gates. They reuse the same application and Worker scenarios, exercise actual Workerd relay sockets through real loopback WebSockets, and separate blocked control HTTP from relay byte counters. Native evidence exercises automatic fallback; browser evidence exercises the actual Worker relay transport through explicit test connections. Deployed authentication, real WSS networks and provider/device cost remain separate observations.
+
+## Qualified seven-gate composition: `2209cd27`
+
+All seven public consumers, the strict composition assembler and artifact upload
+passed in [core CI run 44151716927](https://github.com/werg/chronolog-db/actions/runs/44151716927),
+job `134281576851`. The unchanged
+[composition](evidence/2026-11-17-ci-composition-2209cd27/composition.json) and
+[origin/provenance index](evidence/2026-11-17-ci-composition-2209cd27/origin.json)
+bind the complete result to these clean sources:
+
+| Source | Qualified commit | Verified tree |
+| --- | --- | --- |
+| Chronolog actual CI merge | `2209cd271ef3661d24ea3421f665146c2f8c76fc` | `ac8bf1387d3601d20eb4b18391f8fb556d21bff8` |
+| Chronolog branch head | `73ffcad9cb74a924e94862e71ef01a00b456b9ca` | The same exact tree as the CI merge |
+| Tendriller | `50810422bfa1003ae5690eda32c8e71ecaf31e72` | `838202323b42442b3cb6cc31873d33573d9d4bdc` |
+| Independent consumer | `03c601b4ca744af34ab197149d1b795e1bb38250` | `144cde06ecd7a2ad385394eddd93c792e638f42e` |
+
+| Gate | Actual observed boundary | Raw evidence |
+| --- | --- | --- |
+| Native events | Public session, exact retry, projections, inherited recovery and owned participation | [Report](evidence/2026-11-17-ci-composition-2209cd27/native-events/report.json) |
+| Native RTC | The same scenario over actual loopback RTC and common encrypted peer channels | [Report](evidence/2026-11-17-ci-composition-2209cd27/native-rtc/report.json) |
+| Browser RTC | Real Chromium Worker/OPFS ownership, key enrollment, UI, content interruption and recovery | [Report](evidence/2026-11-17-ci-composition-2209cd27/browser-worker/report.json) |
+| Native SQL | Actual native engine, transactional task guards, shared session and recovery | [Report](evidence/2026-11-17-ci-composition-2209cd27/native-sql/report.json) |
+| Hosted participant | Actual Workerd controls, filtering, signed HTML/code publication, restart and direct peer traffic | [Report](evidence/2026-11-17-ci-composition-2209cd27/hosted-participant/report.json) |
+| Native relay | Forced direct failure, automatic WebSocket relay selection and session-owned cut/reconnect | [Report](evidence/2026-11-17-ci-composition-2209cd27/hosted-websocket-relay/report.json) |
+| Browser relay | Actual Worker-owned WebSockets, the same OPFS/UI/content/recovery/reopen scenario, explicit transport fault fixtures | [Report](evidence/2026-11-17-ci-composition-2209cd27/browser-websocket-relay/report.json) |
+
+The browser relay gate does not independently exercise the introductions
+fallback policy; the native relay gate supplies that observation. Both browser
+gates used Chromium `158.0.8127.18`. Relayed sockets stayed in the dedicated
+Worker, while the page held no private keys or application transport owner.
+Browser controls remain the declared portable HTTP fixture; the separate hosted
+participant gate exercises Tendriller's actual control transport.
+
+The native relay run recorded seven explicit peer pairs, 36 relay socket
+upgrades, 1,799,043 sent and 1,775,299 received relay payload bytes. The existing
+participation owner reconnected after a physical relay cut in the same
+generation. Its retained 32-command, 1,024-byte workload lost no known command,
+with 383 ms of observed adopted-prefix age and 3.434 seconds to recovery.
+The browser relay run recorded four peer pairs, 16 relay socket upgrades,
+655,628 sent and 646,639 received payload bytes. It retained 32,768 content bytes
+in the ordinary workload and completed the larger interrupted-content scenario
+after reopening. Both runs observed actual reliable and live binary traffic and
+zero matches for the declared private markers at the raw relay boundary. These
+are complete-scenario payload totals, not comparable per-command prices,
+IP/TCP/TLS wire counters or provider billing measurements.
+
+This source also includes the shared participation-owner correction: discovery
+waits for an already owned incoming coordinator opening, and recovery rechecks
+coordinator health/opening before a proposal or selection. A pending bounded
+connection cannot be discarded merely because the recovery grace elapsed while
+direct establishment was progressing toward relay fallback. The maintained
+controller remains the only owner of attempts and recovery policy.
+
+The complete downloaded artifact was verified as 9,349,316 bytes with SHA-256
+`b23f8a7991912d924ba63ff756a7406d3c94fbd669cc6cf7e1155f226ecc670e`.
+All seven report hashes match the unchanged composition, whose SHA-256 is
+`c1d5fc57086db4d044842f3b7173fd2e29f5ba3fcb542a62b11f79dbf0e97998`.
+Local reassembly reproduced that manifest exactly. Verification covered 107
+files in the RTC archive, 138 in the SQL archive and all seven engine files,
+plus the SDK/runtime/engine archive digests and embedded control provenance.
+
+Core verification job `134281605688` passed typecheck, lint, build and public
+artifact checks: 572 tests passed and six were skipped in the general run,
+with 91.93% statement, 86.02% branch and 90.45% function coverage. The six skips
+are the `wasm-conformance.test.ts` cases; all six engine comparisons passed in
+[the dedicated native/WASM run 44151716443](https://github.com/werg/chronolog-db/actions/runs/44151716443).
+Linux conformance passed. At this evidence checkpoint macOS conformance job
+`134281605713` is still queued, so the complete Quality workflow is not claimed
+green. Engine-level WASM comparisons do not establish a complete browser
+SQL/WASM application with OPFS; these browser consumers use the events runtime.
+
+Deployed login, WSS over real home/mobile/restrictive networks, sustained
+suspension/churn/quota, large-content operating limits, device/provider costs and
+an unassisted install/create-enroll/discovery study remain outside this local
+composition. No existing baseline or failed preview is relabeled as one of its
+seven successful reports.
 
 ## Local WebSocket relay checkpoint: `3d31e101`
 
@@ -812,10 +882,10 @@ study is not erased by combining their results.
 
 | Plan gate | Implemented and observed | Remaining acceptance boundary |
 | --- | --- | --- |
-| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `e82163de` composition verifies complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
-| G1 — Remove hosted steady-state commands | Native, actual workerd/native RTC and real Chromium gates pass host-blocked work. The host enforces its participant facet policy; required ordinary application-body bytes stay off its transport. | Deployed direct/WSS relay routes and provider traffic/cost require measurement. The direct zero-host-byte result does not apply to relay transit. |
-| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `e82163de` direct/RTC/hosted lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
-| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `e82163de` SQL, host and Chromium gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
+| G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `2209cd27` composition verifies the common encrypted channel across RTC/WebSocket and complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
+| G1 — Remove hosted steady-state commands | The `2209cd27` direct gates pass host-blocked work. The host enforces its control participant facet policy. Native automatic WebSocket fallback and actual browser Worker relay gates pass with explicit positive relay byte traffic; control HTTP remains separate. | Deployed direct/WSS relay routes and provider traffic/cost require measurement. The direct zero-host-byte result does not apply to relay transit. |
+| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `2209cd27` direct/RTC/hosted/relay lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
+| G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `2209cd27` SQL, host, direct Chromium and browser relay gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
 | G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, WSS relay fallback, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
 ## Public consumer and evidence boundary
