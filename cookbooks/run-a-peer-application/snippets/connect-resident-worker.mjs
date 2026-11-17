@@ -2,7 +2,7 @@ import { createHttpWebRtcSignaling, negotiateWebRtc, supervisePeerSession } from
 
 /**
  * Maintain one authenticated connection to the resident declared in the initial
- * page configuration. attach must synchronously transfer both untouched channels
+ * page configuration. attach must synchronously transfer both untouched { reliable, live } channels
  * and return an authenticated attachment lifetime { signal, close }. Its signal
  * ends when the Worker peer link ends, even if ICE remains connected.
  * The signal owns that Worker lifetime; replacing it stops attempts and retries.

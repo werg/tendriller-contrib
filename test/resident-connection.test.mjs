@@ -22,26 +22,27 @@ const hooks = registerHooks({
   },
 });
 const { connectResidentWorker } = await import('../cookbooks/run-a-peer-application/snippets/connect-resident-worker.mjs');
+const { introducePeerWorker } = await import('../cookbooks/run-a-peer-application/snippets/introduce-peer-worker.mjs');
 hooks.deregister();
 
 function fixture() {
-  const rtc = new AbortController(), worker = new AbortController(), channel = { reliable: {}, live: {} };
+  const rtc = new AbortController(), worker = new AbortController(), channels = { reliable: {}, live: {} };
   const observed = { signalingClosed: 0, rtcClosed: 0, workerClosed: 0, transferred: false };
   const attachment = { signal: worker.signal, async close() { observed.workerClosed++; worker.abort(); } };
   globalThis[ports] = {
     signaling: () => ({ stats: { requests: 1, requestBytes: 100, responseBytes: 100, closed: true },
       close() { observed.signalingClosed++; } }),
     async negotiate(options) {
-      options.onDataChannels(channel);
+      options.onDataChannels(channels);
       assert.equal(observed.transferred, true, 'The Worker port must transfer before the callback returns');
       return { signal: rtc.signal, signaling: { sentMessages: 1, receivedMessages: 1 }, async close() { observed.rtcClosed++; rtc.abort(); } };
     },
   };
-  return { rtc, worker, channel, observed, attachment,
+  return { rtc, worker, channels, observed, attachment,
     connect(attach, timeoutMs = 1000) {
       return connectResidentWorker({ endpoint: 'https://resident.example/introduce', timeoutMs,
         retry: { initialDelayMs: 10, maxDelayMs: 20, maxAttempts: 2 }, attach(value, signal) {
-          assert.equal(value, channel); observed.transferred = true; return attach(signal);
+          assert.equal(value, channels); observed.transferred = true; return attach(signal);
         } });
     } };
 }
@@ -101,7 +102,7 @@ test('negotiation failure after an already acknowledged Worker handoff fences an
   const value = fixture();
   let attemptSignal;
   globalThis[ports].negotiate = async options => {
-    options.onDataChannels(value.channel);
+    options.onDataChannels(value.channels);
     await turn();
     throw new Error('ICE negotiation failed after handoff');
   };
@@ -110,4 +111,19 @@ test('negotiation failure after an already acknowledged Worker handoff fences an
   assert.equal(attemptSignal.aborted, true);
   assert.equal(value.observed.workerClosed, 1);
   assert.equal(value.observed.signalingClosed, 1);
+});
+
+test('coordinated introduction hands both untouched lanes to the Worker synchronously', async () => {
+  const value = fixture(), lifetime = new AbortController();
+  let selected;
+  const rendezvous = { ready: Promise.resolve({ role: 'offerer' }), close() {} };
+  const session = await introducePeerWorker({ peers: { rendezvous(channel) { selected = channel; return rendezvous; } },
+    channel: 'one-attempt', signal: lifetime.signal, handoff(channels) {
+      assert.equal(channels, value.channels);
+      assert.notEqual(channels.reliable, channels.live);
+      value.observed.transferred = true;
+    } });
+  assert.equal(selected, 'one-attempt');
+  assert.equal(value.observed.transferred, true);
+  await session.close();
 });

@@ -1331,10 +1331,10 @@
         "publish-coherent-updates"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md",
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"
+        "https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/ARCHITECTURE.md",
+        "https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/DURABILITY.md",
+        "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/portable-peers.md",
+        "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/app-ownership.md"
       ],
       "path": "cookbooks/run-a-peer-application/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
@@ -1541,7 +1541,7 @@
         "run-a-peer-application"
       ],
       "sources": [
-        "https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/src/index.ts"
+        "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/packages/signals/src/index.ts"
       ],
       "path": "cookbooks/share-live-signals/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/share-live-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."

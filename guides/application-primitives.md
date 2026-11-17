@@ -217,6 +217,18 @@ publishes a result. If a provider acted before a crash, use its idempotency key 
 query its original result. Without either, retain an uncertain outcome for
 reconciliation.
 
+A completed provider action and its durable result publication are separate
+outcomes. If publication is proved finally rejected, retain the saved provider
+result and pause in `publication-rejected`. After correcting the cause,
+`retryPublication(effectId)` allocates a new publication attempt without calling
+the provider again. An ambiguous reply keeps the exact original attempt. Durable
+timers use the same rule with `retryPublication(occurrenceId)`: the occurrence ID,
+generation, due time and payload remain unchanged, and the new program checks
+the current final schedule. A cancelled or already accepted occurrence cannot
+be emitted again. Successful events carry the rejection audit; the timer's local
+`publicationStatus(occurrenceId)` also retains cancelled attempts that emit no
+event. See Chronolog's resident agent guide for these bounded recovery APIs.
+
 A timer preserves the original configuration event's authenticated
 `configurationOrigin` alongside `configurationEventId`, including after a
 scheduler restart or an uncertain publication. Its publisher checks whether

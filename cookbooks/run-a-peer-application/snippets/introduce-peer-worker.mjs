@@ -4,12 +4,12 @@ import { negotiateWebRtc } from '@chronolog/transport-webrtc';
  * Explicit coordinated Tendriller introduction; both endpoints must join the
  * same attempt. For cold contact with a resident, use connect-resident-worker.
  * Call only after the exclusive replica Worker is ready.
- * handoff must transfer both untouched RTCDataChannels synchronously; the Worker
- * then frames and authenticates them under its current application membership.
+ * handoff must transfer the untouched { reliable, live } channels synchronously; the Worker
+ * then frames both and authenticates the peer under its current application membership.
  */
 export async function introducePeerWorker({ peers, channel, peerId = crypto.randomUUID(),
   handoff, configuration, signal, timeoutMs }) {
-  if (typeof handoff !== 'function') throw new TypeError('A synchronous RTCDataChannel-pair handoff is required');
+  if (typeof handoff !== 'function') throw new TypeError('A synchronous RTC channel-pair handoff is required');
   signal?.throwIfAborted();
   const rendezvous = peers.rendezvous(channel, peerId, { signal, timeoutMs });
   try {

@@ -8,7 +8,7 @@ choices: ["Peer or hosted durable history", "Atomic SQL and events or an event-o
 capabilities: []
 evidence: "exercised"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md", "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md", "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md", "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"]
+sources: ["https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/ARCHITECTURE.md", "https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/DURABILITY.md", "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/portable-peers.md", "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/app-ownership.md"]
 ---
 
 # Run a shared application with a resident agent
@@ -295,6 +295,14 @@ may need a retry using that same provider key or an explicit provider lookup.
 Without either facility, keep the outcome uncertain and expose a reconciliation
 action. The log cannot make an external service transactional after the fact.
 
+If the provider result was saved but its final event publication is rejected,
+the effect worker pauses in `publication-rejected`. Correct the cause and call
+`retryPublication(effectId)` to allocate a fresh publication attempt; this never
+reruns the external handler. An uncertain publication reply retains the same
+operation ID and payload. The current `effect.completed` version 2 wrapper
+contains the prior rejected-attempt audit; its application result remains the
+versioned domain record. The page reducer validates both layers separately.
+
 The runnable summary worker only reads shared final task data and formats a
 bounded result; it has no private provider or tool. A handler with email,
 filesystem, account or model-provider access must apply its own explicit
@@ -340,8 +348,11 @@ use a different policy without loading history. A disconnected receiver cannot
 promise immediate knowledge of revocations elsewhere. Signal subscriptions use
 FIFO delivery by default; select `latest` for replaceable values such as typing.
 
-Keep the page host out of the warm data path: peer pages have no implicit hosted
-application socket, event stream or health poll. The browser owns its RTC
+For this recipe's peer live topology, keep the page host out of the warm data
+path: peer pages have no implicit hosted application socket, event stream or
+health poll. An explicitly selected hosted live port is another composition;
+it leaves the peer durable backend unchanged and adds its declared hosted
+availability dependency. The browser owns its RTC
 connection; its synchronous channel callback transfers both untouched reliable/live data
 channels to the exclusive replica Worker for framing and authentication. A warm
 session continues while introduction services are unavailable.

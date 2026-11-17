@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -22,9 +22,11 @@ observation disappears.
 The public signal channel is independent of durable application storage. It
 works with an explicit transport and authorization policy. Peer applications can
 use the same interface with Chronolog membership, and Tendriller exposes it through
-`tendril.signals`. Hosted pages receive a channel automatically through their
-existing authenticated page socket. Peer deployments install their selected
-channel independently of durable application readiness. `available` reports
+`tendril.signals`. Hosted pages receive an authenticated hosted live connection
+automatically. Peer deployments install their chosen live implementation
+independently of durable application readiness. They may explicitly choose a
+governed peer channel, a standalone channel, or a hosted live port; no automatic
+fallback changes that selection. `available` reports
 installation, not connectivity or delivery; an unconfigured send fails immediately.
 Signal-only applications do not need to open a SQL database or select a durable
 application backend.
@@ -65,9 +67,30 @@ An application can also explicitly select the hosted live channel with
 `connectHostedSignals` or a native host client's `connectSignals`, including
 when its durable history is peer-owned. That choice uses host accounts and
 credentials; it does not grant Chronolog membership or change the durable backend.
+Choose one live implementation for the binding; the durable backend does not choose it for you.
 Installation is separate from `tendril.application.install()`. If it happens asynchronously,
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
+
+A peer application may explicitly choose hosted live delivery while retaining
+Chronolog for its durable history:
+
+```js
+import { connectHostedSignals } from '@tendriller/core/signals';
+
+const lifetime = new AbortController();
+const hostedLive = await connectHostedSignals({
+  api: new URL('_tendril', tendril.identity.base).href,
+  signal: lifetime.signal,
+});
+tendril.signals.install(hostedLive);
+// Abort lifetime when the owning application closes.
+```
+
+This choice uses the page's hosted permissions and availability. It does not
+grant Chronolog readership, durable publication or finality authority, and it
+does not activate after a peer failure. Custom runtimes may pass the chosen port
+as `{ signals: hostedLive }` to `startRuntime` instead of installing it later.
 
 ```js
 await tendril.signals.send('typing', { typing: true }, { ttlMs: 2500 });
@@ -111,19 +134,14 @@ authenticated hosted session, not fields supplied in the payload.
 
 For native or standalone use, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
-authorization callback, bounded frame transport and optional credential. Attach
-each connection with `channel.attachRoute({ send, close })`, pass its incoming
-frames to the returned route's `receive(frame)`, and close that route when the
-connection ends. Set `relay: true` only when the channel should forward verified
-original frames to its other routes; standalone relay is disabled by default.
-No group history, reader grant,
-SQL engine, durable proposal or finality provider is required by the standalone
-channel. A Chronolog integration can supply a membership-backed policy instead
-of implementing capability checks in application code.
+authorization callback and bounded frame transport. The channel requires no
+group history, reader grant, SQL engine, durable proposal or finality provider.
+A Chronolog integration can supply a membership-backed policy instead of
+implementing capability checks in application code.
 
 The standalone package is supplied as a dependency-free archive built from an
 exact Chronolog checkout; it is not yet published to npm. Follow the
-[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/README.md#build-and-consume-the-standalone-package)
+[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/packages/signals/README.md#build-and-consume-the-standalone-package)
 and install that archive into the consuming application. Construct
 `new SignalChannel({ scope, identity, authorize })`; `generateSignalIdentity()`
 can create a fresh standalone identity. Keeping an identity across restarts is
@@ -144,13 +162,14 @@ these primitives without opening a database or starting finality. Replace that
 route with the chosen live transport; keep its access, confidentiality and
 lifecycle policy explicit.
 
-Each channel is constructed with `{ scope, identity, authorize }`. Its explicit
-`attachRoute({ send(frame, { signal }) })` returns a route with `receive(frame)`
-and `close()`. Receive verifies the sender and, when relay is enabled, forwards
-the original frame to other live routes without rewriting the signature,
-identity or expiry. Closing a route cancels its pending sends. Closing the channel ends
-subscriptions; an unattached send fails immediately. The module provides no
-database, proposal, capability-log or finality dependency to configure.
+Each connection uses `channel.attachRoute({ send(frame, { signal }), close?() })`,
+which returns a route with
+`receive(frame)` and `close()`. Pass incoming original frames through that route.
+Receive verifies the sender; `relay: true` explicitly enables forwarding through
+other live routes without rewriting the signature, identity or expiry. Standalone
+relay is disabled by default. Close the route when its connection ends; closing
+cancels pending sends and verification before admission. Closing the channel ends
+subscriptions, and an unattached send fails immediately.
 
 An agent can participate in the same way as another live endpoint. A disposable
 preview request, attention cue or immediate local Stop can be governed by its

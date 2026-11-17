@@ -11,12 +11,11 @@ import { createTokenPreview } from '../snippets/token-preview.mjs';
 const { values } = parseArgs({ options: { 'signals-module': { type: 'string' } } });
 assert(values['signals-module'], 'Supply --signals-module /exact/built-public-signals.mjs');
 const modulePath = resolve(values['signals-module']);
-const { SignalChannel, generateSignalIdentity } = await import(pathToFileURL(modulePath).href);
+const { SignalChannel, generateSignalIdentity, signalAuthorId } = await import(pathToFileURL(modulePath).href);
 const identities = await Promise.all([generateSignalIdentity(), generateSignalIdentity()]);
-const hex = bytes => Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
-const allowedAuthors = new Set(identities.map(identity => hex(identity.publicKeyBytes)));
+const allowedAuthors = new Set(identities.map(identity => signalAuthorId(identity.publicKeyBytes)));
 const topics = new Set(['reading', 'preview']);
-const authorize = ({ authorId, topic }) => allowedAuthors.has(hex(authorId)) && topics.has(topic);
+const authorize = ({ authorId, topic }) => allowedAuthors.has(authorId) && topics.has(topic);
 const sender = new SignalChannel({ scope: 'live-workbench', identity: identities[0], authorize });
 const receiver = new SignalChannel({ scope: 'live-workbench', identity: identities[1], authorize });
 const lifetime = new AbortController();
@@ -42,7 +41,7 @@ try {
   const firstChunk = chunks.next();
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 20 }, { ttlMs: 3000 });
   const initial = (await firstReading).value;
-  assert.equal(initial.authorId, hex(identities[0].publicKeyBytes));
+  assert.equal(initial.authorId, sender.authorId);
   assert.equal(initial.payload.value, 20);
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 21 });
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 22 });
@@ -66,12 +65,12 @@ try {
   assert.equal(preview.snapshot().incomplete, true);
   checks.push('a lost preview chunk is visible as incomplete instead of a completed answer');
 
-  await assert.rejects(sender.send('administration', { role: 'owner' }), { code: 'SIGNAL_UNAUTHORIZED' });
+  await assert.rejects(sender.send('administration', { role: 'owner' }), { code: 'signal_unauthorized' });
   checks.push('payload role claims cannot authorize a disallowed live topic');
 
   senderRoute.close();
   const beforeDisconnected = frames;
-  await assert.rejects(sender.send('reading', { source: 'thermometer', run: 'run-1', value: 99 }), { code: 'SIGNAL_ROUTE_UNAVAILABLE' });
+  await assert.rejects(sender.send('reading', { source: 'thermometer', run: 'run-1', value: 99 }), { code: 'signal_disconnected' });
   assert.equal(frames, beforeDisconnected);
   senderRoute = sender.attachRoute(toReceiver);
   const freshReading = reading.next();

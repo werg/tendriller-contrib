@@ -50,9 +50,9 @@ an application that chooses the recipe consume the same built program module.
    evidence. Every replica derives the same chronological execution order. Use
    the configured resident HTTPS endpoint for one bounded offer/answer, then
    close introduction resources and authenticate the Chronolog peer over the
-   data channel. The page owns RTC negotiation and
-   synchronously transfers both untouched reliable/live data channels to the
-   exclusive replica Worker, which owns framing, authentication and replication. The
+   reliable channel. The page owns RTC negotiation and
+   synchronously transfers both untouched reliable and live channels to the exclusive replica
+   Worker, which owns framing, authentication and durable replication. The
    [public resident connection recipe](../snippets/connect-resident-worker.mjs)
    keeps this handoff separate from membership and application ownership. The
    native [resident task](../snippets/serve-resident-webrtc.mjs) starts its HTTPS

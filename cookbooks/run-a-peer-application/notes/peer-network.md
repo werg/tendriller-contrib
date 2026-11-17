@@ -96,9 +96,9 @@ protocol domains and authorization. RTC transport configuration cannot choose a
 new signer, rewrite a proposal or change finality.
 
 A browser page owns its `RTCPeerConnection` and introduction. The synchronous
-`negotiateWebRtc` callback transfers both untouched `RTCDataChannel` objects
-together to the exclusive OPFS Worker before either loses transferability. That Worker owns
-the framed channel, authenticated peer link, replica and signing identity. This
+`negotiateWebRtc` callback `onDataChannels` transfers both untouched
+`{ reliable, live }` channels to the exclusive OPFS Worker before they lose
+transferability. That Worker owns the framed channels, authenticated peer link, replica and signing identity. This
 requires a browser implementing transferable RTC data channels; unsupported
 transfer must fail visibly. Closing the page or replacing the Worker must close
 the connection and pending sends. Opening another tab does not create a second
@@ -169,9 +169,11 @@ In the receiving Worker, use public `frameRtcPeerChannels(channels)` from
 `@chronolog/transport-webrtc`, and await its bounded `ready` handshake. Call the
 opened browser peer's `connectPeer({ connection })`. That public composition
 uses its persisted signing identity, verifies current reader capabilities,
-attaches durable replication to the reliable lane and its signal channel to the
-independent live lane. Signals never wait behind history credit or body replay.
-Both lanes still share network bandwidth; this is not a latency guarantee. An optional `peerIdentity` pins the expected remote endpoint as well
+attaches durable replication to the reliable lane and signals to the independent
+live lane. The live lane uses unordered datagrams without retransmission. It has
+its own bounded buffers, so reliable history credit cannot queue a signal behind
+a body transfer; both lanes still share network bandwidth. A reliable-only
+connection installs no signal route. An optional `peerIdentity` pins the expected remote endpoint as well
 as checking membership. Application bootstrap need not recreate the handshake,
 signal routing or cleanup. Neither the recipe nor the rendezvous grants access.
 Install `createChronologApplicationBackend` through the selected

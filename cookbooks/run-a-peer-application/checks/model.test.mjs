@@ -9,8 +9,9 @@ const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${i
 const jobRequest = (index, jobId = 'job-1', taskId = 'task-1') => ({ ...message(index), topic: 'job-requests',
   payload: { type: 'job.requested', version: 1, jobId, taskId, kind: 'summarize-task' } });
 const jobResult = (index, request, overrides = {}) => ({ ...message(index), topic: 'job-results', payload: {
-  type: 'effect.completed', version: 1, effectId: `effect-${index}`, originEventId: request.id,
+  type: 'effect.completed', version: 2, effectId: `effect-${index}`, originEventId: request.id,
   handlerId: 'summarize-task', handlerVersion: '1',
+  publication: { attempt: 0, rejections: [] },
   result: { type: 'job.completed', version: 1, jobId: request.payload.jobId, taskId: request.payload.taskId, text: 'Reviewed', ...overrides },
 } });
 const batch = (events, revision = 'view-a', scannedThrough = 'opaque-cursor', hasMore = false) => ({ transactions: [{ proposalId: 'proposal', events }], revision, scannedThrough, hasMore });
@@ -106,6 +107,8 @@ test('the task-summary projection validates its handler and bounded domain field
     { ...request, payload: { ...request.payload, kind: 'another-handler' } },
     { ...result, payload: { ...result.payload, handlerId: 'another-handler' } },
     { ...result, payload: { ...result.payload, handlerVersion: '2' } },
+    { ...result, payload: { ...result.payload, version: 1 } },
+    { ...result, payload: { ...result.payload, publication: { attempt: 1, rejections: [] } } },
     jobResult(2, request, { text: 'x'.repeat(8001) }),
   ];
   const state = reduceBatch(emptyProjection(), batch([...invalid, request, result]));

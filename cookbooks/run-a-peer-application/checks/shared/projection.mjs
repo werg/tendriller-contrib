@@ -22,10 +22,10 @@ export function reduceEvent(state, event) {
   const data = event.payload;
   // Topic grants authorize publication, not this page's application vocabulary.
   // Preserve later valid history when another writer emits an unsupported record.
-  if (!isText(event.id, 1024) || !isObject(data) || data.version !== 1) return advance(state, {}, true);
+  if (!isText(event.id, 1024) || !isObject(data)) return advance(state, {}, true);
   let messages = state.messages, jobs = state.jobs;
   if (event.topic === 'conversation' && data.type === 'message.posted') {
-    if (!isText(data.messageId, 128) || !isText(data.text, 8000) ||
+    if (data.version !== 1 || !isText(data.messageId, 128) || !isText(data.text, 8000) ||
         (data.inReplyTo !== undefined && !isText(data.inReplyTo, 128))) return advance(state, {}, true);
     const entry = {
       eventId: event.id, messageId: data.messageId, text: data.text,
@@ -39,13 +39,16 @@ export function reduceEvent(state, event) {
              (event.topic === 'job-results' && data.type === 'effect.completed')) {
     const result = event.topic === 'job-results';
     const job = result ? data.result : data;
-    if (!isObject(job) || job.version !== 1 ||
+    if (data.version !== (result ? 2 : 1) || !isObject(job) || job.version !== 1 ||
         !(result ? ['job.completed', 'job.failed'] : ['job.requested']).includes(job.type) ||
         !isText(job.jobId, 128) || !isText(job.taskId, 128) ||
         (job.text !== undefined && !isText(job.text, 8000)) ||
         (!result && job.kind !== 'summarize-task') ||
         (result && (data.handlerId !== 'summarize-task' || data.handlerVersion !== '1' ||
-          !isText(data.effectId, 256) || !isText(data.originEventId, 1024)))) return advance(state, {}, true);
+          !isText(data.effectId, 256) || !isText(data.originEventId, 1024) ||
+          !isObject(data.publication) || !Number.isSafeInteger(data.publication.attempt) ||
+          data.publication.attempt < 0 || data.publication.attempt >= 64 ||
+          !Array.isArray(data.publication.rejections) || data.publication.rejections.length !== data.publication.attempt))) return advance(state, {}, true);
     const jobId = job.jobId, requestEventId = result ? data.originEventId : event.id;
     const prior = jobs.find(value => value.requestEventId === requestEventId);
     if (prior && (prior.jobId !== jobId || prior.taskId !== job.taskId)) return advance(state, {}, true);
