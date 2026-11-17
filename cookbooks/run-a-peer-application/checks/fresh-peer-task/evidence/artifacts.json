@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-11-17T13:59:28.857Z",
+  "node": "v24.22.1",
+  "platform": "linux",
+  "architecture": "x64",
+  "archives": {
+    "initialPeer": {
+      "filename": "chronolog-peer-session-3187d9df-rtc-sql-wasm.tgz",
+      "sha256": "84f7542e1db04b0be3e325b9b37c35764e65ec138241a593a60661acd0283eaf"
+    },
+    "finalPeer": {
+      "filename": "chronolog-peer-session-fe752b7f-rtc-sql-wasm.tgz",
+      "sha256": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c"
+    },
+    "tendriller": {
+      "filename": "tendriller-sdk-0.3.0-rc.9.tgz",
+      "sha256": "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614"
+    }
+  },
+  "installed": {
+    "peer": {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gfe752b7f-rtc-sql-wasm"
+    },
+    "tendriller": {
+      "name": "@tendriller/core",
+      "version": "0.3.0-rc.9"
+    }
+  },
+  "peerProvenance": {
+    "source": "fe752b7f6fd7095b6f45c61a176e34b6f37d0674",
+    "sourceTree": "e1fb126210b09ff87bfea826509a8e83fcb7efe2",
+    "dirty": false,
+    "profile": "peer-generation-v1",
+    "optionalNativeRtc": true,
+    "nativeEngine": {
+      "implementation": "@dolthub/doltlite@0.11.29",
+      "platform": "linux",
+      "architecture": "x64",
+      "node": "v24.22.1"
+    }
+  },
+  "scope": "Native SQL via local connectApplications and real Tendriller Worker control HTTP; no RTC/browser qualification"
+}

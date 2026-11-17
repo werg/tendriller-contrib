@@ -1,0 +1,77 @@
+{
+  "status": "passed",
+  "source": "fe752b7f6fd7095b6f45c61a176e34b6f37d0674",
+  "earliestUsefulCommand": {
+    "at": "2026-11-17T13:55:51.247Z",
+    "elapsedMs": 5709,
+    "event": "first.useful.command",
+    "studyElapsedMs": 1052247,
+    "runElapsedMs": 5709
+  },
+  "finalRunStarted": "2026-11-17T14:01:06.574Z",
+  "finalFirstUsefulCommand": {
+    "at": "2026-11-17T14:01:14.019Z",
+    "elapsedMs": 7455,
+    "event": "first.useful.command",
+    "studyElapsedMs": 1375019,
+    "runElapsedMs": 7455
+  },
+  "finalRunCompleted": "2026-11-17T14:01:27.773Z",
+  "finalRunMs": 21209,
+  "finalHostedRequestCount": 13,
+  "finalReopenHostedRequests": 0,
+  "exactRetry": {
+    "before": "bcff9fabd28248ca9c75902d4c55ca96d6deb972be494b60e657291f42537488",
+    "after": "bcff9fabd28248ca9c75902d4c55ca96d6deb972be494b60e657291f42537488",
+    "fullSignedAttemptDeepEquality": true,
+    "eventCopies": 1
+  },
+  "recovery": {
+    "adopted": {
+      "generation": "5636f38169309a67a2cf4c08a4633feb0bd489eed9a7aa662274cef396cb32ca",
+      "root": "0567d15d5452bbdf18afa543d626aeebb6664185b6e074664ac4594a7ef954e9",
+      "sequence": 3
+    },
+    "unknownLoss": true,
+    "staleCursorError": "RecoveredViewError",
+    "reapplyOf": "070f15a5aca5291696a434fdb5bfb7dcb56ddc4b924bc146b5ce38058152a05c"
+  },
+  "finalRows": [
+    [
+      "launch-checklist",
+      "Review the launch checklist",
+      "done",
+      2
+    ],
+    [
+      "reply-observation",
+      "Check exact retry after a lost observation",
+      "open",
+      1
+    ]
+  ],
+  "scope": {
+    "realLocalTendrillerWorker": true,
+    "nativeSql": true,
+    "localConnectApplications": true,
+    "resultObservationLoss": true,
+    "internetRtcQualification": false,
+    "browserQualification": false,
+    "actualWireReplyLoss": false
+  },
+  "coaching": {
+    "sqlApi": 1,
+    "testingScopeDirection": 1,
+    "infrastructureEnvironment": 1
+  },
+  "consumerMistakes": {
+    "jsonObjectOrderFingerprintAssertion": 1,
+    "recoveryModel": 0
+  },
+  "rawEvidence": [
+    "run-1.jsonl",
+    "run-2.jsonl",
+    "reopen-continuation.jsonl",
+    "run-3.jsonl"
+  ]
+}

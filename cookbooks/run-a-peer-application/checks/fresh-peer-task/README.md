@@ -2,6 +2,8 @@
 
 This independent consumer builds a small shared SQL task board using the packed public Chronolog peer-session and Tendriller SDK interfaces. It was authored from an empty directory without reading implementation source, existing consumer scripts, private fixtures, or another consumer's work. The SQL owner binding and assertion syntax required one recorded coaching intervention; see `DX-RECORD.md`.
 
+The final complete run passed on the clean `fe752b7f` native SQL archive: first useful command in 7.455 seconds of that run, all stages in 21.209 seconds, and zero hosted requests during cached reopen. See `evidence/run-3.jsonl`. The full fresh-agent timing, initial infrastructure failure, consumer assertion mistake, and independent recovery of that mistake are retained in `DX-RECORD.md` and the earlier raw evidence.
+
 ## Scope
 
 - Three separate native device stores and SQL databases.
@@ -55,4 +57,5 @@ In this execution environment, separate shell tool invocations have isolated net
 - `task-definition.mjs`: application schema, guarded commands, and queries.
 - `task-flow.mjs`: executable study and raw observation emitter.
 - `DX-RECORD.md`: timing, coaching, mistakes, and boundaries.
-- `evidence/`: actual run output once the supplied endpoint is available.
+- `verify-reopen.mjs`: narrow, network-disabled continuation of the original run's final evidence-assertion error, preserving the original device identities.
+- `evidence/`: actual raw runs, targeted reopen proof, archive hashes, and runtime provenance. The failed runs are retained alongside subsequent verification.

@@ -1,0 +1,10 @@
+{
+  "format": "fresh-peer-task-source/v1",
+  "repository": "werg/tendriller-contrib",
+  "commit": "6fcd9bf94fde98713667e4a1676100bcc4223a68",
+  "tree": "31f23ab85ec29b36c68999accd9a4d9909746f72",
+  "dirty": false,
+  "scriptSha256": "67a91b3ef16e0e6f498332470cde8e397b00b0faea34f14b2a844dcea3ae5a6e",
+  "independentlyAuthoredScriptMatchesPublishedCheckpoint": true,
+  "fixtureBoundary": "Clean detached public host fixture; independent script runs as a child in the same command network namespace. No application protocol or domain code supplied by the fixture."
+}
