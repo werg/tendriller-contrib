@@ -57,6 +57,21 @@ TURN, browser ownership, Tendriller HTTP, deployed login or provider billing.
 The byte boundary excludes RTC/SCTP/DTLS/IP overhead. This development report is
 preserved separately from later clean-consumer or hosted/browser qualification.
 
+## Clean native RTC pairing
+
+The [clean-consumer report](evidence/2026-11-17-peer-generation-rtc-clean-report.json)
+and [checked summary](evidence/2026-11-17-peer-generation-rtc-clean-summary.json)
+repeat the complete native RTC scenario with both source checkouts clean:
+
+- Chronolog: `784414c95e77f797083866f9c314c1ecd4183661`.
+- Consumer: `8d308a6e5cfb12de4fe3eb6d7da6c2132407a039`.
+- Session archive SHA-256: `79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c`.
+
+The independent workflow now pins that exact Chronolog source. The run verifies
+native SQLite ownership, real loopback RTC, exact operation retry, selected-prefix
+recovery and old-branch exclusion. Its portable-control boundary does not qualify
+Tendriller HTTP or browser Worker ownership; those remain separate gates.
+
 ## Public consumer boundary
 
 The runtime consumer must install an explicitly supplied `@chronolog/peer-session`
