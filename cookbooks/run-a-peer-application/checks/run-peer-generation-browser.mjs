@@ -81,10 +81,10 @@ try {
   const imports = new Set(), tools = new Set();
   for (const fixture of fixtures) {
     report.fixtures.push({ path: fixture.path, sha256: hash(fixture.bytes) });
-    for (const match of fixture.bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*)['"]([^'"]+)['"]/gu)) {
+    for (const match of fixture.bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)['"]([^'"]+)['"]/gu)) {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
-        '@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
+        '@chronolog/peer-session/browser', '@chronolog/peer-session/worker', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
         ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers'] : []),
         './peer-generation-definition.mjs', './peer-generation-browser-transport.mjs', './peer-generation-native-transport.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
         './typing.mjs', './recovery-choice.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);

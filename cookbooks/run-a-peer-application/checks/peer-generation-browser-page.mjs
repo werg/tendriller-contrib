@@ -1,7 +1,7 @@
 // Playwright uses a bounded fixture-only port to open and cut transport links.
 // Ordinary application work goes through the public facade; the Worker owns
 // peer authentication, signaling, history, and the only operation journal.
-import { connectApplicationWorker, openBrowserDevice } from '@chronolog/peer-session/browser';
+import { connectApplicationWorker } from '@chronolog/peer-session/browser';
 import { serveFixtureConnections } from './peer-generation-browser-transport.mjs';
 
 let worker, application, name, rtcService, fixtureLifetime;
@@ -45,6 +45,8 @@ globalThis.fixture = {
     finally { contender.terminate(); }
   },
   async windowStorage() {
+    // This explicit misuse check is the only page import of the Worker surface.
+    const { openBrowserDevice } = await import('@chronolog/peer-session/worker');
     try { await openBrowserDevice({ name, create: true }); return 'unexpected-success'; }
     catch (error) { return error.message; }
   },

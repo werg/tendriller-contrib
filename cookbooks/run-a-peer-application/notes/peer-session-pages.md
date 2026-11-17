@@ -17,14 +17,15 @@ the events application does not pretend to execute SQL.
 The complete deployment supplies `deployment/bootstrap.mjs`. Its
 `applicationReady` export resolves to the client returned by
 `connectApplicationWorker(worker)` from `@chronolog/peer-session/browser`.
-The Worker first opens the device and application using its authorized
-enrollment and pinned execution runtime. It attaches the host's dedicated
+The Worker opens the device identity and application participant using its authorized
+enrollment. This immediately makes live signals and control exchange available;
+it does not open the durable database. It attaches the host's dedicated
 participant transport and starts the maintained participation controller before
 serving the page facade:
 
 ```js
 import { createPeerIntroductions } from '@tendriller/core/peers';
-import { serveApplicationWorker } from '@chronolog/peer-session/browser';
+import { serveApplicationWorker } from '@chronolog/peer-session/worker';
 import { openWorkerWebRtcConnection } from '@chronolog/peer-session/webrtc';
 import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 
@@ -50,6 +51,21 @@ journals and shutdown. Attaching the control port performs no request.
 Participation owns bounded discovery, connection attempts, authority refresh,
 coordinator selection, reconnect grace and recovery approval. The host adapter
 supplies routing and invitations, then tries direct RTC and the bounded WebSocket relay within one connection opening. Both use the same encrypted peer channel; the Worker retains authority and the only command journal.
+
+The `worker` entry owns `openBrowserDevice`, `openBrowserApplication` and
+`serveApplicationWorker`; the `browser` entry supplies the page facade. Device
+identity and minimal control metadata survive restarts without opening OPFS.
+The first command, query, content operation or durable observation loads the
+database component and acquires its storage lock inside that same Worker.
+Concurrent data requests share that initialization. There is no alternate
+application profile, second client or replacement identity. A deployment using
+SQL must keep its SQL-module import inside its `createMaterializer` callback.
+
+The maintained pages start live observation as soon as `applicationReady`
+resolves, then query the visible conversation. Showing that durable view is
+database demand; a page using only signals and control does not issue that query.
+`session.status.database` reports `idle`, `opening`, `ready`, `failed` or `closed`;
+reading status and describing the application are passive.
 
 On the page, call `serveWorkerWebRtcConnections(worker)` from the public
 `webrtc` entry before connecting the page facade. This helper supplies browser

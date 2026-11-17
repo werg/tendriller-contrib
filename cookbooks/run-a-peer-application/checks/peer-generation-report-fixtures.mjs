@@ -147,7 +147,7 @@ export function syntheticBrowserReport() {
     browserBundleInputs: ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs',
       'peer-generation-definition.mjs', 'recovery-choice.mjs', 'node_modules/@chronolog/peer-session/browser.mjs'],
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native',
-      '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'], testTools: ['esbuild', 'playwright'],
+      '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native', '@chronolog/peer-session/worker'], testTools: ['esbuild', 'playwright'],
       siblingSourceImports: 0, applicationRpcMaps: 0, applicationRetryQueues: 0, residentRequired: false },
     runtime: { dependencies: { lockSha256: digest, packages: Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })
       .map(([name, version]) => ({ path: `node_modules/${name}`, version, integrity: 'sha512-synthetic' })) } },
@@ -207,7 +207,7 @@ export function syntheticTaskReport() {
 export function syntheticBrowserRelayReport() {
   const report = syntheticBrowserReport(), native = syntheticRelayReport();
   report.topology = 'browser-worker-opfs-websocket';
-  report.publicBoundary.imports = ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native', '@chronolog/peer-session/websocket', '@tendriller/core/peers'];
+  report.publicBoundary.imports = ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native', '@chronolog/peer-session/websocket', '@chronolog/peer-session/worker', '@tendriller/core/peers'];
   report.browser.signalingBoundary = 'workerd-relay-pairing'; report.browser.nativeCandidateSource = 'not-used'; report.browser.interfaceEnumeration = 'not-used';
   report.browser.transportComposition = { page: 'no-transport-owner', worker: 'openWebSocketConnection' };
   report.connections.forEach(connection => { connection.routes = [{ route: 'websocket-relay' }, { route: 'websocket-relay' }]; connection.signaling = { descriptions: 0, bytes: 0, closed: true }; });

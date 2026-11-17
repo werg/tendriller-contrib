@@ -16,7 +16,8 @@ export function validateBrowserPeerReport(report) {
   assert.match(artifact.sourceCommit, /^[a-f0-9]{40}$/u); assert.match(artifact.sourceTree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof artifact.sourceDirty, 'boolean');
   assert.deepEqual(report.publicBoundary.imports, ['@chronolog/peer-session', '@chronolog/peer-session/browser',
-    '@chronolog/peer-session/native', ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers'] : ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'])]);
+    '@chronolog/peer-session/native', '@chronolog/peer-session/worker',
+    ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers'] : ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'])].sort());
   assert.deepEqual(report.publicBoundary.testTools, ['esbuild', 'playwright']);
   for (const field of ['siblingSourceImports', 'applicationRpcMaps', 'applicationRetryQueues']) assert.equal(report.publicBoundary[field], 0);
   assert.equal(report.publicBoundary.residentRequired, false);

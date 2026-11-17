@@ -1,6 +1,6 @@
 // Only fixture provisioning crosses HTTP. The maintained session owns every
 // application command, signer, operation journal, read view, and RTC channel.
-import { openBrowserApplication, openBrowserDevice, serveApplicationWorker } from '@chronolog/peer-session/browser';
+import { openBrowserApplication, openBrowserDevice, serveApplicationWorker } from '@chronolog/peer-session/worker';
 import { openFixtureConnection, inspectFixtureConnection } from './peer-generation-browser-transport.mjs';
 import { conversation } from './peer-generation-definition.mjs';
 

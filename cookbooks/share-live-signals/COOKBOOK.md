@@ -228,9 +228,11 @@ must be recovered, use a durable operation instead.
 
 Start these observers independently of durable application readiness. In the
 [peer specimen](../run-a-peer-application/checks/README.md), live subscription
-starts while the bootstrap's separate `applicationReady` promise is pending.
-Stopping or failing that durable initialization does not silently cancel live
-observation; the page lifetime cancels both when the person leaves.
+starts as soon as the same Chronolog participant is available, before the page's
+first durable query. `applicationReady` means the participant is available;
+Chronolog opens the database only when a data operation needs it. No second
+signal client or application lifecycle is needed. The page lifetime cancels
+observation when the person leaves.
 
 The [focused checks](checks/live-run.test.mjs) exercise payload selection,
 independent expiry, replaceable previews and local attention policy. They establish

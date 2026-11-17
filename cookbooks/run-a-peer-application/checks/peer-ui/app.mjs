@@ -142,6 +142,10 @@ window.addEventListener('pagehide', () => { lifetime.abort(); void session?.clos
 
 try {
   session = await applicationReady;
+  // Live observation belongs to this same session and starts before any query.
+  void observeTyping(session.signals, { signal: lifetime.signal,
+    onChange: ({ count }) => { $('#typing').textContent = count ? `${count} ${count === 1 ? 'person is' : 'people are'} typing…` : ''; },
+  }).catch(() => { $('#typing').textContent = ''; });
   definition = await session.describe();
   bindRecoveryChoice(session.participation, { panel: $('#recovery-choice'), message: $('#recovery-choice-message'),
     details: $('#recovery-choice-details'), button: $('#approve-recovery'), signal: lifetime.signal,
@@ -176,7 +180,4 @@ try {
       await refresh();
     }
   })().catch(error => { if (!lifetime.signal.aborted) status(`Live view paused: ${error.message}`, true); });
-  void observeTyping(session.signals, { signal: lifetime.signal,
-    onChange: ({ count }) => { $('#typing').textContent = count ? `${count} ${count === 1 ? 'person is' : 'people are'} typing…` : ''; },
-  }).catch(() => { $('#typing').textContent = ''; });
 } catch (error) { status(`Application unavailable: ${error.message}`, true); }
