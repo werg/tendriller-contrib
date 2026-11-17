@@ -25,6 +25,27 @@ Offer explicit cancellation or supersession only if the application has a define
 
 ## Choose the host mechanism
 
+For a peer application, open the same owned Chronolog application as an ordinary
+participant. Its public local MCP facade already exposes domain commands,
+queries, operation inspection, waits, retry and explicit reapplication. A process
+resume reopens that identity and journal; it does not create a second hosted
+inbox or automatically replace the coordinator. The
+[peer agent recipe](../run-a-peer-application/COOKBOOK.md#give-an-agent-the-same-application)
+shows that maintained entry.
+
+For background domain work, use `ApplicationProjection`,
+`ApplicationEffectWorker` and `ApplicationTimerScheduler`. Their durable
+checkpoints and journals understand selected-history resets. Keep external
+dispatch inside the actual application owner, authorize the original verified
+event, and reconcile uncertain provider outcomes. The
+[public worker gate](../run-a-peer-application/notes/application-workers-qualification.md)
+demonstrates actual recovery and reopen. A UI view, count-only wake or payload
+claim cannot grant tool authority.
+
+The receiver mechanisms below apply when integrating a hosted service or an
+agent conversation host. They supply wakeup and account routing; the chosen
+application backend continues to own its data and recovery contract.
+
 | Host capability | Receiver shape | Verify |
 | --- | --- | --- |
 | Session queue or IPC | Persistent WebSocket receiver submits a count-only notice to an exact conversation ID. | Host admission, identity binding, restart, and acknowledgement after effects. |

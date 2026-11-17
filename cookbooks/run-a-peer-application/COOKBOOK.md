@@ -258,6 +258,22 @@ application requires it to survive recovery; this does not require a second
 default architecture. Reversible computations and replaceable caches can follow
 an explicit rerun policy.
 
+Use the maintained `ApplicationProjection`, `ApplicationEffectWorker` and
+`ApplicationTimerScheduler` for this work. Projections and timer proposals can
+use the maintained Worker facade; external dispatch stays inside the actual
+application owner for its final authorization check. The
+[notification definition](snippets/peer-notifications.mjs) keeps intents and
+results in ordinary commands and uses shared SQL timer guards. The
+[worker qualification](notes/application-workers-qualification.md) records a
+passing public-package run with actual HTTP effect uncertainty, prefix recovery,
+timer cancellation races and a real Worker owner.
+
+Page/code publication uses the optional `/releases` facet. Publisher policy is
+separate from data membership. The host verifies approved immutable authored
+assets and signs a guarded activation without receiving private application
+keys. The [page update example](snippets/peer-release-page.mjs) uses the maintained
+keyless observer and an explicit apply/defer UI while preserving its draft.
+
 ## Exercise the public composition
 
 Run the independent public consumer against one emitted session archive:

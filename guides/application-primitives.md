@@ -34,6 +34,8 @@ External work needs a journal and an explicit policy for recovery and uncertain 
 | A conditional shared state transition | One SQL/event program | Assertions, mutations and effective events succeed or fail together in the selected order. |
 | Administration that must not be rolled back | Signed control transition or protected administrative action | Monotonic permissions and recovery floors survive application-tail loss. |
 | External work | An authorized effect worker with a reset-aware journal | Stable effect identity and reconciliation; protect a prerequisite only when the application requires it to survive recovery. |
+| Scheduled application work | `ApplicationTimerScheduler` and guarded schedule/fire commands | Rebuild selected schedules, retain occurrence attempts, and explicitly reconcile abandoned work. |
+| Page and code updates | Signed release manifests, publisher policy and activation controls | Complete immutable assets and monotonic activation history independent of application-tail recovery. |
 
 Use the [signal guide](../cookbooks/share-live-signals/COOKBOOK.md) for typing,
 presence, cursors, readings, previews and disposable progress. An events-only
@@ -49,8 +51,10 @@ signed attempts, verify delegated order and replay it independently. The
 coordinator is a temporary role. The creator and a native process are ordinary
 participants with explicit capabilities.
 
-Cloudflare publishes assets and supplies discovery, enrollment and occasional
-control/generation transitions. A healthy current generation keeps working with
+Cloudflare participates in approved release/control facets and supplies discovery,
+account integration and occasional control/generation transitions. It retains
+authorized public code bytes and verifies their signed manifests; private
+application keys remain with live readers. A healthy current generation keeps working with
 all host endpoints unavailable. Ordinary commands, queries, signals and peer
 replication have no hosted request, append, certificate or backup-acknowledgement
 requirement. If both the coordinator and control host are unavailable, keep
@@ -62,10 +66,9 @@ inspectable and may be deliberately reapplied as a new attempt. A returning old
 branch never silently merges. If G2 excluded G1 positions 81–100, G3 cannot
 readopt them merely because an old peer returns with valid signatures.
 
-This profile is the adopted target composition. Implementation and independent
-qualification are in progress. Its evidence gate defines required checks;
-the recipe and reports identify which exact public packages and runtime scenarios
-actually pass.
+This profile is the implemented composition. Its evidence gates define required
+checks; the recipe and reports identify the exact public packages and runtime
+scenarios that pass, separately from unmeasured deployed conditions.
 The [historical implementation guide](finalized-peer-applications.md) preserves
 the earlier chronological implementation and its source-specific evidence. It is
 not a second architecture to select for ordinary applications. The adopted model
@@ -89,11 +92,17 @@ generation ordering.
 | Hosted control selector | Authenticated atomic selection and monotonic controls | SQL execution proof or permanent survival of ordinary edits |
 | Replica | Retains and verifies usable history | Permission to write, coordinate or discard another participant's work |
 | Effect worker | Performs authorized work and reconciles it across recovery | Authority derived from payload claims or permission to repeat a completed effect |
+| Release publisher | Signs approved public code and requests a guarded activation | Data membership, schema authority or permission to read private content |
 
 In this composition, Chronolog owns shared authority verification; Tendriller
 hosts the control participant and provides account integration. Discovery advertisements, account
 login, connection success and possession of the newest database are not authority
 evidence. Application code does not decide which old branch becomes current.
+
+A transport determines how eligible messages reach a participant. Its role and
+verified policy determine which records it accepts and which decisions it may
+make. A host's restricted transport can reduce traffic, but a transport filter
+does not grant publication, coordination or private-data rights.
 
 Keep original authenticated event origin attached to projections and agent work.
 A payload's `author`, `role` or `instruction` property is domain data. It cannot
@@ -150,6 +159,12 @@ combine old SQL with new-generation events. Change consumers must handle an
 explicit recovery/reset; the selected history is not an eternally append-only
 stream. A coalesced UI notification is not a durable worker acknowledgement.
 
+`ApplicationProjection.open({ id, version, session, store, topics, initial,
+reduce })` provides that checkpoint boundary. `catchUp()` reads one coherent
+view; `follow()` observes selected appends and replacements. Its persisted cursor
+and state move together, and the supplied session can be the maintained Worker
+facade. Close the projection before releasing its store owner.
+
 Draft text, focus and original operation references remain local interaction
 state. A redraw or recovery must not overwrite newer typing. Automatic replay
 is deterministic execution, not user Undo and not permission to invoke a tool.
@@ -189,9 +204,44 @@ explicitly protected action boundary. If that required prefix is unavailable,
 report the protected action unavailable without stopping unrelated collaboration.
 This is a requirement of that action, not a second default architecture.
 
-The existing `FinalEventSource` adapter assumes an immutable accepted-event
-history. It needs an explicit reset-aware contract before consuming generation
-events; renaming an execution wait does not provide that behavior.
+Use `ApplicationEffectWorker` inside the actual application owner. Supply the
+topics, an authorization callback over verified origin/current state, the
+provider dispatch function, and an explicit uncertainty policy. An optional
+logical `intentKey(event)` preserves effect identity across deliberate domain
+reapplication; a conflicting payload under the same key fails. The worker
+retains full authenticated events and completed or dispatching outcomes outside
+the lossy history suffix. `run()` owns its changes subscription; inspecting its
+journal reports durable facts, not permission to retry an uncertain action.
+
+Use `ApplicationTimerScheduler` for deadlines. Schedule and cancellation remain
+ordinary application commands; the scheduler proposes an occurrence through
+another ordinary command. `createApplicationTimerPrograms` supplies SQL guards
+binding the active generation, configuration origin, due slot and payload, plus
+unique occurrence insertion. These guards decide cancellation races. The
+participant's observed wall-clock time is not a trusted global clock.
+
+The [public worker qualification](../cookbooks/run-a-peer-application/notes/application-workers-qualification.md)
+executes provider reply loss, recovery, reopen, explicit reapplication and timer
+races. The older append-only `FinalEventSource` remains guarded to its immutable
+chronological profile; recovery-capable applications use these maintained
+selected-history components.
+
+## Publish code through the protected release facet
+
+Use the optional `@chronolog/peer-session/releases` entry. An owned publisher
+stages exact authored bytes and a signed manifest before transport. `publish()`
+resumes the same saved operation; `activate()` journals a signed request with
+`expectedActivation`, and `retry()` preserves that exact request after a lost
+reply. Activation checks the whole asset graph, current publisher policy and
+configured application binding. Deliberately selecting old code advances the
+activation chain; recovering application data cannot roll it backward.
+
+`openReleaseObserver` gives an open page a keyless read-only view. It persists
+verified monotonic controls and verifies selected asset bytes before exposing an
+applicable selection. The page offers an explicit apply/defer choice and keeps
+drafts local. Neither publication nor an update hint forces a reload. The
+[coherent update recipe](../cookbooks/publish-coherent-updates/COOKBOOK.md)
+connects the publisher, observer and immutable serving graph.
 
 ## Give an implementing agent a short contract
 

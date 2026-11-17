@@ -44,6 +44,53 @@ Pack the exact authored directory. Relative assets and lazy imports must resolve
 
 ## Separate transfer from publication
 
+### Peer pages use signed Chronolog releases
+
+Use `openReleasePublisher` with an owned device before an application exists, or
+`createReleasePublisher` inside an existing application owner. Supply the public
+`client.peers.releases` transport. The publisher stages immutable assets and
+saves the signed manifest under one `operationId`; `publish(operationId)` resumes
+those exact bytes. A saved operation cannot be repurposed after source changes.
+
+`activate(releaseId, { requestId, expectedActivation })` journals an exact signed
+request before transport. If the reply is lost, inspect and retry that request.
+Two publishers racing one activation head can produce only one selection.
+Choosing old code deliberately creates a newer activation; application-data
+recovery cannot reverse this protected history. Publisher policy is independent
+of application data grants, and activation checks the configured application
+definition/schema/execution binding.
+
+The host receives only the approved publication bytes and controls. Raw content
+downloads return exact authored bytes; trusted runtime injection is separate.
+Immutable `/_publications/<releaseId>/...` paths keep nested documents and lazy
+imports bound to their original graph. A private attachment's hash does not
+admit those bytes to the public release namespace.
+
+An open page uses `openReleaseObserver`, which needs no signing key or private
+application replica. It verifies signed controls and selected asset bytes before
+offering an update. The [page example](../run-a-peer-application/snippets/peer-release-page.mjs)
+shows explicit check, defer and apply actions, preserves a local unsent draft,
+and continues using its current graph while an update waits. Its small public
+control store has one Web Lock owner; Chronolog owns the monotonic journal and
+verification policy.
+
+Run the independent public host/browser gate with a clean session archive and
+matching SDK/runtime/engine artifacts:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-releases.mjs \
+  --artifact /exact/chronolog-peer-session.tgz \
+  --artifacts /exact/tendriller-dist \
+  --output /new/release-evidence
+```
+
+### Hosted shared-file publications
+
+The hosted Cloudflare application profile also supplies shared-file revisions
+and atomic bundle imports. The following reference/import rules describe those
+service transactions. Peer releases use the signed policy and activation API
+above; neither route silently substitutes for the application's selected backend.
+
 Upload immutable bytes first, then commit their use. An upload completion confirms one verified byte object; it does not advance a shared-file reference or the published page. Keep the upload session identity separate from the command that commits a named file or publication. A lost response should resume the same original intent, including its byte digest and concurrency guards.
 
 A shared-file write compares the previous revision of that path. A publication compares the current publication-head revision and commits a complete file manifest with an existing entry point. These are distinct guards. If either conflicts, review the current state before making a new command; do not fetch a newer revision merely to make the old request pass. Reusing already verified bytes does not authorize overwriting a newer reference. The publication head changes for every switch, including rollback and a portable-copy import. A version number can return to an earlier value; a captured head revision must still detect the intervening change.
