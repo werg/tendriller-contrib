@@ -77,6 +77,9 @@ try {
     args: ['--disable-features=WebRtcHideLocalIpsWithMdns'] });
   report.browser = { implementation: 'chromium', version: browser.version(), headless: true,
     transportOwner: 'dedicated-worker', storage: 'opfs-with-exclusive-web-lock',
+    transportComposition: { page: 'serveWorkerWebRtcConnections', worker: 'openWorkerWebRtcConnection',
+      authentication: 'session.connectPeer', fixtureControls: ['connect', 'inspect', 'disconnect'],
+      qualification: 'explicit-transport-faults', applicationQueue: 'owned-session-only' },
     signalingBoundary: 'loopback-fixture-http', controlBoundary: 'chronolog-participant-over-loopback-http',
     nativeCandidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
     pageErrors: [], consoleErrors: [] };
