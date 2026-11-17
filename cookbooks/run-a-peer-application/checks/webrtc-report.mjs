@@ -115,7 +115,7 @@ export function validateWebRtcReport(report) {
   assert.equal(metrics.introduction.pending, 0, 'No introduction may remain pending');
   assert.equal(metrics.introduction.active, 1, 'Only the recovered resident session may remain live');
   assert(Array.isArray(reconnect.expectedTerminations) && reconnect.expectedTerminations.length <= 1 &&
-    reconnect.expectedTerminations.every(value => ['WEBRTC_CONNECTION_ENDED', 'WEBRTC_CONNECTION_CLOSED'].includes(value)),
+    reconnect.expectedTerminations.every(value => ['WEBRTC_CONNECTION_ENDED', 'WEBRTC_CONNECTION_CLOSED', 'WEBRTC_LIVE_ENDED', 'WEBRTC_LIVE_CLOSED'].includes(value)),
   'Only the single injected interruption may have an attributed normal termination');
   assert.equal(metrics.introduction.failed, reconnect.expectedTerminations.length, 'Every terminal handler failure must be attributed');
   assert(Array.isArray(reconnect.routes) && reconnect.routes.length === 2, 'Actual route observations for both sessions are required');

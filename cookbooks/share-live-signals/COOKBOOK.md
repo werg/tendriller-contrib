@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/70ea5c35c317b657535657af95cdeb96452f09d0/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -61,6 +61,10 @@ belong to the channel; the application still validates its payload schema.
 A hosted page can use `tendril.signals` directly. A peer bootstrap installs
 `tendril.signals.install(client.signals)`; it does not also send through the hosted
 channel. A standalone bootstrap can install its own `SignalChannel` instead.
+An application can also explicitly select the hosted live channel with
+`connectHostedSignals` or a native host client's `connectSignals`, including
+when its durable history is peer-owned. That choice uses host accounts and
+credentials; it does not grant Chronolog membership or change the durable backend.
 Installation is separate from `tendril.application.install()`. If it happens asynchronously,
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
@@ -116,6 +120,20 @@ No group history, reader grant,
 SQL engine, durable proposal or finality provider is required by the standalone
 channel. A Chronolog integration can supply a membership-backed policy instead
 of implementing capability checks in application code.
+
+The standalone package is supplied as a dependency-free archive built from an
+exact Chronolog checkout; it is not yet published to npm. Follow the
+[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/README.md#build-and-consume-the-standalone-package)
+and install that archive into the consuming application. Construct
+`new SignalChannel({ scope, identity, authorize })`; `generateSignalIdentity()`
+can create a fresh standalone identity. Keeping an identity across restarts is
+an explicit application choice.
+
+The governed peer service owns routes for browser and resident replicas.
+Applications using that service call `peer.connectPeer(...)` or
+`context.connectPeer(...)` instead of adding another frame-forwarding loop.
+An otherwise valid, authorized expired frame is dropped without closing the
+durable peer connection.
 
 The [executable standalone composition](checks/README.md) creates two public
 channels from an explicitly supplied `@chronolog/signals` build. It combines

@@ -167,11 +167,17 @@ backup, that a person read the result, or that an external provider acted.
 
 Author dependent work after observing the prerequisite's final accepted result,
 and retain the appropriate guards inside the new transaction. Chronolog advances
-its author clock past the durable history it has observed; applications never
+its author clock past successfully applied history and verified closed time;
+merely receiving an unadmitted envelope does not advance that clock. Applications never
 calculate timestamps to order dependent work. An operation ID identifies one
 immutable request. Retry preserves its signed bytes and meaning; updating a
 guard or payload creates new intent and needs a new operation ID. The clock does
 not invent dependencies on work the replica has not observed.
+
+The signed group's future-skew limit still applies. If new authoring reports
+`AUTHOR_CLOCK_AHEAD`, retain the draft and resolve the clock difference before
+preparing a new operation. Do not edit signed timestamps or refresh an existing
+operation's identity to hide that condition.
 
 ## Observe state or consume work
 

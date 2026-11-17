@@ -196,7 +196,8 @@ lost response, reload, or membership change.
 For a claim, assert availability and update the row in the same program as its
 event. For a dependent second action, either batch it with the first or observe
 the first action's final accepted result before authoring the dependent change.
-Chronolog advances the author's clock past observed durable history; application
+Chronolog advances the author's clock past successfully applied history and
+verified closed time, including after reopening; application
 code does not choose protocol timestamps. Keep the dependency's business guard
 inside the new program because another final change may intervene. Total order
 cannot discover a prerequisite the author has not observed. If an earlier authored edit and a later reset are both
