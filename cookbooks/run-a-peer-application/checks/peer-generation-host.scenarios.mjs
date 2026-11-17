@@ -28,10 +28,22 @@ test('public host controls and rendezvous serve independent native application p
       case 'api.binary': {
         assert.ok(page);
         const body = job.base64 === undefined ? undefined : new Uint8Array(Buffer.from(job.base64, 'base64'));
-        const response = await page.api(job.method, job.path, body);
+        const response = await page.api(job.method, job.path, body,
+          { headers: job.contentType === undefined ? {} : { 'Content-Type': job.contentType } });
         return { status: response.status, contentType: response.headers.get('Content-Type') ?? 'application/octet-stream',
           base64: Buffer.from(await response.arrayBuffer()).toString('base64') };
       }
+      case 'page.fetch': {
+        assert.ok(page);
+        const response = await page.fetchPage(job.path);
+        const headers = {};
+        for (const name of ['Content-Type', 'Cache-Control', 'Content-Security-Policy', 'ETag']) {
+          const value = response.headers.get(name); if (value !== null) headers[name] = value;
+        }
+        return { status: response.status, headers, base64: Buffer.from(await response.arrayBuffer()).toString('base64') };
+      }
+      case 'restart':
+        assert.ok(page); await page.restart(); return { restarted: true };
       case 'traffic':
         assert.ok(page);
         return { host: page.hostTraffic, rendezvous: [...sessions.values()].flatMap(pair => pair.map(value => value.session.stats)) };

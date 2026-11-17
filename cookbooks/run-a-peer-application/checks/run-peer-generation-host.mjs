@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { copyFile, cp, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { createWriteStream } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
@@ -15,6 +15,7 @@ const { values } = parseArgs({ options: {
   'control-fixture': { type: 'boolean', default: false },
   'fixture-script': { type: 'string' }, 'fixture-cwd': { type: 'string' }, 'fixture-log': { type: 'string' },
   'application-id': { type: 'string' },
+  'serve-runtime': { type: 'boolean', default: false },
   'allow-dirty': { type: 'boolean', default: false },
 } });
 if ((!values.artifact && !values['control-fixture']) || !values.artifacts || !values.output) throw Error('Usage: (--artifact /exact/native-rtc-session.tgz | --control-fixture) --artifacts /exact/tendriller-dist --output /new/evidence');
@@ -31,7 +32,7 @@ const selected = kind => {
   assert.equal(matches.length, 1, `Exactly one ${kind} archive is required`);
   return join(artifacts, matches[0]);
 };
-const sdk = selected('sdk'), engine = selected('engine');
+const sdk = selected('sdk'), engine = selected('engine'), runtime = values['serve-runtime'] ? selected('runtime') : null;
 const manifest = JSON.parse(await readFile(join(artifacts, 'provenance.json'), 'utf8'));
 assert.equal(manifest.repository, 'werg/tendriller');
 assert.match(manifest.source, /^[a-f0-9]{40}$/u); assert.match(manifest.sourceTree, /^[a-f0-9]{40}$/u);
@@ -47,9 +48,17 @@ for (const [name, path] of [['@tendriller/core', sdk], ['@tendriller/engine', en
   hostEvidence.artifacts.push({ name, version: record.version, sha256, sourceCommit: manifest.source,
     sourceTree: manifest.sourceTree, sourceDirty: manifest.dirty });
 }
+if (runtime !== null) {
+  const record = expectedArchives.get(runtime.slice(runtime.lastIndexOf('/') + 1));
+  assert.ok(record, 'Runtime archive missing from its provenance manifest');
+  assert.equal(hash(await readFile(runtime)), record.sha256);
+  hostEvidence.runtimeArtifact = { name: '@tendriller/runtime', version: record.version, sha256: record.sha256,
+    sourceCommit: manifest.source, sourceTree: manifest.sourceTree, sourceDirty: manifest.dirty };
+}
 const write = (path, value) => writeFile(join(hostDirectory, path), typeof value === 'string' ? value : `${JSON.stringify(value, null, 2)}\n`);
 await write('package.json', { private: true, type: 'module', dependencies: {
   '@tendriller/core': `file:${sdk}`, '@tendriller/engine': `file:${engine}`,
+  ...(runtime === null ? {} : { '@tendriller/runtime': `file:${runtime}` }),
   '@cloudflare/vitest-plugin': '1.8.1', vitest: '4.1.12', typescript: '7.0.2',
 } });
 await copyFile(join(here, 'peer-generation-host.scenarios.mjs'), join(hostDirectory, 'host.test.mjs'));
@@ -64,9 +73,21 @@ await write('wrangler.jsonc', { name: 'independent-peer-host', main: 'entry.mjs'
 });
 execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: hostDirectory, stdio: 'inherit',
   env: { ...process.env, npm_config_cache: join(output, 'host-npm-cache') } });
+if (runtime !== null) {
+  const assets = join(hostDirectory, 'node_modules/@tendriller/runtime/assets');
+  const descriptor = JSON.parse(await readFile(join(assets, 'manifest.json'), 'utf8'));
+  assert.match(descriptor.id, /^[a-f0-9]{64}$/u);
+  const runtimeRoot = join(hostDirectory, 'assets/_tendril');
+  await mkdir(join(runtimeRoot, 'runtime'), { recursive: true });
+  await cp(assets, join(runtimeRoot, 'runtime', descriptor.id), { recursive: true });
+  await copyFile(join(assets, 'sw.js'), join(runtimeRoot, 'sw.js'));
+  await cp(join(assets, 'brand'), join(runtimeRoot, 'brand'), { recursive: true });
+  hostEvidence.runtimeArtifact.runtimeId = descriptor.id;
+}
 const lock = await readFile(join(hostDirectory, 'package-lock.json'));
 hostEvidence.dependencies = { lockSha256: hash(lock), packages: Object.entries(JSON.parse(lock).packages)
-  .filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@tendriller/core', 'node_modules/@tendriller/engine'].includes(path))
+  .filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@tendriller/core', 'node_modules/@tendriller/engine',
+    ...(runtime === null ? [] : ['node_modules/@tendriller/runtime'])].includes(path))
   .map(([path, value]) => ({ path, version: value.version, integrity: value.integrity })) };
 assert.ok(hostEvidence.dependencies.packages.every(value => value.integrity));
 const hostEvidencePath = join(output, 'host-artifacts.json');
@@ -154,7 +175,7 @@ function run(command, args, cwd, environment = {}, logPath) {
 
 async function createBridge() {
   const queue = [], pending = new Map();
-  let nextId = 0, blocked = false, requests = 0, requestBodyBytes = 0, reader, markReady;
+  let nextId = 0, blocked = false, loseActivationReply = false, requests = 0, requestBodyBytes = 0, reader, markReady;
   const ready = new Promise(resolve => { markReady = resolve; });
   const enqueue = job => new Promise((resolve, reject) => {
     assert.ok(pending.size < 32, 'The test bridge is bounded');
@@ -182,17 +203,27 @@ async function createBridge() {
         body.error ? item.reject(Error(body.error)) : item.resolve(body.value); return json(res, 200, { received: true });
       }
       if (url.pathname === '/testing/block') { blocked = body.blocked === true; return json(res, 200, { blocked }); }
+      if (url.pathname === '/testing/lose-activation-reply') { loseActivationReply = true; return json(res, 200, { armed: true }); }
+      if (url.pathname === '/testing/restart') return json(res, 200, await enqueue({ kind: 'restart' }));
       if (url.pathname === '/testing/stop') return json(res, 200, await enqueue({ kind: 'stop' }));
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.isBuffer(body) ? body.length : Buffer.byteLength(JSON.stringify(body));
       if (blocked) return json(res, 503, { error: 'CONTROL_HOST_UNAVAILABLE' });
+      if (url.pathname === '/page' || url.pathname.startsWith('/page/')) {
+        assert.equal(req.method, 'GET', 'The public page fixture is read-only');
+        const response = await enqueue({ kind: 'page.fetch', path: url.pathname.slice('/page/'.length) + url.search });
+        const bytes = Buffer.from(response.base64, 'base64');
+        res.writeHead(response.status, { ...response.headers, 'Content-Length': bytes.length });
+        return res.end(bytes);
+      }
       if (url.pathname.startsWith('/api/')) {
         const path = url.pathname.slice(5);
         if (binaryRoute) {
           assert.ok(['GET', 'PUT'].includes(req.method), 'Release bytes use GET or PUT');
           const response = await enqueue({ kind: 'api.binary', method: req.method, path,
-            ...(body === undefined ? {} : { base64: body.toString('base64') }) });
+            ...(body === undefined ? {} : { base64: body.toString('base64') }),
+            ...(typeof req.headers['content-type'] === 'string' ? { contentType: req.headers['content-type'] } : {}) });
           const bytes = Buffer.from(response.base64, 'base64');
           res.writeHead(response.status, { 'Content-Type': response.contentType, 'Content-Length': bytes.length });
           return res.end(bytes);
@@ -201,6 +232,9 @@ async function createBridge() {
           /^peers\/releases(?:\/(?:policy|manifests|activations)|\/manifests\/[a-f0-9]{64})?$/u.test(path),
         'Only public compact control and release routes belong to this fixture');
         const response = await enqueue({ kind: 'api', method: req.method, path, body });
+        if (loseActivationReply && path === 'peers/releases/activations' && response.status >= 200 && response.status < 300) {
+          loseActivationReply = false; res.destroy(); return;
+        }
         return json(res, response.status, response.value);
       }
       if (url.pathname === '/rendezvous/open') return json(res, 200, await enqueue({ kind: 'rendezvous.open', ...body }));
