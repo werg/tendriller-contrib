@@ -25,10 +25,37 @@ This preserves the observed development result; it does not qualify a clean
 release artifact, actual HTTP control routes, physical WebRTC, browser storage,
 deployed networks, or a recovery-age bound. Those scopes need their own execution.
 
-The manually dispatched `Independent peer-generation consumer` workflow builds
-an exact Chronolog source revision and runs the same isolated public consumer.
+The `Independent peer-generation consumer` workflow builds an exact pinned
+Chronolog source revision and runs the same isolated public consumer through both
+direct session links and the maintained native RTC composition. A manual run can
+select another exact source revision.
 It uploads its artifact, provenance, raw report and checked summary even when a
 later assertion fails. Its existence is not a claim that CI has run.
+
+## Preserved native RTC development run
+
+The [native RTC report](evidence/2026-11-17-peer-generation-rtc-preview-report.json)
+and [checked summary](evidence/2026-11-17-peer-generation-rtc-preview-summary.json)
+record the full recovery scenario on four actual authenticated ICE/DTLS/SCTP
+connections. The package came from clean Chronolog
+`5fbc7b182e461e12100c8bc339c5f9f2431bdeb6`; its archive SHA-256 is
+`6e1d65697dd7ab17419f9cc03982fc43d3c4ee73a2f0adafb0eeaa82681837af`.
+The consumer recorded its uncommitted explicit-loopback fixture change as dirty.
+
+Two commands completed while the portable control boundary was blocked. Reliable
+application-frame traffic increased by 32,009 logical bytes; the retired
+introduction stayed at two SDP descriptions and 1,137 bytes. Live typing arrived
+without appending history. The run retained the lost-reply operation, recovered
+sequence 6 to prefix 4, replayed on a fresh peer, preserved abandoned evidence,
+linked a deliberate reapplication, rejected ancestor-tail resurrection in the
+third generation, and reopened the original durable identity.
+
+Each observed route selected host candidates. The fixture explicitly supplies
+loopback candidates and disables interface enumeration through public native
+options. It does not exercise network-interface discovery, Internet reachability,
+TURN, browser ownership, Tendriller HTTP, deployed login or provider billing.
+The byte boundary excludes RTC/SCTP/DTLS/IP overhead. This development report is
+preserved separately from later clean-consumer or hosted/browser qualification.
 
 ## Public consumer boundary
 

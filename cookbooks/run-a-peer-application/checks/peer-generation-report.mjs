@@ -88,6 +88,8 @@ export function validatePeerGenerationReport(report) {
     const network = report.rtc;
     same(network?.implementation, 'werift', 'Missing maintained native RTC adapter');
     same(network.version, '0.27.0', 'RTC dependency must match the public adapter pin');
+    same(network.candidateSource, 'explicit-loopback-only', 'Do not infer representative interface discovery from a loopback fixture');
+    same(network.interfaceEnumeration, 'disabled-by-native-options', 'Record actual native candidate configuration');
     same(network.signalingBoundary, hosted ? 'tendriller-workerd-rendezvous' : 'one-off-in-process-sdp-mailbox', 'The introduction boundary must be explicit');
     same(network.byteBoundary, 'authenticated-reliable-application-frames', 'Byte scope must exclude unobserved wire overhead');
     assert.ok(network.connections?.length >= 4, 'Recovery requires original, reconnect, fresh and returning-peer RTC sessions');
@@ -191,7 +193,8 @@ export function validatePeerGenerationReport(report) {
         : 'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
       hosted ? 'Tendriller HTTP controls and rendezvous ran in workerd with synthetic authenticated accounts; deployed login was not exercised.'
         : 'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
-      'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
+      rtc ? 'Explicit loopback candidates do not qualify network-interface discovery, Internet routes, provider cost or a universal loss bound.'
+        : 'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
     ],
   };
 }

@@ -105,6 +105,7 @@ function syntheticRtcReport() {
   report.runtime.dependencies = { lockSha256: 'c'.repeat(64), packages: [{ path: 'node_modules/werift', version: '0.27.0', integrity: 'sha512-synthetic' }] };
   const signaling = { sentMessages: 2, sentBytes: 2048, closed: true };
   report.rtc = { implementation: 'werift', version: '0.27.0', signalingBoundary: 'one-off-in-process-sdp-mailbox',
+    candidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
     byteBoundary: 'authenticated-reliable-application-frames', connections: Array.from({ length: 4 }, () => ({
       peers: ['1'.repeat(64), '2'.repeat(64)], authenticated: true, closed: true, signaling,
       routes: [{ route: 'unknown', localCandidateType: null, remoteCandidateType: null }, { route: 'unknown', localCandidateType: null, remoteCandidateType: null }],
@@ -131,6 +132,7 @@ test('host-independent RTC commands require authenticated traffic after signalin
     value => { value.hostOutage.transport.after.signaling = { sentMessages: 3, sentBytes: 4096, closed: true }; },
     value => { value.rtc.connections[0].routes[0].route = 'direct'; },
     value => { delete value.runtime.dependencies.lockSha256; },
+    value => { delete value.rtc.candidateSource; },
   ]) {
     const report = syntheticRtcReport(); mutate(report);
     assert.throws(() => validatePeerGenerationReport(report));

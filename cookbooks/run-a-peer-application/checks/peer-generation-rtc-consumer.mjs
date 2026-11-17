@@ -10,7 +10,9 @@ const connections = [];
 const host = process.env.PEER_GENERATION_HOST_BRIDGE ? createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE) : null;
 const connectSessions = async (a, b) => {
   const introduction = host ? await host.signalingPair(a, b) : signalingPair();
-  const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceUseIpv6: false, iceUseTcp: false };
+  const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceAdditionalHostAddresses: ['127.0.0.1'],
+    // Supply only the explicit loopback candidate; interface discovery is outside this gate.
+    iceUseIpv4: false, iceUseIpv6: false, iceUseTcp: false };
   const started = performance.now();
   const endpoints = await Promise.allSettled([
     connectNativeApplicationWebRtc(a, { role: 'offerer', signaling: introduction.a, expectedPeerId: b.deviceId, native }),
@@ -51,6 +53,7 @@ try {
 } finally {
   const report = JSON.parse(await readFile(process.argv[2], 'utf8'));
   report.rtc = { implementation: 'werift', version: '0.27.0',
+    candidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
     signalingBoundary: host ? 'tendriller-workerd-rendezvous' : 'one-off-in-process-sdp-mailbox',
     byteBoundary: 'authenticated-reliable-application-frames',
     connections: connections.map(value => ({ ...value.observed, ...value.inspect(), closed: value.closed() })) };
