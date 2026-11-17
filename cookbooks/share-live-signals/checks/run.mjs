@@ -11,11 +11,12 @@ import { createTokenPreview } from '../snippets/token-preview.mjs';
 const { values } = parseArgs({ options: { 'signals-module': { type: 'string' } } });
 assert(values['signals-module'], 'Supply --signals-module /exact/built-public-signals.mjs');
 const modulePath = resolve(values['signals-module']);
-const { SignalChannel, generateSignalIdentity, signalAuthorId } = await import(pathToFileURL(modulePath).href);
+const { SignalChannel, generateSignalIdentity } = await import(pathToFileURL(modulePath).href);
 const identities = await Promise.all([generateSignalIdentity(), generateSignalIdentity()]);
-const allowedAuthors = new Set(identities.map(identity => signalAuthorId(identity.publicKeyBytes)));
+const hex = bytes => Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+const allowedAuthors = new Set(identities.map(identity => hex(identity.publicKeyBytes)));
 const topics = new Set(['reading', 'preview']);
-const authorize = ({ authorId, topic }) => allowedAuthors.has(authorId) && topics.has(topic);
+const authorize = ({ authorId, topic }) => allowedAuthors.has(hex(authorId)) && topics.has(topic);
 const sender = new SignalChannel({ scope: 'live-workbench', identity: identities[0], authorize });
 const receiver = new SignalChannel({ scope: 'live-workbench', identity: identities[1], authorize });
 const lifetime = new AbortController();
@@ -24,14 +25,14 @@ let dropNext = false, frames = 0;
 const toReceiver = { async send(frame, { signal }) {
   signal.throwIfAborted(); frames++;
   if (dropNext) { dropNext = false; return; }
-  await receiver.receive(frame, toSender);
+  await receiverRoute.receive(frame);
 } };
 const toSender = { async send(frame, { signal }) {
   signal.throwIfAborted(); frames++;
-  await sender.receive(frame, toReceiver);
+  await senderRoute.receive(frame);
 } };
-let detachSender = sender.attach(toReceiver);
-const detachReceiver = receiver.attach(toSender);
+let senderRoute = sender.attachRoute(toReceiver);
+const receiverRoute = receiver.attachRoute(toSender);
 const reading = receiver.subscribe({ topics: ['reading'], mode: 'latest', signal })[Symbol.asyncIterator]();
 const chunks = receiver.subscribe({ topics: ['preview'], signal })[Symbol.asyncIterator]();
 const checks = [];
@@ -41,7 +42,7 @@ try {
   const firstChunk = chunks.next();
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 20 }, { ttlMs: 3000 });
   const initial = (await firstReading).value;
-  assert.equal(initial.authorId, sender.authorId);
+  assert.equal(initial.authorId, hex(identities[0].publicKeyBytes));
   assert.equal(initial.payload.value, 20);
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 21 });
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 22 });
@@ -65,14 +66,14 @@ try {
   assert.equal(preview.snapshot().incomplete, true);
   checks.push('a lost preview chunk is visible as incomplete instead of a completed answer');
 
-  await assert.rejects(sender.send('administration', { role: 'owner' }), { code: 'signal_unauthorized' });
+  await assert.rejects(sender.send('administration', { role: 'owner' }), { code: 'SIGNAL_UNAUTHORIZED' });
   checks.push('payload role claims cannot authorize a disallowed live topic');
 
-  detachSender();
+  senderRoute.close();
   const beforeDisconnected = frames;
-  await assert.rejects(sender.send('reading', { source: 'thermometer', run: 'run-1', value: 99 }), { code: 'signal_disconnected' });
+  await assert.rejects(sender.send('reading', { source: 'thermometer', run: 'run-1', value: 99 }), { code: 'SIGNAL_ROUTE_UNAVAILABLE' });
   assert.equal(frames, beforeDisconnected);
-  detachSender = sender.attach(toReceiver);
+  senderRoute = sender.attachRoute(toReceiver);
   const freshReading = reading.next();
   await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 23 });
   assert.equal((await freshReading).value.payload.value, 23);
@@ -85,7 +86,7 @@ try {
   preview.clear();
   checks.push('ending the live session disposes consumers and clears transient state');
 } finally {
-  lifetime.abort(); detachSender(); detachReceiver(); sender.close(); receiver.close();
+  lifetime.abort(); senderRoute.close(); receiverRoute.close(); sender.close(); receiver.close();
 }
 console.log(JSON.stringify({ format: 'standalone-live-signals/v1', passed: true,
   publicModuleSha256: createHash('sha256').update(await readFile(modulePath)).digest('hex'), checks,

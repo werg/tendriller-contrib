@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/92264b64cff41746aa9520f8c9f9047e616659cc/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/70ea5c35c317b657535657af95cdeb96452f09d0/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -40,7 +40,8 @@ application backend.
 `all` preserves the queued order of distinct received messages until the bounded
 consumer overflows or its channel ends. It is not an offline queue and does not
 promise every sent message arrives. `latest` deliberately coalesces pending
-values from the same author/session/topic. Use it only when replacement is meaningful.
+values from the same author/session/topic and ignores reordered older values,
+even after the newest value has been consumed. Use it only when replacement is meaningful.
 One topic should not mix independent entities that need separate pending values;
 send a small complete snapshot or choose separate topics.
 
@@ -83,15 +84,19 @@ independently: one person's short-lived indication must not erase another
 person's still-live indication. Expire the display even if no later packet
 arrives, and clear it immediately when the subscription ends.
 
-`send()` resolving means the local channel handed the frame to its configured
-transport. It is not a remote delivery receipt, durable acceptance or completed
+`send()` resolving means at least one currently attached route accepted local
+dispatch. It is not a remote delivery receipt, durable acceptance or completed
 action. Keep a transient send failure separate from a durable submission result.
 Never queue yesterday's typing or preview to be resent after reconnect.
 
 For native or standalone use, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
-authorization callback and bounded frame routes. Attach
-that transport's incoming frames to `receive()`. No group history, reader grant,
+authorization callback, bounded frame transport and optional credential. Attach
+each connection with `channel.attachRoute({ send, close })`, pass its incoming
+frames to the returned route's `receive(frame)`, and close that route when the
+connection ends. Set `relay: true` only when the channel should forward verified
+original frames to its other routes; standalone relay is disabled by default.
+No group history, reader grant,
 SQL engine, durable proposal or finality provider is required by the standalone
 channel. A Chronolog integration can supply a membership-backed policy instead
 of implementing capability checks in application code.
@@ -106,10 +111,10 @@ route with the chosen live transport; keep its access, confidentiality and
 lifecycle policy explicit.
 
 Each channel is constructed with `{ scope, identity, authorize }`. Its explicit
-`attach({ send(frame, { signal }) })` route returns a detach function; pass
-incoming original frames to `receive(frame, route)`. Receive verifies the sender
-and relays through other live routes without rewriting the signature, identity
-or expiry. Closing a route cancels its pending sends. Closing the channel ends
+`attachRoute({ send(frame, { signal }) })` returns a route with `receive(frame)`
+and `close()`. Receive verifies the sender and, when relay is enabled, forwards
+the original frame to other live routes without rewriting the signature,
+identity or expiry. Closing a route cancels its pending sends. Closing the channel ends
 subscriptions; an unattached send fails immediately. The module provides no
 database, proposal, capability-log or finality dependency to configure.
 
