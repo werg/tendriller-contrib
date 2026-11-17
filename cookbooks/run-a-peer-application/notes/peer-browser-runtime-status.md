@@ -1,5 +1,14 @@
 # Browser runtime qualification status
 
+The current [clean browser pairing](peer-generation-qualification.md#clean-browser-worker-and-opfs-pairing)
+passed in GitHub Actions with actual Chromium, Worker-owned OPFS, peer key
+enrollment, real RTC, host-blocked work, partial-content restart and explicit
+recovery. Its report and summary are preserved separately at the exact tested
+Chronolog and consumer revisions. It qualifies the events profile on that local
+browser/native topology; SQL and deployed operating conditions remain separate.
+
+## Earlier workspace launch failure
+
 The [preserved attempted runtime report](evidence/2026-11-17-peer-generation-browser-blocked-report.json)
 records `passed: false`. It installed and verified the clean public Chronolog
 archive from `784414c95e77f797083866f9c314c1ecd4183661`, with SHA-256
@@ -16,9 +25,9 @@ archive before it could be used. No system restrictions were changed.
 
 The runner now retains the original runtime error as well as its outer process
 failure, so a missing executable or denied launch cannot be mistaken for an
-application failure. The browser gate must run in an environment supporting its
-normal browser process requirements before it supplies acceptance evidence.
-The existing packed native RTC evidence remains scoped to native peers.
+application failure. That attempt supplied no browser acceptance evidence. The
+later CI run used an environment supporting normal browser process requirements.
+The earlier packed native RTC evidence remains scoped to native peers.
 
 Later public Worker-client, page and SQL changes require their own exact clean
 archive and a fresh report. Building or checking those files does not update

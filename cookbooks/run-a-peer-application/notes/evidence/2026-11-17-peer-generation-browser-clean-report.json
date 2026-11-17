@@ -1,0 +1,621 @@
+{
+  "format": "peer-generation-browser/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "browser-worker-opfs-native-rtc",
+  "passed": true,
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "8d390fc5ae43175e201c46bdae2a1547c6a7ae86",
+    "tree": "fd5ae204e03f09088de97d40e8143a49b42878f6",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g572fded7-rtc",
+      "sha256": "0c40d7ecf5c010fcbc8014d5bfd135bf7018f2c2d30d7ad4161bd962dd46cb71",
+      "sourceCommit": "572fded79a41d5aeda670d60f0e022d08b85c51a",
+      "sourceTree": "aca326927f169c972f1af9a1581367e65fa8b5a6",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-consumer.mjs",
+      "sha256": "889ca9a816d89b1f7bc80c770d37bbe6fab06ff99a4af200c632e52e5f9138ed"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-page.mjs",
+      "sha256": "92b8c234ec699c8c024f96f78dc53a738de36999d10e8ef5eb32d0fea65c6807"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-worker.mjs",
+      "sha256": "d4d5a7da94ac7793eb35ab181ce351a04d088e18410332401ed5c779e253045a"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/board.html",
+      "sha256": "85b09db8c1e1ab1b044f5fad5625ffaf35edc950ef2dac6c674d1bc73257affa"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/compact.html",
+      "sha256": "68f87ac5cf872d797a14f27b7d077b8b3417fab6c7d1b42b9060fe0e0b85954f"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/style.css",
+      "sha256": "ef306b3e70b338bab8b986db35fa67c977f90d8aced8ce6a333a2802147ef4a9"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-ui/app.mjs",
+      "sha256": "fe23d843eb7fbc7cf9107d0b52ce606cd23afd044c7ec7758a7329108d7e1efe"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/shared/typing.mjs",
+      "sha256": "44de2d5704c6b89d51ec57e92fec1eb9ea04d88988771c82e305fd2366ec0a0f"
+    }
+  ],
+  "error": null,
+  "runtime": {
+    "node": "v24.22.2",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "8e83162fd2f62c1f67aec6164a70638f744545c62564f8234dfbcfb1a602b8e1",
+      "packages": [
+        {
+          "path": "node_modules/@esbuild/aix-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-kXXoiPVVGQcnIYGOeaovwOURpniDBpSq4A03qkQ+BMQqtGG6HYap3xne9C1O1yo4TR3qxlCX5IqqmX6fFo2Lqg=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-5YfKeeI8qWfBZIX+u2xZC3Zlb3Os/gLS2sbEKM+I4ZOcsWmHS2WLysCcQZDAFRslDUU5Oiq44gf6PYN1vGwG5A=="
+        },
+        {
+          "path": "node_modules/@esbuild/android-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-O387ite7SzUyCcy3JQX4P4bLtEA7bLLkx+esve5JHnyYfNTxcVpXZo9jhdB0lTKN44gztELTdU7nS8Nr16Fs1Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n4KqkOQrraxHJcgjM1RvwbigfQKIKJVpM7xp+KsxiyUSrRdIXnt73VhrPAx0fV44hgfmIVKjxMN9J1t5jySVkw=="
+        },
+        {
+          "path": "node_modules/@esbuild/darwin-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-uq6suIWYP37qzGddBKPw5QEQPi6HiLGsO7UmkpfyaYNQ3D+rN6w6WfwH+nuqcGXWvawGwxOEroO4YGnFh95azw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-n+I0BTSRIoy+d6RPKnEVwql5UwBJolytvY4mAOIEJorKlqgPII8ix6slVVrfZ5Tnj7glIZvloylbB/EJPMWEXw=="
+        },
+        {
+          "path": "node_modules/@esbuild/freebsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-78XJTJkvPs0kz2w61301PJjXl4g7q3JqiYMZ/M/yVI73EHBrCRTgkhu9oqG7vPqq+a/yadEW8aD+agKlk5xrmg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm",
+          "version": "0.28.2",
+          "integrity": "sha512-XlDnu2q5yoqems+xay6wSAcg9DDD7K9RLKZEBOMZm3ckNpJBvOX20tSfby8KfrrhINDyv9V2YVZKY/SpoGJI8w=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-pW4AC0P3it8c7do9MVM4p51FzHzdM/TZrerurgRcHJ2WTa1VQ1CIq18xncfpBJw4ojkiZZrKW2yIBWBP92j6Ug=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-CYbnj78HsIeA+DhgUKgFCfvNsTHFhMMrinUrMZpDXJXKN8T3XViTZ/+wtHeVxEWY8ewSzTFN+nRmSwO2tZaLUQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-loong64",
+          "version": "0.28.2",
+          "integrity": "sha512-buwkd8nsph4R+ajRvw0qM5Hja/TXQow3ptzWO2EbG/cqcIkHloRrdlBtQlshyYGTNFvfkfJ5tpPLVkY4DtsPfQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-mips64el",
+          "version": "0.28.2",
+          "integrity": "sha512-ZVykbDyk7519VwiNb9Lcj9m8XM6v5V9uKPvrEMkkEedVewf+0itkhahp4HDpgERXhwLRpWFypsGbG/J8s0QjJA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-ppc64",
+          "version": "0.28.2",
+          "integrity": "sha512-CAXl+Dtd9UUuJd8pKKdwh6MLm3MUMiqMPmhZ3tTSXPqfyQ3vDl6R5hZdZ/kYojK4ofXtdfSv1tFq8XzWx3heNQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-riscv64",
+          "version": "0.28.2",
+          "integrity": "sha512-GeXCej4IQtU1B+QlDV8W/RRvbzI3O/Stss+/bCXv4lZls5WGRtu2a+3JkA3i4qIUlMXpcHebWpF8AkJhATowuA=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-s390x",
+          "version": "0.28.2",
+          "integrity": "sha512-3H1weTYZPxt/WOhByszQZybS9w5lKzUn1FDMsgEChbHWQwHYQQRfBxgCcZvPhjHfKyJjIievvMmEUawJrdY9Dg=="
+        },
+        {
+          "path": "node_modules/@esbuild/linux-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-4xTZr1FUmSoQW4XIWmit3tzQrUTZM+N3P0XV8xROKYF50XfI7xeO90+1bZvNwxIufQ9hDQVRJH5YhgPVF8A/HQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-sSATRjPeDBg3pdgHoQfoYBob11Kk1FGa9lui5RIHZCoCkJa9QKlvl3/vKz2usCmYYjs7ymJR/2Nnsqe+Hjt5nw=="
+        },
+        {
+          "path": "node_modules/@esbuild/netbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-lqnzCV+mM0gIADaKihiCg6ifgfU2L3h5E33rNQBN1Y4MaVGnzryzmvvf7UHxprpQdE8hpqLolJ9Rl+SkIRDpyw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-AL2qJILH7lNjrDmCQDvdxMfAUIv8KMNZOvrwAQ8i8//ntL9FflhOyMJ8OZSMBb8/AWXe3/5v5S20y3zCoZWKoQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/openbsd-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-QtiuPytchRyC4rwUKhexJdQKvDuZ6hWloi3igqPQNUJCS1/v9EiO3UTOXR6A3FoMo4fnAKbWJdqaIwhOzh8qEw=="
+        },
+        {
+          "path": "node_modules/@esbuild/openharmony-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-WkhYDmpTjLvGlScA1rwjRUmhl4k8oXR3cIbtqWmELgU/dFeHHlEllxDvdWcNJV9rbzCexB5vz8gtNewWLgCT7Q=="
+        },
+        {
+          "path": "node_modules/@esbuild/sunos-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-GPMSkTOtMnv2U2F8gxe4Io6qmVs+YKyp832Etqqxr0hFngmXQ3rzwytelm3GIn7T4VviRUlf3sOgBOiTdvaf7g=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-arm64",
+          "version": "0.28.2",
+          "integrity": "sha512-PIhhEkE9uPBleRBrQEJpUn7MBnibZzbGzYWPmY3x+YoVg/95zbjB4CxPPOQ8l5tYYM4mMaCthF8/1DIfBQQyWQ=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-ia32",
+          "version": "0.28.2",
+          "integrity": "sha512-YmJbfTlvU7Sdn9BB+4PRES4oB6pxgS37MAONj+hBr/cpXS1aBPKXxNnDbu+QCWPj0o9dgyxeq79g6c5P8KeuYA=="
+        },
+        {
+          "path": "node_modules/@esbuild/win32-x64",
+          "version": "0.28.2",
+          "integrity": "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="
+        },
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/esbuild",
+          "version": "0.28.2",
+          "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/playwright",
+          "version": "1.65.0",
+          "integrity": "sha512-F3AMWcR44qMBt4kq+6Kb6mX7bjGXshktKFOPULd7reED6ZJWevjbNRqysP7q+AATE9kdPEZBibex1BYsvpVoeA=="
+        },
+        {
+          "path": "node_modules/playwright-core",
+          "version": "1.65.0",
+          "integrity": "sha512-vNSKgH6YqtN7cdT/L334zo0a+YwkrpicyrHJlWWPIm/Q+Nn2SWInil01oT0mbu96U4GgoRtCYQD9CzJQgju+lA=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/browser",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc",
+      "@chronolog/peer-session/webrtc-native"
+    ],
+    "testTools": [
+      "esbuild",
+      "playwright"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRpcMaps": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "browserAssets": [
+    {
+      "file": "app.mjs",
+      "sha256": "c7085f3f7b7b3b18d6870956e7f249781bc9e6e3405c29d4bb9e174be64eb8c5"
+    },
+    {
+      "file": "board.html",
+      "sha256": "85b09db8c1e1ab1b044f5fad5625ffaf35edc950ef2dac6c674d1bc73257affa"
+    },
+    {
+      "file": "chunk-6BJ4SO3R.mjs",
+      "sha256": "c37380b491745de6dcb1bd670229759deb8167eb9b075c8563f964b7c75df98d"
+    },
+    {
+      "file": "compact.html",
+      "sha256": "68f87ac5cf872d797a14f27b7d077b8b3417fab6c7d1b42b9060fe0e0b85954f"
+    },
+    {
+      "file": "style.css",
+      "sha256": "ef306b3e70b338bab8b986db35fa67c977f90d8aced8ce6a333a2802147ef4a9"
+    },
+    {
+      "file": "worker.mjs",
+      "sha256": "54b56ef0cdb00dc347856865f41b149bcef30dd0bae7d7489d5cdb2d90d8d3f6"
+    }
+  ],
+  "browserBundleInputs": [
+    "app.mjs",
+    "deployment/bootstrap.mjs",
+    "node_modules/@chronolog/peer-session/browser.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-C5L4AMKQ.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-N3WHXMSB.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-OMSAQWWX.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-V66TATJS.mjs",
+    "node_modules/@chronolog/peer-session/chunks/chunk-ZSUYWWSS.mjs",
+    "node_modules/@chronolog/peer-session/index.mjs",
+    "node_modules/@chronolog/peer-session/webrtc.mjs",
+    "peer-generation-browser-page.mjs",
+    "peer-generation-browser-worker.mjs",
+    "peer-generation-definition.mjs",
+    "typing.mjs"
+  ],
+  "browser": {
+    "implementation": "chromium",
+    "version": "158.0.8127.18",
+    "headless": true,
+    "transportOwner": "dedicated-worker",
+    "storage": "opfs-with-exclusive-web-lock",
+    "signalingBoundary": "loopback-fixture-http",
+    "controlBoundary": "portable-registry-over-loopback-http",
+    "nativeCandidateSource": "explicit-loopback-only",
+    "interfaceEnumeration": "disabled-by-native-options",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "observations": {
+      "notices": [],
+      "statuses": [
+        {
+          "phase": "ready",
+          "role": "coordinator",
+          "generation": "1489a32220bee66935ac508a798a6f19c2d77dff69ebad7ecebb4f4061a57c32",
+          "coordinator": "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9",
+          "connectedPeers": 0
+        }
+      ],
+      "secureContext": true,
+      "storage": true,
+      "locks": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36"
+    }
+  },
+  "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+  "ownership": {
+    "workerOnly": true,
+    "secondOwnerRefused": true,
+    "secondTabRefused": true,
+    "unsupportedStorageRefused": true,
+    "unsupportedFault": "Worker navigator.storage.getDirectory removed by the fixture",
+    "initialDeviceId": "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9",
+    "initialStorageId": "bc14b3ea-b2de-405c-a1b1-5114366de4e2",
+    "pagePrivateKeys": 0,
+    "freshDeviceAwaitedKeys": true,
+    "gracefulReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "storedKeysReused": true
+    },
+    "abruptWorkerReopen": {
+      "sameDeviceId": true,
+      "sameStorageId": true,
+      "sameView": true,
+      "durableOperation": true,
+      "attempts": 1
+    }
+  },
+  "stage": "fresh peer replay and graceful plus abrupt Worker reopening passed",
+  "operations": {
+    "cancelledWaitPreservedAttempt": true,
+    "resumedExactAttempt": true,
+    "operationId": "98522f7c-536b-4ab3-a552-6af74496b6c9",
+    "attemptId": "54a2012b640970272b6b7320accd3893f958e1355f909351934589a267526875",
+    "receiptPeer": "5d885cc8cf05bb7f64a68233b40c3f1a7dd0f2d42d8e609dcc8eaa269b1d5b21",
+    "enrolledFromPeer": true
+  },
+  "hostOutage": {
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "before": {
+      "controlRequests": 1,
+      "controlBodyBytes": 0,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1192
+    },
+    "after": {
+      "controlRequests": 1,
+      "controlBodyBytes": 0,
+      "signalingRequests": 6,
+      "signalingBodyBytes": 1192
+    },
+    "transport": {
+      "before": {
+        "reliable": {
+          "sentBytes": 41965,
+          "receivedBytes": 41965
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1103,
+          "closed": true
+        }
+      },
+      "after": {
+        "reliable": {
+          "sentBytes": 156313,
+          "receivedBytes": 156313
+        },
+        "signaling": {
+          "descriptions": 2,
+          "bytes": 1103,
+          "closed": true
+        }
+      }
+    },
+    "liveSignalsObserved": 1,
+    "content": {
+      "bytes": 32768,
+      "sha256": "1b63c5c2620244657e032368abf44fec5395a6d53cd7511e88255a9bb1237dc5",
+      "retainedByBrowser": true
+    },
+    "disposablePathsDidNotAppend": true,
+    "coherentReadView": true
+  },
+  "contentRecovery": {
+    "bytes": 131095,
+    "interruptedAfter": 65536,
+    "partialRetentionRefused": true,
+    "partialSurvivedRestart": true,
+    "unavailableRemainderRefused": true,
+    "completeAfterReconnect": true,
+    "retainedBy": "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9",
+    "retentionSignature": "bf29ab0c8002b35defdb1475de81f6cdd557d231e34b8a57e3074d365ee76c00e597950a11de93ef29bee7be1db9332ac256f0419bce080757bfb18ba7aef400"
+  },
+  "recovery": {
+    "originatorClosed": true,
+    "originatorStoreUnavailable": true,
+    "priorHead": {
+      "generation": "19e1687ad795ff27b7cabaee385932a73b3d781c235ec7d8001cdab4e2222224",
+      "sequence": 6,
+      "root": "8ca1c12f80570d31aaf1dc6471bd21efdd965189c874d7dbbcac1bba11eee30a"
+    },
+    "adoptedPrefix": {
+      "generation": "19e1687ad795ff27b7cabaee385932a73b3d781c235ec7d8001cdab4e2222224",
+      "sequence": 4,
+      "root": "782894b731aaddb23c7d9a89b9b78e52e92dfa92b8eb522c939b79b136070fcd"
+    },
+    "selectedGeneration": "1489a32220bee66935ac508a798a6f19c2d77dff69ebad7ecebb4f4061a57c32",
+    "originalAttempt": {
+      "status": "needsReapply",
+      "attemptId": "010ede12db0a22015ab62bd3078d40a0fcb5478ffa5d279f90f0f0855b2f812b",
+      "operationId": "a89a5ca0-f3f1-49ef-8d2b-4c8360198cf9",
+      "generation": "19e1687ad795ff27b7cabaee385932a73b3d781c235ec7d8001cdab4e2222224",
+      "selectedGeneration": "1489a32220bee66935ac508a798a6f19c2d77dff69ebad7ecebb4f4061a57c32",
+      "previous": null
+    },
+    "reapplied": {
+      "status": "applied",
+      "attemptId": "1891925c9a7b75c5b4a02a070d7577bd87007962775f977a1fdf68b4b30caafc",
+      "operationId": "f0aee627-d54b-44d6-bc5c-7dfda295a765",
+      "author": "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9",
+      "generation": "1489a32220bee66935ac508a798a6f19c2d77dff69ebad7ecebb4f4061a57c32",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "staleCursorError": "RecoveredViewError",
+    "heldViewPreserved": true,
+    "reapplyOf": "010ede12db0a22015ab62bd3078d40a0fcb5478ffa5d279f90f0f0855b2f812b",
+    "currentGuardsChecked": true,
+    "noticesPersisted": 1,
+    "transitionJournalEntries": 1
+  },
+  "ui": {
+    "pages": [
+      "board.html",
+      "compact.html"
+    ],
+    "domain": "events",
+    "sessionFacade": "connectApplicationWorker",
+    "sentThroughForms": 3,
+    "reapplicationConfirmed": true,
+    "recoveryNoticeVisible": true,
+    "draftBeforeRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRecovery": "An unsent draft must survive page replacement and recovery.",
+    "originalReviewPreserved": true
+  },
+  "freshPeer": {
+    "deviceId": "78035e8db7d6f487d5689f2b1c30d2df7a1c827bc3d3c12f3fc55b4fcfe82ec7",
+    "joinedAfterOriginatorLoss": true,
+    "enrolledFromBrowser": true,
+    "generation": "1489a32220bee66935ac508a798a6f19c2d77dff69ebad7ecebb4f4061a57c32",
+    "browserViewSha256": "1f3a77d14811d42dbe331f170c6e6fe3ac6a91cac386d7dc104391b97c3fed89",
+    "nativeViewSha256": "1f3a77d14811d42dbe331f170c6e6fe3ac6a91cac386d7dc104391b97c3fed89"
+  },
+  "connections": [
+    {
+      "peers": [
+        "5d885cc8cf05bb7f64a68233b40c3f1a7dd0f2d42d8e609dcc8eaa269b1d5b21",
+        "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 169.68639100000019,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1103,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "5d885cc8cf05bb7f64a68233b40c3f1a7dd0f2d42d8e609dcc8eaa269b1d5b21",
+        "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 142.497924,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1103,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "5d885cc8cf05bb7f64a68233b40c3f1a7dd0f2d42d8e609dcc8eaa269b1d5b21",
+        "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 99.93748199999982,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1103,
+        "closed": true
+      },
+      "nativeClosed": true
+    },
+    {
+      "peers": [
+        "78035e8db7d6f487d5689f2b1c30d2df7a1c827bc3d3c12f3fc55b4fcfe82ec7",
+        "cb02f953755239b586dc6a30907a34fa21f9050ad2ce4c9a88bf06fbe0fcb1d9"
+      ],
+      "authenticated": true,
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "host",
+          "remoteCandidateType": "prflx"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ],
+      "connectedInMs": 330.50441,
+      "signaling": {
+        "descriptions": 2,
+        "bytes": 1130,
+        "closed": true
+      },
+      "nativeClosed": true
+    }
+  ]
+}

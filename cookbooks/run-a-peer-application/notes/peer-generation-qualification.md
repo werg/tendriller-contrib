@@ -67,10 +67,124 @@ repeat the complete native RTC scenario with both source checkouts clean:
 - Consumer: `8d308a6e5cfb12de4fe3eb6d7da6c2132407a039`.
 - Session archive SHA-256: `79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c`.
 
-The independent workflow now pins that exact Chronolog source. The run verifies
+That workflow run pinned the exact Chronolog source. The run verifies
 native SQLite ownership, real loopback RTC, exact operation retry, selected-prefix
 recovery and old-branch exclusion. Its portable-control boundary does not qualify
 Tendriller HTTP or browser Worker ownership; those remain separate gates.
+
+## Clean browser, Worker and OPFS pairing
+
+The [unaltered browser report](evidence/2026-11-17-peer-generation-browser-clean-report.json)
+and [checked summary](evidence/2026-11-17-peer-generation-browser-clean-summary.json)
+come from the passing [independent workflow 44091858762](https://github.com/werg/tendriller-contrib/actions/runs/44091858762).
+Its direct, native RTC and browser/native jobs all passed. This browser evidence
+uses Chromium **158.0.8127.18**, four authenticated RTC connections, an owning
+dedicated Worker and real OPFS storage with exclusive Web Locks.
+
+| Input | Exact identity |
+| --- | --- |
+| Chronolog source | `572fded79a41d5aeda670d60f0e022d08b85c51a` |
+| Chronolog tree | `aca326927f169c972f1af9a1581367e65fa8b5a6` |
+| Public session archive SHA-256 | `0c40d7ecf5c010fcbc8014d5bfd135bf7018f2c2d30d7ad4161bd962dd46cb71` |
+| Authored consumer | `004b8b26731c6fbe4f872e05ed074319f2467986` |
+| Tested clean PR merge | `8d390fc5ae43175e201c46bdae2a1547c6a7ae86` |
+| Tested consumer tree | `fd5ae204e03f09088de97d40e8143a49b42878f6` |
+| Downloaded CI artifact | `14331178863`, 160,556 bytes |
+| Downloaded ZIP SHA-256 | `5fe4c8dfbc2b4fa997bcf36a937df0719c8bbe4a39af0587ab74df00e75150e4` |
+| Raw report SHA-256 | `d998f3e7b004167ca775cb1fd8866e071c545459660d716f7a7836fa99252c73` |
+
+Both sources were clean. The downloaded ZIP digest was checked before extraction;
+the report and summary are copied without modification. They retain dependency
+integrities, fixture and bundled asset hashes, public import boundaries and
+each connection's observed route.
+
+The browser began without application keys and enrolled directly from a granted
+peer. It refused a second Worker, a second tab, a page-owned storage attempt and
+the fixture's deliberately unavailable OPFS capability. Cancelling an operation
+wait preserved the saved attempt; reconnect applied that exact attempt. The
+actual board and compact pages sent domain commands, retained an unsent draft
+through page replacement, and exposed abandoned intent for confirmed reapplication.
+
+While control HTTP was blocked, two commands applied, live typing arrived and
+the browser retained and verified a 32,768-byte encrypted attachment. Control
+requests stayed at **1**, signaling requests at **6**, and their request-body
+counters stayed at **0** and **1,192 bytes** respectively. Logical authenticated
+reliable traffic increased from **41,965 to 156,313 bytes**; the retired SDP
+introduction stayed at two descriptions and 1,103 bytes. Live/content transfer
+did not append application history. These are logical frame counts, excluding
+RTC/SCTP/DTLS/IP overhead.
+
+A separate 131,095-byte attachment was interrupted after 65,536 bytes. The partial
+cache survived Worker replacement, refused a full-retention receipt and refused
+an unavailable byte. Reconnection completed the content and produced a signed
+retention receipt. The originating peer was then closed and its store removed
+from usable recovery sources. The browser selected retained prefix **4** from
+prior head **6**, exposed `needsReapply`, preserved the old captured view and
+rejected its cursor against a new-generation view with `RecoveredViewError`.
+Confirmed reapplication created a new operation linked to the old signed attempt.
+A fresh keyless native peer enrolled from that browser and produced the same
+selected-state digest. Graceful and abrupt Worker reopen retained device identity,
+storage identity, keys, state and the observed durable operation.
+
+This gate uses the events profile and a measured portable registry over loopback
+HTTP. It does not claim actual Tendriller control routes, SQL, deployed login,
+Internet routes, TURN, quota pressure, eviction, or interrupted-write crash
+safety. Abrupt Worker termination occurred after an observed durable apply.
+The [earlier blocked browser attempt](peer-browser-runtime-status.md) remains
+unchanged at its original source and is not relabeled as a passing run.
+
+## Clean Tendriller workerd and native RTC pairing
+
+The [unaltered hosted report](evidence/2026-11-17-peer-generation-host-clean-report.json)
+and [checked summary](evidence/2026-11-17-peer-generation-host-clean-summary.json)
+record a separate passing actual-host execution. The test installed the public
+Tendriller SDK and engine archives into an isolated workerd pool, used their
+public testing surface with synthetic authenticated accounts, and introduced
+four actual native RTC sessions through Tendriller's rendezvous routes. The
+application imported only the packed public session; no sibling source or host
+internals were used.
+
+| Input | Exact identity |
+| --- | --- |
+| Consumer source | `004b8b26731c6fbe4f872e05ed074319f2467986` |
+| Chronolog source | `572fded79a41d5aeda670d60f0e022d08b85c51a` |
+| Session archive SHA-256 | `9dbcf32ba7ef88cdcf8c9f8aa1efad5e40b5395edcf783c15cf06a779eac8dde` |
+| Tendriller source | `2e8200a33a47da4029a96b3699e23d2b1441f823` |
+| SDK archive SHA-256 | `71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614` |
+| Engine archive SHA-256 | `05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468` |
+| Raw report SHA-256 | `07667378f7704291f5b68c05d109ec03cd0cb99f2823815986c652f468b6b3c3` |
+
+All three source identities were clean. The host supplied the immutable public
+application definition and signed authority, and authenticated generation
+selection. The native peers preserved the exact lost-reply operation, applied
+two more commands while the host probe was blocked, and exchanged a live signal.
+
+| Measured boundary during those commands | Before | After |
+| --- | ---: | ---: |
+| Test bridge requests | 19 | 19 |
+| Test bridge request-body bytes | 5,061 | 5,061 |
+| Actual Worker HTTP requests | 8 | 8 |
+| Actual Worker request-body bytes | 2,117 | 2,117 |
+| Rendezvous upgrades | 4 | 4 |
+| Rendezvous sent / received bytes | 2,860 / 3,486 | 2,860 / 3,486 |
+| Hosted application-body bytes | 0 | 0 |
+| Authenticated reliable frame bytes | 24,027 | 60,762 |
+
+Signaling retired before the ordinary workload. Each observed connection used
+direct loopback host candidates. After removing the originating peer and its
+store from usable sources, a survivor selected prefix **4** from prior head
+**6**. A fresh peer reconstructed the same state; the returning old peer retained
+its excluded evidence without replacing selected state. Deliberate reapplication
+used a new linked attempt, a third generation did not resurrect the abandoned
+suffix, and reopening retained the original device and operation state.
+
+This proves the named workerd control/rendezvous routes with native loopback
+peers. The bridge is test infrastructure, account authentication is synthetic,
+and the scenario explicitly controls introductions and recovery faults. It does
+not qualify deployed login, managed discovery/invitation lifecycle against a
+deployed host, browser/Tendriller composition, Internet or TURN routes, provider
+billing, or a five-minute loss bound. The browser pairing above has its own
+separate portable-control boundary and archive hash.
 
 ## Public consumer boundary
 
@@ -122,5 +236,7 @@ never turn an unmeasured heartbeat into a universal maximum. Compare provider co
 only for equivalent workloads with the different retention/finality guarantee
 stated explicitly.
 
-No result in this note marks those additional gates passed. A preserved runtime
-report and its exact public artifact pairing are required for each claim.
+The clean browser pairing above supplies its explicitly named Worker, ownership,
+content and recovery observations. Other scopes remain open until a preserved
+runtime report and exact public artifact pairing support each claim. The
+five-minute recovery-age objective is not measured by these short scenarios.
