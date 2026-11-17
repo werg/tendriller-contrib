@@ -27,7 +27,7 @@ prove that a runtime, browser or deployment ran.
 | --- | --- | --- | --- |
 | Native RTC | Chronolog `d70939f5a10d51259879d53e19f1de9667c7bf9b`; contrib `94b4a751c700bd4df3e1857e544e8b39c952755e` | [Raw report](evidence/2026-11-17-common-session-native-d70939f5-report.json), [checked summary](evidence/2026-11-17-common-session-native-d70939f5-summary.json) | Public native sessions, independent durable stores and real authenticated loopback RTC; session-owned control/publication APIs and exact retry. |
 | Native SQL | Same exact Chronolog and contrib sources as the native RTC row | [Raw report](evidence/2026-11-17-common-session-sql-d70939f5-report.json), [checked summary](evidence/2026-11-17-common-session-sql-d70939f5-summary.json) | The real patched native SQL engine through common `prepareSqlApplication`/`openSqlApplication` with an explicit engine capability; transactional authorization, coherent recovery and durable reopen. |
-| Hosted participant | Chronolog `095a04cf027a7c753c028306d1d8311d70e415fe`; Tendriller `d252a1e10e6632fba35c07a9e45f22fce38b9d81`; contrib `f44ac7a77146df2b2542d46d85b6b87ec56117ca` | [Raw report](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-report.json), [checked summary](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-summary.json) | Installed Tendriller SDK/engine, actual local workerd HTTP and rendezvous, synthetic authenticated accounts, real native RTC and served signed HTML/JavaScript. |
+| Hosted participant | Chronolog `d70939f5a10d51259879d53e19f1de9667c7bf9b`; Tendriller `fa2eb6122cdf915bd893bb8f0f66d0bb86e68099`; contrib `8e3f9038749da5b94b62389fe8ab2fdc2dd41059` | [Raw report](evidence/2026-11-17-common-session-hosted-d70939f5-fa2eb612-report.json), [checked summary](evidence/2026-11-17-common-session-hosted-d70939f5-fa2eb612-summary.json) | Installed Tendriller SDK/engine, actual local workerd HTTP and rendezvous, synthetic authenticated accounts, real native RTC and served signed HTML/JavaScript. |
 
 All named package sources and consumer checkouts were clean at capture. The
 reports name source trees, package versions, fixture digests, runtime versions,
@@ -39,9 +39,10 @@ The Chronolog native RTC archive at `d70939f5` has SHA-256
 `f7df9cd6028f1ad2aec4b4f328beab04f1be1349897fa0a3fb64c7f87cbf6a13`.
 The SQL archive at that source has SHA-256
 `72a413408c6bc704c742777b6ac3622b28a577981d8a8a4248ca23b4a2f1801a`.
-The hosted checkpoint's Chronolog RTC archive has SHA-256
-`7e61730a2f21180e7be5558c86a0c77008cd570c20a377dc6cc1eef92e41d656`;
-its report records the separate Tendriller SDK/runtime/engine hashes.
+The hosted checkpoint uses that same Chronolog RTC archive. Its Tendriller SDK
+has SHA-256 `fe5a98f5f74294af82535d0cc4b3ac2965c9a527c391d266f917dd0917cd1862`;
+runtime `67ebb6b5468547357cd9c6bf3062d9bb0dac96175fae4cd0e22e1ad3a37336d9`;
+and engine `0f806c110cda78fedda09189249f1db880debc1ee03db8ee9306252aadc74c81`.
 
 The native scenario recovered the original saved operation after a lost reply,
 completed two commands while its control boundary was blocked, recovered from
@@ -122,6 +123,10 @@ require equivalent outcomes and explicitly stated retention/settlement guarantee
 see [measurement guidance](measuring-application-costs.md).
 
 ## Earlier source-specific evidence
+
+The [earlier hosted095/d252 report](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-report.json)
+and [checked summary](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-summary.json)
+preserve the first clean actual-host checkpoint separately from the newer pairing.
 
 The [dirty native/events development report](evidence/2026-11-17-peer-generation-preview-report.json)
 and [summary](evidence/2026-11-17-peer-generation-preview-summary.json),
