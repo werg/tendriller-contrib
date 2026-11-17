@@ -52,6 +52,22 @@ Bound draft bytes, attachment count, and pending items. When storage fails or a 
 
 A connectivity indicator should report transport separately from service authority and feature readiness. It can explain that the connection returned while the task is still reconciling. Keep status updates readable and accessible without stealing focus or repeatedly announcing each reconnect attempt.
 
+## Peer operations remain valid across offline time
+
+For a peer-selected application, use `tendril.application` and the replica's
+operation store. The hosted `state` and `timers` calls in this guide describe the
+hosted backend, not a second queue for peer work. Keep pending proposal identity
+and exact payload in the selected backend; the page retains only drafts and
+review references.
+
+Chronolog places a returning offline operation into a later sealed batch. Its
+author timestamp does not expire it and cannot move it into already final
+history. The original generation, revision or resource assertions still apply,
+so a reset or conflicting reservation can reject it for a concrete domain
+reason. Current membership can also reject a revoked writer. Show that reason,
+preserve the original result and offer a newly reviewed operation when needed.
+An already accepted operation remains accepted on exact retry, even after reset.
+
 ## Reconnect without changing historical intent
 
 1. Establish the current page identity, reader authority, service capabilities, and task context. Reauthorize before restoring sensitive projections when required.

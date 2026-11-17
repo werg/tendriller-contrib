@@ -38,7 +38,7 @@ roles, but colocating them does not grant one role another role's rights.
 | Page host | Assets, page accounts and configured introductions | Database reader/writer permission or successful SQL execution |
 | Membership administrator | Capability grants, revocations and group-key delivery | Application schema administration, finality or permission to perform external effects |
 | Schema administrator | Allowed schema changes under the group's execution rules | Finality or tool credentials |
-| Finality provider | Which proposals are included and which author-time range is closed | SQL success, replication to every peer or completion of an external action |
+| Finality provider | Which exact proposals belong to each sealed batch | SQL success, replication to every peer or completion of an external action |
 | Replica | Verification and deterministic execution of available history | Permission to write, certify finality or act for a user |
 | Effect worker | Dispatch of explicitly configured final intents | Permission to invent intent, redefine handlers from event data or bypass provider authorization |
 | Signal authorization policy | Who may send each live topic in its scope | Any durable application role |
@@ -60,19 +60,26 @@ signal connections and existing local reads have their own lifetimes.
 
 ## Separate inclusion, execution and finality
 
-In Chronolog, replicas order included proposals by signed author time, author
-identity and stable proposal identity. The finality provider certifies inclusion
-and closes an author-time range. It does not choose SQL winners by network
-arrival order. A replica still needs complete bodies and the pinned execution
-profile to determine the accepted or rejected application outcome.
+In Chronolog, finality seals exact batches of proposals. A signed batch names
+its predecessor and exact membership. Replicas append that batch after the prior
+sealed prefix and apply its deterministic order under the pinned execution
+profile. Author timestamps describe when an operation was authored; they do not
+expire an offline operation or let it insert itself into already final history.
+
+The finality provider chooses inclusion. A replica verifies the signed batch,
+fetches its complete bodies and executes the programs to determine accepted or
+rejected outcomes. Governance changes in batch N become active for batch N+1,
+so every program in a batch sees the same previously finalized permissions.
+Changing membership, schema administration, provider placement or worker
+placement remains an explicit role decision.
 
 For application code, keep four useful states distinct:
 
 | State | What the application can say |
 | --- | --- |
 | Queued | The original proposal is prepared locally and awaits progress. |
-| Provisional | The replica has a current result that may change as eligible history arrives. |
-| Final accepted | The agreed prefix was executed and this operation succeeded. |
+| Provisional | The replica has a current result that may change as the pending set or next sealed batch changes. |
+| Final accepted | The sealed prefix was executed and this operation succeeded. |
 | Final rejected | The original operation has a stable rejection; recovery is a newly reviewed action. |
 
 An inclusion receipt alone cannot establish either final application outcome.
@@ -80,15 +87,20 @@ A final accepted operation also does not establish that another peer has a
 backup, that a person read the result, or that an external provider acted.
 
 Author dependent work after observing the prerequisite's final result, and retain
-the appropriate guards inside the new transaction. An operation ID identifies
-one immutable request. Retry preserves its bytes and meaning; updating a guard,
+the appropriate guards inside the new transaction. It then belongs to a later
+batch; no wall-clock adjustment is required. An operation prepared offline can
+join the next unsealed batch with its original identity, payload and guards.
+Domain guards and current authorization determine whether it is still valid.
+An operation ID identifies one immutable request. Retry preserves its bytes and meaning; updating a guard,
 timestamp or payload creates new intent and needs a new operation ID.
 
 ## Treat rollback and redo as replica work
 
 Use a coherent `final` view for confirmed work. A `local` view may include
-provisional work when immediate feedback is useful. When eligible earlier
-history arrives, Chronolog may roll back and re-execute its provisional suffix.
+provisional work when immediate feedback is useful. When pending proposals or
+the next sealed batch change the tentative order, Chronolog may roll back and
+re-execute only its provisional suffix. The sealed
+prefix never changes.
 The UI replaces its affected projection from one captured revision; it keeps
 drafts, focus and original operation references separately.
 

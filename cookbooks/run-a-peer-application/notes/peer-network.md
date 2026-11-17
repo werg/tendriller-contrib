@@ -6,7 +6,7 @@ resident peer accepts a bounded HTTPS introduction directly; deployment places
 that endpoint in the initial page configuration. Tendriller also provides an
 explicit rendezvous when both endpoints already participate in the same attempt.
 After introduction, an authenticated WebRTC data channel carries the application
-history, inclusion and closure evidence, detached envelopes and transient signals.
+history, sealed-batch evidence, detached envelopes and transient signals.
 The page's normal operation has no hosted application socket or health poll.
 
 This is the current architecture being implemented across
@@ -33,15 +33,15 @@ and host-independent exchange, with the packaged-host integration scope explicit
 | ICE, reliable data channel and flow control | Chronolog WebRTC transport | No application payload relay through the page host |
 | Peer identity, reader grants and signed records | Chronolog authenticated peer link | Independent of the introduction service |
 | Durable proposals, retry, SQL, events and proofs | Chronolog replica | No hosted application-state command or replay queue |
-| Inclusion and author-time closure | Selected Chronolog finality provider | Provider placement is independent of page hosting |
+| Exact batch inclusion and finality | Selected Chronolog finality provider | Provider placement is independent of page hosting |
 | Agent effects and timers | Resident Chronolog services | No browser reducer or hosted state handler dispatches the same work |
 | Rendered views, drafts and focus | Page-owned application | Local reads and interaction state |
 
 The portable membership administrator remains an explicit trust boundary. It
 retains the keys needed to authorize readers and wrap epoch keys. Participant
 operations synchronize a complete compact control projection whose count/root
-is committed by the signed finality closure. Each entry binds its original
-receipt and activation cutoff. The administrator verifies controls and their
+is committed by the signed finality batch. Each entry binds its original
+record and activating batch. The administrator verifies controls and their
 checkpoint without application descriptors or bodies; full replicas recompute
 the commitment while verifying the entire ledger. Retained administrative work
 scales with governance changes, and ordinary application writes do not trigger

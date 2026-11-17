@@ -46,8 +46,8 @@ an application that chooses the recipe consume the same built program module.
    same immutable backend ID selected when the host page was created. The page
    awaits `tendril.application.ready()`.
 4. Connect portable synchronization through the public WebRTC framed transport;
-   the resident native authority supplies inclusion and author-time closure
-   evidence. Every replica derives the same chronological execution order. Use
+   the selected finality provider supplies chained sealed-batch evidence. Every
+   replica verifies exact inclusion and derives the same application order. Use
    the configured resident HTTPS endpoint for one bounded offer/answer, then
    close introduction resources and authenticate the Chronolog peer over the
    data channel. The page owns RTC negotiation and
@@ -362,7 +362,7 @@ connects an actual Chromium/OPFS device to a separate native SQL peer.
 The current `chronolog-thin-membership/v3` runner uses a direct native HTTP
 offer/answer endpoint and Worker-owned RTC for application history, while
 participant operations continue through the packaged Cloudflare administrator.
-Its compact control proof authenticates completeness and activation cutoffs
+Its compact control proof authenticates completeness and activating batches
 without transferring intervening application descriptors to that administrator.
 
 ```sh

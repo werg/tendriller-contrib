@@ -106,14 +106,23 @@ content.
 
 ## Decisive checks
 
-Chronolog executes proposals by signed author time, regardless of the order in
-which the provider receives them. If an earlier authored edit and later reset
-are both included before closure, replay accepts the edit against the old
-generation and then the reset clears it. A delayed arrival alone does not turn
-that edit into a stale-generation rejection. An edit whose canonical position
-is after the reset must carry the current generation or fail atomically. A
-proposal first included after its timestamp is already closed is rejected as
-late by the finality policy before SQL. These are separate acceptance cases.
+Chronolog appends exact sealed batches. An edit prepared offline can join the
+next unsealed batch without changing its original operation ID, payload or
+captured generation. If a reset has already become final, the later batch
+executes that edit against the new generation and rejects it atomically.
+
+When an edit and reset share a batch, their deterministic within-batch order
+decides which assertions succeed. If the edit executes first, the reset clears
+it; if the reset executes first, the old generation fails. Wall-clock age does
+not reject otherwise valid intent. An exact retry of work already accepted
+before the reset still resolves to that original outcome and does not execute
+again.
+
+Exercise these cases with actual batch boundaries: seal initialization and the
+accepted original, prepare an offline edit, seal the reset, then include the
+unchanged offline edit in the next batch. Assert rejection from the SQL guard,
+not from admission timing. Also include an old but still valid offline edit to
+prove that time alone cannot discard durable work.
 
 ### Historical receipt-order qualification
 
