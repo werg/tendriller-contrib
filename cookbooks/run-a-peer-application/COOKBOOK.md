@@ -8,7 +8,7 @@ choices: ["Peer or hosted durable history", "Atomic SQL and events or an event-o
 capabilities: []
 evidence: "exercised"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/ARCHITECTURE.md", "https://github.com/werg/tendriller/blob/0c73282d816e3ffc7cba7e5c43a6b544867d629e/docs/DURABILITY.md", "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/portable-peers.md", "https://github.com/werg/chronolog-db/blob/be7a2d5c61cf63859d91eccb2335581e8e487d21/docs/app-ownership.md"]
+sources: ["https://github.com/werg/tendriller/blob/0b690952e6eefc42b11a58563cf696ddd9489f05/docs/ARCHITECTURE.md", "https://github.com/werg/tendriller/blob/0b690952e6eefc42b11a58563cf696ddd9489f05/docs/DURABILITY.md", "https://github.com/werg/chronolog-db/blob/f5ac73003f0b8bcec42f91e8a708ba79a666fd5a/docs/portable-peers.md", "https://github.com/werg/chronolog-db/blob/f5ac73003f0b8bcec42f91e8a708ba79a666fd5a/docs/app-ownership.md"]
 ---
 
 # Run a shared application with a resident agent
@@ -91,6 +91,15 @@ An event-only conversation can use the same history and reader contract without
 loading a SQL engine. The task-board variant uses a mixed SQL/event execution
 profile. A client that cannot execute that profile must not label an inclusion
 certificate as proof that the SQL succeeded.
+
+Catch-up captures finite retained targets and processes already committed
+evidence in bounded batches. A fresh replica can publish one coherent view for
+many historical closures, so change notifications need not reproduce every
+intermediate revision from the original session. Final event history still
+contains every accepted emission. Use its processed cursor for a durable
+consumer; use view notifications to refresh the UI. A connected session or a
+completed byte transfer does not establish that the final application target is
+applied.
 
 ## Put each kind of traffic in its intended place
 
