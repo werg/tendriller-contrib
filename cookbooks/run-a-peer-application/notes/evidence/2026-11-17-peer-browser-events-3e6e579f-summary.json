@@ -1,0 +1,60 @@
+{
+  "format": "peer-generation-browser-summary/v1",
+  "passed": true,
+  "qualification": "clean-source-pair",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "1a63e2a69bdcb80b36a10759f7dac10cdf690a45",
+    "tree": "72ef2d8b83c56e3483c167283fd22f0ff43979d5",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g3e6e579f-rtc",
+      "sha256": "0196d434e083edddf22cce60b0158964a4fd50d12d55f883abfdeacf87724e3e",
+      "sourceCommit": "3e6e579fea6ec3d248245c4233205629f0f6002b",
+      "sourceTree": "4731da5dd178b72594c94c5c5dfe3676e888241b",
+      "sourceDirty": false
+    }
+  ],
+  "ui": {
+    "pages": [
+      "board.html",
+      "compact.html"
+    ],
+    "domain": "events",
+    "sessionFacade": "connectApplicationWorker",
+    "sentThroughForms": 3,
+    "reapplicationConfirmed": true,
+    "recoveryNoticeVisible": true,
+    "draftBeforeRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRestart": "An unsent draft must survive page replacement and recovery.",
+    "draftAfterRecovery": "An unsent draft must survive page replacement and recovery.",
+    "originalReviewPreserved": true
+  },
+  "browser": {
+    "version": "158.0.8127.18",
+    "transportOwner": "dedicated-worker",
+    "storage": "opfs-with-exclusive-web-lock"
+  },
+  "hostRequestsDuringCommands": 0,
+  "signalingRequestsDuringCommands": 0,
+  "recovery": {
+    "previousHead": 6,
+    "adoptedPrefix": 4,
+    "abandonedOperationId": "a621d748-8af6-4af5-9be5-9c37ca6955f5",
+    "reappliedOperationId": "ff988a43-accf-430d-95fa-3e7bede6de53"
+  },
+  "identityReopened": {
+    "graceful": true,
+    "abruptWorker": true
+  },
+  "limitations": [
+    "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+    "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+    "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+    "The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate."
+  ],
+  "reportSha256": "42bfa4c6867215fac6a91f2aea089af5c1f805212dc504e46f0407393aba491e"
+}

@@ -1,0 +1,25 @@
+{
+  "format": "peer-final-archive-identity/v1",
+  "repository": "werg/chronolog-db",
+  "source": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+  "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+  "dirty": false,
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "file": "chronolog-peer-session-7b9bd41d-rtc-sql-wasm.tgz",
+      "sha256": "810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4",
+      "bytes": 3006477,
+      "provenanceFile": "2026-11-17-peer-session-7b9bd41d-combo-provenance.json",
+      "provenanceSha256": "7394f57954e44286a1810881c2f5dd8abcd258a77eb6d4292b0f8ca6175eff0a"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "file": "chronolog-peer-session-7b9bd41d.tgz",
+      "sha256": "3d9298de752eaedeb23953a9b0e288d3c11c45c1740fc59902244cd9bd0337f2",
+      "bytes": 152741,
+      "provenanceFile": "2026-11-17-peer-session-7b9bd41d-default-provenance.json",
+      "provenanceSha256": "0ae1575135669bfa184bc34b3a99bce58ab8311af99e065d7e9530811d16e3b6"
+    }
+  ]
+}

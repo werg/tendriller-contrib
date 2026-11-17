@@ -1,0 +1,40 @@
+{
+  "format": "chronolog-peer-session-sql-check/v1",
+  "artifact": "/workspace/scratch/d94f538c5a49/chronolog-db/artifacts/session-7b9bd41d/chronolog-peer-session-7b9bd41d-rtc-sql-wasm.tgz",
+  "artifactSha256": "810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4",
+  "source": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+  "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+  "dirty": false,
+  "node": "v24.22.1",
+  "nativeEngine": {
+    "implementation": "@dolthub/doltlite@0.11.29",
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v24.22.1",
+    "manifest": {
+      "doltliteVersion": "0.11.29",
+      "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+      "sqliteVecVersion": "0.1.9",
+      "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+      "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+      "fts5": true,
+      "json1": true,
+      "rtree": true,
+      "dynamicExtensions": false
+    },
+    "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+  },
+  "result": {
+    "status": "passed",
+    "profile": "peer-generation-v1",
+    "application": "packed-shared-board",
+    "checks": [
+      "canonical hosted configuration",
+      "signed schema bootstrap",
+      "real SQL constraints",
+      "earlier prefix recovery",
+      "shared rows after creator closes",
+      "native reopen identity and outcomes"
+    ]
+  }
+}
