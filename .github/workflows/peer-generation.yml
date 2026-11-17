@@ -35,7 +35,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: peer-generation-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}
+  group: peer-generation-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}-${{ inputs.tendriller_ref }}
   cancel-in-progress: true
 jobs:
   public-session:
