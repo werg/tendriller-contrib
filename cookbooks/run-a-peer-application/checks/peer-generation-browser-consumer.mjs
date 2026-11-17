@@ -120,8 +120,10 @@ try {
       { operationId: 'shared-native-task' })).applied({ signal: timeout() })).outcome, 'accepted');
     await synchronize(ab);
     assert.deepEqual((await browserQuery()).value, (await a.query(queryName, {})).value);
+    const race = await qualifyCompetingClaims(ab);
     report.tasks = { definitionId: conversation.id, signedSchemaDigest: authority.descriptor.payload.schemaDigest,
-      board: { created: true, claimed: true, finished: true }, competingClaim: competing.outcome, unauthorizedFinish: unauthorized.outcome };
+      board: { created: true, claimed: true, finished: true }, competingClaim: competing.outcome, unauthorizedFinish: unauthorized.outcome,
+      sameViewRace: race };
   }
   await disconnect(ab);
   const original = await submitMessage('Saved while disconnected', 'saved');
@@ -246,6 +248,7 @@ try {
   await checkpoint('partial encrypted content survived Worker restart and completed after reconnect');
 
   const retainedPrefix = await page.evaluate(() => application.recoveryPoint());
+  const retainedTasks = tasks ? (await browserQuery()).value.tasks : null;
   await disconnect(ab);
   const excluded = await submitMessage('Intent on the old generation', 'saved');
   await page.locator('#message').fill(draft);
@@ -300,6 +303,7 @@ try {
   assert.ok(recovered.recovery.length > 0);
   assert.ok(recovered.selected.value.messages.every(message => !message.operationId.startsWith('originator-tail-')));
   if (tasks) {
+    assert.deepEqual(recovered.selected.value.tasks, retainedTasks, 'SQL rows must match the selected retained prefix');
     const task = recovered.selected.value.tasks.find(value => value.id === 'after-originator');
     assert.equal(task.claimedBy, null); assert.equal(task.status, 'open');
     assert.equal((await taskAction(task, 'Claim')).outcome, 'accepted');
@@ -307,7 +311,8 @@ try {
     const selected = await browserQuery();
     assert.equal(selected.value.tasks.find(value => value.id === task.id).status, 'done');
     Object.assign(report.tasks, { unsharedClaimExcluded: true, compact: { claimed: true, finished: true },
-      sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true });
+      sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true,
+      retainedTasksSha256: valueHash(retainedTasks), recoveredTasksSha256: valueHash(recovered.selected.value.tasks) });
   }
   report.recovery = { originatorClosed: true, originatorStoreUnavailable: true, priorHead: lostHead.point,
     adoptedPrefix: retainedPrefix.point, selectedGeneration: recovered.status.generation,
@@ -504,6 +509,35 @@ async function waitForUiOperation(label, expected = 'applied') {
     .some(row => row.querySelector('strong')?.textContent === label && row.dataset.status === expected), { label, expected });
   const operationId = await page.locator('#operations li').evaluateAll((rows, label) => rows.find(row => row.querySelector('strong')?.textContent === label).dataset.operation, label);
   return page.evaluate(id => application.operations.get(id), operationId);
+}
+
+async function qualifyCompetingClaims(connection) {
+  const taskId = 'same-view-race';
+  assert.equal((await (await a.command('addTask', { taskId, title: 'Two authors claim from one view' },
+    { operationId: 'race-task' })).applied({ signal: timeout() })).outcome, 'accepted');
+  await synchronize(connection);
+  const before = await browserQuery();
+  const [browserClaim, nativeClaim] = await Promise.all([
+    page.evaluate(async ({ taskId, basedOn }) => {
+      const operation = await application.command('claimTask', { taskId }, { operationId: 'race-browser', basedOn });
+      return operation.applied({ signal: AbortSignal.timeout(20_000) });
+    }, { taskId, basedOn: before.revision }),
+    a.command('claimTask', { taskId }, { operationId: 'race-native', basedOn: before.revision })
+      .then(operation => operation.applied({ signal: timeout() })),
+  ]);
+  assert.deepEqual([browserClaim.outcome, nativeClaim.outcome].sort(), ['accepted', 'rejected']);
+  const winner = browserClaim.outcome === 'accepted' ? browserClaim : nativeClaim;
+  const loser = browserClaim.outcome === 'rejected' ? browserClaim : nativeClaim;
+  await synchronize(connection);
+  const claimedBy = (await browserQuery()).value.tasks.find(task => task.id === taskId).claimedBy;
+  assert.equal(claimedBy, winner.author);
+  const events = await page.evaluate(async () => {
+    const view = await application.readView();
+    try { return (await view.readEvents({ topics: ['tasks'] })).events; } finally { await view.release(); }
+  });
+  assert.equal(events.filter(event => event.operationId === winner.operationId && event.payload.type === 'task.claimed').length, 1);
+  assert.equal(events.filter(event => event.operationId === loser.operationId).length, 0);
+  return { basedOn: before.revision, winner, loser, claimedBy, atomicEffectiveEvents: true };
 }
 function introduction() {
   let deliverNative, deliverBrowser, nativeClosed = false, browserClosed = false, descriptions = 0, bytes = 0;

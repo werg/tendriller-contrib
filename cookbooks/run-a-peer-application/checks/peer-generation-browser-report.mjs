@@ -54,6 +54,8 @@ export function validateBrowserPeerReport(report) {
     assert.equal(report.sql?.native.implementation, '@dolthub/doltlite@0.11.29');
     assert.match(report.sql.native.patchSha256, /^[a-f0-9]{64}$/u);
     assert.deepEqual(report.sql.browser.manifest.nativeManifest, report.sql.native.manifest);
+    assert.equal(report.sql.browser.manifest.toolchain, 'emscripten-4.0.20');
+    assert.ok(report.sql.browser.manifest.wasmBytes > 0);
     assert.match(report.sql.browser.manifest.wasmSha256, /^[a-f0-9]{64}$/u);
     assert.equal(report.browserAssets.find(asset => asset.file === 'browser-engine/sqlite3.wasm')?.sha256, report.sql.browser.manifest.wasmSha256);
     const domain = report.tasks;
@@ -63,6 +65,12 @@ export function validateBrowserPeerReport(report) {
     assert.equal(domain.competingClaim, 'rejected'); assert.equal(domain.unauthorizedFinish, 'rejected');
     assert.equal(domain.commandsWithHostBlocked, 3); assert.ok(domain.unsharedOriginatorClaim);
     for (const field of ['unsharedClaimExcluded', 'sharedTaskCompletedAfterCreatorClosed', 'sqlAndEventsSelectedTogether']) assert.equal(domain[field], true);
+    assert.match(domain.retainedTasksSha256, /^[a-f0-9]{64}$/u);
+    assert.equal(domain.recoveredTasksSha256, domain.retainedTasksSha256);
+    const race = domain.sameViewRace;
+    assert.ok(race.basedOn.generation); assert.equal(race.winner.outcome, 'accepted'); assert.equal(race.loser.outcome, 'rejected');
+    assert.notEqual(race.winner.author, race.loser.author); assert.equal(race.claimedBy, race.winner.author);
+    assert.equal(race.atomicEffectiveEvents, true);
   }
   const ownership = report.ownership;
   for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceAwaitedKeys']) assert.equal(ownership[field], true);

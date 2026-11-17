@@ -101,12 +101,15 @@ test('task UI qualification requires both exact engines, guarded forms, and shar
   report.publicBoundary.imports.push('@chronolog/peer-session/sql-native', '@chronolog/peer-session/sql-browser'); report.publicBoundary.imports.sort();
   report.browserAssets.push({ file: 'browser-engine/sqlite3.wasm', sha256: digest });
   report.sql = { native: { implementation: '@dolthub/doltlite@0.11.29', patchSha256: digest, manifest: { synthetic: true } },
-    browser: { manifest: { nativeManifest: { synthetic: true }, wasmSha256: digest } } };
+    browser: { manifest: { nativeManifest: { synthetic: true }, wasmSha256: digest, toolchain: 'emscripten-4.0.20', wasmBytes: 123 } } };
   report.tasks = { definitionId: 'shared-peer-task-board', signedSchemaDigest: digest,
     board: { created: true, claimed: true, finished: true }, compact: { claimed: true, finished: true },
     competingClaim: 'rejected', unauthorizedFinish: 'rejected', commandsWithHostBlocked: 3,
     unsharedOriginatorClaim: 'excluded-claim', unsharedClaimExcluded: true,
-    sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true };
+    sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true,
+    retainedTasksSha256: digest, recoveredTasksSha256: digest,
+    sameViewRace: { basedOn: { generation: 'generation' }, winner: { author: 'one', outcome: 'accepted' },
+      loser: { author: 'two', outcome: 'rejected' }, claimedBy: 'one', atomicEffectiveEvents: true } };
   assert.equal(validateBrowserPeerReport(report).tasks.definitionId, 'shared-peer-task-board');
   for (const mutate of [
     value => { value.browser.observations.isolated = false; },
@@ -114,5 +117,8 @@ test('task UI qualification requires both exact engines, guarded forms, and shar
     value => { value.sql.browser.manifest.nativeManifest = { synthetic: 'different' }; },
     value => { value.tasks.competingClaim = 'accepted'; }, value => { value.tasks.compact.finished = false; },
     value => { value.tasks.sharedTaskCompletedAfterCreatorClosed = false; },
+    value => { value.tasks.sameViewRace.loser.outcome = 'accepted'; },
+    value => { value.tasks.sameViewRace.atomicEffectiveEvents = false; },
+    value => { value.tasks.recoveredTasksSha256 = 'b'.repeat(64); },
   ]) { const changed = structuredClone(report); mutate(changed); assert.throws(() => validateBrowserPeerReport(changed)); }
 });
