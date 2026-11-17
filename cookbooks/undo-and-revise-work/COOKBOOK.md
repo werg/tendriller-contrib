@@ -26,21 +26,6 @@ Use this when people need to correct mistakes, explore alternatives, or understa
 
 Tendriller has no default application-wide undo policy. Core's atomic conditional state writes supply the concurrency primitive; the application chooses which inverse is meaningful and retains the required history. Reading this guide installs neither history nor compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
 
-## Separate replica replay from application Undo
-
-A peer replica may replace and re-execute its tentative suffix before a batch is
-sealed. That is internal convergence: the UI rebuilds from a captured revision
-and preserves drafts and operation references separately. It cannot replay an
-external action. The finalized prefix remains fixed.
-
-Undo of final work creates a new guarded operation in a later batch. Redo after
-that Undo creates another new operation after reviewing current conditions.
-Retry means asking for the same original outcome with the same operation ID and
-bytes. None of these actions changes timestamps to force old intent back into
-history. For peer applications put the inverse assertion, mutation and event in
-one program; the hosted state example below uses the same conditional-write idea
-through that backend's public primitives.
-
 ## Make correction part of the normal journey
 
 Consider a shared checklist where someone marks the wrong item complete. Immediately after the accepted change, offer a visible “Undo completion” action with the affected item and a short description. If another person has already changed that item, show the conflict and a comparison rather than overwriting their work. A history panel can reveal the original completion, its reversal, and any intervening revision.

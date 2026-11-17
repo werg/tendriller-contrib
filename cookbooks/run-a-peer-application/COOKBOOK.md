@@ -17,11 +17,10 @@ Use this approach when an application has a native agent peer that must keep
 working while an LLM is idle, thinking, or restarting. A browser keeps a local
 replica, queries its own SQL, derives views from accepted events, and authors
 changes. A separately selected finality service certifies included proposals and
-exact sealed batches. It may run in the resident process or elsewhere;
+a closed author-time frontier. It may run in the resident process or elsewhere;
 running an agent does not itself grant finality or membership rights. Every
-replica verifies the same batch chain and computes the same deterministic order
-within each batch. Author time remains metadata, so an offline operation does
-not expire merely because other peers made progress.
+replica computes the same application order from signed author time and
+deterministic tie-breakers.
 
 Start with the [primitive and role decision guide](../../guides/application-primitives.md).
 Durable events and transactions use this history. Live typing, presence, cursor
@@ -111,25 +110,20 @@ view decision and never permission to prune the canonical history.
 
 ## Assign membership, execution and finality separately
 
-The finality provider seals an exact set of proposals into the next batch. Each
-signed batch binds its sequence number, predecessor digest and included record
-commitments. The native profile uses one configured signing key; that is a
-provider choice, not implicit authority granted to every resident agent. Every
-replica verifies the same batch chain and deterministic within-batch order.
-Network receipt order and author wall clocks do not define application history.
+The finality provider decides which proposals are included and which author-time
+frontier is closed. In the native profile one fixed authority key certifies those
+decisions. Every replica sorts included proposals by their immutable signed
+author time and deterministic tie-breakers; neither receipt position nor arrival
+order chooses the winner of a SQL conflict.
 
-The finality service retains exact envelope hashes, lengths, routing metadata and
-deduplication identities. Proposals not yet included stay pending for a later
-batch. An offline proposal may join that later batch unchanged; current
-authorization and its original SQL assertions decide whether it succeeds.
-An exact retry of an already included proposal returns its original result. Full
-peers fetch and verify detached application envelopes. Batch evidence can travel
-through other authorized peers. A relay forwards data; it does not acquire SQL,
-membership or finality rights.
-
-Programs in batch N use governance finalized through batch N-1. Capability and
-epoch controls in N activate for N+1. This makes permission changes explicit and
-causal without inventing timestamp cutoffs or arrival-dependent control rules.
+The finality service retains exact envelope hashes, lengths and routing metadata,
+deduplication identities, and an authenticated receipt prefix. Signed closure
+markers bind a closed timestamp to the preceding included prefix. A newly
+included proposal at or below an already closed timestamp is rejected as late;
+an exact retry of an earlier included proposal retains its original result. Full
+peers fetch and verify detached application envelopes. Receipt and closure
+evidence can travel through other authorized peers. A relay forwards data; it
+does not acquire SQL, membership, or finality authority.
 
 The Cloudflare membership root is a separate role. Signed genesis selects the
 application schema administrator independently, so native application setup does
@@ -145,8 +139,8 @@ Keep these facts distinct in both the interface and operations:
 | --- | --- |
 | Stored locally | This device durably prepared its original proposal. |
 | Included | The provider committed receipt evidence; the SQL outcome may still be unresolved locally. |
-| Batch sealed | Verified evidence fixes the next exact included set and its predecessor. |
-| Applied final | The replica applied the sealed canonical prefix under the pinned execution profile. |
+| Frontier closed | Complete evidence fixes the included set through a signed author-time cutoff. |
+| Applied final | The replica applied the closed canonical prefix under the pinned execution profile. |
 | Replicated or backed up | An additional stated location has acknowledged the bytes. |
 | Worker completed | A separately recorded effect/result reached its declared completion condition. |
 
@@ -166,9 +160,8 @@ not a durable finality service.
 The agent's `context.finality` identifies its configured local
 `NativeFinalityService`, or `null` when the resident does not perform that role.
 Ordinary effect workers and replicas do not need to own it. The service is opened
-from the verified enrollment descriptor; its trusted key and execution policy
-come from signed genesis. Sealing does not rely on an author-time acceptance
-window or synchronized wall clocks.
+from the verified enrollment descriptor; its timing and trusted key come from
+signed genesis, rather than repeated process-local policy settings.
 
 ## Author one operation and retain its meaning
 
@@ -180,12 +173,12 @@ lost response, reload, or membership change.
 
 For a claim, assert availability and update the row in the same program as its
 event. For a dependent second action, either batch it with the first or wait for
-the first action's final result before authoring the dependent change. It then
-belongs to a later batch, with no timestamp manipulation. An offline edit
-submitted after a final reset executes against the new generation and fails its
-original guard. If an edit and reset share a batch, their deterministic order
-decides which assertion succeeds. Keep that business condition in the program;
-transport arrival and clock age are not a substitute for it.
+the first action's final result and author the dependent change with a later
+timestamp. Total order by itself does not discover causal dependencies submitted
+through different paths. If an earlier authored edit and a later reset are both
+included before closure, replay applies the edit first and the reset clears it,
+even when the reset arrived first. A stale-generation assertion fails when the
+edit executes after the reset; receipt order alone cannot cause that rejection.
 
 A page can show a provisional claim while finality is pending, but it should label
 that state. If another claim wins, replace the whole affected view from a coherent
