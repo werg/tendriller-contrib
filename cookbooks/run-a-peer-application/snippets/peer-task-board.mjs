@@ -1,5 +1,5 @@
 // Domain declarations only. The signed schema and shared collective are core contracts.
-import { APPLICATION_COLLECTIVE_ID, defineApplication, defineCommand, defineQuery,
+import { APPLICATION_COLLECTIVE_ID, OWNER_FOR_KEY_SQL, defineApplication, defineCommand, defineQuery,
   emit, program, sqlStatement } from '@chronolog/peer-session';
 import { conversation } from './peer-conversation.mjs';
 
@@ -15,7 +15,7 @@ export const taskBoard = defineApplication({
     addTask: defineCommand({ description: 'Create one task owned by the verified shared application collective.',
       input: input({ taskId: id, title: { type: 'string', minLength: 1, maxLength: 512 } }),
       prepare: ({ taskId, title }) => program(sqlStatement(
-        'INSERT INTO tasks(id,title,chronolog_owner) VALUES(?,?,(SELECT id FROM chronolog_principals WHERE key=?))',
+        `INSERT INTO tasks(id,title,chronolog_owner) VALUES(?,?,${OWNER_FOR_KEY_SQL})`,
         [taskId, title, APPLICATION_COLLECTIVE_ID]), emit('tasks', { type: 'task.created', version: 1, taskId })),
     }),
     claimTask: defineCommand({ description: 'Claim an open unclaimed task, rechecking the condition at execution.', input: taskInput,

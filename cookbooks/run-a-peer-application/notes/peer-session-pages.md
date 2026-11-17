@@ -15,14 +15,61 @@ the events application does not pretend to execute SQL.
 ## Bootstrap the owned public client
 
 The complete deployment supplies `deployment/bootstrap.mjs`. Its
-`applicationReady` export resolves to the client returned by
-`connectApplicationWorker(worker)` from `@chronolog/peer-session/browser`.
-The Worker first opens the device and application using its authorized
-enrollment and pinned execution runtime, then calls
-`serveApplicationWorker(session, self)` from that same public entry.
-That owner also installs and closes the maintained Worker RTC transport. Use
-`connectWorkerApplicationWebRtc` from the public `webrtc` entry on the page for
-negotiation and authenticated handoff.
+`applicationReady` export resolves to the maintained page facade. The page
+supplies its existing authenticated `runtime.host.peers`; no agent credential
+belongs in a browser Worker or application source.
+
+```js
+import { connectApplicationWorker, serveApplicationWorkerHost } from '@chronolog/peer-session/browser';
+import { maintainWorkerApplicationWebRtc } from '@chronolog/peer-session/webrtc';
+
+const worker = new Worker(new URL('./application.worker.mjs', import.meta.url), { type: 'module' });
+const hostBridge = serveApplicationWorkerHost(worker, runtime.host.peers);
+export const applicationReady = connectApplicationWorker(worker);
+const session = await applicationReady;
+const network = maintainWorkerApplicationWebRtc(session, worker, { host: runtime.host.peers });
+await network.ready;
+
+export async function close() {
+  await network.close();
+  await session.close();
+  hostBridge.close();
+  worker.terminate();
+}
+```
+
+The owning Worker opens the session through that maintained control bridge. This
+is a join/reopen example. First-time device creation explicitly adds
+`create: true`; first application publication explicitly adds `create: {}` to the
+session opener. A missing store never silently creates a new identity.
+
+```js
+import { openApplicationSession } from '@chronolog/peer-session';
+import { connectApplicationWorkerHost, openBrowserDevice, serveApplicationWorker } from '@chronolog/peer-session/browser';
+import { conversation } from './peer-conversation.mjs';
+
+const host = await connectApplicationWorkerHost(self);
+const device = await openBrowserDevice({ name: 'conversation' });
+const session = await openApplicationSession({
+  device, definition: conversation, applicationId, host,
+});
+serveApplicationWorker(session, self, { host });
+session.signal.addEventListener('abort', () => { void host.close(); }, { once: true });
+```
+
+For the task definition, replace the session opener with
+`openBrowserSqlSession` from `@chronolog/peer-session/sql-browser` and pass
+`engineUrl: new URL('./browser-engine/', import.meta.url)`. Serve the complete
+packed engine directory with the required cross-origin isolation headers and
+JavaScript/WASM MIME types. The constructor checks the artifact identity and
+owns the OPFS engine pool.
+
+The facade installs the maintained Worker RTC transport. The lifecycle owner
+handles discovery, introductions, authenticated catch-up, reconnect and eligible
+takeover. Do not install a second Worker transport handler. The host bridge has
+only four compact methods: application lookup, definition lookup, immutable
+configuration and signed generation selection. Domain commands, keys and content
+stay off that bridge.
 
 The device owner retains private keys, original signed attempts, authenticated
 authority, materialization and detached content. RPC requests carry application

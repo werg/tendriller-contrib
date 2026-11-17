@@ -8,22 +8,24 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/packages/peer-session/README.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/fe752b7f6fd7095b6f45c61a176e34b6f37d0674/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
 
-**Implementation preview:** This recipe targets the paired `@chronolog/peer-session`
-composition under active qualification. The public encrypted session and
-maintained network/RTC composition are implemented. The qualification note
-preserves independent native/events and clean native RTC reports with their exact
-source and archive hashes. Those runs do not establish browser, Internet or deployed readiness;
-existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
+**Current implementation:** The public `@chronolog/peer-session` package owns
+bootstrap, saved attempts, generation recovery, peer connections and browser
+Worker storage. Independent clean reports cover native RTC, actual Tendriller
+control routes, browser/Worker/OPFS events, and native guarded SQL at their
+[recorded revisions](notes/peer-generation-qualification.md). Each result has its
+own artifact pairing and scope. Internet, TURN, deployed cost and a recovery-age
+bound remain unqualified.
 
-The unified target uses `local()` for applied-here results and `final()` for
-committed/applied results under the selected history, with an explicit recovery
-exception. This preview currently calls its execution wait `applied()`; the code
-below uses that actual API spelling and adds no aliases or protocol stages.
+The implemented waits are `applied()` and `shared()`. Applied means executed in
+the selected generation; shared reports independently retained complete coverage.
+Neither prevents explicit recovery from abandoning a recent suffix. This recipe
+adds no `local()` or `final()` alias. The older immutable-prefix implementation
+retains its [historical evidence](notes/finalized-resident-recipe.md).
 
 Use this approach for shared applications that can lose a recent unreplicated
 tail when peers disappear. A temporary coordinating peer orders commands; other
@@ -37,7 +39,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/fe752b7f6fd7095b6f45c61a176e34b6f37d0674/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
@@ -49,8 +51,8 @@ older immutable-prefix implementation and the original scope of its reports.
 | Application | Start here | What must be configured |
 | --- | --- | --- |
 | Disposable typing, cursors, progress or previews | [Standalone live signals](../share-live-signals/COOKBOOK.md) | An authenticated scope, topic policy and live transport; no history, database or finality. |
-| Conversation and recorded observations | [Events-only conversation definition](snippets/peer-conversation.mjs) with the public session | Explicit device creation/enrollment, signed application descriptor, current controls and authorized keys. No SQL/WASM. |
-| Board, reservations or guarded domain changes | [Shared task-board definition](snippets/peer-task-board.mjs) with the pinned SQL/event runtime | Signed schema and collective ownership, deterministic assertions, compatible native/WASM engine artifacts. |
+| Conversation and recorded observations | [Events-only conversation definition](snippets/peer-conversation.mjs) with the public session | Explicit device creation/enrollment, application ID and public host port. The session owns signed bootstrap and key delivery. No SQL/WASM. |
+| Board, reservations or guarded domain changes | [Shared task-board definition](snippets/peer-task-board.mjs) with the pinned SQL/event runtime | The SQL session publishes the signed schema; domain commands choose shared ownership and deterministic guards. Supply compatible native/WASM artifacts. |
 
 An agent can use any path. Its presence does not require a durable transaction
 for every preview or a fixed native authority for ordinary collaboration.
@@ -86,8 +88,8 @@ requires a public session package and complete real deployment assets.
 8. **Review and reapply.** Read the new view, inspect the abandoned intent, and
    deliberately create a linked new attempt with current input and guards.
 
-Five minutes is the initial measured freshness objective with a second suitable
-peer available. It is not a universal loss bound. A long partition or a lone
+Five minutes is an initial qualification objective with a second suitable peer
+available. These short scenarios have not measured it; it is not a loss bound. A long partition or a lone
 copy can expose more work. If no usable prefix survives, report unavailable;
 never replace the application with an empty history without an explicit action.
 
@@ -98,35 +100,47 @@ command preparation and coherent query in one application definition. Its
 `postMessage` command emits one ordinary conversation event. The query keeps the
 verified author and operation identity separate from payload fields.
 
-Device enrollment and verified deployment inputs are explicit setup. With those
-inputs, a native application uses the public package:
+Use the public host client with the owned session. This example performs explicit
+first device and application creation; normal reopening omits both `create`
+options. Joining an existing application also omits application `create` and
+requires an administrator to grant the device's public key.
 
 ```js
-import { openNativeDevice, openNativeApplication } from '@chronolog/peer-session/native';
+import { createClient } from '@tendriller/core';
+import { openApplicationSession } from '@chronolog/peer-session';
+import { openNativeDevice } from '@chronolog/peer-session/native';
+import { maintainNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
 import { conversation } from './peer-conversation.mjs';
 
-// Use { create: true } only for explicit first-time device creation.
-const device = await openNativeDevice({ path: './device.sqlite' });
-const session = await openNativeApplication({
-  device,
-  definition: conversation,
-  authority,  // The published signed descriptor, controls and selected generations.
-  epochKeys,  // Keys delivered to this enrolled device.
+const host = createClient({ api, token }).peers;
+const device = await openNativeDevice({ path: './device.sqlite', create: true });
+const session = await openApplicationSession({
+  device, definition: conversation, applicationId, host, create: {},
 });
-
+const network = maintainNativeApplicationWebRtc(session, { host });
 try {
+  await network.ready;
   const view = await session.query('conversation', {});
   const operation = await session.command('postMessage', {
     messageId, text,
   }, { operationId, basedOn: view.revision });
-
   const applied = await operation.applied({ signal: waitLifetime.signal });
   if (applied.outcome === 'accepted') showApplied(applied);
   else showRejection(applied.rejectionCode);
 } finally {
+  await network.close();
   await session.close();
 }
 ```
+
+`openApplicationSession` saves the bootstrap configuration, initial key and
+selection identity durably before sending them. A lost hosted reply reuses those
+records after reopening. A newly granted reader receives wrapped keys through
+authenticated peer connections; the host receives public metadata and key
+commitments. Cached reopening can omit `host` when the device already has a
+verified binding. The network owner handles discovery, coarse availability
+renewals, invitations, reconnect and eligible takeover. Ordinary commands use
+established peer channels.
 
 The application keeps draft text and any operation reference needed by its UI.
 Chronolog owns the attempt journal, exact retry, ordering, peer replication and
@@ -199,16 +213,34 @@ update its owner/status, and emit `task.claimed`. All three steps either apply
 together or reject together. Keep the guard in the program even when the user
 just read the task; another command may execute before the claim.
 
-Use the same application definition and session with the pinned SQL/event
-materializer. Schema, ownership and permission changes belong to protected
+Use `openNativeSqlSession` from `@chronolog/peer-session/sql-native` with the
+same device, definition, application ID and host, plus `databasePath`. In the
+owning browser Worker, use `openBrowserSqlSession` from `/sql-browser` and the
+URL of the packaged `browser-engine/` assets. First creation signs and publishes
+`definition.schema`; join/reopen uses its published or cached authenticated
+binding. Domain code does not build schema signatures or generation requests.
+
+The [task-board definition](snippets/peer-task-board.mjs) uses
+`OWNER_FOR_KEY_SQL` with `APPLICATION_COLLECTIVE_ID` for shared rows. An explicit
+shared owner lets another currently authorized member finish work after its
+creator leaves. Private author-owned rows remain private. Schema, ownership and
+permission changes belong to protected
 administrative setup/transitions, not ordinary lossy edits. A recovery must never
 restore broader access through an old SQL snapshot.
 
-The events-only package check does not prove SQL replay or native/WASM
-conformance. The SQL path needs its own exact engine/profile/artifact evidence.
-The earlier [board/chat specimen](checks/README.md) remains a regression for the
-historical chronological implementation; relabeling its outcomes would not qualify SQL under
-`peer-generation-v1`.
+The [native guarded-task report](notes/peer-task-qualification.md) records the
+SQL path separately. Browser SQL needs its own actual Worker/OPFS run and matching
+engine identity; an events-only result cannot supply that evidence.
+
+## Give an agent the same application
+
+The [native agent entry](snippets/run-peer-agent.mjs) opens the same owned session
+and maintained peer network, then serves the public local MCP adapter. Tool
+schemas come from the application definition. Commands, queries, operation
+inspection, exact retry, waiting and explicit reapplication use that session's
+identity and journal. The agent does not need a second inbox, hosted command
+proxy or privileged coordinator role. Closing its input closes its network and
+store; resuming opens the original device.
 
 ## Keep live signals and external work separate
 
