@@ -1,0 +1,2382 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-agent-tools",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "5512b5c6de3d02b1ee250f19c1349057f2a6d9bd",
+    "tree": "73fb745985e352c5d5d5fc7896434a28b098a9db",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g08ee9f2a-sql",
+      "sha256": "d691daa96083aaa6e286b474312b6530f6c715577baa337db32849745b0a6388",
+      "sourceCommit": "08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c",
+      "sourceTree": "e57a4edb0df84ebfe69f70c3ba83b2e3878bed76",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-agent-harness.mjs",
+      "sha256": "1f6db90a566c003c692a01643089a382efefbbc75a1e58ca1a74f1b7ce371a7c"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-participation.mjs",
+      "sha256": "9c083daf823e43662b923c243478043a5440c3482505f4ef791b435883e0cf52"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-task-board.mjs",
+      "sha256": "9be0c4353e7c64a7f2a30a2c9a71020780bbbee3e5c03e07504508cfb4288d3f"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": null,
+  "sqlEngine": {
+    "implementation": "@dolthub/doltlite@0.11.29",
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v24.22.1",
+    "manifest": {
+      "doltliteVersion": "0.11.29",
+      "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+      "sqliteVecVersion": "0.1.9",
+      "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+      "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+      "fts5": true,
+      "json1": true,
+      "rtree": true,
+      "dynamicExtensions": false
+    },
+    "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/sql",
+      "@chronolog/peer-session/sql-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "stage": "passed",
+  "exercise": {
+    "scope": "fresh-agent-public-tools-with-provided-enrollment",
+    "startedAt": "2026-11-17T15:34:10.435Z",
+    "domain": "shared-peer-task-board",
+    "commands": [
+      "agent-note-1",
+      "agent-note-2",
+      "agent-wrong-author-1",
+      "agent-claim-1",
+      "agent-finish-1"
+    ],
+    "trace": [
+      {
+        "startedAt": "2026-11-17T15:34:25.450Z",
+        "finishedAt": "2026-11-17T15:34:25.501Z",
+        "request": {
+          "id": 1,
+          "tool": "list",
+          "input": {}
+        },
+        "response": {
+          "id": 1,
+          "result": [
+            {
+              "name": "describe",
+              "description": "Inspect authenticated application definitions, current role and supported guarantees.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "query",
+              "description": "Execute a declared query against one coherent captured application revision.",
+              "inputSchema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "board",
+                        "description": "Read tasks and conversation together from the same selected revision."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {},
+                        "required": [],
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            {
+              "name": "command",
+              "description": "Save one signed command under a caller-owned operation ID, optionally guarded by a captured revision. Returns saved or currently applied state.",
+              "inputSchema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "addTask",
+                        "description": "Create one task owned by the verified shared application collective."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "title": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "claimTask",
+                        "description": "Claim an open unclaimed task, rechecking the condition at execution."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "finishTask",
+                        "description": "Complete a task still claimed by this authenticated author."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "postMessage",
+                        "description": "Record one message in the currently selected conversation history."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "messageId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "text": {
+                            "maxLength": 4096,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "messageId",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            {
+              "name": "operation",
+              "description": "Inspect saved attempt bytes, current outcome and explicit reapplication linkage.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "operationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": [
+                  "operationId"
+                ],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "retry",
+              "description": "Retry the exact saved command. Never recreates an abandoned operation.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "operationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": [
+                  "operationId"
+                ],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "wait",
+              "description": "Wait for the current applied result. Cancellation only cancels this wait.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "operationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": [
+                  "operationId"
+                ],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "changes",
+              "description": "Observe one coalesced coherent revision, optionally waiting after a captured revision. A generation change requires a reread; this is not an event replay cursor.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "after": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "applicationId",
+                      "historyId",
+                      "generation",
+                      "point",
+                      "controlRevision",
+                      "materializationRevision"
+                    ],
+                    "properties": {
+                      "applicationId": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "historyId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                      },
+                      "generation": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "controlRevision": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "materializationRevision": {
+                        "type": "string",
+                        "pattern": "^[0-9]{1,32}$"
+                      },
+                      "point": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "generation",
+                          "sequence",
+                          "root"
+                        ],
+                        "properties": {
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "sequence": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "root": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "waitMs": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 30000,
+                    "default": 0
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "recoveries",
+              "description": "Inspect generation recovery notices and preserved abandoned operations.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            {
+              "name": "reapply",
+              "description": "Deliberately create a newly signed, linked command from current input after abandonment, optionally guarded by a captured revision.",
+              "inputSchema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "addTask",
+                        "description": "Create one task owned by the verified shared application collective."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "title": {
+                            "maxLength": 512,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "originalOperationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId",
+                      "originalOperationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "claimTask",
+                        "description": "Claim an open unclaimed task, rechecking the condition at execution."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "originalOperationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId",
+                      "originalOperationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "finishTask",
+                        "description": "Complete a task still claimed by this authenticated author."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "taskId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "taskId"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "originalOperationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId",
+                      "originalOperationId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "const": "postMessage",
+                        "description": "Record one message in the currently selected conversation history."
+                      },
+                      "input": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "messageId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "text": {
+                            "maxLength": 4096,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "messageId",
+                          "text"
+                        ],
+                        "type": "object"
+                      },
+                      "operationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "originalOperationId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "basedOn": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "applicationId",
+                          "historyId",
+                          "generation",
+                          "point",
+                          "controlRevision",
+                          "materializationRevision"
+                        ],
+                        "properties": {
+                          "applicationId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "historyId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                          },
+                          "generation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "controlRevision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "materializationRevision": {
+                            "type": "string",
+                            "pattern": "^[0-9]{1,32}$"
+                          },
+                          "point": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "generation",
+                              "sequence",
+                              "root"
+                            ],
+                            "properties": {
+                              "generation": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "sequence": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "root": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "input",
+                      "operationId",
+                      "originalOperationId"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            {
+              "name": "takeover",
+              "description": "Select this eligible device's complete recovery point through the hosted authority; may abandon a recent suffix.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "transitionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "transitionId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          ]
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:34:28.929Z",
+        "finishedAt": "2026-11-17T15:34:28.958Z",
+        "request": {
+          "id": 2,
+          "tool": "describe",
+          "input": {}
+        },
+        "response": {
+          "id": 2,
+          "result": {
+            "definition": {
+              "commands": [
+                {
+                  "description": "Create one task owned by the verified shared application collective.",
+                  "input": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "taskId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "title": {
+                        "maxLength": 512,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "taskId",
+                      "title"
+                    ],
+                    "type": "object"
+                  },
+                  "name": "addTask"
+                },
+                {
+                  "description": "Claim an open unclaimed task, rechecking the condition at execution.",
+                  "input": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "taskId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "taskId"
+                    ],
+                    "type": "object"
+                  },
+                  "name": "claimTask"
+                },
+                {
+                  "description": "Complete a task still claimed by this authenticated author.",
+                  "input": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "taskId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "taskId"
+                    ],
+                    "type": "object"
+                  },
+                  "name": "finishTask"
+                },
+                {
+                  "description": "Record one message in the currently selected conversation history.",
+                  "input": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "messageId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "text": {
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "messageId",
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  "name": "postMessage"
+                }
+              ],
+              "id": "shared-peer-task-board",
+              "queries": [
+                {
+                  "description": "Read tasks and conversation together from the same selected revision.",
+                  "input": {
+                    "additionalProperties": false,
+                    "properties": {},
+                    "required": [],
+                    "type": "object"
+                  },
+                  "name": "board"
+                }
+              ],
+              "schema": "a2000301818200a2007893435245415445205441424c45207461736b732869642054455854205052494d415259204b45592c207469746c652054455854204e4f54204e554c4c2c20636c61696d65645f627920544558542c207374617475732054455854204e4f54204e554c4c2044454641554c5420276f70656e2720434845434b2873746174757320494e2028276f70656e272c27646f6e65272929290180",
+              "version": "1",
+              "capabilities": {
+                "ordering": "generation-sequence",
+                "applied": true,
+                "shared": true,
+                "finality": false,
+                "automaticExternalEffects": false,
+                "recovery": "selected-prefix",
+                "sql": true
+              }
+            },
+            "status": {
+              "phase": "ready",
+              "role": "follower",
+              "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "coordinator": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+              "connectedPeers": 1
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:34:32.833Z",
+        "finishedAt": "2026-11-17T15:34:36.939Z",
+        "request": {
+          "id": 3,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 3,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "point": {
+                "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                "sequence": 3,
+                "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "4"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": null,
+                  "status": "open"
+                }
+              ],
+              "messages": []
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:34:47.661Z",
+        "finishedAt": "2026-11-17T15:34:52.575Z",
+        "request": {
+          "id": 4,
+          "tool": "command",
+          "input": {
+            "name": "postMessage",
+            "input": {
+              "messageId": "review-ready",
+              "text": "Ready for review"
+            },
+            "operationId": "agent-note-1",
+            "basedOn": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "point": {
+                "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                "sequence": 3,
+                "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "4"
+            }
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 4,
+          "error": "EXERCISE_TRANSPORT_REPLY_LOST",
+          "outcome": "unknown; inspect the original operation identity"
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:02.899Z",
+        "finishedAt": "2026-11-17T15:35:02.917Z",
+        "request": {
+          "id": 5,
+          "tool": "operation",
+          "input": {
+            "operationId": "agent-note-1"
+          }
+        },
+        "response": {
+          "id": 5,
+          "result": {
+            "state": {
+              "status": "needsReapply",
+              "attemptId": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649",
+              "operationId": "agent-note-1",
+              "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "selectedGeneration": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "previous": null
+            },
+            "attempt": {
+              "payload": {
+                "header": {
+                  "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                  "profile": "peer-generation-v1",
+                  "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                  "controlRevision": 0,
+                  "epoch": 0,
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-1",
+                  "definitionDigest": "3a34b0324fbe6c0ac9c7786a51fd51289d1253af139c73b5954c24af6c3d4d59",
+                  "command": "postMessage",
+                  "commandVersion": "1",
+                  "basedOn": {
+                    "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                    "historyId": "independent-agent-exercise",
+                    "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                    "point": {
+                      "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                      "sequence": 3,
+                      "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a"
+                    },
+                    "controlRevision": 0,
+                    "materializationRevision": "4"
+                  },
+                  "reapplyOf": null,
+                  "coreDigest": "0cc21b919a8ace5b2bd6ddb793dcd4559b92db0b52bface6b56129aa8560447b"
+                },
+                "nonce": "88b01eeb68295a8a34be9fdb",
+                "ciphertext": "6aec139ff6bb61f27370944798ec6f552852c2dd59ec6cd50f98fe61c572ef77cd9b863b59b907625f89356b86f8a13e45aaa57e625489c6fc67a7dbd92f6aa79f8db2f0496c9201c7f59034e104674d6edff3ac618a510004cef9aca0463ae6edd96a886eff38956506c6d9850928d2dc331489e351fa5402fd763090eaf388299cd6dfacb1d9af2d9e836e52e160f914b1e3b6f85e39afec6607833dd2fdfbd10f3cc45c9d9bb2ec0281af7092508304512ff4ddf9ffd6761a844f1507c7bf268aa73cb2edae85ff2995aa6f94d74719b3623cfdd943d12e5d943e4b98128eaf980876fdae3774a787beabc75c81f1d06c178fae28b3eb2fa9c8ed2f19498cee192796d11f329c8e54c1723b1f062f36e4de8bbd01bd9f50e01991be935c759ed64085e7ac830c6c10cb1a3a672a38b86f3aa438055d5bbeff1075939433598b56b18e2664a04bb68b7f31bc26013b30f78eccab8af5225cc50598f4"
+              },
+              "signature": "448f721cef8bbb970b42138ba9b4c060485bc93e1ccb852133831f99b3c246714bfba851b50e083050b08fc93a97ae330f82027e6f7deea1d48905cf7b20de01",
+              "id": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649"
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:07.814Z",
+        "finishedAt": "2026-11-17T15:35:07.821Z",
+        "request": {
+          "id": 6,
+          "tool": "changes",
+          "input": {
+            "after": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "point": {
+                "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                "sequence": 3,
+                "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "4"
+            },
+            "waitMs": 0
+          },
+          "timeoutMs": 5000
+        },
+        "response": {
+          "id": 6,
+          "result": {
+            "change": {
+              "kind": "recovery",
+              "revision": {
+                "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                "historyId": "independent-agent-exercise",
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "point": {
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "sequence": 0,
+                  "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+                },
+                "controlRevision": 0,
+                "materializationRevision": "4"
+              },
+              "recovery": {
+                "previousGeneration": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "adopted": {
+                  "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                  "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a",
+                  "sequence": 3
+                },
+                "revision": {
+                  "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                  "historyId": "independent-agent-exercise",
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "point": {
+                    "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                    "sequence": 0,
+                    "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+                  },
+                  "controlRevision": 0,
+                  "materializationRevision": "4"
+                },
+                "abandoned": [
+                  {
+                    "status": "needsReapply",
+                    "attemptId": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649",
+                    "operationId": "agent-note-1",
+                    "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                    "selectedGeneration": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                    "previous": null
+                  }
+                ],
+                "unknownLoss": true
+              }
+            },
+            "resetRequired": true
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:11.956Z",
+        "finishedAt": "2026-11-17T15:35:11.961Z",
+        "request": {
+          "id": 7,
+          "tool": "recoveries",
+          "input": {}
+        },
+        "response": {
+          "id": 7,
+          "result": [
+            {
+              "previousGeneration": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "adopted": {
+                "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a",
+                "sequence": 3
+              },
+              "revision": {
+                "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                "historyId": "independent-agent-exercise",
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "point": {
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "sequence": 0,
+                  "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+                },
+                "controlRevision": 0,
+                "materializationRevision": "4"
+              },
+              "abandoned": [
+                {
+                  "status": "needsReapply",
+                  "attemptId": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649",
+                  "operationId": "agent-note-1",
+                  "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+                  "selectedGeneration": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "previous": null
+                }
+              ],
+              "unknownLoss": true
+            }
+          ]
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:15.678Z",
+        "finishedAt": "2026-11-17T15:35:15.745Z",
+        "request": {
+          "id": 8,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 8,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 0,
+                "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "4"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": null,
+                  "status": "open"
+                }
+              ],
+              "messages": []
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:20.314Z",
+        "finishedAt": "2026-11-17T15:35:20.471Z",
+        "request": {
+          "id": 9,
+          "tool": "reapply",
+          "input": {
+            "originalOperationId": "agent-note-1",
+            "operationId": "agent-note-2",
+            "name": "postMessage",
+            "input": {
+              "messageId": "review-ready",
+              "text": "Ready for review"
+            },
+            "basedOn": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 0,
+                "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "4"
+            }
+          },
+          "timeoutMs": 5000
+        },
+        "response": {
+          "id": 9,
+          "result": {
+            "status": "saved",
+            "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be",
+            "operationId": "agent-note-2",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818"
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:23.845Z",
+        "finishedAt": "2026-11-17T15:35:23.856Z",
+        "request": {
+          "id": 10,
+          "tool": "wait",
+          "input": {
+            "operationId": "agent-note-2"
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 10,
+          "result": {
+            "status": "applied",
+            "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be",
+            "operationId": "agent-note-2",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+            "sequence": 1,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:26.836Z",
+        "finishedAt": "2026-11-17T15:35:26.842Z",
+        "request": {
+          "id": 11,
+          "tool": "operation",
+          "input": {
+            "operationId": "agent-note-2"
+          }
+        },
+        "response": {
+          "id": 11,
+          "result": {
+            "state": {
+              "status": "applied",
+              "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be",
+              "operationId": "agent-note-2",
+              "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "sequence": 1,
+              "outcome": "accepted",
+              "rejectionCode": null
+            },
+            "attempt": {
+              "payload": {
+                "header": {
+                  "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                  "profile": "peer-generation-v1",
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "controlRevision": 0,
+                  "epoch": 0,
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-2",
+                  "definitionDigest": "3a34b0324fbe6c0ac9c7786a51fd51289d1253af139c73b5954c24af6c3d4d59",
+                  "command": "postMessage",
+                  "commandVersion": "1",
+                  "basedOn": {
+                    "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                    "historyId": "independent-agent-exercise",
+                    "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                    "point": {
+                      "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                      "sequence": 0,
+                      "root": "9d47959a27f6e3c72ea992731dc4d6a0e2733bd895db7757d9b915fadc0b0a91"
+                    },
+                    "controlRevision": 0,
+                    "materializationRevision": "4"
+                  },
+                  "reapplyOf": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649",
+                  "coreDigest": "8f1efd4ec436710d42c0cabe75e67e18f9708d0e316d5463e0d4a8165a83f217"
+                },
+                "nonce": "87acc72ab9543d8e07dd3769",
+                "ciphertext": "f455663a5f552317a6dae86b3b3a89b6fb1dc1dcae65e15bc8c5456578642ba4830f44c739a2d929aaf44f29f9140e69fa317e9651672d483f2d3eb90aa97b2bad3f6b553b0a4e6861b44855b4e2d79b352d4ccbfb34576ab1819556d1ca16cbe27b53c14d06cc9d520b6a14747bd749bfc97f78515b8603f7de7f7bda166a47c6082c84a94bcef3b328623a8a72f371d518fa1d498a061c43198cf3810252d03845cd14a5c773a1fa7167d3a0a3b2a8acc01f24d0a37d8c70d62bce13e43614847de44da9c8a9e8029d3007a99810f899f0ff2cf2012ab850922c4674cef2c34d7da0fdc9e9e5cff4af4a59ee8e7d7abb2753f398e3ce4a609362a581d75b8d745091702354c1b733f456237dae2e0384f1c2791b166447518d584474c74362aa94a0396bc81e64e3bc2bd0fa931b7ea573df0f85ccbdd50338d0a5dbcde9b53045dd6f112106b748a6456b64599386d4ef8096295d1562e290217523"
+              },
+              "signature": "e480abd830b0e8c19e4797f84daaf13a09ab522f4c63c47c62cb883d6120edfbecee43b22ca6ee2f18c2bc972b4dad40879d3e8e00a0819b6744bc44c4af1d04",
+              "id": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:30.149Z",
+        "finishedAt": "2026-11-17T15:35:30.964Z",
+        "request": {
+          "id": 12,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 12,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 1,
+                "root": "e3105faf78514fb36a154f5e5f186560bd1af3a3d7aff9444ce254729d9ba27d"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "5"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": null,
+                  "status": "open"
+                }
+              ],
+              "messages": [
+                {
+                  "messageId": "review-ready",
+                  "text": "Ready for review",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-2",
+                  "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:34.265Z",
+        "finishedAt": "2026-11-17T15:35:34.301Z",
+        "request": {
+          "id": 13,
+          "tool": "command",
+          "input": {
+            "name": "finishTask",
+            "input": {
+              "taskId": "locked"
+            },
+            "operationId": "agent-wrong-author-1",
+            "basedOn": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 1,
+                "root": "e3105faf78514fb36a154f5e5f186560bd1af3a3d7aff9444ce254729d9ba27d"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "5"
+            }
+          },
+          "timeoutMs": 5000
+        },
+        "response": {
+          "id": 13,
+          "result": {
+            "status": "saved",
+            "attemptId": "13b77660b34ecb1f831e4507303a908858133e2cbe8da5e3803ee97d7019069a",
+            "operationId": "agent-wrong-author-1",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818"
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:37.515Z",
+        "finishedAt": "2026-11-17T15:35:37.516Z",
+        "request": {
+          "id": 14,
+          "tool": "wait",
+          "input": {
+            "operationId": "agent-wrong-author-1"
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 14,
+          "result": {
+            "status": "applied",
+            "attemptId": "13b77660b34ecb1f831e4507303a908858133e2cbe8da5e3803ee97d7019069a",
+            "operationId": "agent-wrong-author-1",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+            "sequence": 2,
+            "outcome": "rejected",
+            "rejectionCode": "assert:claim_required"
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:40.495Z",
+        "finishedAt": "2026-11-17T15:35:40.554Z",
+        "request": {
+          "id": 15,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 15,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 2,
+                "root": "6e0e58f99c3bdf0c062de66e89220282fb58f9f43ed126420460326e38931458"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "6"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": null,
+                  "status": "open"
+                }
+              ],
+              "messages": [
+                {
+                  "messageId": "review-ready",
+                  "text": "Ready for review",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-2",
+                  "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:44.990Z",
+        "finishedAt": "2026-11-17T15:35:45.107Z",
+        "request": {
+          "id": 16,
+          "tool": "command",
+          "input": {
+            "name": "claimTask",
+            "input": {
+              "taskId": "review"
+            },
+            "operationId": "agent-claim-1",
+            "basedOn": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 2,
+                "root": "6e0e58f99c3bdf0c062de66e89220282fb58f9f43ed126420460326e38931458"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "6"
+            }
+          },
+          "timeoutMs": 5000
+        },
+        "response": {
+          "id": 16,
+          "result": {
+            "status": "saved",
+            "attemptId": "8fb2ae49a399dfeb208b9d45a1419d1d77ae4d5d83803e4f3b79299338143afe",
+            "operationId": "agent-claim-1",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818"
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:48.094Z",
+        "finishedAt": "2026-11-17T15:35:48.103Z",
+        "request": {
+          "id": 17,
+          "tool": "wait",
+          "input": {
+            "operationId": "agent-claim-1"
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 17,
+          "result": {
+            "status": "applied",
+            "attemptId": "8fb2ae49a399dfeb208b9d45a1419d1d77ae4d5d83803e4f3b79299338143afe",
+            "operationId": "agent-claim-1",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+            "sequence": 3,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:51.515Z",
+        "finishedAt": "2026-11-17T15:35:51.550Z",
+        "request": {
+          "id": 18,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 18,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 3,
+                "root": "189ac5563c71dd098888b10efc61327323f7092a84b2c08557dd371e965ea722"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "7"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "status": "open"
+                }
+              ],
+              "messages": [
+                {
+                  "messageId": "review-ready",
+                  "text": "Ready for review",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-2",
+                  "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:35:56.419Z",
+        "finishedAt": "2026-11-17T15:35:56.457Z",
+        "request": {
+          "id": 19,
+          "tool": "command",
+          "input": {
+            "name": "finishTask",
+            "input": {
+              "taskId": "review"
+            },
+            "operationId": "agent-finish-1",
+            "basedOn": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 3,
+                "root": "189ac5563c71dd098888b10efc61327323f7092a84b2c08557dd371e965ea722"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "7"
+            }
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 19,
+          "result": {
+            "status": "saved",
+            "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+            "operationId": "agent-finish-1",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818"
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:36:00.239Z",
+        "finishedAt": "2026-11-17T15:36:00.242Z",
+        "request": {
+          "id": 20,
+          "tool": "operation",
+          "input": {
+            "operationId": "agent-finish-1"
+          }
+        },
+        "response": {
+          "id": 20,
+          "result": {
+            "state": {
+              "status": "applied",
+              "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+              "operationId": "agent-finish-1",
+              "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "sequence": 4,
+              "outcome": "accepted",
+              "rejectionCode": null
+            },
+            "attempt": {
+              "id": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+              "payload": {
+                "ciphertext": "e39b6736d633dcd79b6fc0a68d7007194fc6606a5590a9c8d00c5094b553f1869e06d1171eac8037ce211a40f3de5cbdb02ad20388cdde568ccd5c358acbc29a8a1d49717f1915e1078e1b8cdc18c2f36d78e8b719d5eb1a3fee5ebca7efe8cb38e1bbb7c52bffe7f5c26b362cb52035e1fdff878b17489d6294c0fb7bc4e365a3ab77535d4a6988270f44923e3be3b42aa9522e5f5f117e38c25ad44a1e3e3adefb51f6f66a82c63541d68ad9c4b3526d5e7149cb9f83ef5d6bbbb0b999967a1b8139dc6ffb66cd17d641c906792faec67ea911fe0a1bb08cc2412c9a1f066bb042e70a5977cb197c5a256f5fb2070a28930e3c210510b17ea7c0b0869837eeb932e9d7c114e1f65742fea3a5f0b87a8e526f0d8e42ec1cda08dcb9b50003ce7e02d21d01fdd2db7fb6569b6b8a444d4163cc4a3d9d52346e09e299da78d10079fc4e3b5e97f9617e30d0c78edabfc7f9c6b77206c0c4bca235aba16dd049f5e34d0e8e05711b7c0ef36f2afb1ca2bded2972c7015e779c669c6f27735d424effd0b7b2184b102e36d6d28346fd62f0d5c33c5586a097e9297a5309a3a1654f936a93318775ec2a03e899184dcd450404a46fe8d34e9d31abf384311c2e0d0ddd055bb91d06a25d652eb10a729239f3703dc609e3b8da8a1c1c068aeeb5c345c8bbe8d4d6739bee3637dda2a446b9bb8db4634ebc347c558cc74a879976e046c0852b19ee44381688f158",
+                "header": {
+                  "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "basedOn": {
+                    "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                    "controlRevision": 0,
+                    "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                    "historyId": "independent-agent-exercise",
+                    "materializationRevision": "7",
+                    "point": {
+                      "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                      "root": "189ac5563c71dd098888b10efc61327323f7092a84b2c08557dd371e965ea722",
+                      "sequence": 3
+                    }
+                  },
+                  "command": "finishTask",
+                  "commandVersion": "1",
+                  "controlRevision": 0,
+                  "coreDigest": "de170ed1b79f29b1a387b8d023bf5ad9e42c2319e2860872b29d8028abcb7777",
+                  "definitionDigest": "3a34b0324fbe6c0ac9c7786a51fd51289d1253af139c73b5954c24af6c3d4d59",
+                  "epoch": 0,
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "operationId": "agent-finish-1",
+                  "profile": "peer-generation-v1",
+                  "reapplyOf": null
+                },
+                "nonce": "4c04ab1b7bde8e4008364ea9"
+              },
+              "signature": "2684cbd0031f95487f78a1912d8f2cfdad1da02dd3262f03bb483a2dbf0cf0c82cee8edfcbdc537ae54a65e967042419aa63f5260f8de777322d2037174a1309"
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:36:03.528Z",
+        "finishedAt": "2026-11-17T15:36:03.706Z",
+        "request": {
+          "id": 21,
+          "tool": "wait",
+          "input": {
+            "operationId": "agent-finish-1"
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 21,
+          "result": {
+            "status": "applied",
+            "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+            "operationId": "agent-finish-1",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+            "sequence": 4,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:36:06.723Z",
+        "finishedAt": "2026-11-17T15:36:06.727Z",
+        "request": {
+          "id": 22,
+          "tool": "retry",
+          "input": {
+            "operationId": "agent-finish-1"
+          },
+          "timeoutMs": 10000
+        },
+        "response": {
+          "id": 22,
+          "result": {
+            "status": "applied",
+            "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+            "operationId": "agent-finish-1",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+            "sequence": 4,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:36:09.764Z",
+        "finishedAt": "2026-11-17T15:36:09.770Z",
+        "request": {
+          "id": 23,
+          "tool": "operation",
+          "input": {
+            "operationId": "agent-finish-1"
+          }
+        },
+        "response": {
+          "id": 23,
+          "result": {
+            "state": {
+              "status": "applied",
+              "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+              "operationId": "agent-finish-1",
+              "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "sequence": 4,
+              "outcome": "accepted",
+              "rejectionCode": null
+            },
+            "attempt": {
+              "id": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+              "payload": {
+                "ciphertext": "e39b6736d633dcd79b6fc0a68d7007194fc6606a5590a9c8d00c5094b553f1869e06d1171eac8037ce211a40f3de5cbdb02ad20388cdde568ccd5c358acbc29a8a1d49717f1915e1078e1b8cdc18c2f36d78e8b719d5eb1a3fee5ebca7efe8cb38e1bbb7c52bffe7f5c26b362cb52035e1fdff878b17489d6294c0fb7bc4e365a3ab77535d4a6988270f44923e3be3b42aa9522e5f5f117e38c25ad44a1e3e3adefb51f6f66a82c63541d68ad9c4b3526d5e7149cb9f83ef5d6bbbb0b999967a1b8139dc6ffb66cd17d641c906792faec67ea911fe0a1bb08cc2412c9a1f066bb042e70a5977cb197c5a256f5fb2070a28930e3c210510b17ea7c0b0869837eeb932e9d7c114e1f65742fea3a5f0b87a8e526f0d8e42ec1cda08dcb9b50003ce7e02d21d01fdd2db7fb6569b6b8a444d4163cc4a3d9d52346e09e299da78d10079fc4e3b5e97f9617e30d0c78edabfc7f9c6b77206c0c4bca235aba16dd049f5e34d0e8e05711b7c0ef36f2afb1ca2bded2972c7015e779c669c6f27735d424effd0b7b2184b102e36d6d28346fd62f0d5c33c5586a097e9297a5309a3a1654f936a93318775ec2a03e899184dcd450404a46fe8d34e9d31abf384311c2e0d0ddd055bb91d06a25d652eb10a729239f3703dc609e3b8da8a1c1c068aeeb5c345c8bbe8d4d6739bee3637dda2a446b9bb8db4634ebc347c558cc74a879976e046c0852b19ee44381688f158",
+                "header": {
+                  "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "basedOn": {
+                    "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+                    "controlRevision": 0,
+                    "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                    "historyId": "independent-agent-exercise",
+                    "materializationRevision": "7",
+                    "point": {
+                      "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                      "root": "189ac5563c71dd098888b10efc61327323f7092a84b2c08557dd371e965ea722",
+                      "sequence": 3
+                    }
+                  },
+                  "command": "finishTask",
+                  "commandVersion": "1",
+                  "controlRevision": 0,
+                  "coreDigest": "de170ed1b79f29b1a387b8d023bf5ad9e42c2319e2860872b29d8028abcb7777",
+                  "definitionDigest": "3a34b0324fbe6c0ac9c7786a51fd51289d1253af139c73b5954c24af6c3d4d59",
+                  "epoch": 0,
+                  "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                  "operationId": "agent-finish-1",
+                  "profile": "peer-generation-v1",
+                  "reapplyOf": null
+                },
+                "nonce": "4c04ab1b7bde8e4008364ea9"
+              },
+              "signature": "2684cbd0031f95487f78a1912d8f2cfdad1da02dd3262f03bb483a2dbf0cf0c82cee8edfcbdc537ae54a65e967042419aa63f5260f8de777322d2037174a1309"
+            }
+          }
+        }
+      },
+      {
+        "startedAt": "2026-11-17T15:36:12.958Z",
+        "finishedAt": "2026-11-17T15:36:13.771Z",
+        "request": {
+          "id": 24,
+          "tool": "query",
+          "input": {
+            "name": "board",
+            "input": {}
+          }
+        },
+        "response": {
+          "id": 24,
+          "result": {
+            "revision": {
+              "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+              "historyId": "independent-agent-exercise",
+              "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+              "point": {
+                "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+                "sequence": 4,
+                "root": "a5446cb176f314c9fa5bcca96f6d8d259b52283f4f83c437adb8066d673e8f72"
+              },
+              "controlRevision": 0,
+              "materializationRevision": "8"
+            },
+            "value": {
+              "tasks": [
+                {
+                  "id": "locked",
+                  "title": "A task claimed by another authenticated author",
+                  "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+                  "status": "open"
+                },
+                {
+                  "id": "review",
+                  "title": "Review the public session experience",
+                  "claimedBy": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "status": "done"
+                }
+              ],
+              "messages": [
+                {
+                  "messageId": "review-ready",
+                  "text": "Ready for review",
+                  "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+                  "operationId": "agent-note-2",
+                  "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "passed": true,
+    "identity": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+    "storageId": "41bd18cd-88fe-4a44-b330-cb61ba0f82b0",
+    "enrollment": "provided verified authority, signed schema and persistent native device",
+    "initialRevision": {
+      "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+      "historyId": "independent-agent-exercise",
+      "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+      "point": {
+        "generation": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+        "sequence": 3,
+        "root": "5150f45c82192347792ceed9079fc80a39d6f5780165941beb0c9c0674dfa50a"
+      },
+      "controlRevision": 0,
+      "materializationRevision": "4"
+    },
+    "fault": {
+      "persistedAtCoordinator": true,
+      "originalOperationId": "agent-note-1",
+      "priorGeneration": "b852304f439ae44aacd9519533337c50235878a3b84eee2e1111bdf5d7b2ffe0",
+      "coordinatorRemoved": true,
+      "responseSuppressed": true,
+      "selectedGeneration": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+      "originalAttemptId": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649"
+    },
+    "reopen": {
+      "identityBefore": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+      "identityAfter": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+      "storageBefore": "41bd18cd-88fe-4a44-b330-cb61ba0f82b0",
+      "storageAfter": "41bd18cd-88fe-4a44-b330-cb61ba0f82b0",
+      "operationBefore": {
+        "status": "applied",
+        "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+        "operationId": "agent-finish-1",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "operationAfter": {
+        "status": "applied",
+        "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+        "operationId": "agent-finish-1",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "plaintextKeysSupplied": false
+    },
+    "final": {
+      "revision": {
+        "applicationId": "4b3cbeb77c19e66ceb5fe8a901215be1a0958b342f11ff18d7e0693de8983eeb",
+        "historyId": "independent-agent-exercise",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "point": {
+          "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+          "sequence": 4,
+          "root": "a5446cb176f314c9fa5bcca96f6d8d259b52283f4f83c437adb8066d673e8f72"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "8"
+      },
+      "board": {
+        "tasks": [
+          {
+            "id": "locked",
+            "title": "A task claimed by another authenticated author",
+            "claimedBy": "e857ef0d4bd5dcd0899d6ffb6a67f6889c5528714209b02c8200f401aaab62e7",
+            "status": "open"
+          },
+          {
+            "id": "review",
+            "title": "Review the public session experience",
+            "claimedBy": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "status": "done"
+          }
+        ],
+        "messages": [
+          {
+            "messageId": "review-ready",
+            "text": "Ready for review",
+            "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+            "operationId": "agent-note-2",
+            "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be"
+          }
+        ]
+      },
+      "reapplication": {
+        "status": "applied",
+        "attemptId": "97063a84fcd9557b2acd856977b0c1724d31d5bb8d4be8ecb8e648a667fe57be",
+        "operationId": "agent-note-2",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 1,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "reapplyOf": "4f950933847a8efa1975fda885f619fc5f8454df6f57305ce726f11d9539c649",
+      "wrongAuthor": {
+        "status": "applied",
+        "attemptId": "13b77660b34ecb1f831e4507303a908858133e2cbe8da5e3803ee97d7019069a",
+        "operationId": "agent-wrong-author-1",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 2,
+        "outcome": "rejected",
+        "rejectionCode": "assert:claim_required"
+      },
+      "claim": {
+        "status": "applied",
+        "attemptId": "8fb2ae49a399dfeb208b9d45a1419d1d77ae4d5d83803e4f3b79299338143afe",
+        "operationId": "agent-claim-1",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 3,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "finish": {
+        "status": "applied",
+        "attemptId": "e7cf82931481575f073b53c5ad56603c63c2084ab76bce3de421b7887f7880d9",
+        "operationId": "agent-finish-1",
+        "author": "1c8b8989cdaaa70e7584191deac9a20ec196cf050328f9bd4529e1952f96739e",
+        "generation": "bbc0904070e983ca2ff6564e2a4adfa4607fbdf0bbc58a509c3deb4390703818",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      }
+    },
+    "finishedAt": "2026-11-17T15:36:14.355Z",
+    "requests": 24
+  },
+  "executionManifestDigest": "100507b526fa14db10368b53f82af6be52ea224dfa44020437442e4285146a64"
+}

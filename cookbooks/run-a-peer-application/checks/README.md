@@ -43,8 +43,16 @@ the maintained recovery journal retries the identical signed request and
 receives the original selection and recovery notice. The fixture does not
 implement another transition queue or recovery policy.
 
-The direct run uses the maintained in-process transport. The RTC run uses the
-public native connection composition and real ICE/DTLS/SCTP. Its explicit
+The explicit lost-reply and ancestry faults use public connection primitives.
+The ordinary lifecycle then runs through `session.participate`: it discovers and
+authenticates peers, continues commands with the host blocked, waits reconnect
+grace before an eligible takeover, and requires the exact displayed approval
+when a cold observer has no verified freshness. The fixture supplies only bounded
+byte delivery or SDP introduction; it has no recovery or retry policy.
+
+The direct run uses an in-process implementation of the public framed transport
+interface. The RTC run uses the public raw native connection composition and
+real ICE/DTLS/SCTP. Its explicit
 loopback candidate and one-off in-process SDP mailbox do not qualify network
 interface discovery, Internet reachability, TURN or deployed discovery. Both
 record their exact measurement boundary rather than calling a loopback result a
@@ -82,8 +90,10 @@ npm run test:peer-browser -- \
 The isolated consumer installs declared Playwright/esbuild tools and imports
 only public browser entries. The Worker owns OPFS, identity, keyring, the attempt
 journal and both RTC channels. `connectApplicationWorker` exposes the same
-commands and queries to the page; `connectWorkerApplicationWebRtc` owns channel
-transfer. The page copies neither protocol lifecycle nor request maps.
+commands and queries to the page. The page's `serveWorkerWebRtcConnections`
+supplies RTC mechanics; the Worker calls `openWorkerWebRtcConnection`, owns the
+raw frames and authenticates its peer through the session. The page copies
+neither protocol lifecycle nor request maps.
 The Worker attaches the same session-owned control participant over the shared
 envelope; fixture HTTP hosts the public registry without introducing separate
 application/read and generation/select APIs.
@@ -137,6 +147,46 @@ uses authenticated peer RTC. After introduction, the test blocks hosted access
 and requires complete Worker HTTP/body/SDP counters and bridge counters to stay
 unchanged while real peer application bytes increase. Live signals do not append
 history. TURN would be real data-plane traffic and must be measured separately.
+
+The maintained `createPeerIntroductions` adapter also supplies actual hosted
+discovery, invitation listeners and rendezvous to `session.participate`.
+Advertisements contain only peer/storage identities and routes. The session
+checks grants and usable retained history itself. The gate exercises the same
+automatic and explicitly reviewed recoveries as the portable/native lane and
+requires every owned introduction socket to close.
+
+## Independent agent business workflow
+
+Prepare a fresh public-package tool process with the actual native SQL engine:
+
+```sh
+npm run test:peer-generation -- \
+  --artifact /exact/chronolog-peer-session-with-sql.tgz \
+  --domain agent --output /new/agent-evidence
+```
+
+The runner prints an isolated working directory and interactive command. Start
+that command with stdin kept open, then send one JSON object per line using the
+public `{id, tool, input, timeoutMs?}` format. `list` supplies the tool schemas.
+The fixture provides enrolled peers, the task definition and transport delivery;
+it does not perform the agent's business commands. The native peer and owning
+session provide the same journal, guarded SQL execution and recovery as other
+consumers. Every request/result is retained in the raw report.
+
+The bounded exercise reserves `agent-note-1` for a lost-reply conversation
+command and `agent-note-2` for its deliberate replacement containing
+`Ready for review`. It reserves `agent-wrong-author-1` for refusing completion of
+the other author's `locked` task, then `agent-claim-1` and `agent-finish-1` for
+claiming/completing `review`. The fixture closes/reopens the device after accepted
+finish. The agent must discover/query, capture revision guards, inspect the
+uncertain original, observe a recovery reset, inspect actual notices, explicitly
+reapply, and inspect/wait/retry the exact finished identity after reopen.
+
+Record the supplied task, infrastructure, coaching, mistakes and elapsed time.
+This exercise qualifies public business-tool use with provided enrollment.
+Automated artifact installation and fixture-owned enrollment are separate from
+a fresh agent independently configuring the full deployment; do not claim those
+setup steps from the workflow transcript.
 
 ## Evidence and remaining qualification
 

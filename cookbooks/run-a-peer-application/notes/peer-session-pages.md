@@ -19,31 +19,48 @@ The complete deployment supplies `deployment/bootstrap.mjs`. Its
 `connectApplicationWorker(worker)` from `@chronolog/peer-session/browser`.
 The Worker first opens the device and application using its authorized
 enrollment and pinned execution runtime. It attaches the host's dedicated
-participant transport before serving the page facade:
+participant transport and starts the maintained participation controller before
+serving the page facade:
 
 ```js
-const host = session.connectControlParticipant({
+import { createPeerIntroductions } from '@tendriller/core/peers';
+import { serveApplicationWorker } from '@chronolog/peer-session/browser';
+import { openWorkerWebRtcConnection } from '@chronolog/peer-session/webrtc';
+
+const control = session.connectControlParticipant({
   exchange: (envelope, { signal }) => peers.exchange(envelope, { signal }),
 });
-serveApplicationWorker(session, self, { host });
+session.participate({
+  control,
+  ...createPeerIntroductions({
+    peers,
+    identity: session.deviceId,
+    openConnection: options => openWorkerWebRtcConnection(self, options),
+  }),
+});
+serveApplicationWorker(session, self, { host: control });
 ```
 
 `peers` is the deployment's public Tendriller peer client. It carries the shared
 participant envelope over authenticated HTTP and applies the host interest
 policy. The session owns authority verification, exact takeover/publication
-journals and shutdown. Attaching performs no host request; explicit lifecycle
-actions are the only users of that transport. `serveApplicationWorker` comes
-from the public browser entry.
-That owner also installs and closes the maintained Worker RTC transport. Use
-`connectWorkerApplicationWebRtc` from the public `webrtc` entry on the page for
-negotiation and authenticated handoff.
+journals and shutdown. Attaching the control port performs no request.
+Participation owns bounded discovery, connection attempts, authority refresh,
+coordinator selection, reconnect grace and recovery approval. The host adapter
+supplies routing and invitations; it does not implement those policies.
+
+On the page, call `serveWorkerWebRtcConnections(worker)` from the public
+`webrtc` entry before connecting the page facade. This helper supplies browser
+RTC mechanics while the Worker opens the raw connection and authenticates it
+through its own session. Close the helper when the owning page closes. Private
+keys, authentication and application traffic remain in the Worker.
 
 The device owner retains private keys, original signed attempts, authenticated
 authority, materialization and detached content. RPC requests carry application
 commands and bounded query results. A successful handoff or reachable endpoint
 does not grant membership; readiness and connection teardown belong to the
-maintained client. The deployment chooses and exposes explicit create/resume,
-enrollment, recovery eligibility and connection behavior.
+maintained client. The deployment supplies explicit create/resume, enrollment
+and transport configuration; it does not write a peer-recovery policy loop.
 
 Build both pages from a packed public session package and the complete deployment:
 
@@ -62,6 +79,13 @@ insufficient. The build refuses missing bootstrap assets and never substitutes
 an in-memory backend.
 
 ## Keep decisions visible through recovery
+
+Both layouts observe `session.participation`. When its phase is
+`approval-required`, they display the controller's reason, exact available
+history point, last verified contact and observed age. Missing freshness remains
+unknown. An explicit button calls `approveRecovery` with that displayed proposal
+ID; a superseded or rejected choice stays visible for review. The page computes
+no freshness threshold, ranks no candidates and schedules no reconnect timer.
 
 A query returns one captured selected-history revision. The page submits new
 commands using that revision, while task assertions also run inside the actual

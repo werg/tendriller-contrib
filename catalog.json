@@ -1332,7 +1332,7 @@
         "publish-coherent-updates"
       ],
       "sources": [
-        "https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/packages/peer-session/README.md"
+        "https://github.com/werg/chronolog-db/blob/08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c/packages/peer-session/README.md"
       ],
       "path": "cookbooks/run-a-peer-application/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."

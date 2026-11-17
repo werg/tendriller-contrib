@@ -8,17 +8,18 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/packages/peer-session/README.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
 
-**Implementation preview:** This recipe targets the paired `@chronolog/peer-session`
-composition under active qualification. The public encrypted session and
-maintained network/RTC composition are implemented. The qualification note
-preserves independent native/events and clean native RTC reports with their exact
-source and archive hashes. Those runs do not establish browser, Internet or deployed readiness;
-earlier finalized implementations retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
+This recipe uses one `@chronolog/peer-session` composition for browser and native
+peers. The session owns encrypted history, exact operation retry, replication,
+discovery and recovery policy. The [qualification note](notes/peer-generation-qualification.md)
+records the exact native, SQL, hosted and browser checkpoints and the independent
+agent business workflow. Local runtime results do not establish deployed-network
+readiness. Earlier implementations retain their original
+[historical evidence](notes/finalized-resident-recipe.md).
 
 `operation.applied()` returns execution in the selected generation.
 `operation.shared()` separately observes retained coverage on another peer.
@@ -37,7 +38,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c5f9f2431bdeb6/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
@@ -79,9 +80,11 @@ requires a public session package and complete real deployment assets.
    survival across explicit recovery.
 5. **Lose a reply.** Look up or retry the original operation. Do not allocate a
    replacement ID merely because a waiter timed out.
-6. **Lose the coordinator.** An eligible survivor may select a successor from its
-   complete older prefix through the control service. Recent unretained work may
-   disappear from the selected view. The session publishes one recovery notice.
+6. **Lose the coordinator.** The owned participation controller waits reconnect
+   grace and selects an eligible successor using verified complete history. An
+   older or unknown-freshness recovery requires approval of its displayed
+   proposal. Recent unretained work may disappear from the selected view. The
+   session publishes one recovery notice.
 7. **Return with old work.** The old peer follows the selected ancestry and keeps
    its excluded suffix for inspection. Nothing from that suffix silently merges.
 8. **Review and reapply.** Read the new view, inspect the abandoned intent, and
@@ -104,6 +107,9 @@ inputs, a native application uses the public package:
 
 ```js
 import { openNativeDevice, openNativeApplication } from '@chronolog/peer-session/native';
+import { openWebRtcConnection } from '@chronolog/peer-session/webrtc';
+import { createNativePeerConnection } from '@chronolog/peer-session/webrtc-native';
+import { createPeerIntroductions } from '@tendriller/core/peers';
 import { conversation } from './peer-conversation.mjs';
 
 // Use { create: true } only for explicit first-time device creation.
@@ -113,6 +119,15 @@ const session = await openNativeApplication({
   definition: conversation,
   authority,  // The published signed descriptor, controls and selected generations.
   epochKeys,  // Keys delivered to this enrolled device.
+});
+const control = session.connectControlParticipant({ exchange: peers.exchange });
+session.participate({
+  control,
+  ...createPeerIntroductions({
+    peers, // The deployment's authenticated public Tendriller peer client.
+    identity: session.deviceId,
+    openConnection: options => openWebRtcConnection({ ...options, createPeerConnection: createNativePeerConnection }),
+  }),
 });
 
 try {
@@ -130,8 +145,9 @@ try {
 ```
 
 The application keeps draft text and any operation reference needed by its UI.
-Chronolog owns the attempt journal, exact retry, ordering, peer replication and
-view recovery. A timeout cancels the wait; it does not cancel the command or
+Chronolog owns the attempt journal, exact retry, ordering, peer replication,
+discovery scheduling, coordinator selection and view recovery. The Tendriller
+adapter only maps introductions to the host transport. A timeout cancels the wait; it does not cancel the command or
 establish a rejection. `session.operations.get(operationId)` recovers its current
 state, and `session.retry(operationId)` resends only the original saved attempt.
 
@@ -167,6 +183,11 @@ from an excluded generation requires an explicit reset/reread.
 If the host is unavailable while the current coordinator remains reachable,
 ordinary work continues. If both disappear, keep the saved attempt and show a
 waiting state. A client must not mint a competing current generation locally.
+Observe `session.participation.onStatus` for connection/recovery progress. When
+it presents `approval-required`, display the exact proposal and its unknown or
+observed age, then call `approveRecovery(proposal.id)` only after explicit review.
+The [shared page layouts](notes/peer-session-pages.md) implement that presentation
+without adding a second recovery policy.
 
 ## Inspect and deliberately reapply
 
