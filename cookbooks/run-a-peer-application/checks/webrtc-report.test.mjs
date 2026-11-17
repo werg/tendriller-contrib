@@ -7,7 +7,7 @@ function report() {
   const host = { requests: 5, requestBytes: 2048, responseBytes: 20000, applicationRequests: 0,
     signalingMessages: 4, signalingBytes: 4096 };
   const browser = { proposalId: 'original-browser-proposal', outcome: { transactionId: 'original-browser-proposal',
-    final: true, phase: 'accepted', admissible: true, orderKey: 'original-order-key', outcome: { type: 'accepted' },
+    final: true, admissible: true, orderKey: 'original-order-key', outcome: { type: 'accepted' },
     observedAt: '2026-11-16T00:00:00.000Z', eventSetRevision: '10', materializedRevision: '10', changedByReplay: false } };
   const recovered = structuredClone(browser);
   recovered.proposalId = recovered.outcome.transactionId = 'original-reconnect-proposal';
@@ -33,7 +33,7 @@ function report() {
         expectedTerminations: ['WEBRTC_CONNECTION_ENDED'],
         routes: Array.from({ length: 2 }, () => ({ route: 'unknown', localCandidateType: null, remoteCandidateType: null })) },
       outcomes: { browser, retry: structuredClone(browser), native: { transactionId: 'original-native-proposal',
-        final: true, outcome: { type: 'accepted' } } } } };
+        final: true, admissible: true, orderKey: 'original-native-order-key', outcome: { type: 'accepted' } } } } };
 }
 
 test('RTC report validation preserves actual scope, dirty source and unknown physical routing', () => {
@@ -44,6 +44,17 @@ test('RTC report validation preserves actual scope, dirty source and unknown phy
   assert.equal(summary.topology.route, undefined);
   assert.equal(summary.peerBytesAfterIntroduction.browserSent, 120000);
   assert(summary.limits.some(limit => limit.includes('page-host quiescence')));
+});
+
+test('canonical final outcomes qualify without a phase field', () => {
+  const input = report();
+  const outcomes = [input.metrics.outcomes.browser.outcome, input.metrics.outcomes.retry.outcome,
+    input.metrics.outcomes.native, input.metrics.reconnect.original.outcome, input.metrics.reconnect.retry.outcome];
+  for (const outcome of outcomes) assert.equal(Object.hasOwn(outcome, 'phase'), false);
+  const summary = validateWebRtcReport(input);
+  assert.deepEqual(summary.originalOperations, input.metrics.outcomes);
+  assert.deepEqual(summary.reconnect.original, input.metrics.reconnect.original);
+  assert.deepEqual(summary.reconnect.retry, input.metrics.reconnect.retry);
 });
 
 test('all observed fixture host counters must remain unchanged after actual shutdown', () => {
@@ -59,11 +70,20 @@ test('all observed fixture host counters must remain unchanged after actual shut
 test('original accepted outcomes and identity must survive exact retry after host shutdown', () => {
   for (const change of [
     value => { value.metrics.outcomes.retry.proposalId = 'replacement-proposal'; },
+    value => { value.metrics.outcomes.browser.outcome.transactionId = 'another-proposal'; },
+    value => { delete value.metrics.outcomes.browser.outcome.transactionId; },
     value => { value.metrics.outcomes.browser.outcome.final = false; },
+    value => { delete value.metrics.outcomes.browser.outcome.final; },
+    value => { value.metrics.outcomes.browser.outcome.outcome.type = 'rejected'; },
+    value => { value.metrics.outcomes.browser.outcome.orderKey = ''; },
+    value => { delete value.metrics.outcomes.browser.outcome.admissible; },
     value => { value.metrics.outcomes.retry.outcome.orderKey = 'replacement-order'; },
     value => { value.metrics.outcomes.retry.outcome.admissible = false; },
     value => { value.metrics.outcomes.native.final = false; },
     value => { value.metrics.outcomes.native.outcome.type = 'rejected'; },
+    value => { value.metrics.outcomes.native.transactionId = ''; },
+    value => { delete value.metrics.outcomes.native.orderKey; },
+    value => { value.metrics.outcomes.native.admissible = false; },
     value => { delete value.metrics.outcomes.browser; },
   ]) { const value = report(); change(value); assert.throws(() => validateWebRtcReport(value)); }
 });
@@ -113,6 +133,8 @@ test('recovery must use the public authenticated recipe and retain the original 
     value => { value.metrics.reconnect.introductions.push(value.metrics.reconnect.introductions[0]); },
     value => { value.metrics.reconnect.introductions[0].closed = false; },
     value => { value.metrics.reconnect.retry.proposalId = 'replacement'; },
+    value => { value.metrics.reconnect.retry.outcome.final = false; },
+    value => { value.metrics.reconnect.original.outcome.outcome.type = 'rejected'; },
     value => { value.metrics.reconnect.browserAuthoredAfter.push('replacement'); },
     value => { value.metrics.introduction.active = 2; },
     value => { value.metrics.introduction.failed = 2; },
