@@ -20,8 +20,10 @@ export function validateRelayTraffic(network, { implementation, minimumSockets }
     assert.ok(socket.maxQueuedBytes <= 2_200_000);
   }
   for (const lane of ['reliable', 'live']) {
-    assert.ok(sockets.some(socket => socket.lane === lane && socket.sentBinaryFrames > 0 && socket.receivedBinaryFrames > 0),
-      `No actual ${lane} frames crossed the relay`);
+    const endpoints = sockets.filter(socket => socket.lane === lane);
+    assert.ok(endpoints.reduce((sum, socket) => sum + socket.sentBinaryFrames, 0) > 0 &&
+      endpoints.reduce((sum, socket) => sum + socket.receivedBinaryFrames, 0) > 0,
+    `No actual ${lane} frames crossed the relay`);
   }
   assert.ok(network.traffic.host.relayUpgrades >= minimumSockets && network.traffic.host.relaySentBytes > 0 && network.traffic.host.relayReceivedBytes > 0,
     'Relay cost must include observed host byte traffic');

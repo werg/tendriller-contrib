@@ -245,3 +245,15 @@ test('relay evidence preserves control scope, actual ciphertext traffic and owne
     const report = syntheticRelayReport(); mutate(report); assert.throws(() => validatePeerGenerationReport(report));
   }
 });
+
+
+test('a delivered one-way live signal records sender and receiver on separate sockets', () => {
+  const report = syntheticRelayReport(); let index = 0;
+  for (const socket of report.relay.traffic.sockets.filter(socket => socket.lane === 'live')) {
+    socket.sentBinaryFrames = index++ % 2 ? 0 : 1;
+    socket.receivedBinaryFrames = 1 - socket.sentBinaryFrames;
+  }
+  assert.doesNotThrow(() => validatePeerGenerationReport(report));
+  for (const socket of report.relay.traffic.sockets.filter(socket => socket.lane === 'live')) socket.receivedBinaryFrames = 0;
+  assert.throws(() => validatePeerGenerationReport(report), /No actual live frames/);
+});
