@@ -21,6 +21,8 @@ export function validateBrowserPeerReport(report) {
   assert.deepEqual(report.publicBoundary.testTools, ['esbuild', 'playwright']);
   for (const field of ['siblingSourceImports', 'applicationRpcMaps', 'applicationRetryQueues']) assert.equal(report.publicBoundary[field], 0);
   assert.equal(report.publicBoundary.residentRequired, false);
+  assert.equal(report.publicBoundary.bootstrap, tasks ? 'openBrowserSqlSession' : 'openApplicationSession');
+  assert.equal(report.publicBoundary.hostBridge, 'serveApplicationWorkerHost/connectApplicationWorkerHost');
   assert.ok(report.fixtures.length >= 4);
   for (const fixture of report.fixtures) assert.match(fixture.sha256, /^[a-f0-9]{64}$/u);
   assert.ok(report.browserAssets.length >= 2);

@@ -1,9 +1,9 @@
 // Playwright calls these fixture lifecycle methods, then the actual public
 // application facade directly. There is no application-owned RPC or retry map.
-import { connectApplicationWorker, openBrowserDevice } from '@chronolog/peer-session/browser';
+import { connectApplicationWorker, openBrowserDevice, serveApplicationWorkerHost } from '@chronolog/peer-session/browser';
 import { connectWorkerApplicationWebRtc } from '@chronolog/peer-session/webrtc';
 
-let worker, application, name;
+let worker, application, hostBridge, name;
 let resolveApplication;
 export const applicationReady = new Promise(resolve => { resolveApplication = resolve; });
 const links = new Map();
@@ -27,8 +27,14 @@ const create = (deviceName, provision) => new Worker(`/worker.mjs?${new URLSearc
 globalThis.fixture = {
   async open({ deviceName, provision = false }) {
     name = deviceName; worker = create(name, provision);
+    hostBridge = serveApplicationWorkerHost(worker, {
+      application: () => request('/control/application'),
+      definition: () => request('/control/definition'),
+      configureApplication: configuration => request('/control/configuration', configuration),
+      selectGeneration: transition => request('/control/generations', transition),
+    });
     try { await ready(worker); application = await connectApplicationWorker(worker); }
-    catch (error) { worker.terminate(); throw error; }
+    catch (error) { hostBridge.close(); worker.terminate(); throw error; }
     globalThis.application = application;
     resolveApplication(application);
     application.onRecovery(notice => notices.push(notice));
@@ -91,9 +97,9 @@ globalThis.fixture = {
   async disconnect(id) { const link = links.get(id); if (link) { await link.close(); links.delete(id); } },
   async close() {
     await Promise.all([...links.values()].map(link => link.close())); links.clear();
-    await application.close(); worker.terminate();
+    await application.close(); hostBridge.close(); worker.terminate();
   },
-  crash() { worker.terminate(); },
+  crash() { worker.terminate(); hostBridge.close(); },
   observations: () => ({ notices, statuses, connectionFailures, startup, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
     locks: !!navigator.locks, isolated: crossOriginIsolated, userAgent: navigator.userAgent }),
 };

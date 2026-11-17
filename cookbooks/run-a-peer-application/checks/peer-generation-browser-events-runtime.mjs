@@ -1,4 +1,4 @@
-import { openBrowserApplication } from '@chronolog/peer-session/browser';
+import { openApplicationSession } from '@chronolog/peer-session';
 import { conversation } from './peer-generation-definition.mjs';
 
-export const openApplication = ({ device, authority }) => openBrowserApplication({ device, authority, definition: conversation });
+export const openApplication = ({ device, applicationId, host }) => openApplicationSession({ device, applicationId, host, definition: conversation });

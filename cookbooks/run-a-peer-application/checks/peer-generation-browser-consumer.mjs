@@ -7,7 +7,7 @@ import { cp, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promise
 import { dirname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { build } from 'esbuild';
-import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, participantGrant, peerDigest,
+import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, describeApplication, participantGrant, peerDigest,
   signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
@@ -18,6 +18,8 @@ const path = resolve(process.argv[2]), report = JSON.parse(await readFile(path, 
 const directory = dirname(path), stores = join(directory, 'stores'), assets = join(directory, 'assets');
 const sessions = new Set(), devices = new Set(), connections = [], introductions = new Map();
 const tasks = report.domain === 'tasks', queryName = tasks ? 'board' : 'conversation', sqlPaths = new Map();
+report.publicBoundary.bootstrap = tasks ? 'openBrowserSqlSession' : 'openApplicationSession';
+report.publicBoundary.hostBridge = 'serveApplicationWorkerHost/connectApplicationWorkerHost';
 const timeout = () => AbortSignal.timeout(20_000);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const valueHash = value => hash(JSON.stringify(value));
@@ -427,6 +429,7 @@ async function route(request, response) {
     controlRequests++; controlBodyBytes += bytes;
     if (blocked) { response.statusCode = 503; json({ error: 'CONTROL_HOST_UNAVAILABLE' }); return; }
     if (pathname === '/control/application' && request.method === 'GET') json(await registry.read());
+    else if (pathname === '/control/definition' && request.method === 'GET') json({ descriptor: authority.descriptor, definition: describeApplication(conversation), schema });
     else if (pathname === '/control/generations' && request.method === 'POST') json(await registry.select(body));
     else throw Error('FIXTURE_CONTROL_ROUTE_UNKNOWN');
     return;

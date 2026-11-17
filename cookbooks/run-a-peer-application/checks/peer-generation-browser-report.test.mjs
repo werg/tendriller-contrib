@@ -19,7 +19,8 @@ function fixture() {
       'peer-generation-definition.mjs', 'node_modules/@chronolog/peer-session/browser.mjs'],
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native',
       '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'], testTools: ['esbuild', 'playwright'],
-      siblingSourceImports: 0, applicationRpcMaps: 0, applicationRetryQueues: 0, residentRequired: false },
+      siblingSourceImports: 0, applicationRpcMaps: 0, applicationRetryQueues: 0, residentRequired: false,
+      bootstrap: 'openApplicationSession', hostBridge: 'serveApplicationWorkerHost/connectApplicationWorkerHost' },
     runtime: { dependencies: { lockSha256: digest, packages: Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })
       .map(([name, version]) => ({ path: `node_modules/${name}`, version, integrity: 'sha512-synthetic' })) } },
     browser: { implementation: 'chromium', version: '156.0.0', transportOwner: 'dedicated-worker', storage: 'opfs-with-exclusive-web-lock',
@@ -98,6 +99,7 @@ test('reopening must retain the browser identity, durable key enrollment, and th
 test('task UI qualification requires both exact engines, guarded forms, and shared work after originator loss', () => {
   const report = fixture(), digest = 'a'.repeat(64);
   report.domain = 'tasks'; report.ui.domain = 'tasks'; report.browser.observations.isolated = true;
+  report.publicBoundary.bootstrap = 'openBrowserSqlSession';
   report.publicBoundary.imports.push('@chronolog/peer-session/sql-native', '@chronolog/peer-session/sql-browser'); report.publicBoundary.imports.sort();
   report.browserAssets.push({ file: 'browser-engine/sqlite3.wasm', sha256: digest });
   report.sql = { native: { implementation: '@dolthub/doltlite@0.11.29', patchSha256: digest, manifest: { synthetic: true } },
