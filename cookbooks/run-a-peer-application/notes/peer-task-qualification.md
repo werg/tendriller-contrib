@@ -40,7 +40,7 @@ separate shared task. Reopening that member's owned native device preserved its
 identity, storage identity, complete view and applied operation. The reopen call
 did not supply epoch keys: the device's retained keyring supplied them.
 
-## Current public preparation contract
+## Recorded preparation contract at fe752b7f
 
 The [later native report](evidence/2026-11-17-peer-generation-task-fe752b7f-report.json)
 and [validated summary](evidence/2026-11-17-peer-generation-task-fe752b7f-summary.json)
@@ -56,6 +56,15 @@ building the signed descriptor from that binding. It verifies the package
 contract directly. Consumer commit `9736489` corrected an unsupported assumption
 that those binding fields had moved to the top level; no alternate shape or
 compatibility path remains.
+
+The current public API at Chronolog `17a1b64ae0fae6954d9e094db19e17edfbedc7ac`
+returns the flat hosted configuration fields `definition`, `schema`,
+`executionManifestDigest` and `schemaAdministrator`. The independent fixture
+constructs its own signed descriptor from those values and computes the bound
+schema/definition digests through public helpers. Canonical
+`openNativeSqlSession` and `openBrowserSqlSession` own those steps for ordinary
+applications. The fixture accepts only this current shape. The fe752b7f report
+above remains unchanged as evidence of its actual earlier artifact.
 
 ## Scope of this result
 

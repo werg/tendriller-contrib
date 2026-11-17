@@ -7,7 +7,7 @@ import { cp, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promise
 import { dirname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { build } from 'esbuild';
-import { bytesDigest, createGenerationRegistry, describeApplication, participantGrant,
+import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, describeApplication, participantGrant, peerDigest,
   signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
@@ -397,7 +397,8 @@ async function bootstrap(identity) {
   const prepared = await prepareApplication({ applicationId, schemaAdministrator: deviceA.identity });
   schema = prepared.schema;
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'browser-peer-conversation',
-    ...prepared.binding,
+    executionManifestDigest: prepared.executionManifestDigest, schemaAdministrator: prepared.schemaAdministrator,
+    definitionDigest: await applicationDefinitionDigest(conversation), schemaDigest: schema === null ? null : await peerDigest(schema),
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: controlDevice.identity.publicKey,
   }, controlDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,

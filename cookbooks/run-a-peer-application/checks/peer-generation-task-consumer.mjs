@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { bytesDigest, connectApplications, controlParticipantGrant, createGenerationRegistry,
-  participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
+import { applicationDefinitionDigest, bytesDigest, connectApplications, controlParticipantGrant, createGenerationRegistry,
+  participantGrant, peerDigest, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { openNativeSqlApplication, prepareNativeSqlApplication } from '@chronolog/peer-session/sql-native';
 import { taskBoard } from './peer-generation-task-definition.mjs';
@@ -21,9 +21,11 @@ try {
   resources.push(host, ...devices);
   const applicationId = randomBytes(32).toString('hex'), epochKey = new Uint8Array(randomBytes(32));
   const prepared = await prepareNativeSqlApplication({ applicationId, definition: taskBoard, schemaAdministrator: devices[0].identity });
-  assert.deepEqual(Object.keys(prepared).sort(), ['binding', 'schema'], 'The packed SQL API must return its signed schema and descriptor binding');
+  assert.deepEqual(Object.keys(prepared).sort(), ['definition', 'executionManifestDigest', 'schema', 'schemaAdministrator'], 'The packed SQL API must return its public hosted configuration fields');
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'independent-guarded-tasks',
-    profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: host.identity.publicKey, ...prepared.binding }, host.identity);
+    profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: host.identity.publicKey,
+    executionManifestDigest: prepared.executionManifestDigest, schemaAdministrator: prepared.schemaAdministrator,
+    definitionDigest: await applicationDefinitionDigest(taskBoard), schemaDigest: await peerDigest(prepared.schema) }, host.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
     revision: 0, previous: null, epoch: 0, keyDigest: await bytesDigest(epochKey), recoveryFloor: null,
     grants: [controlParticipantGrant(host.identity.publicKey), ...devices.map(device => participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: true }))] }, host.identity);
