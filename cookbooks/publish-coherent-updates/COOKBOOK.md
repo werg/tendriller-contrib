@@ -36,6 +36,12 @@ A selected release does not prove that a browser loaded it, an application synch
 
 Open the application's ordinary session and attach the host's public exchange transport. Attachment performs no request; explicit publication operations do the work:
 
+The signing device needs the current signed `publisher` grant. That permission
+is independent of `administrator`, data access and coordination: a publisher
+can release code without controlling membership, and an administrator without
+the publisher grant cannot release code. Enrollment must supply the intended
+permission explicitly.
+
 ```js
 const control = session.connectControlParticipant({ exchange: host.peers.exchange });
 const publication = await control.preparePublication({
@@ -79,5 +85,9 @@ Importing domain data is a separate guarded application command. Cross-applicati
 ## Verify
 
 Race two publishers from the same signed predecessor. Lose a persisted reply and recover the exact signed identity. Tamper with one asset and require rejection without a head change. Publish a second graph, navigate both canonical and prior immutable URLs, and verify the actual module bytes. Restart the actual host and verify the selected code and unchanged application authority. Publish while a user types, fail one authored import, and exercise offline readiness with fresh storage.
+
+Verify the authorization boundary with a publisher that has no administrator
+grant and an administrator that has no publisher grant. The former can publish
+the reviewed graph; the latter must be refused without a head change.
 
 The [independent hosted participant gate](../run-a-peer-application/checks/README.md) exercises signed HTML/module delivery, authority, byte integrity, exact retry, predecessor conflict, old graph retention and host restart. Its runtime result does not establish browser interaction, deployed login or Internet connectivity; qualify those separately for the finished page.

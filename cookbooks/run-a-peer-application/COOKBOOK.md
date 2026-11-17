@@ -8,7 +8,7 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c/packages/peer-session/README.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/482c4a4c079345d990bd4d97e42cb947dec6778a/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
@@ -38,7 +38,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/482c4a4c079345d990bd4d97e42cb947dec6778a/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
@@ -188,6 +188,37 @@ it presents `approval-required`, display the exact proposal and its unknown or
 observed age, then call `approveRecovery(proposal.id)` only after explicit review.
 The [shared page layouts](notes/peer-session-pages.md) implement that presentation
 without adding a second recovery policy.
+
+## Reuse a derived view
+
+Use `session.project` for a reusable local reduction over the same verified
+events. The [conversation module](snippets/peer-conversation.mjs) exports a pure
+`conversationCounts` definition alongside its commands and query:
+
+```js
+import { conversationCounts } from './peer-conversation.mjs';
+
+const counts = session.project(conversationCounts);
+try {
+  renderCounts(await counts.read());
+  for await (const snapshot of counts.changes({ signal: lifetime.signal })) {
+    renderCounts(snapshot); // { state, revision, reset }
+  }
+} finally { await counts.close(); }
+```
+
+The session persists the reducer state with its verified cursor and revision.
+Unchanged reads and durable reopen reuse that checkpoint. A selected recovery
+that excludes its cursor rebuilds from the selected history and reports
+`reset.reason: 'recovery'` with the previous revision. Changing the definition's
+version reports `reset.reason: 'definition'` and rebuilds the derived state.
+Use a stable ID and increment the version when reducer semantics change.
+
+Keep reducers pure: recovery can replay them. A projection is a local derived
+view, not a second command journal or an acknowledgement that external work
+completed. Render its explicit reset with the new coherent state, and retain
+user drafts separately. The same session lifetime owns projection handles and
+their bounded pending work.
 
 ## Inspect and deliberately reapply
 
