@@ -40,33 +40,30 @@ A dry run validates under the conditions it observed; it does not reserve author
 
 ## Choose atomic or partial semantics honestly
 
-An atomic batch means every covered mutation commits together or none does at the actual authority boundary. For shared-state changes, use core's [conditional `state.apply` operation](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md). It checks all supplied conditions against one authoritative snapshot and applies every operation in one transaction. It also persists the command and its accepted or state-conflict receipt. A page does not need a custom transaction implementation for this guarantee.
+An atomic application batch means every covered mutation commits together or none does in one deterministic command transaction. Define a bounded command that checks the author, exact selected IDs and reviewed domain versions before changing any record. A query is the review snapshot; it is not a lock.
 
-For example, after `observed = await tendril.state.snapshot()`, freeze a bounded list of existing `selectedIds` for review. Retain each exact record from `observed.state.items`. Once the person confirms archiving those records, submit:
+For illustration, your definition may declare `selectedItems` and `archiveItems`:
 
 ```js
-const result = await tendril.state.apply(
-  selectedIds.map(id => ({
-    op: "set", path: ["items", id, "status"], value: "archived",
-  })),
-  {
-    conditions: selectedIds.map(id => ({
-      path: ["items", id], equals: observed.state.items[id],
-    })),
-    expected_generations: Object.fromEntries(
-      observed.scopes.map(scope => [scope.id, scope.generation]),
-    ),
-  },
-);
+const reviewed = await session.query('selectedItems', { ids: [...selectedIds] });
+const selection = reviewed.value.items.map(item => ({
+  id: item.id,
+  expectedVersion: item.version,
+}));
+const operation = await session.command('archiveItems', { selection }, {
+  operationId: crypto.randomUUID(),
+  basedOn: reviewed.revision,
+});
+const receipt = await operation.applied();
 ```
 
-This example requires a nonempty selection of existing non-null object records within the service's condition and payload limits; its `status` path cannot traverse an array or scalar. It guards every observed scope conservatively; a task can select its relevant scope dependencies. A changed selected record rejects the entire batch, while an unrelated record can change without failing these value conditions. Use `expected_revision: observed.rev` instead when any intervening state mutation must invalidate review. Show `queued`, `accepted`, and `rejected` distinctly; the conditional batch does not optimistically remove rows. Optional conditions provide concurrency control for cooperating writers, not permission or approval enforcement against other authorized operations.
+The definition rejects empty, duplicate, unknown or over-limit selections and validates every selected version and transition before updating records. An unrelated record can change without rejecting the batch unless the domain deliberately guards a broader revision. `basedOn` carries the coherent application revision as an ordering prerequisite; it does not replace version checks. These query and command names are application vocabulary, not installed runtime methods.
 
-For protected domain transitions, private records, or effects in an external system, the trusted operation must enforce those additional rules. A shared-state transaction does not atomically rename files, publish assets, create timers, or execute an external action. Use the authority that owns those effects and state its actual boundary.
+Observe locally saved, applied accepted/rejected and retained coverage separately. An atomic applied batch is still part of recoverable application history. Explicit recovery may abandon the whole operation; reread the selected history and preserve the review snapshot before offering deliberate reapplication. Ordinary application execution cannot atomically change host publication, transfer membership across applications, send an email or commit another system's transaction.
 
-Independent per-item execution is often more practical. Define whether an item failure stops the batch, skips dependent work, or allows independent items to continue. Give every item its own immutable intent and result identity while retaining a parent batch identity for navigation. A parent receipt saying “started” does not mean every child succeeded.
+Independent per-item commands are useful when partial progress is acceptable. Give each immutable item operation a stable identity and retain a parent batch ID for navigation. Define whether failure stops dependent work or allows independent items to continue. A parent status of “started” does not mean every child succeeded.
 
-Do not split a semantic transaction into arbitrary chunks and still call it atomic. If a large workload must be chunked, expose the chunk boundaries and partial completion. Bound selected count, payload bytes, in-flight requests, retry age, retained result details, and diagnostic data. Quota rejection should leave a coherent record of what happened.
+Bound the selected count, payload bytes, concurrent requests, retry age and retained diagnostics. If a large workload must be divided into chunks, expose those transaction boundaries and partial completion. Irreversible external actions need their own configured protected boundary, idempotency and reconciliation; a collection of applied receipts does not provide one.
 
 ## Present progress people can act on
 
@@ -80,9 +77,9 @@ Use accessible status summaries without announcing every result at high volume. 
 
 ## Recover without duplicating effects
 
-Retain the review selection and explanatory progress under an appropriate privacy policy. Core already persists an admitted shared-state batch's operations, conditions, identity, and generations; use `state.pending()` and `state_queue` to restore outstanding work, then correlate `state_result.cid` and its original `ops` with the reviewed rows. Do not build a second mutation outbox or submit a new `state.apply` merely because its promise returned `queued`. Those APIs expose pending commands and terminal events, not an application history of completed batches. Keep a bounded outcome report when completed per-item history must survive a later reload. Reauthorize before restoring private details. External integrations still need their own durable progress and supported receipt mechanism. Do not restart an entire batch because the browser lost its progress counter.
+Retain the review selection and explanatory progress under an appropriate privacy policy. The session persists admitted command attempts and exposes them through `session.operations`; use original operation IDs to restore the progress view. Retry each saved operation with `session.retry` and correlate its actual result with the frozen selection. Do not build another mutation outbox or create new commands because a waiter timed out. Reauthorize before restoring private details.
 
-A lost reply after an effect is an uncertain outcome, not an ordinary failure. Query the authoritative result or use the external system's supported idempotency mechanism before retrying. For Tendriller durable operations, preserve their original command and generation context through retry; runtime-owned capture identities follow their own documented retry path. Never attach current generations to an old payload solely to make it pass.
+A lost external reply is an uncertain outcome, not proof of failure. Query the real action authority or use its documented idempotency mechanism before retrying. If application recovery abandons an attempt, preserve its identity and review current domain state before `session.reapply` creates a deliberately linked new operation. External effect journals must independently reconcile actions already dispatched.
 
 Offer “Retry these original failures” only for cases whose retry meaning is unchanged. If records or parameters must change, create a new reviewed batch and link it to the prior one. Successful items should remain excluded unless the person deliberately selects a new action. External effects still require their own deduplication and compensation policy.
 
@@ -98,7 +95,7 @@ If reversal is supported, preview it as another guarded operation with its own c
 | --- | --- |
 | New rows arrive after selection | They are excluded from the captured batch unless deliberately reviewed. |
 | One selected record changes before execution | Its stale operation rejects or follows the explicit conflict policy. |
-| One condition fails in a core atomic state batch | None of the selected rows change; the proposal and conflict remain reviewable. |
+| One domain guard fails in an atomic application command | None of the selected rows change; the proposal and conflict remain reviewable. |
 | An accepted batch reply is lost, then the page reloads | Core replays the original command and receipt without admitting the batch twice. |
 | One item fails in an independent batch | Other outcomes remain visible and follow the stated continue/stop policy. |
 | A claimed atomic batch hits quota midway | The real transaction commits none; a client loop cannot claim this result. |

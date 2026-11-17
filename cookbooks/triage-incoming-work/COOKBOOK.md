@@ -47,38 +47,30 @@ Use stable item IDs and explicit record revisions or appropriate protected opera
 
 ## Choose ownership and concurrency policy
 
-For one reviewer, a simple accepted owner field may suffice. For a team, decide whether assignment means a suggestion, accepted responsibility, or an enforced processing right. Core's conditional `state.apply` provides atomic claims among cooperating authorized writers. It evaluates the current claim and item status together, then records both changes in one transaction. A disabled button in another browser is not that check.
+Decide whether assignment is a suggestion, accepted responsibility or an enforced processing right. Implement claims in the application's definition: check current status and absence of a claim, validate the verified author, and record ownership and status together. Every command caller executes the same guards. A disabled button or advisory live signal does not provide exclusion.
 
-Start a review with `await tendril.state.snapshot()` to obtain matching `{state,rev,scopes}`. This is a connected read; a cached `state.get()` remains useful for offline browsing but includes ordinary optimistic work and cannot establish current claim availability. For this example, ready items have `status:"ready"`; a missing `claims[itemId]` means unclaimed. `reviewerId` is the application's collaboration identity, not a credential or permission grant:
+For illustration, your definition may declare an `item` query and `claimItem` command:
 
 ```js
-const reviewed = await tendril.state.snapshot();
-const claim = {id: crypto.randomUUID(), reviewer: reviewerId};
-const result = await tendril.state.apply([
-  {op: "set", path: ["claims", itemId], value: claim},
-  {op: "set", path: ["items", itemId, "status"], value: "in_progress"},
-], {
-  expected_generations: Object.fromEntries(
-    reviewed.scopes.map(scope => [scope.id, scope.generation]),
-  ),
-  conditions: [
-    {path: ["claims", itemId], exists: false},
-    {path: ["items", itemId, "status"], equals: "ready"},
-  ],
-});
+const reviewed = await session.query('item', { itemId });
+const claimId = crypto.randomUUID();
+const operation = await session.command('claimItem', {
+  itemId,
+  claimId,
+  expectedVersion: reviewed.value.version,
+}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
+const receipt = await operation.applied();
 ```
 
-Show the reviewed item before invoking the command. A concurrent ready-item claim produces one acceptance and one `state_conflict`; unrelated changes to another item need not conflict. `exists:false` differs from `equals:null`: choose one representation and use its actual predicate. If the entire reviewed queue revision matters, add `expected_revision:reviewed.rev`, understanding that any shared-state write, including an unrelated item, can reject it. A distinct claim ID lets a later release require `equals` on the exact current claim, preventing an old release from removing a subsequently reacquired claim.
+The definition obtains the claimant from the verified command author, not a payload role. It rejects an unavailable item or changed version and advances the domain version on success. The captured application revision orders the attempt; the guard remains transaction logic. The [actual SQL task example](../run-a-peer-application/snippets/peer-task-board.mjs) and its independent consumer exercise a real two-member claim race and a rejected completion by the wrong signer.
 
-Conditions and generations are captured before delivery and retained across reload. Conditional claims do not appear as accepted ownership in the optimistic shared view. Show “Claim pending” for `queued`, “Claim accepted” for `accepted`, and a reviewable conflict for `rejected`. Admitted results carry `cid`; use `state.pending()` and `state_queue` to rebuild this device's pending cards after reload. For this model, a pending command concerns an item when an operation's normalized path starts with `["claims",itemId]`; `state_result` carries the same original operations and CID. No application delivery queue is needed. Keep private response drafts separately from those shared operations. The [browser API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) defines these inspection and receipt surfaces.
+A release must match the exact claim identity and authorized holder so a delayed release cannot remove a later claim. Domain versions protect reviewed state independently of application recovery generations. If a failed claim later becomes possible, offer a new reviewed decision instead of refreshing the old inputs during delivery retry.
 
-A stored conflict stays rejected even after the winner releases the item. Read current state and offer a fresh Claim decision; do not refresh the old predicate or allocate another command merely to retry delivery. Scope resets similarly invalidate old claim intent, including dependencies read through conditions.
+Show saved locally, applied accepted/rejected and retained coverage as separate observations. After reopening, inspect `session.operations` for original operation IDs and inputs; do not build another mutation outbox. A lost reply uses exact `session.retry`. An abandoned claim after explicit history recovery needs current review before reapplication. Human responsibility and irreversible processing cannot be inferred solely from an applied claim that may be abandoned.
 
-These are optional cooperative guards, not access controls. An authorized writer can omit them. If only particular people may claim, only a holder may resolve, or expiry must be enforced using server time, put those domain checks in the authorized operation that enforces that policy. Core already supplies atomic compare-and-set; the additional trusted policy is for mandatory rights and transition rules. A shared claim field or device identity cannot confer those rights.
+An agent's handled-event checkpoint is separate from a human claim. Its effect journal must retain verified requester provenance and the original action identity. Irreversible work requires the explicitly configured protected boundary; it cannot be dispatched from ordinary replay or inferred from an `assignedTo` field.
 
-Tendriller's [named event consumers](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md) coordinate host processing of an event log. They do not automatically implement human ticket ownership or make a page's arbitrary `assigned_to` field exclusive. Select or implement the application policy deliberately and keep its claim identity separate from the agent's handled-event checkpoint.
-
-When two people claim the same item, fetch current authorized state after the conflict to show the owner; the error receipt itself does not contain current field values. Retain any private draft. If a holder disappears, a documented timeout policy or explicit release allows recovery. A browser's timeout cannot enforce expiry against other writers, and last-seen time is not consent to steal responsibility. A new owner needs task context and unresolved work, while private drafts require an explicit authorized transfer path.
+After a conflict, query current authorized state to show the actual owner and preserve the local response draft. Define recovery for an unavailable holder through a reviewed release or an explicit timed capability. A browser clock or last-seen signal cannot enforce expiry, grant rights or imply consent to transfer responsibility.
 
 ## Handle duplicates without losing evidence
 
@@ -90,7 +82,7 @@ If the same issue returns after resolution, choose between reopening the origina
 
 ## Defer and escalate predictably
 
-Snooze should name its scope and return condition: this reviewer's view, the whole team queue, a date/time, or a missing response. Keep deferred items discoverable with a visible count. A foreground timeout is insufficient if the item must return while the page is closed; use the actual durable timer or another supported server mechanism and observe its receipt.
+Snooze should name its scope and return condition: this reviewer's view, the whole team queue, a date/time, or a missing response. Keep deferred items discoverable with a visible count. A foreground timeout is insufficient if the item must return while the page is closed; use an explicitly configured durable scheduling capability and observe its actual receipt. The light host participant supplies no application timer executor.
 
 Escalation requires a reason, recipient policy, and authority. Age alone may identify forgotten work, while severity can require immediate review. Record which rule and item revision caused an escalation so repeated evaluations do not spam recipients. Do not infer an external message channel exists or send private issue details through a general notification. A durable unresolved queue is still needed when notifications are unavailable.
 
@@ -109,7 +101,7 @@ Measure useful outcomes such as unresolved age or time to an acknowledged dispos
 | Scenario | Expected observation |
 | --- | --- |
 | Two reviewers submit the same ready/unclaimed predicates. | One whole claim/status batch is accepted and the other conflicts; neither leaves half a transition. |
-| The claim is queued and the browser reloads. | `state.pending()` identifies its original CID and item; the UI stays pending until its correlated result. |
+| The claim is queued and the browser reloads. | The session journal identifies its original operation and item; the UI follows that operation's actual outcome. |
 | The original losing command is delivered after the claim is released. | Its stored conflict is replayed; it cannot unexpectedly acquire ownership later. |
 | A stale release follows a new claim by the same reviewer. | The distinct claim ID prevents removal of the newer responsibility. |
 | The same intake delivery is retried. | One intended item remains with the original receipt. |
