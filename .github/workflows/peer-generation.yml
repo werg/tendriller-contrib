@@ -122,7 +122,7 @@ jobs:
         shell: bash
         run: |
           args=()
-          while IFS= read -r report; do args+=(--report "$report"); done < <(rg --files evidence -g report.json)
+          while IFS= read -r -d '' report; do args+=(--report "$report"); done < <(find evidence -type f -name report.json -print0)
           node cookbooks/run-a-peer-application/checks/peer-composition.mjs "${args[@]}" --output composition.json
       - uses: actions/upload-artifact@v4
         with:
