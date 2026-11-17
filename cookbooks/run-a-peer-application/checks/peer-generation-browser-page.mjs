@@ -74,7 +74,7 @@ globalThis.fixture = {
   },
   crash() { worker.terminate(); },
   observations: () => ({ notices, statuses, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
-    locks: !!navigator.locks, userAgent: navigator.userAgent }),
+    locks: !!navigator.locks, isolated: crossOriginIsolated, userAgent: navigator.userAgent }),
 };
 
 async function request(path, body) {

@@ -3,23 +3,24 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
-import { mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { build } from 'esbuild';
-import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, eventExecutionManifest,
-  executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
-import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
+import { bytesDigest, createGenerationRegistry, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
+import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
 import { conversation } from './peer-generation-definition.mjs';
+import { prepareApplication, openApplication } from './peer-generation-native-runtime.mjs';
 
 const path = resolve(process.argv[2]), report = JSON.parse(await readFile(path, 'utf8'));
 const directory = dirname(path), stores = join(directory, 'stores'), assets = join(directory, 'assets');
 const sessions = new Set(), devices = new Set(), connections = [], introductions = new Map();
+const tasks = report.domain === 'tasks', queryName = tasks ? 'board' : 'conversation', sqlPaths = new Map();
 const timeout = () => AbortSignal.timeout(20_000);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const valueHash = value => hash(JSON.stringify(value));
-let browser, page, server, registry, authority, a, controlDevice, deviceA, deviceC, browserIdentity;
+let browser, page, server, registry, authority, a, controlDevice, deviceA, deviceC, browserIdentity, schema;
 let blocked = false, controlRequests = 0, controlBodyBytes = 0, signalingRequests = 0, signalingBodyBytes = 0;
 const applicationId = randomBytes(32).toString('hex'), key = new Uint8Array(randomBytes(32));
 const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceAdditionalHostAddresses: ['127.0.0.1'],
@@ -30,10 +31,11 @@ const checkpoint = async stage => {
 };
 const nativeDevice = async name => {
   const device = await openNativeDevice({ path: join(stores, name, 'device.sqlite'), create: true });
+  sqlPaths.set(device.identity.publicKey, join(stores, name, 'materialized.sqlite'));
   devices.add(device); return device;
 };
 const openNative = async (device, selected, epochKeys) => {
-  const session = await openNativeApplication({ device, authority: selected, definition: conversation,
+  const session = await openApplication({ device, authority: selected, schema, databasePath: sqlPaths.get(device.identity.publicKey),
     ...(epochKeys === undefined ? {} : { epochKeys }) });
   sessions.add(session); return session;
 };
@@ -45,7 +47,7 @@ const browserPost = (id, text) => page.evaluate(async ({ id, text }) => {
   const operation = await application.command('postMessage', { messageId: id, text }, { operationId: id });
   return operation.applied({ signal: AbortSignal.timeout(20_000) });
 }, { id, text });
-const browserQuery = () => page.evaluate(() => application.query('conversation', {}));
+const browserQuery = () => page.evaluate(name => application.query(name, {}), queryName);
 const traffic = () => ({ controlRequests, controlBodyBytes, signalingRequests, signalingBodyBytes });
 
 try {
@@ -57,9 +59,11 @@ try {
     target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
   for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
+      'peer-generation-browser-runtime.mjs', 'peer-task-board.mjs', 'peer-conversation.mjs',
       'app.mjs', 'typing.mjs', 'deployment/bootstrap.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
   for (const file of ['board.html', 'compact.html', 'style.css']) await writeFile(join(assets, file), await readFile(join(process.cwd(), file)));
-  report.browserAssets = await Promise.all((await readdir(assets)).map(async file => ({ file, sha256: hash(await readFile(join(assets, file))) })));
+  if (tasks) await cp(join(process.cwd(), 'node_modules/@chronolog/peer-session/browser-engine'), join(assets, 'browser-engine'), { recursive: true });
+  report.browserAssets = await Promise.all((await assetFiles(assets)).map(async file => ({ file, sha256: hash(await readFile(join(assets, file))) })));
   report.browserBundleInputs = Object.keys(bundle.metafile.inputs).sort();
   [controlDevice, deviceA, deviceC] = await Promise.all(['control', 'a', 'c'].map(nativeDevice));
   server = createServer((request, response) => {
@@ -104,6 +108,21 @@ try {
   await post(a, 'anchor', 'A retained anchor');
   let ab = await connect(a, 'answerer');
   assert.equal((await browserQuery()).revision.generation, authority.generations.at(-1).id);
+  if (tasks) {
+    await page.locator('#tasks-section').waitFor({ state: 'visible' });
+    const task = await submitTask('Board task with one authenticated claimant');
+    assert.equal((await taskAction(task, 'Claim')).outcome, 'accepted');
+    const competing = await (await a.command('claimTask', { taskId: task.id }, { operationId: 'competing-native-claim' })).applied({ signal: timeout() });
+    const unauthorized = await (await a.command('finishTask', { taskId: task.id }, { operationId: 'unauthorized-native-finish' })).applied({ signal: timeout() });
+    assert.equal(competing.outcome, 'rejected'); assert.equal(unauthorized.outcome, 'rejected');
+    assert.equal((await taskAction(task, 'Finish')).outcome, 'accepted');
+    assert.equal((await (await a.command('addTask', { taskId: 'after-originator', title: 'Finish after the originator leaves' },
+      { operationId: 'shared-native-task' })).applied({ signal: timeout() })).outcome, 'accepted');
+    await synchronize(ab);
+    assert.deepEqual((await browserQuery()).value, (await a.query(queryName, {})).value);
+    report.tasks = { definitionId: conversation.id, signedSchemaDigest: authority.descriptor.payload.schemaDigest,
+      board: { created: true, claimed: true, finished: true }, competingClaim: competing.outcome, unauthorizedFinish: unauthorized.outcome };
+  }
   await disconnect(ab);
   const original = await submitMessage('Saved while disconnected', 'saved');
   const offline = await page.evaluate(async operationId => {
@@ -127,18 +146,18 @@ try {
   assert.deepEqual(applied.inspected.attempt, offline.before.attempt);
   assert.equal(applied.status.phase, 'ready');
   assert.equal((await a.operations.get(original.operationId, { author: opened.deviceId })).status, 'applied');
-  assert.deepEqual((await browserQuery()).value, (await a.query('conversation', {})).value);
+  assert.deepEqual((await browserQuery()).value, (await a.query(queryName, {})).value);
   report.operations = { cancelledWaitPreservedAttempt: true, resumedExactAttempt: true, operationId: original.operationId,
     attemptId: applied.result.attemptId, receiptPeer: a.deviceId, enrolledFromPeer: true };
   await checkpoint('enrolled browser keys and applied the exact offline attempt over real RTC');
 
   await page.evaluate(async () => {
     globalThis.capturedView = await application.readView();
-    globalThis.initialEvents = (await capturedView.readEvents()).events.length;
+    globalThis.initialEvents = (await capturedView.readEvents({ topics: ['conversation'] })).events.length;
     globalThis.liveAbort = new AbortController();
     globalThis.liveStream = application.signals.subscribe({ topics: ['typing'], signal: liveAbort.signal })[Symbol.asyncIterator]();
     globalThis.liveNext = liveStream.next();
-    await application.query('conversation', {});
+    await application.query(application.describe().queries.some(query => query.name === 'board') ? 'board' : 'conversation', {});
   });
   blocked = true;
   const rejected = await fetch(`${origin}/control/application`);
@@ -146,6 +165,12 @@ try {
   const beforeTraffic = traffic(), beforeTransport = await inspect(ab);
   assert.equal((await submitMessage('Browser commands without host access')).outcome, 'accepted');
   await post(a, 'native-host-blocked', 'Native commands without host access');
+  if (tasks) {
+    const task = await submitTask('SQL continues while control HTTP is blocked');
+    assert.equal((await taskAction(task, 'Claim')).outcome, 'accepted');
+    assert.equal((await taskAction(task, 'Finish')).outcome, 'accepted');
+    report.tasks.commandsWithHostBlocked = 3;
+  }
   await synchronize(ab);
   const beforeDisposable = await a.recoveryPoint();
   await a.signals.send('typing', { typing: true }, { ttlMs: 2500 });
@@ -166,14 +191,14 @@ try {
   assert.equal(retainedContent.digest, hash(contentBytes));
   assert.equal(retainedContent.retention.payload.peer, browserIdentity.deviceId);
   assert.deepEqual(await a.recoveryPoint(), beforeDisposable);
-  const coherent = await page.evaluate(async () => ({ old: (await capturedView.readEvents()).events.length,
-    initial: initialEvents, current: (await application.query('conversation', {})).value.messages.length }));
+  const coherent = await page.evaluate(async () => ({ old: (await capturedView.readEvents({ topics: ['conversation'] })).events.length,
+    initial: initialEvents, current: (await application.query(application.describe().queries.some(query => query.name === 'board') ? 'board' : 'conversation', {})).value.messages.length }));
   assert.equal(coherent.old, coherent.initial); assert.ok(coherent.current > coherent.old);
   const afterTransport = await inspect(ab), afterTraffic = traffic();
   assert.deepEqual(afterTraffic, beforeTraffic);
   assert.ok(afterTransport.reliable.sentBytes > beforeTransport.reliable.sentBytes);
-  assert.deepEqual((await browserQuery()).value, (await a.query('conversation', {})).value);
-  report.hostOutage = { blocked: true, blockedProbeRejected: true, commandsApplied: 2,
+  assert.deepEqual((await browserQuery()).value, (await a.query(queryName, {})).value);
+  report.hostOutage = { blocked: true, blockedProbeRejected: true, commandsApplied: tasks ? 5 : 2,
     before: beforeTraffic, after: afterTraffic, transport: { before: beforeTransport, after: afterTransport },
     liveSignalsObserved: 1, content: { bytes: retainedContent.bytes, sha256: retainedContent.digest, retainedByBrowser: true },
     disposablePathsDidNotAppend: true, coherentReadView: true };
@@ -224,6 +249,12 @@ try {
   await disconnect(ab);
   const excluded = await submitMessage('Intent on the old generation', 'saved');
   await page.locator('#message').fill(draft);
+  if (tasks) {
+    const unshared = await (await a.command('claimTask', { taskId: 'after-originator' },
+      { operationId: 'unshared-originator-claim' })).applied({ signal: timeout() });
+    assert.equal(unshared.outcome, 'accepted');
+    report.tasks.unsharedOriginatorClaim = unshared.operationId;
+  }
   await post(a, 'originator-tail-1', 'Unshared originator tail one');
   await post(a, 'originator-tail-2', 'Unshared originator tail two');
   const lostHead = await a.recoveryPoint();
@@ -240,7 +271,7 @@ try {
     const currentView = await application.readView();
     try { await currentView.readEvents({ cursor: capturedEvents.cursor }); } catch (error) { staleCursor = error.name; }
     await currentView.release();
-    const selected = await application.query('conversation', {});
+    const selected = await application.query(application.describe().queries.some(query => query.name === 'board') ? 'board' : 'conversation', {});
     return { notice, abandoned, staleCursor, heldViewPreserved, selected,
       journal: await application.recovery.inspect(), recovery: await application.inspectRecovery(), status: application.status };
   }, excluded.operationId);
@@ -268,13 +299,23 @@ try {
   assert.equal(recovered.journal[0].selected, recovered.status.generation);
   assert.ok(recovered.recovery.length > 0);
   assert.ok(recovered.selected.value.messages.every(message => !message.operationId.startsWith('originator-tail-')));
+  if (tasks) {
+    const task = recovered.selected.value.tasks.find(value => value.id === 'after-originator');
+    assert.equal(task.claimedBy, null); assert.equal(task.status, 'open');
+    assert.equal((await taskAction(task, 'Claim')).outcome, 'accepted');
+    assert.equal((await taskAction(task, 'Finish')).outcome, 'accepted');
+    const selected = await browserQuery();
+    assert.equal(selected.value.tasks.find(value => value.id === task.id).status, 'done');
+    Object.assign(report.tasks, { unsharedClaimExcluded: true, compact: { claimed: true, finished: true },
+      sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true });
+  }
   report.recovery = { originatorClosed: true, originatorStoreUnavailable: true, priorHead: lostHead.point,
     adoptedPrefix: retainedPrefix.point, selectedGeneration: recovered.status.generation,
     originalAttempt: recovered.abandoned.state, reapplied: recovered.applied, staleCursorError: recovered.staleCursor,
     heldViewPreserved: recovered.heldViewPreserved,
     reapplyOf: recovered.inspected.attempt.payload.header.reapplyOf, currentGuardsChecked: true,
     noticesPersisted: recovered.recovery.length, transitionJournalEntries: recovered.journal.length };
-  report.ui = { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',
+  report.ui = { pages: ['board.html', 'compact.html'], domain: tasks ? 'tasks' : 'events', sessionFacade: 'connectApplicationWorker',
     sentThroughForms: 3, reapplicationConfirmed: true, recoveryNoticeVisible: await page.locator('#recovery').isVisible(),
     draftBeforeRestart: draft, draftAfterRestart, draftAfterRecovery: await page.locator('#message').inputValue(),
     originalReviewPreserved: await page.locator(`#operations [data-operation="${excluded.operationId}"]`).count() === 1 };
@@ -285,7 +326,7 @@ try {
   assert.equal(c.status.phase, 'awaiting-keys');
   const bc = await connect(c, 'offerer');
   await synchronize(bc);
-  const [browserResult, freshResult] = await Promise.all([browserQuery(), c.query('conversation', {})]);
+  const [browserResult, freshResult] = await Promise.all([browserQuery(), c.query(queryName, {})]);
   assert.deepEqual(freshResult.value, browserResult.value);
   assert.equal(c.status.phase, 'ready');
   assert.ok(freshResult.value.messages.some(message => message.operationId === reappliedId));
@@ -319,6 +360,7 @@ try {
   report.browser.observations = await page.evaluate(() => fixture.observations());
   assert.equal(report.browser.observations.secureContext, true);
   assert.equal(report.browser.observations.storage, true); assert.equal(report.browser.observations.locks, true);
+  if (tasks) assert.equal(await page.evaluate(() => crossOriginIsolated), true);
   assert.equal(report.browser.pageErrors.length, 0);
   await page.evaluate(() => fixture.close());
   report.passed = true;
@@ -337,13 +379,13 @@ try {
 }
 
 async function bootstrap(identity) {
-  if (browserIdentity) { assert.deepEqual(identity, browserIdentity); return { authority: await registry.read() }; }
+  if (browserIdentity) { assert.deepEqual(identity, browserIdentity); return { authority: await registry.read(), schema }; }
   assert.match(identity.deviceId, /^[a-f0-9]{64}$/u); assert.match(identity.storageId, /^[a-f0-9-]{36}$/u);
   browserIdentity = identity;
-  const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+  const prepared = await prepareApplication({ applicationId, schemaAdministrator: deviceA.identity });
+  schema = prepared.schema;
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'browser-peer-conversation',
-    executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
-    definitionDigest: await applicationDefinitionDigest(conversation), schemaAdministrator: controlDevice.identity.publicKey, schemaDigest: null,
+    ...prepared.binding,
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: controlDevice.identity.publicKey,
   }, controlDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
@@ -358,10 +400,12 @@ async function bootstrap(identity) {
   authority = await registry.read();
   a = await openNative(deviceA, authority, new Map([[0, key]]));
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
-  return { authority };
+  return { authority, schema };
 }
 
 async function route(request, response) {
+  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   const pathname = new URL(request.url, 'http://fixture').pathname;
   const chunks = []; let bytes = 0;
   for await (const chunk of request) { bytes += chunk.length; if (bytes > 1_048_576) throw Error('FIXTURE_REQUEST_TOO_LARGE'); chunks.push(chunk); }
@@ -387,11 +431,25 @@ async function route(request, response) {
   }
   if (pathname === '/') { response.setHeader('content-type', 'text/html'); response.end(await readFile(join(assets, 'board.html'))); return; }
   if (pathname === '/favicon.ico') { response.statusCode = 204; response.end(); return; }
+  if (tasks && /^\/browser-engine\/(manifest\.json|sqlite3\.mjs|sqlite3\.wasm|sqlite3-opfs-async-proxy\.js)$/u.test(pathname)) {
+    response.setHeader('content-type', pathname.endsWith('.wasm') ? 'application/wasm' : pathname.endsWith('.json') ? 'application/json' : 'text/javascript');
+    response.end(await readFile(join(assets, pathname.slice(1)))); return;
+  }
   if (/^\/[A-Za-z0-9_.-]+\.(mjs|html|css)$/u.test(pathname)) {
     response.setHeader('content-type', pathname.endsWith('.mjs') ? 'text/javascript' : pathname.endsWith('.html') ? 'text/html' : 'text/css');
     response.end(await readFile(join(assets, pathname.slice(1)))); return;
   }
   throw Error('FIXTURE_ROUTE_UNKNOWN');
+}
+
+async function assetFiles(directory, prefix = '') {
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) files.push(...await assetFiles(join(directory, entry.name), relative));
+    else files.push(relative);
+  }
+  return files.sort();
 }
 
 async function connect(session, browserRole) {
@@ -425,9 +483,22 @@ async function disconnect(connection) { await Promise.all([connection.native.clo
 async function submitMessage(text, expected = 'applied') {
   await page.waitForFunction(() => !document.querySelector('#send').disabled);
   await page.locator('#message').fill(text); await page.locator('#send').click();
-  await page.waitForFunction(({ text, expected }) => [...document.querySelectorAll('#operations li')]
-    .some(row => row.querySelector('strong')?.textContent === text && row.dataset.status === expected), { text, expected });
-  const operationId = await page.locator('#operations li').evaluateAll((rows, text) => rows.find(row => row.querySelector('strong')?.textContent === text).dataset.operation, text);
+  return waitForUiOperation(text, expected);
+}
+async function submitTask(title) {
+  await page.locator('#task-title').fill(title); await page.locator('#task-form button').click();
+  assert.equal((await waitForUiOperation(`Add: ${title}`)).outcome, 'accepted');
+  const task = (await browserQuery()).value.tasks.find(value => value.title === title);
+  assert.ok(task); return task;
+}
+async function taskAction(task, action) {
+  await page.locator(`#tasks [data-task="${task.id}"] button`).filter({ hasText: `${action} task` }).click();
+  return waitForUiOperation(`${action}: ${task.title}`);
+}
+async function waitForUiOperation(label, expected = 'applied') {
+  await page.waitForFunction(({ label, expected }) => [...document.querySelectorAll('#operations li')]
+    .some(row => row.querySelector('strong')?.textContent === label && row.dataset.status === expected), { label, expected });
+  const operationId = await page.locator('#operations li').evaluateAll((rows, label) => rows.find(row => row.querySelector('strong')?.textContent === label).dataset.operation, label);
   return page.evaluate(id => application.operations.get(id), operationId);
 }
 function introduction() {

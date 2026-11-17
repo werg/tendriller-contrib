@@ -9,7 +9,7 @@ function fixture() {
   const signaling = { descriptions: 2, bytes: 1000, closed: true };
   return {
     format: 'peer-generation-browser/v1', profile: 'peer-generation-v1', mode: 'runtime',
-    topology: 'browser-worker-opfs-native-rtc', passed: true, executionManifestDigest: digest,
+    topology: 'browser-worker-opfs-native-rtc', domain: 'conversation', passed: true, executionManifestDigest: digest,
     source: { commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: true },
     artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-fixture', sha256: digest,
       sourceCommit: 'c'.repeat(40), sourceTree: 'd'.repeat(40), sourceDirty: false }],
@@ -93,4 +93,26 @@ test('reopening must retain the browser identity, durable key enrollment, and th
   rejects(report => { report.ownership.abruptWorkerReopen.durableOperation = false; });
   rejects(report => { report.contentRecovery.partialRetentionRefused = false; });
   rejects(report => { report.contentRecovery.partialSurvivedRestart = false; });
+});
+
+test('task UI qualification requires both exact engines, guarded forms, and shared work after originator loss', () => {
+  const report = fixture(), digest = 'a'.repeat(64);
+  report.domain = 'tasks'; report.ui.domain = 'tasks'; report.browser.observations.isolated = true;
+  report.publicBoundary.imports.push('@chronolog/peer-session/sql-native', '@chronolog/peer-session/sql-browser'); report.publicBoundary.imports.sort();
+  report.browserAssets.push({ file: 'browser-engine/sqlite3.wasm', sha256: digest });
+  report.sql = { native: { implementation: '@dolthub/doltlite@0.11.29', patchSha256: digest, manifest: { synthetic: true } },
+    browser: { manifest: { nativeManifest: { synthetic: true }, wasmSha256: digest } } };
+  report.tasks = { definitionId: 'shared-peer-task-board', signedSchemaDigest: digest,
+    board: { created: true, claimed: true, finished: true }, compact: { claimed: true, finished: true },
+    competingClaim: 'rejected', unauthorizedFinish: 'rejected', commandsWithHostBlocked: 3,
+    unsharedOriginatorClaim: 'excluded-claim', unsharedClaimExcluded: true,
+    sharedTaskCompletedAfterCreatorClosed: true, sqlAndEventsSelectedTogether: true };
+  assert.equal(validateBrowserPeerReport(report).tasks.definitionId, 'shared-peer-task-board');
+  for (const mutate of [
+    value => { value.browser.observations.isolated = false; },
+    value => { value.sql.browser.manifest.wasmSha256 = 'b'.repeat(64); },
+    value => { value.sql.browser.manifest.nativeManifest = { synthetic: 'different' }; },
+    value => { value.tasks.competingClaim = 'accepted'; }, value => { value.tasks.compact.finished = false; },
+    value => { value.tasks.sharedTaskCompletedAfterCreatorClosed = false; },
+  ]) { const changed = structuredClone(report); mutate(changed); assert.throws(() => validateBrowserPeerReport(changed)); }
 });

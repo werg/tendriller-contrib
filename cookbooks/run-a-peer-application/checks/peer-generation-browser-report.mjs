@@ -5,6 +5,8 @@ export function validateBrowserPeerReport(report) {
   assert.equal(report.format, 'peer-generation-browser/v1');
   assert.equal(report.profile, 'peer-generation-v1'); assert.equal(report.mode, 'runtime');
   assert.equal(report.topology, 'browser-worker-opfs-native-rtc'); assert.equal(report.passed, true);
+  assert.ok(['conversation', 'tasks'].includes(report.domain));
+  const tasks = report.domain === 'tasks';
   assert.match(report.executionManifestDigest, /^[a-f0-9]{64}$/u);
   assert.match(report.source.commit, /^[a-f0-9]{40}$/u); assert.match(report.source.tree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof report.source.dirty, 'boolean');
@@ -14,7 +16,8 @@ export function validateBrowserPeerReport(report) {
   assert.match(artifact.sourceCommit, /^[a-f0-9]{40}$/u); assert.match(artifact.sourceTree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof artifact.sourceDirty, 'boolean');
   assert.deepEqual(report.publicBoundary.imports, ['@chronolog/peer-session', '@chronolog/peer-session/browser',
-    '@chronolog/peer-session/native', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native']);
+    '@chronolog/peer-session/native', ...(tasks ? ['@chronolog/peer-session/sql-browser', '@chronolog/peer-session/sql-native'] : []),
+    '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native']);
   assert.deepEqual(report.publicBoundary.testTools, ['esbuild', 'playwright']);
   for (const field of ['siblingSourceImports', 'applicationRpcMaps', 'applicationRetryQueues']) assert.equal(report.publicBoundary[field], 0);
   assert.equal(report.publicBoundary.residentRequired, false);
@@ -25,6 +28,7 @@ export function validateBrowserPeerReport(report) {
   assert.ok(report.browserBundleInputs.length > 3);
   for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
+      'peer-generation-browser-runtime.mjs', 'peer-task-board.mjs', 'peer-conversation.mjs',
       'app.mjs', 'typing.mjs', 'deployment/bootstrap.mjs'].includes(input));
   assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
   for (const [name, version] of Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })) {
@@ -40,11 +44,26 @@ export function validateBrowserPeerReport(report) {
   assert.deepEqual(browser.pageErrors, []);
   for (const field of ['secureContext', 'storage', 'locks']) assert.equal(browser.observations[field], true);
   const ui = report.ui;
-  assert.deepEqual(ui.pages, ['board.html', 'compact.html']); assert.equal(ui.domain, 'events');
+  assert.deepEqual(ui.pages, ['board.html', 'compact.html']); assert.equal(ui.domain, tasks ? 'tasks' : 'events');
   assert.equal(ui.sessionFacade, 'connectApplicationWorker'); assert.equal(ui.sentThroughForms, 3);
   for (const field of ['reapplicationConfirmed', 'recoveryNoticeVisible', 'originalReviewPreserved']) assert.equal(ui[field], true);
   assert.ok(typeof ui.draftBeforeRestart === 'string' && ui.draftBeforeRestart.length > 0);
   assert.equal(ui.draftAfterRestart, ui.draftBeforeRestart); assert.equal(ui.draftAfterRecovery, ui.draftBeforeRestart);
+  if (tasks) {
+    assert.equal(browser.observations.isolated, true);
+    assert.equal(report.sql?.native.implementation, '@dolthub/doltlite@0.11.29');
+    assert.match(report.sql.native.patchSha256, /^[a-f0-9]{64}$/u);
+    assert.deepEqual(report.sql.browser.manifest.nativeManifest, report.sql.native.manifest);
+    assert.match(report.sql.browser.manifest.wasmSha256, /^[a-f0-9]{64}$/u);
+    assert.equal(report.browserAssets.find(asset => asset.file === 'browser-engine/sqlite3.wasm')?.sha256, report.sql.browser.manifest.wasmSha256);
+    const domain = report.tasks;
+    assert.equal(domain?.definitionId, 'shared-peer-task-board'); assert.match(domain.signedSchemaDigest, /^[a-f0-9]{64}$/u);
+    assert.deepEqual(domain.board, { created: true, claimed: true, finished: true });
+    assert.deepEqual(domain.compact, { claimed: true, finished: true });
+    assert.equal(domain.competingClaim, 'rejected'); assert.equal(domain.unauthorizedFinish, 'rejected');
+    assert.equal(domain.commandsWithHostBlocked, 3); assert.ok(domain.unsharedOriginatorClaim);
+    for (const field of ['unsharedClaimExcluded', 'sharedTaskCompletedAfterCreatorClosed', 'sqlAndEventsSelectedTogether']) assert.equal(domain[field], true);
+  }
   const ownership = report.ownership;
   for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceAwaitedKeys']) assert.equal(ownership[field], true);
   assert.equal(ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the fixture');
@@ -95,6 +114,7 @@ export function validateBrowserPeerReport(report) {
   return { format: 'peer-generation-browser-summary/v1', passed: true,
     qualification: !report.source.dirty && !artifact.sourceDirty ? 'clean-source-pair' : 'development-preview',
     source: report.source, artifacts: report.artifacts, ui, browser: { version: browser.version, transportOwner: browser.transportOwner, storage: browser.storage },
+    ...(tasks ? { sql: report.sql, tasks: report.tasks } : {}),
     hostRequestsDuringCommands: outage.after.controlRequests - outage.before.controlRequests,
     signalingRequestsDuringCommands: outage.after.signalingRequests - outage.before.signalingRequests,
     recovery: { previousHead: recovery.priorHead.sequence, adoptedPrefix: recovery.adoptedPrefix.sequence,
@@ -104,6 +124,7 @@ export function validateBrowserPeerReport(report) {
       'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.',
       'Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.',
       'Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.',
-      'The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate.',
+      tasks ? 'The task domain used both packaged SQL engines; this result applies to the recorded native platform and browser build.'
+        : 'The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate.',
     ] };
 }

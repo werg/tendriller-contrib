@@ -10,8 +10,10 @@ import { parseArgs } from 'node:util';
 import { validateBrowserPeerReport } from './peer-generation-browser-report.mjs';
 
 const { values } = parseArgs({ options: { artifact: { type: 'string' }, output: { type: 'string' },
-  chromium: { type: 'string' }, 'allow-dirty': { type: 'boolean', default: false } } });
-if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/session-with-native-rtc.tgz --output /new/evidence-directory [--chromium /path/to/chromium]');
+  domain: { type: 'string', default: 'conversation' }, chromium: { type: 'string' }, 'allow-dirty': { type: 'boolean', default: false } } });
+if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/session-with-native-rtc.tgz --output /new/evidence-directory [--domain conversation|tasks] [--chromium /path/to/chromium]');
+assert.ok(['conversation', 'tasks'].includes(values.domain), 'Unknown domain');
+const tasks = values.domain === 'tasks';
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../..');
 const artifact = resolve(values.artifact), output = resolve(values.output), consumer = join(output, 'consumer');
 try { await stat(output); throw Error('Use a new evidence directory; earlier evidence must remain unchanged'); }
@@ -22,7 +24,10 @@ const fixtures = await Promise.all([
   ['peer-generation-browser-consumer.mjs', join(here, 'peer-generation-browser-consumer.mjs')],
   ['peer-generation-browser-page.mjs', join(here, 'peer-generation-browser-page.mjs')],
   ['peer-generation-browser-worker.mjs', join(here, 'peer-generation-browser-worker.mjs')],
-  ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
+  ['peer-generation-definition.mjs', tasks ? join(here, 'peer-generation-browser-task-definition.mjs') : join(here, '../snippets/peer-conversation.mjs')],
+  ['peer-generation-native-runtime.mjs', join(here, tasks ? 'peer-generation-native-sql-runtime.mjs' : 'peer-generation-native-events-runtime.mjs')],
+  ['peer-generation-browser-runtime.mjs', join(here, tasks ? 'peer-generation-browser-sql-runtime.mjs' : 'peer-generation-browser-events-runtime.mjs')],
+  ...(tasks ? ['peer-task-board.mjs', 'peer-conversation.mjs'].map(name => [name, join(here, '../snippets', name)]) : []),
   ...['board.html', 'compact.html', 'style.css', 'app.mjs'].map(name => [name, join(here, 'peer-ui', name)]),
   ['typing.mjs', join(here, 'shared/typing.mjs')],
 ].map(async ([name, path]) => {
@@ -33,7 +38,7 @@ const fixtures = await Promise.all([
 await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
 const report = { format: 'peer-generation-browser/v1', profile: 'peer-generation-v1', mode: 'runtime',
-  topology: 'browser-worker-opfs-native-rtc', passed: false, source, artifacts: [], fixtures: [], error: null,
+  topology: 'browser-worker-opfs-native-rtc', domain: values.domain, passed: false, source, artifacts: [], fixtures: [], error: null,
   runtime: { node: process.version, platform: process.platform, architecture: process.arch } };
 try {
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-browser-peer-consumer', private: true, type: 'module' }));
@@ -46,6 +51,11 @@ try {
   for (const field of ['dependencies', 'optionalDependencies']) assert.deepEqual(metadata[field] ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, { werift: '0.27.0' });
   const provenance = JSON.parse(await readFile(join(installed, 'provenance.json'), 'utf8'));
+  if (tasks) {
+    assert.ok(metadata.exports['./sql-native'] && metadata.exports['./sql-browser'], 'Tasks require the combined native SQL and browser WASM archive');
+    assert.ok(provenance.nativeEngine && provenance.browserEngine, 'Both SQL engines must have exact build provenance');
+    report.sql = { native: provenance.nativeEngine, browser: provenance.browserEngine };
+  }
   assert.match(provenance.source, /^[a-f0-9]{40}$/u); assert.match(provenance.sourceTree, /^[a-f0-9]{40}$/u);
   if (!values['allow-dirty']) assert.equal(provenance.dirty, false, 'Qualification requires a clean-source artifact');
   assert.ok(Object.keys(provenance.sha256 ?? {}).length > 0);
@@ -71,8 +81,10 @@ try {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         '@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
-        './peer-generation-definition.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
-        './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        ...(tasks ? ['@chronolog/peer-session/sql-native', '@chronolog/peer-session/sql-browser'] : []),
+        './peer-generation-definition.mjs', './peer-generation-native-runtime.mjs', './peer-generation-browser-runtime.mjs',
+        '../peer-generation-browser-page.mjs',
+        './peer-task-board.mjs', './peer-conversation.mjs', './deployment/bootstrap.mjs', './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
       if (['playwright', 'esbuild'].includes(specifier)) tools.add(specifier);
     }

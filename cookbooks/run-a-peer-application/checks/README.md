@@ -106,6 +106,27 @@ validator tests alone do not count as a browser execution.
 The [preserved earlier local launch failure](../notes/peer-browser-runtime-status.md)
 remains attached to its original source and does not qualify these scenarios.
 
+To run the actual task forms with browser WASM and native SQL, provide the
+combined public archive and select the task domain:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs \
+  --artifact /exact/session-with-native-rtc-and-both-sql-engines.tgz \
+  --domain tasks --output /new/browser-task-evidence
+```
+
+Build the combined archive with Chronolog's `--native-rtc --sql-native
+--sql-browser /exact/engine-directory` options. The runner verifies both engine
+provenances, serves the packaged WASM resources with isolation headers, and
+opens SQL inside the exclusive Worker through `openBrowserSqlApplication`.
+Native peers use `openNativeSqlApplication` and the same signed task schema.
+The board creates, claims and finishes tasks; conflicting claims and another
+author's completion reject. Task commands continue during the measured control
+outage. After the originator closes, the compact page completes a shared task
+whose unshared old claim was excluded. Fresh replay compares the complete SQL
+and event view between browser and native peers. The report names the selected
+domain; an events-only result cannot qualify this task path.
+
 
 These are two page-owned adaptations of the same application decisions:
 
