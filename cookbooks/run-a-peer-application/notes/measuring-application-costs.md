@@ -12,6 +12,13 @@ The [2026-11-16 native before/after evidence](membership-cost-review-2026-11-16.
 records the executed workload, exact raw reports and the measured reduction in
 administrator writes from atomic page ingestion.
 
+The [2026-11-17 compact proof and resident recovery evidence](compact-membership-resident-qualification-2026-11-17.md)
+adds the current v2 native cost report: application descriptors and bodies stay
+out of administrator traffic while a single verified control covers increasing
+application receipt positions. It also preserves measured browser/native RTC
+recovery and host-outage results. Provider costs and hosted/peer savings remain
+unmeasured.
+
 The author-time finality provider also retains signed closure markers and can
 advance its frontier during a bounded idle period after new receipts. Record its
 signed future-admission window, cutoff lag, closure interval and certificate

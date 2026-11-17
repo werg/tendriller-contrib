@@ -17,6 +17,11 @@ and workerd-relay reports retain their original revisions and transport scope.
 An implemented API or a successful build is not evidence of a completed WebRTC
 runtime scenario; new reports must identify the actual peers and selected route.
 
+The [current compact membership and resident recovery evidence](compact-membership-resident-qualification-2026-11-17.md)
+records clean-source native administration and actual browser/Worker RTC tests.
+It preserves measured direct routes, authenticated recovery, original operations
+and host-independent exchange, with the packaged-host integration scope explicit.
+
 ## Assign each responsibility once
 
 | Responsibility | Owner | When the page host participates |
