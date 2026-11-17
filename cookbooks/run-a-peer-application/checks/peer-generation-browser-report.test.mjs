@@ -43,7 +43,7 @@ function fixture() {
     recovery: { originatorClosed: true, originatorStoreUnavailable: true, priorHead: { sequence: 6 }, adoptedPrefix: { sequence: 4 },
       selectedGeneration: id, originalAttempt: { status: 'needsReapply', operationId: 'old-op', attemptId: 'old-attempt' },
       reapplied: { outcome: 'accepted', operationId: 'new-op', attemptId: 'new-attempt' }, reapplyOf: 'old-attempt',
-      currentGuardsChecked: true, staleViewError: 'RecoveredViewError', noticesPersisted: 1, transitionJournalEntries: 1 },
+      currentGuardsChecked: true, staleCursorError: 'RecoveredViewError', heldViewPreserved: true, noticesPersisted: 1, transitionJournalEntries: 1 },
     freshPeer: { joinedAfterOriginatorLoss: true, enrolledFromBrowser: true, generation: id, browserViewSha256: digest, nativeViewSha256: digest },
     contentRecovery: { bytes: 131_095, interruptedAfter: 65_536, partialRetentionRefused: true, partialSurvivedRestart: true,
       unavailableRemainderRefused: true, completeAfterReconnect: true, retainedBy: id, retentionSignature: 'a'.repeat(128) },
@@ -82,6 +82,8 @@ test('browser recovery needs lost originator storage, key enrollment, linked rea
   rejects(report => { report.recovery.adoptedPrefix.sequence = 6; });
   rejects(report => { report.recovery.reapplyOf = 'another-attempt'; });
   rejects(report => { report.recovery.reapplied.operationId = 'old-op'; });
+  rejects(report => { report.recovery.heldViewPreserved = false; });
+  rejects(report => { report.recovery.staleCursorError = undefined; });
   rejects(report => { report.freshPeer.nativeViewSha256 = 'f'.repeat(64); });
   rejects(report => { report.freshPeer.enrolledFromBrowser = false; });
 });

@@ -77,7 +77,8 @@ export function validateBrowserPeerReport(report) {
   assert.notEqual(recovery.reapplied.attemptId, recovery.originalAttempt.attemptId);
   assert.notEqual(recovery.reapplied.operationId, recovery.originalAttempt.operationId);
   assert.equal(recovery.reapplyOf, recovery.originalAttempt.attemptId); assert.equal(recovery.currentGuardsChecked, true);
-  assert.equal(recovery.staleViewError, 'RecoveredViewError');
+  assert.equal(recovery.staleCursorError, 'RecoveredViewError');
+  assert.equal(recovery.heldViewPreserved, true);
   assert.ok(recovery.noticesPersisted > 0); assert.equal(recovery.transitionJournalEntries, 1);
   assert.equal(report.freshPeer.joinedAfterOriginatorLoss, true); assert.equal(report.freshPeer.enrolledFromBrowser, true);
   assert.equal(report.freshPeer.generation, recovery.selectedGeneration);

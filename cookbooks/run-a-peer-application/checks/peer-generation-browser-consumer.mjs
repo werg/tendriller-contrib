@@ -214,7 +214,10 @@ try {
   report.contentRecovery = { bytes: resumableBytes.length, interruptedAfter: 65_536, partialRetentionRefused: true,
     partialSurvivedRestart: true, unavailableRemainderRefused: true, completeAfterReconnect: true,
     retainedBy: completeRetention.payload.peer, retentionSignature: completeRetention.signature };
-  await page.evaluate(async () => { globalThis.capturedView = await application.readView(); });
+  await page.evaluate(async () => {
+    globalThis.capturedView = await application.readView();
+    globalThis.capturedEvents = await capturedView.readEvents();
+  });
   await checkpoint('partial encrypted content survived Worker restart and completed after reconnect');
 
   const retainedPrefix = await page.evaluate(() => application.recoveryPoint());
@@ -230,12 +233,15 @@ try {
   blocked = false;
   const recovered = await page.evaluate(async operationId => {
     const notice = await application.recovery.takeover({ transitionId: 'browser-retained-prefix' });
-    let abandoned, staleView;
+    let abandoned, staleCursor;
     try { await application.operations.wait(operationId); } catch (error) { abandoned = { name: error.name, state: error.operation }; }
-    try { await capturedView.readEvents(); } catch (error) { staleView = error.name; }
+    const heldViewPreserved = JSON.stringify(await capturedView.readEvents()) === JSON.stringify(capturedEvents);
     await capturedView.release();
+    const currentView = await application.readView();
+    try { await currentView.readEvents({ cursor: capturedEvents.cursor }); } catch (error) { staleCursor = error.name; }
+    await currentView.release();
     const selected = await application.query('conversation', {});
-    return { notice, abandoned, staleView, selected,
+    return { notice, abandoned, staleCursor, heldViewPreserved, selected,
       journal: await application.recovery.inspect(), recovery: await application.inspectRecovery(), status: application.status };
   }, excluded.operationId);
   await page.locator('#recovery').waitFor({ state: 'visible' });
@@ -251,7 +257,8 @@ try {
   assert.equal(recovered.status.role, 'coordinator');
   assert.equal(recovered.abandoned.name, 'AbandonedOperationError');
   assert.ok(['abandoned', 'needsReapply'].includes(recovered.abandoned.state.status));
-  assert.equal(recovered.staleView, 'RecoveredViewError');
+  assert.equal(recovered.staleCursor, 'RecoveredViewError');
+  assert.equal(recovered.heldViewPreserved, true);
   assert.equal(recovered.applied.outcome, 'accepted');
   assert.equal(recovered.applied.operationId, reappliedId);
   assert.equal(recovered.inspected.attempt.payload.header.reapplyOf, recovered.abandoned.state.attemptId);
@@ -263,7 +270,8 @@ try {
   assert.ok(recovered.selected.value.messages.every(message => !message.operationId.startsWith('originator-tail-')));
   report.recovery = { originatorClosed: true, originatorStoreUnavailable: true, priorHead: lostHead.point,
     adoptedPrefix: retainedPrefix.point, selectedGeneration: recovered.status.generation,
-    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied, staleViewError: recovered.staleView,
+    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied, staleCursorError: recovered.staleCursor,
+    heldViewPreserved: recovered.heldViewPreserved,
     reapplyOf: recovered.inspected.attempt.payload.header.reapplyOf, currentGuardsChecked: true,
     noticesPersisted: recovered.recovery.length, transitionJournalEntries: recovered.journal.length };
   report.ui = { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',

@@ -32,7 +32,7 @@ export function createHostedFixture(base) {
     async signalingPair(a, b) {
       const channel = `qualification-${randomUUID()}`;
       const opened = await request('/rendezvous/open', { method: 'POST', body: { channel, peers: [a.deviceId, b.deviceId] } });
-      assert.deepEqual(opened.roles, ['offerer', 'answerer']);
+      assert.deepEqual([...opened.roles].sort(), ['answerer', 'offerer']);
       const types = [], closed = [false, false];
       let sentMessages = 0, sentBytes = 0;
       const endpoint = index => ({
@@ -52,7 +52,7 @@ export function createHostedFixture(base) {
           closed[index] = true;
         },
       });
-      return { a: endpoint(0), b: endpoint(1), types,
+      return { a: endpoint(0), b: endpoint(1), roles: opened.roles, types,
         closed: () => closed.every(Boolean), snapshot: () => ({ sentMessages, sentBytes, closed: closed.every(Boolean) }) };
     },
   };
