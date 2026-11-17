@@ -185,7 +185,7 @@ SDP introductions between Node and workerd. The ordinary application connection
 uses authenticated peer RTC. After introduction, the test blocks hosted access
 and requires complete Worker HTTP/body/SDP counters and bridge counters to stay
 unchanged while real peer application bytes increase. Live signals do not append
-history. TURN would be real data-plane traffic and must be measured separately.
+history. WebSocket relay traffic uses a separate gate with explicit host byte measurements and control-only outage scope.
 
 The maintained `createPeerIntroductions` adapter also supplies actual hosted
 discovery, invitation listeners and rendezvous to `session.participate`.
@@ -193,6 +193,41 @@ Advertisements contain only peer/storage identities and routes. The session
 checks grants and usable retained history itself. The gate exercises the same
 automatic and explicitly reviewed recoveries as the portable/native lane and
 requires every owned introduction socket to close.
+
+## Forced WebSocket relay and browser relay
+
+Run the same application/recovery scenario with direct establishment deliberately
+refused, using a plain or SQL session archive (no Werift capability is needed):
+
+```sh
+npm run test:peer-host -- \
+  --artifact /exact/chronolog-peer-session.tgz \
+  --artifacts /exact/tendriller-dist --transport websocket \
+  --output /new/relay-evidence
+
+npm run test:peer-host -- \
+  --artifact /exact/chronolog-peer-session.tgz \
+  --artifacts /exact/tendriller-dist --transport websocket --browser \
+  --output /new/browser-relay-evidence
+```
+
+The native gate forces each direct opener to fail and lets the public host
+adapter choose its relay within the existing participation owner. It cuts relay
+links and observes the same generation reconnecting. The browser gate reuses the
+entire Worker/OPFS, page UI, interrupted-content and recovery scenario, changing
+only the byte-transport fixture. The page owns no WebSocket or private key.
+
+Native and Chromium clients use real WebSocket sockets. A bounded loopback test
+bridge forwards their unchanged protocol frames into actual authenticated
+Workerd relay sockets. Reports state this boundary; it is not deployed WSS or
+Internet qualification. The fixture scans declared private command/live markers
+at the raw relay boundary and records actual binary traffic on both lanes.
+
+Only control HTTP is blocked during ordinary relayed work. Host relay ingress and
+egress must increase; ciphertext transit has a real availability and bandwidth
+cost. This gate never imports the direct gate's zero-host-traffic claim. Both
+transports use the same authenticated encrypted channel, operation journal,
+replication, projections, content and recovery. TURN is not a required path.
 
 ## Independent agent business workflow
 
@@ -229,7 +264,7 @@ setup steps from the workflow transcript.
 
 ## Assemble the exact local composition
 
-After all five runners pass against the same clean Chronolog and contrib
+After all seven runners pass against the same clean Chronolog and contrib
 revisions, collect their raw reports:
 
 ```sh
@@ -239,6 +274,8 @@ npm run check:peer-composition -- \
   --report /exact/browser/report.json \
   --report /exact/native-sql/report.json \
   --report /exact/hosted/peers/report.json \
+  --report /exact/relay/peers/report.json \
+  --report /exact/browser-relay/peers/report.json \
   --output /new/composition.json
 ```
 
@@ -252,7 +289,7 @@ session-only commit can use an older unchanged verifier; both identities remain
 explicit and their interoperability must pass the actual hosted gate.
 
 CI emits this manifest only after native events, native RTC, browser Worker,
-native SQL and actual workerd participant jobs all succeed. It qualifies that
+native SQL, actual workerd participant, native relay and browser relay jobs all succeed. It qualifies that
 local public-artifact composition. The manifest explicitly leaves real network,
 provider cost, browser SQL/WASM, optional stronger services and an unassisted
 fresh-agent usability study outside that claim. No failed browser run or
@@ -271,7 +308,7 @@ capability of the same session contract and must qualify its stronger boundary.
 It is not an invitation to start a second resident application stack.
 
 Real deployment qualification still needs actual enrollment and controls,
-home/mobile/restrictive networks, TURN, suspension, quota pressure, large content,
+home/mobile/restrictive networks, deployed WSS fallback, suspension, quota pressure, large content,
 recovery freshness and provider/device costs. Measure the initial five-minute
 freshness objective under a stated workload with another usable peer; do not
 infer a universal loss bound from a heartbeat or a local run.

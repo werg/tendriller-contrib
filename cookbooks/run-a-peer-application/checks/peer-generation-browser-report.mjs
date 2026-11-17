@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
+import { validateRelayTraffic } from './peer-generation-relay-report.mjs';
 
 /** Validate the observations this gate actually runs; never infer deployment. */
 export function validateBrowserPeerReport(report) {
   assert.equal(report.format, 'peer-generation-browser/v1');
   assert.equal(report.profile, 'peer-generation-v1'); assert.equal(report.mode, 'runtime');
-  assert.equal(report.topology, 'browser-worker-opfs-native-rtc'); assert.equal(report.passed, true);
+  assert.ok(['browser-worker-opfs-native-rtc', 'browser-worker-opfs-websocket'].includes(report.topology));
+  const relay = report.topology === 'browser-worker-opfs-websocket'; assert.equal(report.passed, true);
   assert.match(report.executionManifestDigest, /^[a-f0-9]{64}$/u);
   assert.match(report.source.commit, /^[a-f0-9]{40}$/u); assert.match(report.source.tree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof report.source.dirty, 'boolean');
@@ -14,7 +16,7 @@ export function validateBrowserPeerReport(report) {
   assert.match(artifact.sourceCommit, /^[a-f0-9]{40}$/u); assert.match(artifact.sourceTree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof artifact.sourceDirty, 'boolean');
   assert.deepEqual(report.publicBoundary.imports, ['@chronolog/peer-session', '@chronolog/peer-session/browser',
-    '@chronolog/peer-session/native', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native']);
+    '@chronolog/peer-session/native', ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers'] : ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'])]);
   assert.deepEqual(report.publicBoundary.testTools, ['esbuild', 'playwright']);
   for (const field of ['siblingSourceImports', 'applicationRpcMaps', 'applicationRetryQueues']) assert.equal(report.publicBoundary[field], 0);
   assert.equal(report.publicBoundary.residentRequired, false);
@@ -23,20 +25,20 @@ export function validateBrowserPeerReport(report) {
   assert.ok(report.browserAssets.length >= 2);
   for (const asset of report.browserAssets) assert.match(asset.sha256, /^[a-f0-9]{64}$/u);
   assert.ok(report.browserBundleInputs.length > 3);
-  for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
+  for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') || relay && input.startsWith('node_modules/@tendriller/core/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs'].includes(input));
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs'].includes(input));
   assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
-  for (const [name, version] of Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })) {
+  for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) {
     assert.ok(report.runtime.dependencies.packages.some(item => item.path === `node_modules/${name}` && item.version === version && item.integrity));
   }
   const browser = report.browser;
   assert.equal(browser.implementation, 'chromium'); assert.equal(typeof browser.version, 'string');
   assert.equal(browser.transportOwner, 'dedicated-worker'); assert.equal(browser.storage, 'opfs-with-exclusive-web-lock');
-  assert.equal(browser.signalingBoundary, 'loopback-fixture-http');
+  assert.equal(browser.signalingBoundary, relay ? 'workerd-relay-pairing' : 'loopback-fixture-http');
   assert.equal(browser.controlBoundary, 'chronolog-participant-over-loopback-http');
-  assert.equal(browser.nativeCandidateSource, 'explicit-loopback-only');
-  assert.equal(browser.interfaceEnumeration, 'disabled-by-native-options');
+  assert.equal(browser.nativeCandidateSource, relay ? 'not-used' : 'explicit-loopback-only');
+  assert.equal(browser.interfaceEnumeration, relay ? 'not-used' : 'disabled-by-native-options');
   assert.deepEqual(browser.pageErrors, []);
   for (const field of ['secureContext', 'storage', 'locks']) assert.equal(browser.observations[field], true);
   const ui = report.ui;
@@ -90,22 +92,31 @@ export function validateBrowserPeerReport(report) {
   for (const connection of report.connections) {
     assert.equal(connection.authenticated, true); assert.equal(connection.nativeClosed, true);
     assert.equal(connection.peers.length, 2); assert.notEqual(connection.peers[0], connection.peers[1]);
-    assert.equal(connection.signaling.descriptions, 2); assert.equal(connection.signaling.closed, true);
+    assert.equal(connection.signaling.descriptions, relay ? 0 : 2); assert.equal(connection.signaling.closed, true);
     assert.equal(connection.routes.length, 2);
-    for (const route of connection.routes) assert.ok(route.route === 'direct' && route.localCandidateType && route.remoteCandidateType);
+    for (const route of connection.routes) assert.ok(relay ? route.route === 'websocket-relay' : route.route === 'direct' && route.localCandidateType && route.remoteCandidateType);
+  }
+  if (relay) {
+    validateRelayTraffic(report.relay, { implementation: 'browser-and-native-websocket', minimumSockets: report.connections.length * 4 });
+    assert.equal(report.host?.runtime, 'workerd');
+    assert.equal(report.host.identity, 'synthetic authenticated test accounts');
+    assert.deepEqual(report.host.publicImports, ['@tendriller/core/peers', '@tendriller/engine/testing']);
+    assert.equal(browser.transportComposition.page, 'no-transport-owner');
+    assert.equal(browser.transportComposition.worker, 'openWebSocketConnection');
   }
   return { format: 'peer-generation-browser-summary/v1', passed: true,
     qualification: !report.source.dirty && !artifact.sourceDirty ? 'clean-source-pair' : 'development-preview',
-    source: report.source, artifacts: report.artifacts, ui, browser: { version: browser.version, transportOwner: browser.transportOwner, storage: browser.storage },
+    source: report.source, artifacts: report.artifacts, ui, ...(relay ? { relay: report.relay, host: report.host } : {}), browser: { version: browser.version, transportOwner: browser.transportOwner, storage: browser.storage },
     hostRequestsDuringCommands: outage.after.controlRequests - outage.before.controlRequests,
     signalingRequestsDuringCommands: outage.after.signalingRequests - outage.before.signalingRequests,
     recovery: { previousHead: recovery.priorHead.sequence, adoptedPrefix: recovery.adoptedPrefix.sequence,
       abandonedOperationId: recovery.originalAttempt.operationId, reappliedOperationId: recovery.reapplied.operationId },
     identityReopened: { graceful: true, abruptWorker: true },
     limitations: [
-      'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.',
+      ...(relay ? ['Control HTTP is blocked independently of relay availability; WebSocket ciphertext consumes observed host bandwidth.'] : []),
+      relay ? 'Local Chromium/native WebSocket and Workerd only; no deployed WSS, Internet, home/mobile/restrictive network or provider billing qualification.' : 'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network or provider billing qualification.',
       'Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.',
       'Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.',
-      'The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate.',
+      'The browser gate uses the event execution runtime; SQL engine behavior requires its separate public-artifact gate.',
     ] };
 }

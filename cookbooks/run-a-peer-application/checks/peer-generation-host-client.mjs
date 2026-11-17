@@ -65,7 +65,7 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
     relayTraffic: () => request('/testing/relay-traffic'),
     cutRelays: () => request('/testing/relay-cut', { method: 'POST', body: {} }),
     async drainIntroductions() { await Promise.all([...closing]); },
-    createParticipationPorts(session, { openConnection, openRelayConnection, createPeerIntroductions, createPeerRelay }) {
+    createParticipationPorts(session, { openDirectConnection, openRelayConnection, createPeerIntroductions, createPeerRelay }) {
       const participant = createParticipantTransport({ applicationId: session.applicationId,
         exchange: (body, { signal } = {}) => request('/api/peers/participant', { method: 'POST', body, signal }) });
       const peers = {
@@ -75,9 +75,9 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
         invite: (peerId, invitation, options) => participant.request('ephemeral', 'invite', { peerId, ...invitation }, options),
         rendezvous: (channel, peerId, { signal }) => socket('rendezvous', { channel, peerId }, signal),
         listenInvitations: (peerId, { signal }) => socket('invitations', { peerId }, signal),
-        ...(createPeerRelay ? { relay: (channel, peerId, { remotePeerId, signal }) => relay(channel, peerId, remotePeerId, createPeerRelay, signal) } : {}),
+        relay: (channel, peerId, { remotePeerId, signal }) => relay(channel, peerId, remotePeerId, createPeerRelay, signal),
       };
-      return createPeerIntroductions({ peers, identity: session.deviceId, openConnection, ...(openRelayConnection ? { openRelayConnection } : {}) });
+      return createPeerIntroductions({ peers, identity: session.deviceId, openDirectConnection, openRelayConnection });
     },
     async createControl({ applicationId, configuration }) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });

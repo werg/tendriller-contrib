@@ -2,14 +2,14 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { test } from 'node:test';
 import { assemblePeerComposition } from './peer-composition.mjs';
-import { syntheticReport, syntheticRtcReport, syntheticHostedReport, syntheticBrowserReport, syntheticTaskReport, syntheticRelayReport } from './peer-generation-report-fixtures.mjs';
+import { syntheticReport, syntheticRtcReport, syntheticHostedReport, syntheticBrowserReport, syntheticTaskReport, syntheticRelayReport, syntheticBrowserRelayReport } from './peer-generation-report-fixtures.mjs';
 
 // These records only test manifest assembly. No synthetic output is published as evidence.
 function fixtures() {
-  const reports = [syntheticReport(), syntheticRtcReport(), syntheticBrowserReport(), syntheticTaskReport(), syntheticHostedReport(), syntheticRelayReport()];
+  const reports = [syntheticReport(), syntheticRtcReport(), syntheticBrowserReport(), syntheticTaskReport(), syntheticHostedReport(), syntheticRelayReport(), syntheticBrowserRelayReport()];
   for (const report of reports) {
     report.source = { repository: 'werg/tendriller-contrib', commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: false };
-    const sql = ['independent-packed-tasks', 'independent-native-websocket'].includes(report.topology), rtc = !sql && report.topology !== 'independent-packed-peers';
+    const sql = ['independent-packed-tasks', 'independent-native-websocket', 'browser-worker-opfs-websocket'].includes(report.topology), rtc = !sql && report.topology !== 'independent-packed-peers';
     const digit = sql ? '1' : rtc ? '2' : '3';
     report.executionManifestDigest = (report.topology === 'independent-packed-tasks' ? 'b' : 'a').repeat(64);
     report.artifacts = [{ name: '@chronolog/peer-session', version: `0.0.0-test-${sql ? 'sql' : rtc ? 'rtc' : 'events'}`,
@@ -37,7 +37,7 @@ test('one manifest binds all exact clean local sources, artifact variants and ob
   assert.equal(manifest.host.storageSchemaRevision, 9);
   assert.equal(manifest.host.embeddedControl.source, '2'.repeat(40), 'A stable embedded verifier can precede session-only changes');
   assert.equal(manifest.gates['native-events'].reportSha256, createHash('sha256').update(raw[0].bytes).digest('hex'));
-  assert.equal(Object.keys(manifest.gates).length, 6);
+  assert.equal(Object.keys(manifest.gates).length, 7);
   assert.ok(manifest.unqualified.some(value => value.includes('Deployed')));
   assert.ok(manifest.unqualified.some(value => value.includes('fresh-agent')));
 });

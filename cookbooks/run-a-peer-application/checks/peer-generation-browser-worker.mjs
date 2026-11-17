@@ -1,7 +1,7 @@
 // Only fixture provisioning crosses HTTP. The maintained session owns every
 // application command, signer, operation journal, read view, and RTC channel.
 import { openBrowserApplication, openBrowserDevice, serveApplicationWorker } from '@chronolog/peer-session/browser';
-import { openWorkerWebRtcConnection } from '@chronolog/peer-session/webrtc';
+import { openFixtureConnection, inspectFixtureConnection } from './peer-generation-browser-transport.mjs';
 import { conversation } from './peer-generation-definition.mjs';
 
 const parameters = new URL(self.location.href).searchParams;
@@ -41,7 +41,7 @@ function serveTransportFaults(session) {
     if (!entry?.link) throw Error('FIXTURE_LINK_UNAVAILABLE');
     await entry.link.synchronize();
     return { peerId: entry.link.peerId, stats: entry.link.stats,
-      route: await entry.connection.getRoute(), closed: entry.link.signal.aborted };
+      route: await inspectFixtureConnection(entry.connection), closed: entry.link.signal.aborted };
   };
   const invoke = async (method, input) => {
     session.signal.throwIfAborted();
@@ -62,7 +62,8 @@ function serveTransportFaults(session) {
       close: () => request(`${base}/close`, {}, AbortSignal.timeout(5000)),
     };
     try {
-      entry.connection = await openWorkerWebRtcConnection(self, { role: input.role, signaling, signal, timeoutMs: 30_000 });
+      entry.connection = await openFixtureConnection({ role: input.role, signaling, signal, timeoutMs: 30_000,
+        localIdentity: session.deviceId, peerIdentity: input.peerId, relayBase: input.relayBase, channel: input.channel });
       entry.link = await session.connectPeer({ connection: entry.connection, peerIdentity: input.peerId, signal, handshakeTimeoutMs: 30_000 });
       return await inspect(input.id);
     } catch (error) { await close(input.id); throw error; }

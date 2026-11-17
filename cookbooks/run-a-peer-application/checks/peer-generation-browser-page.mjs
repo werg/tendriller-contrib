@@ -2,7 +2,7 @@
 // Ordinary application work goes through the public facade; the Worker owns
 // peer authentication, signaling, history, and the only operation journal.
 import { connectApplicationWorker, openBrowserDevice } from '@chronolog/peer-session/browser';
-import { serveWorkerWebRtcConnections } from '@chronolog/peer-session/webrtc';
+import { serveFixtureConnections } from './peer-generation-browser-transport.mjs';
 
 let worker, application, name, rtcService, fixtureLifetime;
 let pendingFaults = 0;
@@ -28,9 +28,9 @@ globalThis.fixture = {
   async open({ deviceName, provision = false }) {
     name = deviceName; worker = create(name, provision);
     fixtureLifetime = new AbortController();
-    rtcService = serveWorkerWebRtcConnections(worker, { signal: fixtureLifetime.signal });
+    rtcService = serveFixtureConnections(worker, { signal: fixtureLifetime.signal });
     try { await ready(worker); application = await connectApplicationWorker(worker); }
-    catch (error) { fixtureLifetime.abort(error); await rtcService.close(); worker.terminate(); throw error; }
+    catch (error) { fixtureLifetime.abort(error); await rtcService?.close(); worker.terminate(); throw error; }
     globalThis.application = application;
     resolveApplication(application);
     application.onRecovery(notice => notices.push(notice));
@@ -61,13 +61,13 @@ globalThis.fixture = {
     try { await application.close(); }
     finally {
       fixtureLifetime.abort(Error('FIXTURE_CLOSED'));
-      await rtcService.close(); worker.terminate();
+      await rtcService?.close(); worker.terminate();
     }
   },
   async crash() {
     worker.terminate();
     fixtureLifetime.abort(Error('FIXTURE_WORKER_TERMINATED'));
-    await rtcService.close();
+    await rtcService?.close();
   },
   observations: () => ({ notices, statuses, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
     locks: !!navigator.locks, userAgent: navigator.userAgent }),

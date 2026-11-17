@@ -23,7 +23,26 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Qualified composition: `e82163de`
+## WebSocket transport contract
+
+The accepted relay path is direct WebRTC with authenticated WebSocket fallback;
+TURN is no longer a required qualification path. Both feed one bounded peer
+connection and the same authenticated encrypted application channel. The server
+keeps its restricted control-participant role; its separately authorized relay
+forwards opaque application frames without storing or executing their contents.
+Relayed application traffic does consume server bandwidth and depends on relay
+availability. Historical zero-host-data observations below apply to direct paths.
+
+The current runners add native and browser relay gates to the five original
+composition gates. They reuse the same application and Worker scenarios,
+exercise actual Workerd relay sockets through real loopback WebSockets, and
+separate blocked control HTTP from relay byte counters. The presence of these
+runners and passing synthetic report tests does not qualify runtime behavior;
+new exact-source relay reports must be retained before claiming a seven-gate
+composition. Deployed authentication, real WSS networks and provider/device
+cost remain separate observations.
+
+## Qualified direct composition: `e82163de`
 
 All five public-package consumers, the strict composition assembler and artifact
 upload passed in [core CI run 44126997819](https://github.com/werg/chronolog-db/actions/runs/44126997819).
@@ -748,10 +767,10 @@ study is not erased by combining their results.
 | Plan gate | Implemented and observed | Remaining acceptance boundary |
 | --- | --- | --- |
 | G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. The `e82163de` composition verifies complete inherited-ancestor recovery, exact saved selection retry, unchanged inherited operation identity and local/raw-host protected-floor rejection. Actual SQL checks original-signer authorization; core quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
-| G1 — Remove hosted steady-state commands | Native, actual workerd/native RTC and real Chromium gates pass host-blocked work. The host enforces its participant facet policy; required ordinary application-body bytes stay off its transport. | Deployed routes, TURN and provider traffic/cost require direct measurement. |
+| G1 — Remove hosted steady-state commands | Native, actual workerd/native RTC and real Chromium gates pass host-blocked work. The host enforces its participant facet policy; required ordinary application-body bytes stay off its transport. | Deployed direct/WSS relay routes and provider traffic/cost require measurement. The direct zero-host-byte result does not apply to relay transit. |
 | G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `e82163de` direct/RTC/hosted lanes retain every command in the declared 32-command, 1,024-byte burst and recover below the five-minute target. Inherited recovery still refuses a prefix below a protected floor. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
 | G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. The exact `e82163de` SQL, host and Chromium gates pass. The separately preserved earlier fresh-agent study completes its bounded public-tools business workflow, with a learned-flow repeat on its stated source checkpoint. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified; the earlier study is not relabeled as a fresh study on later artifacts. The recorded assistance must remain visible. |
-| G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, TURN, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
+| G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, WSS relay fallback, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
 ## Public consumer and evidence boundary
 

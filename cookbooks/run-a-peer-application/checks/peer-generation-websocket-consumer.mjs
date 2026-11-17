@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import * as participantProtocol from '@chronolog/peer-session';
-import { frameWebSocketPeerConnection } from '@chronolog/peer-session/websocket';
+import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 import { createPeerIntroductions, createPeerRelay } from './peer-generation-host-introductions.mjs';
 import { runPeerGenerationScenario } from './peer-generation-scenario.mjs';
 import { createHostedFixture } from './peer-generation-host-client.mjs';
@@ -13,15 +13,14 @@ import { qualifyParticipation } from './peer-generation-participation.mjs';
 const host = createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE, participantProtocol);
 const connections = [], rawConnections = [];
 let directAttempts = 0, ownedReconnect;
-const openConnection = async () => { directAttempts++; throw Error('QUALIFICATION_DIRECT_UNAVAILABLE'); };
+const openDirectConnection = async () => { directAttempts++; throw Error('QUALIFICATION_DIRECT_UNAVAILABLE'); };
 const openRelayConnection = async ({ relay, signal }) => {
-  const connection = frameWebSocketPeerConnection(relay, { ready: relay.ready, signal });
+  const connection = await openWebSocketConnection(relay, { ready: relay.ready, signal });
   rawConnections.push(connection);
-  await connection.ready;
   return connection;
 };
 const ports = session => host.createParticipationPorts(session,
-  { openConnection, openRelayConnection, createPeerIntroductions, createPeerRelay });
+  { openDirectConnection, openRelayConnection, createPeerIntroductions, createPeerRelay });
 const connectSessions = async (a, b) => {
   const channel = `qualification:${randomUUID()}`, started = performance.now();
   const signal = AbortSignal.any([a.signal, b.signal]);
@@ -75,7 +74,13 @@ try {
   await Promise.allSettled(rawConnections.map(connection => connection.close()));
   await host.drainIntroductions();
   const report = JSON.parse(await readFile(process.argv[2], 'utf8'));
-  const traffic = await host.relayTraffic();
+  let traffic;
+  const deadline = performance.now() + 10_000;
+  do {
+    traffic = await host.relayTraffic();
+    if (traffic.sockets.every(socket => socket.closed)) break;
+    await new Promise(resolve => setTimeout(resolve, 20));
+  } while (performance.now() < deadline);
   report.relay = { implementation: 'native-websocket', hostRuntime: 'workerd',
     networkBoundary: 'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket',
     forcedDirectFailure: true, directAttempts, independentLanes: ['reliable', 'live'],

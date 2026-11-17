@@ -202,3 +202,16 @@ export function syntheticTaskReport() {
     reopen: { identityBefore: h('2'), identityAfter: h('2'), storageBefore: 'member', storageAfter: 'member',
       digestBefore: h('4'), digestAfter: h('4'), operationBefore: operation, operationAfter: structuredClone(operation), epochKeysProvided: false } };
 }
+
+
+export function syntheticBrowserRelayReport() {
+  const report = syntheticBrowserReport(), native = syntheticRelayReport();
+  report.topology = 'browser-worker-opfs-websocket';
+  report.publicBoundary.imports = ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native', '@chronolog/peer-session/websocket', '@tendriller/core/peers'];
+  report.browser.signalingBoundary = 'workerd-relay-pairing'; report.browser.nativeCandidateSource = 'not-used'; report.browser.interfaceEnumeration = 'not-used';
+  report.browser.transportComposition = { page: 'no-transport-owner', worker: 'openWebSocketConnection' };
+  report.connections.forEach(connection => { connection.routes = [{ route: 'websocket-relay' }, { route: 'websocket-relay' }]; connection.signaling = { descriptions: 0, bytes: 0, closed: true }; });
+  report.host = native.host; report.relay = { ...native.relay, implementation: 'browser-and-native-websocket' };
+  delete report.relay.ownedReconnect;
+  return report;
+}

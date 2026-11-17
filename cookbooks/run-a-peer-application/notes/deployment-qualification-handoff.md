@@ -24,7 +24,7 @@ control transport. Its interests include monotonic membership and generation
 controls, authenticated code/page publication, bounded discovery and ephemeral
 introductions. Its default transport rejects application database traffic,
 content replication and live UI signals. Cached verified controls keep the
-current generation usable during a host outage. If the coordinator and host
+current generation usable during a control outage while its peer transport remains available. Direct connections can survive a complete host outage; WebSocket relay connections depend on that relay and consume its bandwidth. If the coordinator and host
 both disappear, keep exact saved intent while selecting a successor waits.
 
 Application code and page assets use signed publication revisions. Those
@@ -45,7 +45,9 @@ ordinary applied events do not provide that guarantee.
 | Native RTC | Add `--transport native-rtc` | The same scenario over real authenticated loopback ICE/DTLS/SCTP after SDP introduction retires. |
 | Native SQL | Add `--domain tasks` with a SQL-enabled archive | Guarded competing claims, shared ownership, SQL/events/outcome recovery and continued work after the creator closes. |
 | Browser/native | `npm run test:peer-browser -- --artifact ... --output ...` | Actual Worker/OPFS identity and journal ownership, key enrollment, two-channel RTC, UI recovery and interrupted content. |
-| Hosted participant | `npm run test:peer-host -- --artifact ... --artifacts ... --output ...` | Actual workerd controls and rendezvous, selective protocol routing, signed served code publication/restart, peer recovery and zero hosted traffic during ordinary commands. |
+| Hosted participant | `npm run test:peer-host -- --artifact ... --artifacts ... --output ...` | Actual workerd controls and rendezvous, selective protocol routing, signed served code publication/restart, peer recovery and zero hosted traffic during ordinary direct commands. |
+| Native WebSocket fallback | Add `--transport websocket` to the hosted runner, using a plain or SQL archive | The same application scenario after forced direct failure, actual Workerd relay frames, owned reconnect, independent live/history sockets and explicit relay bytes. |
+| Browser WebSocket | Add `--transport websocket --browser` to the hosted runner | The same Worker/OPFS, UI, content interruption and recovery scenario over Worker-owned WebSocket connections to the actual relay. |
 
 Use clean exact source commits, new output directories and the public artifacts
 emitted from those commits. Preserve failures as well as successes. A runner's
@@ -56,7 +58,7 @@ establish that its runtime scenarios ran.
 
 | Workstream | Required setting | Evidence to retain |
 | --- | --- | --- |
-| [Production routes](https://github.com/werg/tendriller-contrib/issues/14) | Actual deployed host/authentication; separate browser/native devices on home Wi-Fi, mobile and restrictive networks; configured TURN when selected. | Cold join, reconnect, suspension, direct/relayed route, retired introduction, peer traffic during host outage, actual wire bytes, time to usable state and bounded queues. |
+| [Production routes](https://github.com/werg/tendriller-contrib/issues/14) | Actual deployed host/authentication; separate browser/native devices on home Wi-Fi, mobile and restrictive networks; direct WebRTC plus authenticated WSS relay fallback. | Cold join, reconnect, suspension, direct/relayed route, retired introduction, peer traffic during host outage, actual wire bytes, time to usable state and bounded queues. |
 | [Cost](https://github.com/werg/tendriller-contrib/issues/15) | Matched application workload, provider analytics/account allocation and device/relay/storage measurements. | Hosted requests and bytes before/after ordinary commands; idle/discovery/control/publication costs; peer CPU/memory/storage/network and relevant battery behavior; relay costs separately; unknown meters explicitly unknown. |
 | [Recovery](https://github.com/werg/tendriller-contrib/issues/16) | Disposable deployment data, independently retained prefixes, real peer storage loss and durable hosted control continuity. | Coordinator/store removal; older complete survivor adoption; fresh peer reconstruction; known abandoned work and unknown loss; returning old-branch quarantine; exact takeover retry; protected-floor refusal; host restart without stale selection or a new root. |
 | [Device/privacy boundaries](https://github.com/werg/tendriller-contrib/issues/17) | Independently enrolled real devices, actual authorization, storage pressure and controlled key loss. | Grant/revocation transitions, current permissions after data recovery, encrypted key delivery, no server data-reader privilege by implication, same-device reopen, missing-store refusal, second-tab behavior, real browser suspension/eviction and denied private-data access. |
@@ -73,7 +75,7 @@ universal bound from advertised head metadata or heartbeat timestamps.
   A metadata-only head cannot seed recovery; repair its holes or choose an earlier
   complete point.
 - RTC application-frame counters exclude transport overhead. Distinguish direct
-  candidate pairs from TURN and count SDP separately. Loopback does not qualify
+  candidate pairs from WebSocket relay delivery and count SDP separately. Record ciphertext relay ingress/egress and test relay availability independently of control HTTP. Loopback does not qualify
   public NAT traversal or restrictive-network policy.
 - Two tabs sharing one storage owner are one data copy. A small test bucket does
   not establish default-bucket exhaustion or operating-system eviction behavior.
@@ -92,9 +94,7 @@ universal bound from advertised head metadata or heartbeat timestamps.
    deployed versions, browser/OS/native versions, topology and role ownership.
 2. Establish real enrollment, authorized key delivery and bounded discovery.
    Verify publication author/signatures and actual served asset bytes.
-3. Establish peer connections, then block host access during a fixed command,
-   read, signal and replication workload. Record every hosted request/body
-   counter and actual peer traffic rather than only a chosen endpoint.
+3. Establish direct peers, then block host access during a fixed command, read, signal and replication workload. Repeat with forced direct failure and the WSS relay, blocking control HTTP separately. Record every hosted request/body counter, relay ingress/egress and actual peer traffic. Cut the relay and observe the existing session's bounded reconnect and unchanged saved attempts.
 4. Remove the coordinator and its newest store. Recover from another complete
    peer, return the old branch, inspect abandoned work and explicitly reapply one
    suitable intent under current guards. Repeat across three generations.

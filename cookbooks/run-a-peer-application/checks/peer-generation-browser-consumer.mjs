@@ -11,10 +11,11 @@ import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, cre
   eventExecutionManifest, executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision,
   signTransitionRequest, validateParticipantRequest } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
-import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
+import { openFixtureConnection, inspectFixtureConnection } from './peer-generation-native-transport.mjs';
 import { conversation } from './peer-generation-definition.mjs';
 
 const path = resolve(process.argv[2]), report = JSON.parse(await readFile(path, 'utf8'));
+const relay = report.topology === 'browser-worker-opfs-websocket', relayBase = process.env.PEER_GENERATION_HOST_BRIDGE;
 const directory = dirname(path), stores = join(directory, 'stores'), assets = join(directory, 'assets');
 const sessions = new Set(), devices = new Set(), connections = [], introductions = new Map();
 const timeout = () => AbortSignal.timeout(20_000);
@@ -23,8 +24,6 @@ const valueHash = value => hash(JSON.stringify(value));
 let browser, page, server, registry, authority, a, controlDevice, deviceA, deviceC, browserIdentity;
 let blocked = false, controlRequests = 0, controlBodyBytes = 0, signalingRequests = 0, signalingBodyBytes = 0;
 const applicationId = randomBytes(32).toString('hex'), key = new Uint8Array(randomBytes(32));
-const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceAdditionalHostAddresses: ['127.0.0.1'],
-  iceUseIpv4: false, iceUseIpv6: false, iceUseTcp: false };
 const checkpoint = async stage => {
   report.stage = stage; await writeFile(path, `${JSON.stringify(report, null, 2)}\n`);
   console.log(`Browser peer consumer: ${stage}`);
@@ -51,15 +50,19 @@ const traffic = () => ({ controlRequests, controlBodyBytes, signalingRequests, s
 
 try {
   await mkdir(stores); await mkdir(assets);
+  if (relay) {
+    const response = await fetch(`${relayBase}/testing/page`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ applicationId }) });
+    assert.equal(response.status, 200);
+  }
   await mkdir(join(process.cwd(), 'deployment'));
   await writeFile(join(process.cwd(), 'deployment/bootstrap.mjs'), "export { applicationReady } from '../peer-generation-browser-page.mjs';\n");
   const bundle = await build({ entryPoints: { app: 'app.mjs', worker: 'peer-generation-browser-worker.mjs' },
     // The isolated install must not inherit a containing checkout's source aliases.
     absWorkingDir: process.cwd(), tsconfigRaw: {}, outdir: assets, bundle: true, splitting: true, format: 'esm', platform: 'browser',
     target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
-  for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
+  for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') || relay && input.startsWith('node_modules/@tendriller/core/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
   for (const file of ['board.html', 'compact.html', 'style.css']) await writeFile(join(assets, file), await readFile(join(process.cwd(), file)));
   report.browserAssets = await Promise.all((await readdir(assets)).map(async file => ({ file, sha256: hash(await readFile(join(assets, file))) })));
   report.browserBundleInputs = Object.keys(bundle.metafile.inputs).sort();
@@ -77,11 +80,11 @@ try {
     args: ['--disable-features=WebRtcHideLocalIpsWithMdns'] });
   report.browser = { implementation: 'chromium', version: browser.version(), headless: true,
     transportOwner: 'dedicated-worker', storage: 'opfs-with-exclusive-web-lock',
-    transportComposition: { page: 'serveWorkerWebRtcConnections', worker: 'openWorkerWebRtcConnection',
+    transportComposition: { page: relay ? 'no-transport-owner' : 'serveWorkerWebRtcConnections', worker: relay ? 'openWebSocketConnection' : 'openWorkerWebRtcConnection',
       authentication: 'session.connectPeer', fixtureControls: ['connect', 'inspect', 'disconnect'],
       qualification: 'explicit-transport-faults', applicationQueue: 'owned-session-only' },
-    signalingBoundary: 'loopback-fixture-http', controlBoundary: 'chronolog-participant-over-loopback-http',
-    nativeCandidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
+    signalingBoundary: relay ? 'workerd-relay-pairing' : 'loopback-fixture-http', controlBoundary: 'chronolog-participant-over-loopback-http',
+    nativeCandidateSource: relay ? 'not-used' : 'explicit-loopback-only', interfaceEnumeration: relay ? 'not-used' : 'disabled-by-native-options',
     pageErrors: [], consoleErrors: [] };
   const context = await browser.newContext();
   page = await context.newPage();
@@ -138,7 +141,7 @@ try {
   assert.deepEqual((await browserQuery()).value, (await a.query('conversation', {})).value);
   report.operations = { cancelledWaitPreservedAttempt: true, resumedExactAttempt: true, operationId: original.operationId,
     attemptId: applied.result.attemptId, receiptPeer: a.deviceId, enrolledFromPeer: true };
-  await checkpoint('enrolled browser keys and applied the exact offline attempt over real RTC');
+  await checkpoint('enrolled browser keys and applied the exact offline attempt over the selected peer transport');
 
   await page.evaluate(async () => {
     globalThis.capturedView = await application.readView();
@@ -158,7 +161,7 @@ try {
   await post(a, 'native-host-blocked', 'Native commands without host access');
   await synchronize(ab);
   const beforeDisposable = await a.recoveryPoint();
-  await a.signals.send('typing', { typing: true }, { ttlMs: 2500 });
+  await a.signals.send('typing', { typing: true, marker: 'private-live-signal-marker' }, { ttlMs: 2500 });
   const live = await page.evaluate(async () => {
     const result = await Promise.race([liveNext, new Promise((_, reject) => setTimeout(() => reject(Error('FIXTURE_SIGNAL_TIMEOUT')), 10_000))]);
     liveAbort.abort(); await liveStream.return(); return result.value;
@@ -346,6 +349,19 @@ try {
   await Promise.allSettled([...sessions].map(session => session.close()));
   await Promise.allSettled([...devices].map(device => device.close()));
   if (server) { server.closeAllConnections(); await new Promise(resolveClose => server.close(resolveClose)); }
+  if (relay) {
+    let traffic;
+    const deadline = performance.now() + 10_000;
+    do {
+      traffic = await (await fetch(`${relayBase}/testing/relay-traffic`)).json();
+      if (traffic.sockets.every(socket => socket.closed)) break;
+      await new Promise(resolve => setTimeout(resolve, 20));
+    } while (performance.now() < deadline);
+    report.relay = { implementation: 'browser-and-native-websocket', hostRuntime: 'workerd',
+      networkBoundary: 'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket',
+      independentLanes: ['reliable', 'live'], security: 'shared-authenticated-peer-channel',
+      controlOutageScope: 'control-http-only', traffic };
+  }
   await writeFile(path, `${JSON.stringify(report, null, 2)}\n`);
 }
 
@@ -415,9 +431,16 @@ async function connect(session, browserRole) {
   const id = String(introductions.size + 1), mailbox = introduction(); introductions.set(id, mailbox);
   const start = performance.now();
   const outcomes = await Promise.allSettled([
-    connectNativeApplicationWebRtc(session, { native, role: browserRole === 'offerer' ? 'answerer' : 'offerer',
-      peerIdentity: browserIdentity.deviceId, signaling: mailbox.native, timeoutMs: 30_000 }),
-    page.evaluate(options => fixture.connect(options), { id, role: browserRole, peerId: session.deviceId }),
+    (async () => {
+      const connection = await openFixtureConnection({ role: browserRole === 'offerer' ? 'answerer' : 'offerer',
+        peerIdentity: browserIdentity.deviceId, localIdentity: session.deviceId, signaling: mailbox.native,
+        signal: session.signal, timeoutMs: 30_000, relayBase, channel: `browser:${id}` });
+      try {
+        const link = await session.connectPeer({ connection, peerIdentity: browserIdentity.deviceId });
+        await link.synchronize(); return Object.assign(link, { fixtureConnection: connection });
+      } catch (error) { await connection.close(); throw error; }
+    })(),
+    page.evaluate(options => fixture.connect(options), { id, role: browserRole, peerId: session.deviceId, relayBase, channel: `browser:${id}` }),
   ]);
   if (outcomes.some(value => value.status === 'rejected')) {
     if (outcomes[0].status === 'fulfilled') await outcomes[0].value.close();
@@ -425,9 +448,10 @@ async function connect(session, browserRole) {
   }
   const nativeLink = outcomes[0].value, browserLink = outcomes[1].value;
   assert.equal(nativeLink.peerId, browserIdentity.deviceId); assert.equal(browserLink.peerId, session.deviceId);
-  const routes = [await nativeLink.rtc.getRoute(), browserLink.route];
-  assert.ok(routes.every(route => route.route === 'direct' && route.localCandidateType && route.remoteCandidateType));
-  assert.equal(mailbox.snapshot().closed, true); assert.equal(mailbox.snapshot().descriptions, 2);
+  const routes = [await inspectFixtureConnection(nativeLink.fixtureConnection), browserLink.route];
+  assert.ok(routes.every(route => relay ? route.route === 'websocket-relay' : route.route === 'direct' && route.localCandidateType && route.remoteCandidateType));
+  if (relay) { mailbox.native.close(); mailbox.browserClose(); }
+  assert.equal(mailbox.snapshot().closed, true); assert.equal(mailbox.snapshot().descriptions, relay ? 0 : 2);
   const connection = { id, native: nativeLink, mailbox, observed: { peers: [session.deviceId, browserIdentity.deviceId],
     authenticated: true, routes, connectedInMs: performance.now() - start } };
   connections.push(connection); return connection;

@@ -57,7 +57,8 @@ const introductions = host ? await import('./peer-generation-host-introductions.
 try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions,
     qualifyParticipation: options => qualifyParticipation({ ...options,
-      ports: host ? session => host.createParticipationPorts(session, { openConnection, createPeerIntroductions: introductions.createPeerIntroductions }) : network.ports,
+      ports: host ? session => host.createParticipationPorts(session, { openDirectConnection: openConnection, createPeerIntroductions: introductions.createPeerIntroductions, createPeerRelay: introductions.createPeerRelay,
+        openRelayConnection: async () => { throw Error('QUALIFICATION_EXPECTED_DIRECT_ROUTE'); } }) : network.ports,
       copyPrefix: connectSessions, inspectTransport: host ? async () => { await host.drainIntroductions();
         return { boundary: 'tendriller-sdk-introductions', traffic: await options.host.traffic() }; } : network.inspect }),
     ...(host ? { createControl: host.createControl } : {}) });

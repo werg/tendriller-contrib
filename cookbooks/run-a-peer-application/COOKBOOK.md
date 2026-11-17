@@ -108,6 +108,7 @@ inputs, a native application uses the public package:
 ```js
 import { openNativeDevice, openNativeApplication } from '@chronolog/peer-session/native';
 import { openWebRtcConnection } from '@chronolog/peer-session/webrtc';
+import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 import { createNativePeerConnection } from '@chronolog/peer-session/webrtc-native';
 import { createPeerIntroductions } from '@tendriller/core/peers';
 import { conversation } from './peer-conversation.mjs';
@@ -126,7 +127,8 @@ session.participate({
   ...createPeerIntroductions({
     peers, // The deployment's authenticated public Tendriller peer client.
     identity: session.deviceId,
-    openConnection: options => openWebRtcConnection({ ...options, createPeerConnection: createNativePeerConnection }),
+    openDirectConnection: options => openWebRtcConnection({ ...options, createPeerConnection: createNativePeerConnection }),
+    openRelayConnection: ({ relay, signal }) => openWebSocketConnection(relay, { ready: relay.ready, signal }),
   }),
 });
 
@@ -147,7 +149,7 @@ try {
 The application keeps draft text and any operation reference needed by its UI.
 Chronolog owns the attempt journal, exact retry, ordering, peer replication,
 discovery scheduling, coordinator selection and view recovery. The Tendriller
-adapter only maps introductions to the host transport. A timeout cancels the wait; it does not cancel the command or
+adapter tries the direct connection, then the host's WebSocket relay within the same owned opening. Both carry the same authenticated encrypted peer channel. It does not create another application or retry owner. A timeout cancels the wait; it does not cancel the command or
 establish a rejection. `session.operations.get(operationId)` recovers its current
 state, and `session.retry(operationId)` resends only the original saved attempt.
 

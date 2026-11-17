@@ -10,7 +10,7 @@ import { validatePeerGenerationReport } from './peer-generation-report.mjs';
 import { validateBrowserPeerReport } from './peer-generation-browser-report.mjs';
 import { validatePeerTaskReport } from './peer-generation-task-report.mjs';
 
-const required = ['native-events', 'native-rtc', 'browser-worker', 'native-sql', 'hosted-participant', 'hosted-websocket-relay'];
+const required = ['native-events', 'native-rtc', 'browser-worker', 'native-sql', 'hosted-participant', 'hosted-websocket-relay', 'browser-websocket-relay'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 const hex = (value, length, name) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${length}}$`, 'u'), name);
 
@@ -51,8 +51,8 @@ export function assemblePeerComposition(inputs) {
     const raw = Buffer.from(input.bytes), report = JSON.parse(raw);
     const topology = report.topology;
     let gate, summary;
-    if (topology === 'browser-worker-opfs-native-rtc') {
-      gate = 'browser-worker'; summary = validateBrowserPeerReport(report);
+    if (['browser-worker-opfs-native-rtc', 'browser-worker-opfs-websocket'].includes(topology)) {
+      gate = topology === 'browser-worker-opfs-websocket' ? 'browser-websocket-relay' : 'browser-worker'; summary = validateBrowserPeerReport(report);
       browser = { implementation: report.browser.implementation, version: report.browser.version,
         storage: report.browser.storage, transportOwner: report.browser.transportOwner };
     } else if (topology === 'independent-packed-tasks') {
@@ -76,9 +76,9 @@ export function assemblePeerComposition(inputs) {
     } else {
       if (eventManifest !== undefined) assert.equal(report.executionManifestDigest, eventManifest, 'Event execution manifests differ across consumers');
       eventManifest = report.executionManifestDigest;
-      if (!['native-events', 'hosted-websocket-relay'].includes(gate)) assert.equal(session.provenance.optionalNativeRtc, true, 'RTC gate requires the emitted native transport');
+      if (!['native-events', 'hosted-websocket-relay', 'browser-websocket-relay'].includes(gate)) assert.equal(session.provenance.optionalNativeRtc, true, 'RTC gate requires the emitted native transport');
     }
-    if (['hosted-participant', 'hosted-websocket-relay'].includes(gate)) {
+    if (['hosted-participant', 'hosted-websocket-relay', 'browser-websocket-relay'].includes(gate)) {
       for (const artifact of report.host.artifacts) addPackage(artifact, 'werg/tendriller', false);
       if (hostedProvenance !== undefined) assert.deepEqual(report.host.provenance, hostedProvenance, 'Hosted direct and relay gates use different engine contents');
       hostedProvenance = report.host.provenance;
@@ -113,7 +113,7 @@ export function assemblePeerComposition(inputs) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const { values } = parseArgs({ options: { report: { type: 'string', multiple: true }, output: { type: 'string' } } });
-  if (!values.report?.length || !values.output) throw Error('Usage: --report /exact/report.json (repeat for all six gates) --output /new/composition.json');
+  if (!values.report?.length || !values.output) throw Error('Usage: --report /exact/report.json (repeat for all seven gates) --output /new/composition.json');
   const inputs = await Promise.all(values.report.map(async path => ({ path, bytes: await readFile(resolve(path)) })));
   const manifest = assemblePeerComposition(inputs);
   await writeFile(resolve(values.output), `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });

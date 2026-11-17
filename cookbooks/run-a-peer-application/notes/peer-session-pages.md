@@ -26,6 +26,7 @@ serving the page facade:
 import { createPeerIntroductions } from '@tendriller/core/peers';
 import { serveApplicationWorker } from '@chronolog/peer-session/browser';
 import { openWorkerWebRtcConnection } from '@chronolog/peer-session/webrtc';
+import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 
 const control = session.connectControlParticipant({
   exchange: (envelope, { signal }) => peers.exchange(envelope, { signal }),
@@ -35,7 +36,8 @@ session.participate({
   ...createPeerIntroductions({
     peers,
     identity: session.deviceId,
-    openConnection: options => openWorkerWebRtcConnection(self, options),
+    openDirectConnection: options => openWorkerWebRtcConnection(self, options),
+    openRelayConnection: ({ relay, signal }) => openWebSocketConnection(relay, { ready: relay.ready, signal }),
   }),
 });
 serveApplicationWorker(session, self, { host: control });
@@ -47,13 +49,13 @@ policy. The session owns authority verification, exact takeover/publication
 journals and shutdown. Attaching the control port performs no request.
 Participation owns bounded discovery, connection attempts, authority refresh,
 coordinator selection, reconnect grace and recovery approval. The host adapter
-supplies routing and invitations; it does not implement those policies.
+supplies routing and invitations, then tries direct RTC and the bounded WebSocket relay within one connection opening. Both use the same encrypted peer channel; the Worker retains authority and the only command journal.
 
 On the page, call `serveWorkerWebRtcConnections(worker)` from the public
 `webrtc` entry before connecting the page facade. This helper supplies browser
 RTC mechanics while the Worker opens the raw connection and authenticates it
 through its own session. Close the helper when the owning page closes. Private
-keys, authentication and application traffic remain in the Worker.
+keys, authentication and application traffic remain in the Worker. The WebSocket fallback opens directly in that Worker and uses two independent sockets for reliable history and disposable live updates. It needs no page-owned socket or second Worker facade.
 
 The device owner retains private keys, original signed attempts, authenticated
 authority, materialization and detached content. RPC requests carry application

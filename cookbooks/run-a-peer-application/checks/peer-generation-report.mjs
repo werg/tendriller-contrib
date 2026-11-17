@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
+import { validateRelayTraffic } from './peer-generation-relay-report.mjs';
 
 const hex = (value, size, name) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${size}}$`), name);
 const count = (value, name) => assert.ok(Number.isSafeInteger(value) && value >= 0, name);
@@ -158,13 +159,8 @@ export function validatePeerGenerationReport(report) {
   if (relay) {
     assert.ok(hosted, 'WebSocket fallback must exercise the actual hosted relay');
     const network = report.relay;
-    same(network?.implementation, 'native-websocket', 'Exercise the real native WebSocket client');
-    same(network.hostRuntime, 'workerd', 'Exercise the actual Worker relay');
-    same(network.networkBoundary, 'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket', 'State the measured physical boundary');
     same(network.forcedDirectFailure, true, 'Force direct failure to exercise fallback');
-    same(network.independentLanes, ['reliable', 'live'], 'Disposable traffic needs an independent socket');
-    same(network.security, 'shared-authenticated-peer-channel', 'Both transports must use common peer security');
-    same(network.controlOutageScope, 'control-http-only', 'Relay operation cannot claim a complete host outage');
+    validateRelayTraffic(network, { implementation: 'native-websocket', minimumSockets: network.connections.length * 4 });
     assert.ok(network.connections?.length >= 4, 'Exercise original, reopened, fresh and returning connections');
     for (const link of network.connections) {
       same(link.route, 'websocket-relay'); same(link.authenticated, true); same(link.closed, true);
@@ -178,17 +174,6 @@ export function validatePeerGenerationReport(report) {
     for (const field of ['physicalLinksCut', 'reconnected', 'sameGeneration']) same(reconnect[field], true, `Missing relay reconnect observation: ${field}`);
     hex(reconnect.identity, 64, 'Relay reconnection lost its device identity');
     assert.ok(reconnect.afterConnections > reconnect.beforeConnections);
-    same(network.traffic?.boundary, 'actual-workerd-websocket-relay');
-    const sockets = network.traffic.sockets;
-    assert.ok(sockets?.length >= network.connections.length * 4);
-    for (const socket of sockets) {
-      assert.ok(['reliable', 'live'].includes(socket.lane)); same(socket.closed, true);
-      same(socket.plaintextMatches, [], 'A declared private payload reached the relay in cleartext');
-      for (const field of ['sentBytes', 'receivedBytes', 'sentBinaryFrames', 'receivedBinaryFrames', 'maxQueuedBytes']) count(socket[field], `Missing relay ${field}`);
-      assert.ok(socket.maxQueuedBytes <= 2_200_000);
-    }
-    for (const lane of ['reliable', 'live']) assert.ok(sockets.some(socket => socket.lane === lane && socket.sentBinaryFrames > 0 && socket.receivedBinaryFrames > 0), `No actual ${lane} frames crossed the relay`);
-    assert.ok(network.traffic.host.relayUpgrades >= 16 && network.traffic.host.relaySentBytes > 0 && network.traffic.host.relayReceivedBytes > 0, 'Relay cost must include observed host byte traffic');
     assert.ok(host.content?.bytes > 0 && host.content.retainedByPeer === true, 'The relay must transfer retained content');
     hex(host.content.sha256, 64, 'Missing transferred content digest');
     const transport = host.transport;

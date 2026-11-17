@@ -12,11 +12,12 @@ import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
-  transport: { type: 'string', default: 'native-rtc' },
+  transport: { type: 'string', default: 'native-rtc' }, browser: { type: 'boolean', default: false },
   'allow-dirty': { type: 'boolean', default: false },
 } });
 if (!values.artifact || !values.artifacts || !values.output) throw Error('Usage: --artifact /exact/native-rtc-session.tgz --artifacts /exact/tendriller-dist --output /new/evidence');
 assert.ok(['native-rtc', 'websocket'].includes(values.transport), 'Choose native-rtc or websocket');
+if (values.browser) assert.equal(values.transport, 'websocket', 'Use the direct browser runner for RTC');
 const here = dirname(fileURLToPath(import.meta.url)), output = resolve(values.output), artifacts = resolve(values.artifacts);
 try { await stat(output); throw Error('Use a new evidence directory'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const hostDirectory = join(output, 'host');
@@ -96,12 +97,12 @@ import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 const require = createRequire(import.meta.url);
 const migrations = await readD1Migrations(dirname(require.resolve('@tendriller/engine/accounts-schema')));
-export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:360000,provide:{d1Migrations:migrations,bridge:${JSON.stringify(bridge.url)}}}});
+export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:540000,provide:{d1Migrations:migrations,bridge:${JSON.stringify(bridge.url)}}}});
 `);
 const worker = run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.config.mjs'], hostDirectory);
 try {
   await Promise.race([bridge.ready, worker.done.then(() => { throw Error('Workerd exited before becoming ready'); })]);
-  const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
+  const peer = run(process.execPath, [join(here, values.browser ? 'run-peer-generation-browser.mjs' : 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
     '--transport', values.transport, '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
   { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath, PEER_GENERATION_HOST_SDK: sdk });
   await peer.done;

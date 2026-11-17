@@ -1,3 +1,4 @@
+import { syntheticBrowserRelayReport } from './peer-generation-report-fixtures.mjs';
 import { syntheticBrowserReport as fixture } from './peer-generation-report-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -48,4 +49,17 @@ test('reopening must retain the browser identity, durable key enrollment, and th
   rejects(report => { report.ownership.abruptWorkerReopen.durableOperation = false; });
   rejects(report => { report.contentRecovery.partialRetentionRefused = false; });
   rejects(report => { report.contentRecovery.partialSurvivedRestart = false; });
+});
+
+
+test('browser relay evidence requires Worker sockets, private payload isolation and host byte observations', () => {
+  const summary = validateBrowserPeerReport(syntheticBrowserRelayReport());
+  assert.ok(summary.relay.traffic.host.relayReceivedBytes > 0);
+  for (const mutate of [
+    report => { report.relay.controlOutageScope = 'entire-host'; },
+    report => { report.browser.transportComposition.page = 'private-session-owner'; },
+    report => { report.relay.traffic.sockets[0].plaintextMatches = ['private-live-signal-marker']; },
+    report => { report.connections[0].routes[0].route = 'direct'; },
+    report => { report.relay.traffic.host.relayReceivedBytes = 0; },
+  ]) { const report = syntheticBrowserRelayReport(); mutate(report); assert.throws(() => validateBrowserPeerReport(report)); }
 });
