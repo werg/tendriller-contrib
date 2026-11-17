@@ -6,7 +6,7 @@ const deferred = () => { let resolve; const promise = new Promise(done => { reso
 const last = entry => entry.publications.at(-1);
 
 export async function exerciseTimers({ a, b, journal, resources, post, report, timeout, synchronize, recover, effects, provider, drain }) {
-  let clock = 999, beforePublish = async () => {}, loseReply = false;
+  let clock = 999, beforePublish = async () => {}, afterPublish = async () => {}, loseReply = false;
   const calls = [];
   const options = { id: 'notification-scheduler', version: '1', session: a, store: journal,
     configurationTopic: 'schedules', authorize: ({ configuration }) => configuration.author === a.deviceId,
@@ -16,6 +16,7 @@ export async function exerciseTimers({ a, b, journal, resources, post, report, t
       await beforePublish(occurrence);
       const handle = reapplyOf === null ? await a.command('fireNotification', occurrence, { operationId, basedOn })
         : await a.reapply(reapplyOf, 'fireNotification', occurrence, { operationId, basedOn });
+      await afterPublish(occurrence, handle, signal);
       if (loseReply) { loseReply = false; await handle.applied({ signal }); throw Error('TIMER_COMMAND_REPLY_LOST'); }
       return handle;
     },
@@ -107,14 +108,20 @@ export async function exerciseTimers({ a, b, journal, resources, post, report, t
   await schedule('owned-clock-wake', 8000); clock = 7999;
   await scheduler.tick(clock, { signal: timeout() });
   const fired = deferred();
-  beforePublish = async occurrence => { if (occurrence.timerId === 'owned-clock-wake') fired.resolve(); };
+  afterPublish = async (occurrence, handle, signal) => {
+    if (occurrence.timerId === 'owned-clock-wake') { await handle.applied({ signal }); fired.resolve(); }
+  };
   const running = scheduler.run({ signal: timeout() }); clock = 8000;
   await Promise.race([fired.promise, running.then(() => { throw Error('TIMER_DID_NOT_WAKE'); })]);
-  // inspect is queued behind the in-flight tick and sees its durable result.
-  const waking = await entryFor('owned-clock-wake');
-  assert.equal(last(waking).status, 'applied');
   await scheduler.close(); await running;
   assert.throws(() => scheduler.inspect(), /APPLICATION_CONSUMER_CLOSED/u);
+  // The consumer admits one journal turn at a time. Inspect after the owner has
+  // settled, then reconcile any final applied acknowledgement from its session.
+  scheduler = await open(); await scheduler.tick(clock, { signal: timeout() });
+  const waking = await entryFor('owned-clock-wake');
+  assert.equal(last(waking).status, 'applied');
+  assert.equal(calls.filter(value => value.occurrenceId === waking.occurrence.occurrenceId).length, 1);
+  await scheduler.close();
 
   report.timers = { first, retryPreserved: true, cancelled, race, uncertain, reconciled,
     completed, abandoned, restored, retainedEffect, externalBeforeRecovery, externalAfterRecovery: provider.snapshot(),
