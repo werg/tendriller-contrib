@@ -513,10 +513,40 @@ async function taskAction(task, action) {
   return waitForUiOperation(`${action}: ${task.title}`);
 }
 async function waitForUiOperation(label, expected = 'applied') {
-  await page.waitForFunction(({ label, expected }) => [...document.querySelectorAll('#operations li')]
-    .some(row => row.querySelector('strong')?.textContent === label && row.dataset.status === expected), { label, expected });
+  try {
+    await page.waitForFunction(({ label, expected }) => [...document.querySelectorAll('#operations li')]
+      .some(row => row.querySelector('strong')?.textContent === label && row.dataset.status === expected), { label, expected });
+  } catch (error) {
+    const dom = await observeFailure(() => page.evaluate(label => {
+      const rows = [...document.querySelectorAll('#operations li')];
+      return { status: document.querySelector('#status').textContent.slice(0,1024),
+        operationId: rows.find(row => row.querySelector('strong')?.textContent === label)?.dataset.operation ?? null,
+        rows: rows.slice(0,20).map(row => ({ operationId: row.dataset.operation, status: row.dataset.status,
+          text: row.textContent.slice(0,1024) })) };
+    }, label));
+    const operationId = dom.value?.operationId;
+    const [browserState, nativeState, browserView, nativeView] = await Promise.all([
+      observeFailure(() => page.evaluate(async operationId => ({ status: application.status,
+        operation: operationId ? await application.operations.get(operationId) : null,
+      }), operationId)),
+      observeFailure(async () => ({ status: a.status,
+        operation: operationId ? await a.operations.get(operationId, { author: browserIdentity.deviceId }) : null,
+      })),
+      observeFailure(browserQuery), observeFailure(() => a.query(queryName, {})),
+    ]);
+    report.uiFailure = { label, expected, dom, browserState, nativeState, browserView, nativeView };
+    throw error;
+  }
   const operationId = await page.locator('#operations li').evaluateAll((rows, label) => rows.find(row => row.querySelector('strong')?.textContent === label).dataset.operation, label);
   return page.evaluate(id => application.operations.get(id), operationId);
+}
+
+async function observeFailure(read) {
+  let timer;
+  try { return await Promise.race([
+    Promise.resolve().then(read).then(value => ({ value }), error => ({ error: String(error) })),
+    new Promise(resolveTimeout => { timer = setTimeout(() => resolveTimeout({ error: 'FIXTURE_FAILURE_OBSERVATION_TIMEOUT' }), 5000); }),
+  ]); } finally { clearTimeout(timer); }
 }
 
 async function qualifyCompetingClaims(connection) {
