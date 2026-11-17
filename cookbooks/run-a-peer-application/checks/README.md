@@ -28,6 +28,27 @@ The one-off in-process SDP mailbox is test infrastructure, not a claim to have
 exercised Tendriller rendezvous or deployed discovery. A new runner or a passing
 evidence-validator test does not mean the RTC runtime gate has run.
 
+The independent browser/native gate uses the same public archive, Chromium and
+the maintained Worker transport handoff:
+
+```sh
+npm run test:peer-browser -- --artifact /exact/peer-session-with-native-rtc.tgz \
+  --browser /exact/chromium --output /new/browser-peer-evidence
+```
+
+It opens real exclusive OPFS storage in a DedicatedWorker and attempts a second
+tab owner. It checks explicit refusal when durable storage is unavailable,
+identity and operation restart, authenticated browser/native RTC, ordinary
+commands and live signals with the static page/SDP host returning 503, coherent
+selected-prefix recovery and deliberate reapplication. A bounded encrypted file
+is read partially, survives Worker restart, and completes after reconnect before
+the browser may claim complete retention. The one-off HTTP SDP mailbox is test
+infrastructure; this gate does not qualify Tendriller enrollment or Internet
+reachability. The Worker driver only invokes public application operations;
+authentication, channel handoff, replication and retry belong to the package.
+The [browser evidence validator](peer-generation-browser-report.mjs) validates
+those observations separately from the native-only report.
+
 For actual Tendriller controls and short-lived SDP rendezvous, run:
 
 ```sh
