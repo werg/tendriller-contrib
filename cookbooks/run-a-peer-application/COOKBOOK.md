@@ -15,10 +15,9 @@ sources: ["https://github.com/werg/chronolog-db/blob/5fbc7b182e461e12100c8bc339c
 
 **Implementation preview:** This recipe targets the paired `@chronolog/peer-session`
 composition under active qualification. The public encrypted session and
-maintained network/RTC composition are implemented. Its preserved native/events
-package report used an in-process link and dirty-source artifacts; the newer RTC
-consumer needs its own exact-archive result. Neither source code nor that older
-report establishes browser, Internet or deployed readiness;
+maintained network/RTC composition are implemented. The qualification note
+preserves independent native/events and clean native RTC reports with their exact
+source and archive hashes. Those runs do not establish browser, Internet or deployed readiness;
 existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
 
 The unified target uses `local()` for applied-here results and `final()` for
@@ -51,12 +50,16 @@ older immutable-prefix implementation and the original scope of its reports.
 | --- | --- | --- |
 | Disposable typing, cursors, progress or previews | [Standalone live signals](../share-live-signals/COOKBOOK.md) | An authenticated scope, topic policy and live transport; no history, database or finality. |
 | Conversation and recorded observations | [Events-only conversation definition](snippets/peer-conversation.mjs) with the public session | Explicit device creation/enrollment, signed application descriptor, current controls and authorized keys. No SQL/WASM. |
-| Board, reservations or guarded domain changes | The same session with the pinned SQL/event execution runtime | Schema and ownership setup, deterministic assertions and updates, compatible native/WASM engine artifacts. |
+| Board, reservations or guarded domain changes | [Shared task-board definition](snippets/peer-task-board.mjs) with the pinned SQL/event runtime | Signed schema and collective ownership, deterministic assertions, compatible native/WASM engine artifacts. |
 
 An agent can use any path. Its presence does not require a durable transaction
 for every preview or a fixed native authority for ordinary collaboration.
 Choose one application backend and one authenticated profile. Unavailable peers
 never trigger an automatic switch to hosted JSON state or a stronger profile.
+
+The [owned Worker page recipe](notes/peer-session-pages.md) provides two layouts
+using domain commands, coherent queries and explicit recovery notices. Its build
+requires a public session package and complete real deployment assets.
 
 ## Follow conversation through a lost peer
 
