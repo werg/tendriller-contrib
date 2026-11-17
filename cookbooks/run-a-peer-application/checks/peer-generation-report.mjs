@@ -22,7 +22,8 @@ export function validatePeerGenerationReport(report) {
   same(report.mode, 'runtime', 'A build cannot qualify runtime behavior');
   same(report.profile, 'peer-generation-v1', 'A different profile cannot qualify tolerant recovery');
   hex(report.executionManifestDigest, 64, 'Missing exact execution manifest');
-  same(report.topology, 'independent-packed-peers', 'Report the actual execution topology');
+  assert.ok(['independent-packed-peers', 'independent-native-rtc'].includes(report.topology), 'Report the actual execution topology');
+  const rtc = report.topology === 'independent-native-rtc';
   same(report.passed, true, 'The consumer did not pass');
   nonempty(report.runtime?.node, 'Missing actual Node version');
   nonempty(report.runtime?.platform, 'Missing actual platform');
@@ -39,7 +40,8 @@ export function validatePeerGenerationReport(report) {
     hex(artifact.sourceTree, 40, 'Missing artifact source tree');
     same(typeof artifact.sourceDirty, 'boolean', 'Artifact cleanliness must be observed');
   }
-  same(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native'], 'Use only the documented public session entry');
+  same(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native',
+    ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : [])], 'Use only the documented public session entry');
   same(report.publicBoundary?.siblingSourceImports, 0, 'A sibling source checkout is not an independent consumer');
   same(report.publicBoundary?.applicationRetryQueues, 0, 'The consumer must use the session journal');
   same(report.publicBoundary?.residentRequired, false, 'A permanent resident is not this profile');
@@ -54,6 +56,38 @@ export function validatePeerGenerationReport(report) {
   unchangedCounter(host.applicationBodyBytes, 'Hosted application body bytes');
   same(host.applicationBodyBytes.before, 0, 'Default commands must not upload application bodies');
   same(host.finalityCapability, false, 'Applied progress must not claim finality');
+  if (rtc) {
+    hex(report.runtime.dependencies?.lockSha256, 64, 'Missing exact RTC dependency lock');
+    assert.ok(report.runtime.dependencies.packages?.length > 0, 'Missing RTC dependency provenance');
+    assert.ok(report.runtime.dependencies.packages.every(item => item.path && item.version && item.integrity), 'Incomplete RTC dependency provenance');
+    const network = report.rtc;
+    same(network?.implementation, 'werift', 'Missing maintained native RTC adapter');
+    same(network.version, '0.27.0', 'RTC dependency must match the public adapter pin');
+    same(network.signalingBoundary, 'one-off-in-process-sdp-mailbox', 'The introduction boundary must be explicit');
+    same(network.byteBoundary, 'authenticated-reliable-application-frames', 'Byte scope must exclude unobserved wire overhead');
+    assert.ok(network.connections?.length >= 4, 'Recovery requires original, reconnect, fresh and returning-peer RTC sessions');
+    for (const link of network.connections) {
+      same(link.authenticated, true, 'RTC readiness alone is not peer authentication');
+      assert.ok(link.peers?.length === 2 && link.peers[0] !== link.peers[1], 'RTC must connect two distinct devices');
+      for (const peer of link.peers) hex(peer, 64, 'Missing authenticated device identity');
+      same(link.closed, true, 'RTC lifetime must be released');
+      same(link.signaling.closed, true, 'Introduction remains open');
+      same(link.signaling.sentMessages, 2, 'Signaling must carry one complete offer and answer');
+      assert.ok(link.signaling.sentBytes > 0, 'Missing actual SDP bytes');
+      assert.ok(link.reliable.sentBytes > 0 && link.reliable.receivedBytes > 0, 'RTC carried no authenticated application frames');
+      assert.ok(link.routes?.length === 2, 'Missing observed route states');
+      for (const route of link.routes) {
+        assert.ok(['direct', 'relay', 'unknown'].includes(route.route), 'Invented RTC route');
+        if (route.route === 'direct') assert.ok(['host', 'srflx', 'prflx'].includes(route.localCandidateType) && ['host', 'srflx', 'prflx'].includes(route.remoteCandidateType), 'Direct route requires both observed candidates');
+        if (route.route === 'relay') assert.ok(route.localCandidateType === 'relay' || route.remoteCandidateType === 'relay', 'Relay route requires an observed relay candidate');
+      }
+    }
+    const transport = host.transport;
+    assert.ok(transport?.after.reliable.sentBytes > transport?.before.reliable.sentBytes &&
+      transport?.after.reliable.receivedBytes > transport?.before.reliable.receivedBytes, 'Host outage must carry actual RTC application traffic');
+    same(transport.before.signaling, transport.after.signaling, 'Application work changed introduction traffic');
+    same(transport.after.signaling.closed, true, 'Host-independent commands require retired signaling');
+  }
 
   const retry = report.lostReply;
   same(retry?.injectedAfterPersistence, true, 'Lost reply must follow durable acceptance');
@@ -113,6 +147,7 @@ export function validatePeerGenerationReport(report) {
     topology: report.topology,
     source: report.source,
     artifacts: report.artifacts,
+    ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
     commandsWithHostBlocked: host.commandsApplied,
     hostRequestsDuringCommands: host.requests.after - host.requests.before,
     hostedApplicationBodyBytes: host.applicationBodyBytes.after,
@@ -126,7 +161,8 @@ export function validatePeerGenerationReport(report) {
     },
     reapplication: reapply,
     limitations: [
-      'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
+      rtc ? 'Actual native loopback RTC with in-process SDP introduction; this is not a deployed-network or browser qualification.'
+        : 'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
       'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
       'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
     ],

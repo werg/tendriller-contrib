@@ -10,6 +10,24 @@ and synthetic tests remain separate from runtime qualification. The resident/bro
 checks below exercise explicitly finalized chronological profiles and retain
 their own original guarantees and source pins.
 
+The same recovery scenario can use the public maintained native RTC composition:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs \
+  --artifact /exact/peer-session-with-native-rtc.tgz \
+  --transport native-rtc --output /new/rtc-evidence
+```
+
+Build that archive with Chronolog's `tools/package-peer-session.mjs --native-rtc`.
+This explicit adapter installs its pinned `werift@0.27.0` dependency into the fresh
+consumer and records every transitive package integrity. The default direct
+package gate stays dependency-free and installs offline. RTC evidence separately
+records authentication, retired offer/answer signaling, actual route observations,
+application-frame traffic during the blocked-host workload and connection cleanup.
+The one-off in-process SDP mailbox is test infrastructure, not a claim to have
+exercised Tendriller rendezvous or deployed discovery. A new runner or a passing
+evidence-validator test does not mean the RTC runtime gate has run.
+
 
 These are two page-owned adaptations of the same application decisions:
 

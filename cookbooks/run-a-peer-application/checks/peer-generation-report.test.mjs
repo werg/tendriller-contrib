@@ -97,3 +97,42 @@ test('deliberate reapplication needs new identity, linked abandoned intent and c
   rejects(value => { value.reopen.identityAfter = 'replacement-device'; });
   rejects(value => { value.reopen.operationAfter.status = 'waiting'; });
 });
+
+function syntheticRtcReport() {
+  const report = syntheticReport();
+  report.topology = 'independent-native-rtc';
+  report.publicBoundary.imports.push('@chronolog/peer-session/webrtc-native');
+  report.runtime.dependencies = { lockSha256: 'c'.repeat(64), packages: [{ path: 'node_modules/werift', version: '0.27.0', integrity: 'sha512-synthetic' }] };
+  const signaling = { sentMessages: 2, sentBytes: 2048, closed: true };
+  report.rtc = { implementation: 'werift', version: '0.27.0', signalingBoundary: 'one-off-in-process-sdp-mailbox',
+    byteBoundary: 'authenticated-reliable-application-frames', connections: Array.from({ length: 4 }, () => ({
+      peers: ['1'.repeat(64), '2'.repeat(64)], authenticated: true, closed: true, signaling,
+      routes: [{ route: 'unknown', localCandidateType: null, remoteCandidateType: null }, { route: 'unknown', localCandidateType: null, remoteCandidateType: null }],
+      reliable: { sentBytes: 500, receivedBytes: 500 },
+    })) };
+  report.hostOutage.transport = { before: { reliable: { sentBytes: 100, receivedBytes: 100 }, signaling },
+    after: { reliable: { sentBytes: 500, receivedBytes: 500 }, signaling } };
+  return report;
+}
+
+test('native RTC evidence keeps unknown routes and the actual introduction and byte boundaries', () => {
+  const report = syntheticRtcReport();
+  const summary = validatePeerGenerationReport(report);
+  assert.equal(summary.rtc.connections[0].routes[0].route, 'unknown');
+  assert.ok(summary.limitations.some(value => value.includes('in-process SDP')));
+  assert.throws(() => validatePeerGenerationReport({ ...syntheticReport(), topology: 'independent-native-rtc' }));
+});
+
+test('host-independent RTC commands require authenticated traffic after signaling retires', () => {
+  for (const mutate of [
+    value => { value.rtc.connections[0].authenticated = false; },
+    value => { value.rtc.connections[0].closed = false; },
+    value => { value.hostOutage.transport.after.reliable.sentBytes = 100; },
+    value => { value.hostOutage.transport.after.signaling = { sentMessages: 3, sentBytes: 4096, closed: true }; },
+    value => { value.rtc.connections[0].routes[0].route = 'direct'; },
+    value => { delete value.runtime.dependencies.lockSha256; },
+  ]) {
+    const report = syntheticRtcReport(); mutate(report);
+    assert.throws(() => validatePeerGenerationReport(report));
+  }
+});
