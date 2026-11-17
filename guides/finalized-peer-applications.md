@@ -1,9 +1,10 @@
 # Use an explicitly finalized peer profile
 
 This guide describes the explicitly selected chronological finality profiles and
-their existing public APIs. The [peer-first default](application-primitives.md)
-has a different authenticated profile and recovery contract. These guarantees
-must not be inferred from a generation-scoped applied result.
+their existing public APIs. Use it when building with the current pinned packages.
+The [proposed peer-generation profile](application-primitives.md) has a different
+recovery contract and is not implemented or qualified by those packages. These
+guarantees must not be inferred from its proposed generation-scoped applied result.
 
 Start with what must survive. A live cursor can disappear. A submitted message
 must be recoverable. A resource reservation must satisfy its condition. Sending

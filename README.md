@@ -23,25 +23,30 @@ service guarantees, and optional [publishing, preview, bridge, and collector too
 The default core installs no application workflow. Deliberately selected trusted
 references live beside the cookbook that explains their policy.
 
-For architecture and agent implementation, start with
-[application primitives and roles](guides/application-primitives.md). It gives a
-short decision path through local state, ephemeral signals, durable events,
-transactions, tolerant peer recovery and protected effects. [Live signals](cookbooks/share-live-signals/COOKBOOK.md)
+For implementation with the current pinned packages, start with the
+[finalized-profile guide](guides/finalized-peer-applications.md). It describes the
+existing `local()` / `final()` APIs: both return accepted or rejected outcomes,
+and final outcomes belong to an immutable locally applied prefix.
+[Application primitives and roles](guides/application-primitives.md) preserves
+the proposed `peer-generation-v1` architecture, including tolerant peer recovery.
+That profile and its generation-scoped session and applied/shared/abandoned
+outcomes are not implemented or qualified by the current pinned packages.
+[Live signals](cookbooks/share-live-signals/COOKBOOK.md)
 cover typing, presence, cursors, progress and transient messages without requiring
 a database or finality service.
 The [standalone composition check](cookbooks/share-live-signals/checks/README.md)
 uses an actual public signal module for live readings and token previews. For
 peer applications, the selected profile defines whether an outcome is applied
-or final. Recovery may abandon a recent suffix in `peer-generation-v1`;
+or final. The proposed `peer-generation-v1` recovery may abandon a recent suffix;
 authenticated provenance and separately protected decisions govern irreversible
 agent work.
 
 For a shared application, start with the
 [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md).
-The peer-first composition is being qualified around replaceable coordinating
-peers, coherent views and explicit recovery. The
-[finalized-profile guide](guides/finalized-peer-applications.md) and existing
-resident checks describe their separately selected stronger contract. Each
+Its current resident checks exercise the implemented finalized profile. The
+proposed peer-generation composition calls for replaceable coordinating peers,
+coherent views and explicit recovery; its separate evidence gate is a requirement,
+not a runtime qualification. Each
 qualification report names its exact source, public artifacts and measured
 boundary; historical results do not qualify the new profile.
 
