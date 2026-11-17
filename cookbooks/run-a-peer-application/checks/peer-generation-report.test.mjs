@@ -1,54 +1,9 @@
+import { syntheticReport, syntheticRtcReport, syntheticHostedReport } from './peer-generation-report-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { validatePeerGenerationReport } from './peer-generation-report.mjs';
 
 // Deliberately synthetic input tests the evidence boundary, not a runtime.
-function syntheticReport() {
-  const receipt = { generation: 'g1', sequence: 2, root: 'a'.repeat(64) };
-  return {
-    format: 'peer-generation-consumer/v1', mode: 'runtime', profile: 'peer-generation-v1',
-    topology: 'independent-packed-peers', passed: true, executionManifestDigest: 'a'.repeat(64),
-    runtime: { node: 'v24.0.0', platform: 'linux' },
-    source: { commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: true },
-    artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-test', sha256: 'c'.repeat(64),
-      sourceCommit: 'd'.repeat(40), sourceTree: 'e'.repeat(40), sourceDirty: false }],
-    publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/native'], siblingSourceImports: 0, applicationRetryQueues: 0, residentRequired: false },
-    controlParticipant: { owner: 'application-session', role: 'control', attachRequests: 0, definitionVerified: true,
-      recovery: { injectedAfterSelection: true, journalSavedBeforeRetry: true, originalRequest: 'a'.repeat(64), retriedRequest: 'a'.repeat(64),
-        originalSelection: 'g2', retriedSelection: 'g2', recoveryNoticeObserved: true } },
-    hostOutage: { boundary: 'portable-control-port', blocked: true, blockedProbeRejected: true, commandsApplied: 3,
-      requests: { before: 4, after: 4 }, applicationBodyBytes: { before: 0, after: 0 }, finalityCapability: false },
-    lostReply: { injectedAfterPersistence: true, originalOperationId: 'op-retained', retriedOperationId: 'op-retained',
-      originalReceipt: receipt, retriedReceipt: structuredClone(receipt), orderedRecords: { before: 2, after: 2 } },
-    recovery: { previousGeneration: 'g1', selectedGeneration: 'g2', previousHead: 4, adoptedPosition: 2,
-      sourceRemoved: true, coherentReset: true, recoveredDigest: 'f'.repeat(64), freshPeerDigest: 'f'.repeat(64),
-      inheritedOperationIds: ['op-retained'], abandonedOperationIds: ['op-abandoned'],
-      inheritedIdentityPreserved: true, abandonedEvidencePreserved: true },
-    returningBranch: { generationBefore: 'g2', generationAfter: 'g2', digestBefore: '1'.repeat(64), digestAfter: '1'.repeat(64),
-      oldAttemptReadmitted: false, excludedAncestorReadopted: false, thirdGenerationChecked: true },
-    reapply: { originalOperationId: 'op-abandoned', newOperationId: 'op-reapplied', originalAttemptId: 'attempt-abandoned', newAttemptId: 'attempt-reapplied', reapplyOf: 'attempt-abandoned',
-      outcome: 'accepted', currentGuardsChecked: true },
-    reopen: { identityBefore: 'device-a', identityAfter: 'device-a', operationBefore: { id: 'op-reapplied', status: 'applied' },
-      operationAfter: { id: 'op-reapplied', status: 'applied' } },
-    participation: { owner: 'application-session', entry: 'session.participate', automaticConnections: true,
-      observedPeerIdentities: ['1'.repeat(64), '2'.repeat(64)],
-      statuses: [{ device: '1'.repeat(64), phase: 'coordinating', connectedPeers: ['2'.repeat(64)] },
-        { device: '2'.repeat(64), phase: 'following', connectedPeers: ['1'.repeat(64)] }],
-      hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1,
-        before: { requests: 9, applicationBodyBytes: 0 }, after: { requests: 9, applicationBodyBytes: 0 } },
-      automaticRecovery: { previousGeneration: '3'.repeat(64), selectedGeneration: '4'.repeat(64),
-        adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, graceMs: 150, elapsedMs: 200, freshnessBudgetMs: 300_000,
-        workload: { commands: 32, textBytesPerCommand: 1024, completion: 'applied', retentionWaits: 1, clock: 'performance.now',
-          startedAtMs: 100, appliedAtMs: 500, lastAppliedAtMs: 500, retainedAtMs: 510, disconnectedAtMs: 520, recoveredAtMs: 720,
-          lastOperationId: 'freshness-31', observedAdoptedAgeMs: 20, recoveryReadyMs: 200, targetMs: 300_000,
-          retained: { payload: { point: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, peer: '2'.repeat(64), storageId: 'survivor' }, signature: 'a'.repeat(128) },
-          coordinatorStorageId: 'coordinator', independentStorageId: 'survivor',
-          adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, knownLostCommands: 0, scope: 'synthetic boundary test' } },
-      broaderRecovery: { selectedGeneration: '5'.repeat(64), adopted: { generation: '4'.repeat(64), sequence: 0, root: '7'.repeat(64) },
-        reason: 'freshness-unknown', ageMs: null, approvalRequired: true, staleApprovalRejected: true, proposalId: '8'.repeat(64), commandApplied: true },
-      transport: { boundary: 'in-process-fixture-discovery', pendingIntroductions: 0, connections: [{ closed: true }, { closed: true }] } },
-  };
-}
 
 function rejects(mutate, message) {
   const value = syntheticReport();
@@ -166,24 +121,6 @@ test('recovery freshness requires measured workload time and independent retaine
   ]) rejects(mutate);
 });
 
-function syntheticRtcReport() {
-  const report = syntheticReport();
-  report.topology = 'independent-native-rtc';
-  report.participation.transport.boundary = 'loopback-rtc-fixture-discovery';
-  report.publicBoundary.imports.push('@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native');
-  report.runtime.dependencies = { lockSha256: 'c'.repeat(64), packages: [{ path: 'node_modules/werift', version: '0.27.0', integrity: 'sha512-synthetic' }] };
-  const signaling = { sentMessages: 2, sentBytes: 2048, closed: true };
-  report.rtc = { implementation: 'werift', version: '0.27.0', signalingBoundary: 'one-off-in-process-sdp-mailbox',
-    candidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
-    byteBoundary: 'authenticated-reliable-application-frames', connections: Array.from({ length: 4 }, () => ({
-      peers: ['1'.repeat(64), '2'.repeat(64)], authenticated: true, closed: true, signaling,
-      routes: [{ route: 'unknown', localCandidateType: null, remoteCandidateType: null }, { route: 'unknown', localCandidateType: null, remoteCandidateType: null }],
-      reliable: { sentBytes: 500, receivedBytes: 500 },
-    })) };
-  report.hostOutage.transport = { before: { reliable: { sentBytes: 100, receivedBytes: 100 }, signaling },
-    after: { reliable: { sentBytes: 500, receivedBytes: 500 }, signaling } };
-  return report;
-}
 
 test('native RTC evidence keeps unknown routes and the actual introduction and byte boundaries', () => {
   const report = syntheticRtcReport();
@@ -208,33 +145,6 @@ test('host-independent RTC commands require authenticated traffic after signalin
   }
 });
 
-function syntheticHostedReport() {
-  const report = syntheticRtcReport();
-  report.hostOutage.boundary = 'tendriller-workerd-http';
-  report.participation.transport = { boundary: 'tendriller-sdk-introductions', traffic: { worker: {
-    invitations: [{ closed: true }, { closed: true }], rendezvous: Array.from({ length: 10 }, () => ({ closed: true })) } } };
-  report.publicBoundary.imports.push('@tendriller/core/peers');
-  report.rtc.signalingBoundary = 'tendriller-workerd-rendezvous';
-  report.host = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
-    participant: { protocol: 'chronolog-participant-v1', route: 'peers/participant', transport: 'public-chronolog-participant',
-      clientFiltered: ['database.submit', 'content.chunk', 'ephemeral.signal'],
-      hostRejected: ['database.submit', 'content.chunk', 'ephemeral.signal'], clientFilteredHttpRequests: 0 },
-    publication: { author: '1'.repeat(64), nonPublisher: '2'.repeat(64), administratorWithoutPublisher: true,
-      first: { id: '3'.repeat(64), version: 1, expectedCodeDigest: '4'.repeat(64), servedCodeDigest: '4'.repeat(64) },
-      second: { id: '5'.repeat(64), version: 2, previous: '3'.repeat(64), expectedCodeDigest: '6'.repeat(64), servedCodeDigest: '6'.repeat(64) },
-      sessionOwned: true, lostReplyAfterPersistence: true, savedIdentityRecovered: true,
-      exactRetry: true, alteredBytesRejected: true, nonPublisherRejected: true, staleHeadRejected: true,
-      authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true },
-    publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
-    dependencies: { lockSha256: '6'.repeat(64) }, artifacts: ['@tendriller/core', '@tendriller/engine'].map(name => ({
-      ...report.artifacts[0], name,
-    })) };
-  const observation = { requestBodyBytes: 2000, worker: { host: { httpRequests: 6, requestBodyBytes: 2000,
-    rendezvousUpgrades: 4, rendezvousSentBytes: 4000, rendezvousReceivedBytes: 4000 },
-  rendezvous: Array.from({ length: 4 }, () => ({ closed: true, sentBytes: 1000, receivedBytes: 1000 })) } };
-  report.hostOutage.observations = { before: structuredClone(observation), after: structuredClone(observation) };
-  return report;
-}
 
 test('actual hosted evidence retains its synthetic identity and exact public artifact pairing', () => {
   const summary = validatePeerGenerationReport(syntheticHostedReport());

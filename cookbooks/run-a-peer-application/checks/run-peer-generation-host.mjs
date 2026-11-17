@@ -5,7 +5,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
@@ -57,6 +57,25 @@ await write('wrangler.jsonc', { name: 'independent-peer-host', main: 'entry.mjs'
 });
 execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: hostDirectory, stdio: 'inherit',
   env: { ...process.env, npm_config_cache: join(output, 'host-npm-cache') } });
+const installedEngine = join(hostDirectory, 'node_modules/@tendriller/engine');
+const engineProofBytes = await readFile(join(installedEngine, 'provenance.json'));
+const engineProof = JSON.parse(engineProofBytes);
+for (const key of ['repository', 'source', 'sourceTree', 'dirty']) assert.equal(engineProof[key], manifest[key], `Host provenance mismatch: ${key}`);
+assert.ok(Number.isSafeInteger(engineProof.storageSchemaRevision) && engineProof.storageSchemaRevision > 0, 'The engine must record its storage schema');
+for (const [name, digest] of Object.entries(engineProof.files)) {
+  const path = resolve(installedEngine, name), scoped = relative(installedEngine, path);
+  assert.ok(scoped && !isAbsolute(scoped) && scoped !== '..' && !scoped.startsWith(`..${sep}`), 'Host provenance path escapes its archive');
+  assert.equal(hash(await readFile(path)), digest, `Host artifact content mismatch: ${name}`);
+}
+const controlBytes = await readFile(join(installedEngine, 'peer-generation-provenance.json'));
+const control = JSON.parse(controlBytes);
+assert.equal(control.repository, 'werg/chronolog-db'); assert.equal(control.profile, 'peer-generation-v1');
+assert.equal(control.dirty, false, 'The embedded verifier must come from clean source');
+assert.match(control.source, /^[a-f0-9]{40}$/u); assert.match(control.sourceTree, /^[a-f0-9]{40}$/u);
+for (const name of ['control.mjs', 'control.d.ts', 'participant.mjs', 'participant.d.ts']) assert.match(control.sha256[name], /^[a-f0-9]{64}$/u);
+hostEvidence.provenance = { sha256: hash(engineProofBytes), files: engineProof.files, storageSchemaRevision: engineProof.storageSchemaRevision,
+  embeddedControl: { sha256: hash(controlBytes), repository: control.repository, source: control.source,
+    sourceTree: control.sourceTree, dirty: control.dirty, profile: control.profile, files: control.sha256 } };
 const lock = await readFile(join(hostDirectory, 'package-lock.json'));
 hostEvidence.dependencies = { lockSha256: hash(lock), packages: Object.entries(JSON.parse(lock).packages)
   .filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@tendriller/core', 'node_modules/@tendriller/engine'].includes(path))

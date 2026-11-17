@@ -90,7 +90,8 @@ try {
         .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
     assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
   } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
-  const provenance = JSON.parse(await readFile(join(installed, 'provenance.json'), 'utf8'));
+  const provenanceBytes = await readFile(join(installed, 'provenance.json'));
+  const provenance = JSON.parse(provenanceBytes);
   if (tasks) {
     assert.ok(metadata.exports['./sql'] && metadata.exports['./sql-native'], 'The guarded-task gate requires the common SQL composition and native engine capability');
     report.sqlEngine = provenance.nativeEngine;
@@ -106,7 +107,9 @@ try {
     assert.equal(hash(await readFile(path)), digest, `Package content digest mismatch: ${name}`);
   }
   report.artifacts.push({ name: metadata.name, version: metadata.version, sha256: hash(await readFile(artifact)),
-    sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty });
+    sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty,
+    provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, optionalNativeRtc: provenance.optionalNativeRtc,
+      sqlEngines: provenance.sqlEngines, files: provenance.sha256 } });
   const imports = new Set();
   for (const { name, sourcePath, bytes } of fixtures) {
     report.fixtures.push({ path: sourcePath, sha256: hash(bytes) });

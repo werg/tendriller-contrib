@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/peer-generation.yml'
       - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
       - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
       - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
       - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
@@ -12,6 +13,7 @@ on:
     paths:
       - '.github/workflows/peer-generation.yml'
       - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
       - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
       - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
       - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
@@ -103,3 +105,26 @@ jobs:
             .tendriller-build/dist/provenance.json
             .chronolog-build/artifacts/peer-session/*.tgz
             .chronolog-build/artifacts/peer-session/package/provenance.json
+
+  composition:
+    needs: public-session
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: independent-peer-generation-*-evidence
+          path: evidence
+      - name: Bind all independently observed gates to one exact composition
+        shell: bash
+        run: |
+          args=()
+          while IFS= read -r report; do args+=(--report "$report"); done < <(rg --files evidence -g report.json)
+          node cookbooks/run-a-peer-application/checks/peer-composition.mjs "${args[@]}" --output composition.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualified-local-peer-composition
+          path: composition.json

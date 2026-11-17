@@ -204,6 +204,37 @@ Automated artifact installation and fixture-owned enrollment are separate from
 a fresh agent independently configuring the full deployment; do not claim those
 setup steps from the workflow transcript.
 
+## Assemble the exact local composition
+
+After all five runners pass against the same clean Chronolog and contrib
+revisions, collect their raw reports:
+
+```sh
+npm run check:peer-composition -- \
+  --report /exact/direct/report.json \
+  --report /exact/native-rtc/report.json \
+  --report /exact/browser/report.json \
+  --report /exact/native-sql/report.json \
+  --report /exact/hosted/peers/report.json \
+  --output /new/composition.json
+```
+
+The assembler reruns every observation validator and rejects missing/failed
+gates, dirty source, mixed source trees, contradictory execution manifests and
+packages with the same version but different bytes. It records raw report
+hashes, all three source identities, session archive variants and content hashes,
+the native engine binary/patch/manifest, host storage schema, embedded portable
+verifier identity, and the actual browser/runtime/topology observations. A newer
+session-only commit can use an older unchanged verifier; both identities remain
+explicit and their interoperability must pass the actual hosted gate.
+
+CI emits this manifest only after native events, native RTC, browser Worker,
+native SQL and actual workerd participant jobs all succeed. It qualifies that
+local public-artifact composition. The manifest explicitly leaves real network,
+provider cost, browser SQL/WASM, optional stronger services and an unassisted
+fresh-agent usability study outside that claim. No failed browser run or
+historical result is silently replaced by a passing report from another source.
+
 ## Evidence and remaining qualification
 
 The [qualification note](../notes/peer-generation-qualification.md) preserves
