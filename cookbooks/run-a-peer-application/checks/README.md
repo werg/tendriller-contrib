@@ -3,8 +3,10 @@
 ## Peer-generation qualification
 
 The [independent peer-generation gate](../notes/peer-generation-qualification.md)
-defines the new tolerant-recovery consumer contract. Its evidence validator and
-synthetic tests are separate from runtime qualification. The resident/browser
+defines the new tolerant-recovery consumer contract. Run `npm run test:peer-generation -- --artifact /exact/session.tgz --output /new/evidence`
+for the independent packed native/events session exercise. Its topology and
+portable-control counters are explicit in the report. The evidence validator
+and synthetic tests remain separate from runtime qualification. The resident/browser
 checks below exercise explicitly finalized chronological profiles and retain
 their own original guarantees and source pins.
 

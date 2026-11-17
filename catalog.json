@@ -1304,8 +1304,8 @@
     },
     {
       "id": "run-a-peer-application",
-      "title": "Run a shared application with a resident agent",
-      "summary": "Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct.",
+      "title": "Build a peer application with explicit recovery",
+      "summary": "Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.",
       "group": "Keep work dependable",
       "tags": [
         "peers",
@@ -1315,12 +1315,12 @@
         "recovery"
       ],
       "choices": [
-        "Peer or hosted durable history",
-        "Atomic SQL and events or an event-only history",
-        "Separate membership, finality, execution and live signals"
+        "Signals, events or SQL/events",
+        "Applied outcomes or protected actions",
+        "Recover a selected prefix and review abandoned intent"
       ],
       "capabilities": [],
-      "evidence": "exercised",
+      "evidence": "explained",
       "related": [
         "choose-data-model",
         "reconcile-concurrent-edits",
@@ -1331,13 +1331,10 @@
         "publish-coherent-updates"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md",
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"
+        "https://github.com/werg/chronolog-db/blob/3567468a921d3968c606efdef942ddba2641d30d/docs/peer-application-architecture.md"
       ],
       "path": "cookbooks/run-a-peer-application/COOKBOOK.md",
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "run-measurement-experiment",

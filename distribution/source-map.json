@@ -343,10 +343,7 @@
     {
       "id": "run-a-peer-application",
       "sources": [
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/ARCHITECTURE.md",
-        "https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a6e203e7716c/docs/DURABILITY.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/portable-peers.md",
-        "https://github.com/werg/chronolog-db/blob/8a918b824a3be79e7c3608412ec518208896a064/docs/app-ownership.md"
+        "https://github.com/werg/chronolog-db/blob/3567468a921d3968c606efdef942ddba2641d30d/docs/peer-application-architecture.md"
       ]
     },
     {
