@@ -1541,7 +1541,7 @@
         "run-a-peer-application"
       ],
       "sources": [
-        "https://github.com/werg/chronolog-db/blob/70ea5c35c317b657535657af95cdeb96452f09d0/packages/signals/src/index.ts"
+        "https://github.com/werg/chronolog-db/blob/0d7826a32a359149b5c4167adf945235b726118d/packages/signals/src/index.ts"
       ],
       "path": "cookbooks/share-live-signals/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/share-live-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
