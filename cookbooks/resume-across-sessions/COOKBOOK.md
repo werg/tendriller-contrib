@@ -7,7 +7,7 @@ tags: ["handoff", "resume", "context"]
 choices: ["Task brief, handled cursor, view checkpoint, or local draft", "Authorized cross-device state versus private unsent work", "Receiver identity and local consent after handoff"]
 capabilities: []
 evidence: "explained"
-related: ["connect-resuming-agent", "coordinate-devices", "recover-outdated-work"]
+related: ["connect-resuming-agent", "coordinate-devices", "recover-outdated-work", "run-a-peer-application"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/multi-device-workshop/AGENT.md", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/experiences.ts"]
 ---
 
@@ -59,6 +59,27 @@ A new device must reestablish its own permissions and presentation preferences. 
 Use an event's validated generation context for protected results, not an application-provided session label. A known historical intent remains historical after a task reset. If it is still useful, compose new work deliberately against the reviewed current state.
 
 ## Manage overlap and uncertain effects
+
+For a [peer application](../run-a-peer-application/COOKBOOK.md), keep the
+owned device session independent of the model conversation. Reopening
+the UI restores the session's original operation identities and queries their current
+outcomes. The page may keep a reference to an operation beside its local draft;
+that reference is not another delivery queue. A new LLM conversation consumes
+the session's recorded work with its applied, shared or abandoned status.
+
+The durable event continuation belongs to a group/history and filter version.
+Changing a topic filter requires an explicit cursor decision. Empty matching
+batches can advance scanned progress, while unresolved execution cannot. Commit
+the derived state and its processed cursor together, and bind cache checkpoints
+to the reducer version. Rebuilding a view never dispatches an external effect.
+
+An unavailable control host leaves established peer commands, signals and
+replication useful. Losing the coordinating peer requires an eligible survivor
+to select a complete retained prefix at an explicit recovery boundary. Publish
+the resulting recovery notice, preserve abandoned attempts for inspection, and
+review current preconditions before deliberate reapplication. Restoring a stale
+control store must not silently undo a newer selection. Show retained coverage
+and recovery uncertainty separately from the applied result a user saw.
 
 Two devices may remain active during handoff. Define whether one is authoritative for a particular activity or whether both may edit under conflict detection. A “Continue here” control should explain what changes on the old device; presentation focus does not automatically stop its sensor or revoke its access. Show active-device context when it prevents confusion without exposing private identities unnecessarily.
 

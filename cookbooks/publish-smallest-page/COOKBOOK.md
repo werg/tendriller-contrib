@@ -41,29 +41,45 @@ Errors should explain what can be done now. Connection loss can leave a request 
 
 ## Establish the actual delivery loop
 
-The public headless browser API supplies state, events, streams, durable commands, captures, and publication lifecycle. It does not choose the page's DOM, navigation, or conversation layout. Use the [current public core entry](https://github.com/werg/tendriller/blob/master/agent.md) for exact operations and service limits. The pinned `sources` above point to a
-historical contrib example that is no longer on `main`; they are provenance,
-not runnable source-checkout paths. For CLI usage and release installation use
-[core's current CLI guide](https://github.com/werg/tendriller/blob/master/docs/tools/CLI.md).
+The page uses the public runtime's installed application backend, backed by its
+owned Chronolog session. Commands, coherent queries, events, content and live
+signals share that application identity. The page chooses its DOM, navigation
+and conversation layout. See the [public core entry](https://github.com/werg/tendriller/blob/master/agent.md)
+and [session CLI](https://github.com/werg/tendriller/blob/master/docs/tools/CLI.md)
+for the actual operations. Historical `sources` above preserve provenance; they
+are not current executable fixtures.
 
-Before creating a page, inspect the service contract and effective capabilities.
-An unclaimed page has only 1 MiB of retained streams and 1 MiB per request;
-claim it before starting a collector or uploading a telemetry backlog. Create with the intended owner's verified identity and save the returned administrative handle in private host storage. Give the person the user-facing page URL. The human owner must open the page visibly and sign in with the intended identity to claim it; an agent token does not perform that step for them. Explain any remaining claim step and the page's lifetime.
+Inspect the service contract before creating the page. Save the returned
+administrative handle in private host storage and give the person the page URL.
+The intended human owner visibly signs in and claims the page. Explain its
+lifetime and any remaining claim step. The application bootstrap explicitly
+creates or resumes the signing device, establishes authorized membership and
+keys, and opens the same application definition used by other peers. Page
+ownership, a host token and application signing authority are distinct roles.
 
-For an interactive page, attach a host receiver that resumes the intended conversation. Run the end-to-end delivery probe, handle work, rearm, and probe again. An open socket or successful HTTP request proves transport, not resumed conversation. First publication requires established delivery under the public contract. A dashboard without a conversational receiver has a different readiness requirement; producer activity still does not imply agent attentiveness. `tendril push` returns `pending` without waiting for dashboard browser health by default; opt in with `--wait` when a browser is actually viewing.
+For a page promising agent responses, connect the agent's own session and test a
+real command through its accepted result and correlated reply. End the agent's
+turn, submit another request, and verify the deployment's actual wake/resume
+mechanism. A published graph, open transport or accepted command does not prove
+that a receiver will run. A dashboard can state its producer freshness without
+claiming conversational readiness. Publication is a signed code operation; it
+does not wait for an agent listener or manufacture a browser-health receipt.
 
-Page event payloads are application data. Only authenticated owner instruction events have the corresponding instruction authority. Keep administrative tokens, private receiver state, and credentials out of HTML, copied prompts, diagnostics, and shared state.
+Verify original signer provenance and application permissions before invoking
+private tools. Text such as `role: "owner"` grants no authority. Keep host tokens,
+signing keys, receiver state and private credentials out of HTML, shared history
+and diagnostics.
 
 ## Publish the files you actually authored
 
 1. Build the useful interaction locally, including empty, pending, result, and error states. Separate local drafts from submitted snapshots and bind protected work to its original command context.
 2. Enumerate the actual file graph and entry point. Include every authored CSS file, image, module, lazy import, and worker that the page needs. Missing files are errors; a catalog does not fill them in.
-3. Pack and preview those exact files using core's public publishing/preview tools and explicit fixtures. Check narrow and wide layouts, keyboard use, rejected sends, and unavailable capabilities.
-4. Upload immutable bytes and commit one complete publication with the reviewed publication-head revision and any required task generations. An upload receipt alone does not publish the page.
-5. Open the intended page as its actual role in an eligible visible tab. Confirm the publication's health and test the real receiver and service boundary that fixtures cannot establish.
+3. Pack and preview those exact files. A live preview supplies its real application bootstrap through the public [preview tool](https://github.com/werg/tendriller/blob/master/docs/tools/PREVIEW.md). Check narrow and wide layouts, keyboard use, rejected commands, recovery and unavailable capabilities.
+4. Confirm that the signing device has the current signed `publisher` grant, which is independent of its administrator grant. Read the current publication head, then use the session control participant to `preparePublication` and `publish` the complete signed graph. The session saves the exact signed intent under its operation ID. Retry that identity after a lost reply; a changed graph or stale predecessor requires a new reviewed publication.
+5. Open the intended page as its actual role. Verify the selected authored assets and complete a real application action. Test login, receiver readiness and deployed connectivity separately from the publication receipt.
 6. Give the person a brief handoff: the page URL, what it can do, how pending work behaves, and any setup still required. Keep management and stop/recovery routes reachable.
 
-Relative files resolve within the publication's actual directory. Nested HTML can be useful, but inspect framework-generated absolute paths and routing assumptions. Published files and the released runtime form a coherent version; exact publication hashes describe the final authored bytes, not historical snippets before adaptation.
+Relative files resolve within the publication's actual directory. Nested HTML can be useful, but inspect framework-generated absolute paths and routing assumptions. The signed manifest names the complete authored graph. The host may inject its separately released runtime into served HTML; verify authored content hashes and the runtime identity at their respective boundaries. Historical snippets are not the bytes of the adapted page.
 
 ## Grow from observed friction
 
@@ -82,6 +98,6 @@ A draft-aware update should offer a clear choice about applying a new publicatio
 | Receiver turn ends and another event arrives | The intended conversation resumes again; one-shot readiness is insufficient. |
 | One authored dependency is removed | Preview and publication checks reveal the missing file. |
 | New publication arrives during editing | The stated draft-preservation and apply-update policy occurs. |
-| Page is published but never visibly opened | Health is still pending; a push alone does not prove a healthy page. |
+| Page is published but never opened | The selected publication is known; browser execution and receiver readiness remain unobserved. |
 
 Record what was actually verified. Rendering a useful interface and proving delivery are complementary checks, and both belong in the first implementation when the page promises an agent response.

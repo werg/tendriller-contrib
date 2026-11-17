@@ -1,0 +1,292 @@
+{
+  "format": "peer-generation-consumer-summary/v1",
+  "profile": "peer-generation-v1",
+  "executionManifestDigest": "bec3e62bedaf33320f4b379163498f73ba8388a707ca6c9de9ec7aa4a49266d0",
+  "topology": "independent-packed-peers",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "5512b5c6de3d02b1ee250f19c1349057f2a6d9bd",
+    "tree": "73fb745985e352c5d5d5fc7896434a28b098a9db",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g08ee9f2a-sql",
+      "sha256": "d691daa96083aaa6e286b474312b6530f6c715577baa337db32849745b0a6388",
+      "sourceCommit": "08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c",
+      "sourceTree": "e57a4edb0df84ebfe69f70c3ba83b2e3878bed76",
+      "sourceDirty": false
+    }
+  ],
+  "controlParticipant": {
+    "owner": "application-session",
+    "role": "control",
+    "attachRequests": 0,
+    "definitionVerified": true,
+    "recovery": {
+      "injectedAfterSelection": true,
+      "journalSavedBeforeRetry": true,
+      "originalRequest": "fc410e752c40c67a570789d8f2396a0eaee4d67875b9fdd38ce5b591f8b5e58a",
+      "retriedRequest": "fc410e752c40c67a570789d8f2396a0eaee4d67875b9fdd38ce5b591f8b5e58a",
+      "originalSelection": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "retriedSelection": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+      "recoveryNoticeObserved": true
+    }
+  },
+  "participation": {
+    "owner": "application-session",
+    "entry": "session.participate",
+    "automaticConnections": true,
+    "observedPeerIdentities": [
+      "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+      "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836"
+    ],
+    "hostOutage": {
+      "blocked": true,
+      "blockedProbeRejected": true,
+      "commandsApplied": 1,
+      "before": {
+        "requests": 17,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 17,
+        "applicationBodyBytes": 0
+      }
+    },
+    "automaticRecovery": {
+      "previousGeneration": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+      "selectedGeneration": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+      "adopted": {
+        "generation": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+        "sequence": 2,
+        "root": "49920c94b9c2cb45370992a8005af16679239ccb94baca1ab184b98eea451c63"
+      },
+      "graceMs": 150,
+      "elapsedMs": 1050,
+      "freshnessBudgetMs": 300000
+    },
+    "broaderRecovery": {
+      "reason": "freshness-unknown",
+      "ageMs": null,
+      "approvalRequired": true,
+      "staleApprovalRejected": true,
+      "proposalId": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+      "adopted": {
+        "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+        "sequence": 0,
+        "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+      },
+      "selectedGeneration": "331353987763ad73b9282a767b0d62c340e13092f558526cf2b9b81c7a81bc03",
+      "commandApplied": true
+    },
+    "statuses": [
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "approval-required",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "1101881bd6738665175f84e59a04208129aaafbf7f5c7349a9068301e0c61330",
+          "coordinator": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "point": {
+            "generation": "368a82935d11526cb628625c5b28a6f3a804ea2f4c3076e2660596c0cc8ba93b",
+            "sequence": 0,
+            "root": "2a17e855293e6d88faef597dc1bf139d062f2ec07ad06e1041bf4859626a48e9"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "following",
+        "connectedPeers": [
+          "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [
+          "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec"
+        ],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "connecting",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "approval-required",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+          "coordinator": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+          "point": {
+            "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+            "sequence": 0,
+            "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "recovering",
+        "connectedPeers": [],
+        "recovery": {
+          "id": "12c3a977834b8269ff3923aeaf7441c14f3527461952059c565fd22aaf6b13a6",
+          "coordinator": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+          "point": {
+            "generation": "f2e6923d3470a140a4bc105909a715112c5ff2429a876745b778690013785fb1",
+            "sequence": 0,
+            "root": "36e15ef783d0b106d8522091fa8a348cd4aa5cb149bc93e3cf8af81f3f48dd3e"
+          },
+          "reason": "freshness-unknown",
+          "observedAt": null,
+          "ageMs": null
+        },
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "coordinating",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      },
+      {
+        "device": "7f563036c855d1dc77df9677274b514d6b9a5c9ca436c4bc6183307d329de6ec",
+        "phase": "closed",
+        "connectedPeers": [],
+        "recovery": null,
+        "error": null
+      }
+    ],
+    "transport": {
+      "boundary": "in-process-fixture-discovery",
+      "pendingIntroductions": 0,
+      "connections": [
+        {
+          "owner": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+          "peer": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "closed": true
+        },
+        {
+          "owner": "a64b855ae11a25236853f57ee73984b614f4fbb14f27686841f1523b48d46836",
+          "peer": "e4869d53d7118306cd3328314603010c24925c9f403f0be3398b07ae9bf25194",
+          "closed": true
+        }
+      ]
+    }
+  },
+  "commandsWithHostBlocked": 2,
+  "hostRequestsDuringCommands": 0,
+  "hostedApplicationBodyBytes": 0,
+  "recovery": {
+    "previousGeneration": "94e0ed0a36f9615d398c316dde4e4f92a0ad0a4e5fb59a9bf9ef501622471bf1",
+    "selectedGeneration": "6de718d59d102bcc39e50d61b25614e90fdf5567c2bb11020e46228ee4174ef3",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ]
+  },
+  "reapplication": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "741a587b6108a495a2e8b745eb50ea3deab9da54ae57efe52d4125e914a5cb7a",
+    "newAttemptId": "58624850b99a77e657fcf7a22d1904a40ef60916b5b238264c6d745732438c36",
+    "reapplyOf": "741a587b6108a495a2e8b745eb50ea3deab9da54ae57efe52d4125e914a5cb7a",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "limitations": [
+    "Independent packed runtime execution; this is not a deployed-network or browser qualification.",
+    "Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.",
+    "No physical route, provider cost, universal loss bound or unavailable optional service is inferred."
+  ],
+  "reportSha256": "7455f57b8e21d967bccbd5692ae226656526552164f9612968acc3c7519de83a"
+}

@@ -1,0 +1,90 @@
+{
+  "format": "peer-transport-local-evidence/v1",
+  "recordedOn": "2026-11-17",
+  "singleComposition": false,
+  "qualification": "native-direct-and-workerd-websocket-boundaries",
+  "relay": {
+    "report": "relay/report.json",
+    "source": {
+      "repository": "werg/tendriller-contrib",
+      "commit": "a3368d4c79b2dba2fd529156480ee60c0fa7f119",
+      "tree": "0d90c034614e2940dc46827bc10d6ea63b8ed930",
+      "dirty": false
+    },
+    "runnerExitCode": 0,
+    "workerd": {
+      "tests": 1,
+      "passed": 1,
+      "durationMs": 66460
+    },
+    "command": "node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact <core3d31e101.tgz> --artifacts <host50810422-dist> --transport websocket --output <new-directory>"
+  },
+  "direct": {
+    "report": "direct/report.json",
+    "source": {
+      "repository": "werg/tendriller-contrib",
+      "commit": "3853ac9756001020a4cf1889a3a440002810e4b4",
+      "tree": "c753c8d24aec4eb8ca15b491eb136a832059502e",
+      "dirty": false
+    },
+    "runnerExitCode": 0
+  },
+  "failedRelay": {
+    "report": "failed-relay/report.json",
+    "source": {
+      "repository": "werg/tendriller-contrib",
+      "commit": "4bbc94b5550653460a5b645558800e3eb5e132f1",
+      "tree": "b7f1f617a624e2fef69db1a37fd9f1953133aee0",
+      "dirty": false
+    },
+    "reason": "The application scenario completed. The original validator incorrectly required a single live socket to both send and receive, although the workload sends one-way. The corrected clean rerun records separate sender and receiver observations."
+  },
+  "boundaries": [
+    "Native WebSocket clients and actual authenticated Workerd relay sockets are joined by a bounded loopback test bridge.",
+    "Only control HTTP is blocked during relayed work; relay byte traffic and availability remain part of the delivery path.",
+    "These runs use different exact consumer commits and do not constitute the seven-gate composition.",
+    "Real Chromium relay runtime, deployed WSS/authentication/networks and provider/device cost are not established by these local reports."
+  ],
+  "files": {
+    "relay/report.json": {
+      "sha256": "c3573f6628bbb3913c5354196602a9606be31a11708a13f20b91cb6f8e3451b9",
+      "bytes": 119043
+    },
+    "relay/summary.json": {
+      "sha256": "2ff5896942ea398c95908744a6d90771accda7ff9fdf96f067a097628c1d6092",
+      "bytes": 112528
+    },
+    "relay/host-artifacts.json": {
+      "sha256": "3eada24876bd51f26ff24bb92e56a09b7456c33b215ada6caf1e9c07b2743b5b",
+      "bytes": 43793
+    },
+    "direct/report.json": {
+      "sha256": "95be8a25d27fa9dc9de13f90c69f4f63b88b2ce26af31eabac93516fbb411481",
+      "bytes": 39934
+    },
+    "direct/summary.json": {
+      "sha256": "5589fe8c7956d4d6681b4cac7d20ffc4ec510acd6c53975f9c280e15f0a65069",
+      "bytes": 34028
+    },
+    "failed-relay/report.json": {
+      "sha256": "a59748a2408ed8bf3512866a956f905529af8836c255dbe4800629cfe1926d84",
+      "bytes": 119529
+    },
+    "provenance/session.json": {
+      "sha256": "dd90aa7b539ada6095594e74342699e0975ec54fd60276064ba85c24eb305622",
+      "bytes": 20573
+    },
+    "provenance/host.json": {
+      "sha256": "4dca0a32068b70366944f0d363335bad59eeaf0f5d6f0e0927f2e142f432b332",
+      "bytes": 829
+    },
+    "provenance/host-engine.json": {
+      "sha256": "db25c2101fa1b05f5f896591e68be7d57d1d70d5c54e99246e021c8d557b6142",
+      "bytes": 867
+    },
+    "provenance/embedded-control.json": {
+      "sha256": "02c42111978ee10ee89266dcc2561a2e2ab1ba8a6f58efe52b105f32c9ef5524",
+      "bytes": 2418
+    }
+  }
+}

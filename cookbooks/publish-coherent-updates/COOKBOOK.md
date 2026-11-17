@@ -13,59 +13,81 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Publish coherent page updates
 
-Use this when a page has several files, lazy imports, nested HTML, or updates while someone is working. A plain single file remains a good option. There is one target runtime baseline; this guide concerns coherent current-system publications, not compatibility with old runtimes or data formats.
+Use this when a page has several authored files, nested HTML, lazy imports or updates while someone is working. A single file is still useful. One signed publication names a complete authored graph; the host serves that graph through its selective Chronolog publication facet.
 
-## Make an update reviewable to its author and its users
+## Make the update reviewable
 
-Consider a field page receiving a new question flow while someone is typing a report. The author needs to preview the exact changed files and know whether publication succeeded; the person using the page needs to preserve work and understand when the update takes effect. These are separate perspectives on one publication.
+A field page may receive a new question flow while someone types a report. The author needs to inspect the complete changed files and the publication result. The person using the page needs to preserve their draft and choose when to load the update. Keep those concerns explicit.
 
-Before publishing, summarize the visible change, the complete file snapshot, the current destination head, and any application state assumptions. Keep a reviewable diff or source snapshot in the author's workflow. A preview should cover the new empty, pending, rejected, and completed states, not only the default screen. If a new interaction assumes a server capability, verify its deployed descriptor and offer an explicit unsupported state.
+Review the visible changes, full asset snapshot, entry HTML, current signed predecessor and application definition binding. Preview empty, pending, rejected and recovery states. Optional capabilities must be present in the actual application or show an unavailable state; a new UI does not install an executor at the host.
 
-| Stage | Honest status | Useful recovery action |
+| Stage | Honest meaning | Recovery |
 | --- | --- | --- |
-| Preparing | Authored files are being enumerated and checked. | Fix missing assets or an invalid entry before transfer. |
-| Uploading | Exact byte objects are being transferred. | Resume the original upload; do not change its bytes under the same identity. |
-| Awaiting commit | Bytes exist, but the live page has not switched. | Reconcile or retry the original publication command. |
-| Conflict | The reviewed destination changed. | Inspect its new head and deliberately create a fresh reviewed publication. |
-| Published, health pending | The new version is available but not yet verified by an eligible visible tab. | Open it in the intended role and inspect runtime/asset failures. |
-| Update deferred in a tab | That tab still uses its original coherent asset graph. | Preserve its draft and let the person apply when ready. |
+| Prepared locally | The exact signed manifest is saved under its operation ID. | Reuse that identity and complete byte snapshot. |
+| Transfer in progress | The host is receiving and verifying the named assets. | Retry the same signed publication and exact assets. |
+| Selected | The host committed this publication after its declared predecessor. | Inspect the returned signed identity and served version. |
+| Predecessor conflict | Another publication changed the reviewed head. | Inspect the new head and prepare a newly reviewed operation. |
+| Old tab still open | The tab retains its original coherent graph. | Preserve work and navigate to the chosen new publication deliberately. |
+| Asset or capability failure | Actual loading or execution failed. | Diagnose the specific dependency; publishing alone is not proof of a useful page. |
 
-A push or an agent connection alone does not mark a publication healthy. Health remains pending until an eligible visible tab loads it under the public lifecycle. Distinguish pending from unhealthy and do not conceal a failed asset load behind a generic “Published” confirmation.
+A selected release does not prove that a browser loaded it, an application synchronized or an agent handled a request. Record those observations separately. Do not let an unverified health report rewrite the signed head.
 
-On an active page, use a small update notice with a description and a clear apply/defer choice. Preserve keyboard focus and text selection; do not force a reload merely because an author finished uploading. Decide whether an active capture should be completed, cancelled deliberately, or deferred before switching. Pending commands retain their original meaning regardless of the new UI.
+## Publish through the owned participant
 
-A rollback is also a reviewed publication-head transition. It can restore earlier authored files without reversing application data or external effects. Explain that scope before calling it “Undo update.” Test the resulting page against current authorized data and required capabilities; historical source bytes alone do not prove the old behavior remains suitable.
+Open the application's ordinary session and attach the host's public exchange transport. Attachment performs no request; explicit publication operations do the work:
 
-## Separate three identities
+The signing device needs the current signed `publisher` grant. That permission
+is independent of `administrator`, data access and coordination: a publisher
+can release code without controlling membership, and an administrator without
+the publisher grant cannot release code. Enrollment must supply the intended
+permission explicitly.
 
-Cookbook provenance records where reasoning or copied snippets came from; adapted source belongs to the application. A deliberate unchanged executable dependency may need an exact version and integrity lock. A publication identifies the final authored bytes and exact target runtime. Do not confuse provenance with a requirement that a modified snippet match upstream hashes.
+```js
+const control = session.connectControlParticipant({ exchange: host.peers.exchange });
+const publication = await control.preparePublication({
+  operationId,
+  entry: 'index.html',
+  files, // complete { path, type, size, hash } manifest of reviewed authored bytes
+});
+const selected = await control.publish(publication, assets);
+```
 
-Pack the exact authored directory. Relative assets and lazy imports must resolve under the publication's actual serving contract, including nested HTML. An absolute application path can bypass a publication base, so inspect generated framework asset paths and routing assumptions. A client-side route fallback is a serving choice, not an automatic consequence of using a framework.
+`assets` carries each distinct hash and its exact base64 bytes. The public tools' packer enumerates the complete authored directory, validates the entry and paths, preserves bytes and enforces limits. The manifest binds application, definition, execution manifest, author, control revision, operation ID, revision and predecessor. The session journals the signed publication; the host verifies its authority, hashes and compare-and-set predecessor before selecting the graph.
 
-## Separate transfer from publication
+After a lost reply, pass the same intent to `preparePublication` and retry the exact saved signed publication. The host returns its existing receipt rather than making another release. Do not invent a new operation ID to recover a timeout. Changing a file or accepting a different predecessor is a new review and operation.
 
-Upload immutable bytes first, then commit their use. An upload completion confirms one verified byte object; it does not advance a shared-file reference or the published page. Keep the upload session identity separate from the command that commits a named file or publication. A lost response should resume the same original intent, including its byte digest and concurrency guards.
+The host transport accepts control, discovery, invitation and publication messages according to its policy. It rejects database submissions, application content chunks and live UI signals. Code publication does not make the host an application replica or an alternate command executor. Application data and immutable evidence content continue through the common session's peer transport.
 
-A shared-file write compares the previous revision of that path. A publication compares the current publication-head revision and commits a complete file manifest with an existing entry point. These are distinct guards. If either conflicts, review the current state before making a new command; do not fetch a newer revision merely to make the old request pass. Reusing already verified bytes does not authorize overwriting a newer reference. The publication head changes for every switch, including rollback and a portable-copy import. A version number can return to an earlier value; a captured head revision must still detect the intervening change.
+## Keep the file graph coherent
 
-Enumerate, hash, and review the exact source snapshot before transfer. Reject missing files, duplicate or noncanonical paths, and a missing entry. If local bytes change during a resumable operation, choose a new operation after review. A saved upload receipt for an earlier digest cannot stand in for the newly edited file. An intentional merge still ends in one explicit complete manifest; do not silently discover extra files while committing it.
+Validate canonical relative paths, duplicate entries, byte sizes, digests and the existing HTML entry before transfer. Include every authored dependency the page needs. Nested HTML and lazy modules must resolve against their publication directory; absolute application paths can accidentally escape that graph. A framework router fallback is a serving choice to implement and test explicitly.
 
-Retained byte objects can have several reasons to remain available, such as an active file reference or a retained publication. Unreferenced page and agent uploads expire; their returned metadata states that expiry. Removing one name or pin is not proof that all references were removed, and retaining bytes grants no new read authority. Follow the current core retention and access contract rather than deriving lifetime from a UI label.
+Cookbook provenance names where an idea came from. A selected executable dependency may have a separate exact version and integrity lock. The publication identifies the final adapted authored bytes. These identities have different purposes: editing a copied snippet does not require pretending its old upstream digest still describes it.
 
-## Review an independent copy
+The host supplies the selected runtime and injects its configuration into served HTML. Verify that actual runtime binding and complete graph as well as authored module bytes. Do not compare transformed HTML with the unmodified authored digest and call it the same representation.
 
-A portable copy should preserve the actual authored entry and complete file graph. Decide explicitly whether it includes current application state, context, media, and active shared-file heads. Credentials, device identities, scope bindings, private workflow records, receiver checkpoints, and file revision history are separate authority or history concerns; their omission must be visible to the receiving application.
+Prior selected publications retain their own immutable URLs. An existing tab can stay coherent while canonical navigation selects a new graph. A reversion publishes earlier reviewed authored bytes as a new signed revision after the current head; it does not reset the predecessor chain or erase application history.
 
-Stage the copy for review before switching the destination. Capture the destination publication head and each imported shared path's revision before asynchronous transfer. Publication, imported file heads, and restored state must commit together under the same current authority checks as ordinary writes. An intervening edit rejects the complete import, so a partially restored page cannot appear current. Review the conflict before issuing a new command.
+## Preserve the person's work
 
-Copying the same code repeatedly should not accumulate it as duplicate application media. Preserve exact referenced evidence where it is used, bound the encoded portable payload independently of physical deduplication, and verify the bytes again before publication. A successful current-format copy establishes no guarantee about a historical format or private-media authorization.
+Offer a concise update notice and an apply/defer action. Preserve focus, text selection, local drafts and original pending operation IDs. Decide whether a capture must finish or stop before navigation. New page code cannot silently relabel an old command as a new task.
 
-## Adapt update behavior
+Use `tendril.publication.saveOffline()` to request readiness for the exact current publication. Its success does not establish readiness for a later version or unused optional models. Test nested routes and cold start in the actual browser, and keep incomplete saves visible.
 
-Use the public publication lifecycle to observe a new version, preserve or deliberately discard drafts, and apply it when the page is ready. Decide what should happen to active capture and pending work. A new file version does not authorize rebinding a protected command to a new task generation. A user-facing health state should distinguish serving failure, unavailable dependency, pending update, and stale page.
+Preview serves the exact authored files. An optional authored bootstrap opens the real common application session and supplies it to the runtime. A missing dependency remains missing; preview does not fabricate hosted state, receipts or application authority. The [public tooling guide](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/PREVIEW.md) explains that boundary.
 
-Preview must use the target runtime and the exact same page files. A missing authored asset remains missing; the preview must not fetch components from a catalog to complete the page. Explicit fixtures can simulate responses but cannot prove publication authorization or service transactions.
+## Copy code with explicit data boundaries
+
+A new application can reuse a reviewed authored graph after configuring its own application identity and authority. Sign the destination publication under that destination's membership. Never copy device private keys, administrative tokens, session journals or private data merely because the UI files were copied.
+
+Importing domain data is a separate guarded application command. Cross-application imports and code publication are not one implicit transaction. Record which steps succeeded and require review if the destination changed. There is no hosted portable-state import path or automatic format migration.
 
 ## Verify
 
-Publish nested HTML with relative CSS, images, and lazy modules. Interrupt between upload completion and the publication commit; the old page remains coherent. Race two writers against the same publication head and review the conflict. Publish a new version, roll back to the earlier one, and verify an old head guard still fails. Import a reviewed copy while another writer changes a destination shared file; confirm the page, files, and application state remain unchanged after the rejected import. Resume after changing local bytes and confirm the old operation is not silently repurposed. Update during typing and while a command is pending. Break one authored dependency and confirm both preview and serving reveal it. Check manifest/runtime identity and offline recovery with fresh target-system state. Measure the minimal runtime graph and bytes separately from optional speech or application assets; count optional downloads only when actually selected.
+Race two publishers from the same signed predecessor. Lose a persisted reply and recover the exact signed identity. Tamper with one asset and require rejection without a head change. Publish a second graph, navigate both canonical and prior immutable URLs, and verify the actual module bytes. Restart the actual host and verify the selected code and unchanged application authority. Publish while a user types, fail one authored import, and exercise offline readiness with fresh storage.
+
+Verify the authorization boundary with a publisher that has no administrator
+grant and an administrator that has no publisher grant. The former can publish
+the reviewed graph; the latter must be refused without a head change.
+
+The [independent hosted participant gate](../run-a-peer-application/checks/README.md) exercises signed HTML/module delivery, authority, byte integrity, exact retry, predecessor conflict, old graph retention and host restart. Its runtime result does not establish browser interaction, deployed login or Internet connectivity; qualify those separately for the finished page.

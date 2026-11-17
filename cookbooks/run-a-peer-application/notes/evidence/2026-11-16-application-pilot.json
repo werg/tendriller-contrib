@@ -1,0 +1,103 @@
+{
+  "format": "chronolog-application-pilot/v1",
+  "status": "passed",
+  "passed": true,
+  "startedAt": "2026-11-16T19:35:17.535Z",
+  "command": [
+    "/home/runner/work/chronolog-db/chronolog-db/tools/application-pilot.ts",
+    "--contrib",
+    "artifacts/pilot-source/contrib",
+    "--tendriller-runtime",
+    "artifacts/pilot-source/tendriller/dist/runtime",
+    "--wasm",
+    "artifacts/wasm",
+    "--output",
+    "artifacts/application-pilot/ci"
+  ],
+  "checks": [
+    "both contrib layouts compile from an explicit public application bundle, packaged Tendriller runtime and pinned WASM assets",
+    "independent browser identities and OPFS replicas render one shared team-owned task through the actual selected Tendriller backend",
+    "typing traverses authenticated ephemeral frames, expires and leaves no durable event",
+    "both disconnected browsers author original competing claims; real authority reconnect produces one final acceptance and one retained final rejection",
+    "a failed SQL guard emits no intent; the final winning intent runs the native worker once and records a correlated result that browser scope cannot forge",
+    "a delayed durable append reply preserves newer typing and cannot regress the already observed final receipt",
+    "Worker termination before reply delivery reopens durable identity and original operation; one message survives with its saved draft and original proposal ID",
+    "both layouts rebuild from retained final events without redispatching the worker or writing host application state"
+  ],
+  "revisions": {
+    "chronolog": {
+      "head": "43efd510001c2608bc1e28ee4c7d100cb34c773b",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "a3797d528d3bbbc649cda637e1e465105ea86c1c",
+      "dirty": false
+    },
+    "tendrillerRuntime": {
+      "head": "43cac4e75b0bbe1e422f4879b7249d6db5988440",
+      "dirty": false
+    }
+  },
+  "publicArtifacts": {
+    "runtimePackage": {
+      "name": "@tendriller/runtime",
+      "version": "0.3.0-rc.9",
+      "type": "module",
+      "description": "Released Tendriller runtime and public preview primitives",
+      "exports": {
+        "./kernel": {
+          "types": "./kernel.d.mts",
+          "import": "./assets/kernel.mjs"
+        },
+        "./voice": {
+          "types": "./voice.d.mts",
+          "import": "./assets/voice.mjs"
+        },
+        "./preview-support": {
+          "types": "./preview-support.d.mts",
+          "import": "./preview-support.mjs"
+        },
+        "./manifest": "./assets/manifest.json",
+        "./assets/*": "./assets/*",
+        "./preview": {
+          "types": "./preview.d.mts",
+          "import": "./preview.mjs"
+        }
+      },
+      "files": [
+        "assets",
+        "preview-support.mjs",
+        "preview-support.d.mts",
+        "preview.mjs",
+        "preview.d.mts",
+        "kernel.d.mts",
+        "voice.d.mts",
+        "inputs.json",
+        "build-metrics.json"
+      ],
+      "tendriller": {
+        "contract": 3,
+        "runtime": "d6a3e54d43fc925a87a00089e26e9bc61d104a1f00aaa513dd1af4cf9e94116a"
+      }
+    },
+    "kernelSha256": "a4ca4e75b8a8eaaa890d19a9477ae31c094638a14aede5cdc9a6e7722837b686",
+    "wasmManifestSha256": "acf8da9aea85b440d2bdade18a3d8f665b1fb5522926211860c4205d2b60ab34",
+    "wasmSha256": "0aad5ad530b3a4393a4db45c1f891fe52ed397b06602755d63f3352105c00170",
+    "publicModuleSha256": "de27d0147aa061f538548229c5a12c8ffc7ed29bc949f2d237939e9e4e21ed62",
+    "specimenManifestSha256": "8b1566d3e953d4c085d297ae00d06163a62b76703527d681ce1a139403f79f2d"
+  },
+  "counts": {
+    "effectDispatches": 1,
+    "hostApplicationWrites": 0
+  },
+  "browser": "158.0.8127.18",
+  "pageErrors": [],
+  "timingsMs": {
+    "browserRejectedJob": 9503,
+    "nativeWorkerResult": 252,
+    "browser1WorkerResult": 16196,
+    "browser0WorkerResult": 18523
+  },
+  "diagnostics": {},
+  "error": ""
+}

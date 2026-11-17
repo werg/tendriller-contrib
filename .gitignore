@@ -5,3 +5,7 @@ test-results/
 *.log
 
 .core-build/
+
+.chronolog-build/
+
+.tendriller-build/

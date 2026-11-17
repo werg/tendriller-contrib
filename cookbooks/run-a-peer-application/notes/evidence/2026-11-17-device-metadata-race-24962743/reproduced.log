@@ -1,0 +1,38 @@
+
+ RUN  v3.2.7 /workspace/scratch/f3460a050d13/chronolog-db
+
+ ❯ packages/peer-session/src/device.test.ts (9 tests | 2 failed | 7 skipped) 61ms
+   ↓ owned application device identities > keeps protocol identity independent of lazy data storage and coalesces first use
+   ↓ owned application device identities > never opens unused data storage and drains an opening resource before closing metadata
+   ↓ owned application device identities > retains the first storage failure without reopening or changing the signer
+   ↓ owned application device identities > refuses lost or mismatched data storage without replacing the protocol identity
+   ↓ owned application device identities > uses the atomically retained identity when concurrent protocol owners create the same device
+   ↓ owned application device identities > never recreates lost keys when the device storage binding already exists
+   × owned application device identities > resumes a concurrent identity created between metadata reads (create: false) 49ms
+     → APPLICATION_DEVICE_KEYS_MISSING
+   × owned application device identities > resumes a concurrent identity created between metadata reads (create: true) 8ms
+     → APPLICATION_DEVICE_KEYS_MISSING
+   ↓ owned application device identities > verifies the signing private key when resuming the stored identity
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/peer-session/src/device.test.ts > owned application device identities > resumes a concurrent identity created between metadata reads (create: false)
+ FAIL  packages/peer-session/src/device.test.ts > owned application device identities > resumes a concurrent identity created between metadata reads (create: true)
+Error: APPLICATION_DEVICE_KEYS_MISSING
+ ❯ openApplicationDevice packages/peer-session/src/device.ts:36:33
+     34|   let identity: PeerIdentity, storageId: string
+     35|   if (raw === null) {
+     36|     if (binding !== null) throw new Error('APPLICATION_DEVICE_KEYS_MIS…
+       |                                 ^
+     37|     if (options.create !== true) throw new Error('APPLICATION_DEVICE_N…
+     38|     const candidate = await createPeerIdentity(), candidateStorageId =…
+ ❯ packages/peer-session/src/device.test.ts:117:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 7 skipped (9)
+   Start at  21:01:13
+   Duration  3.10s (transform 1.34s, setup 0ms, collect 1.71s, tests 61ms, environment 1ms, prepare 536ms)
+

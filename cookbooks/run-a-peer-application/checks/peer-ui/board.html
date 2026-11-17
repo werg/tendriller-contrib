@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shared peer workspace</title><link rel="stylesheet" href="./style.css"></head>
+<body>
+  <header><p class="eyebrow">Shared workspace</p><h1>Tasks and conversation</h1>
+    <p id="status" role="status">Opening this device…</p><p id="revision" class="quiet"></p>
+    <aside id="recovery" hidden><h2>History recovered</h2><p id="recovery-message"></p><p>Review excluded work below before creating a new attempt. Your unsent draft stays here.</p></aside>
+    <aside id="recovery-choice" hidden aria-labelledby="recovery-choice-title"><h2 id="recovery-choice-title">Recovery needs your choice</h2><p id="recovery-choice-message"></p><details><summary>Review available history</summary><pre id="recovery-choice-details"></pre></details><button id="approve-recovery" type="button" disabled>Recover from this history</button></aside>
+  </header>
+  <main>
+    <section id="tasks-section" hidden><h2>Tasks</h2><form id="task-form"><label for="task-title">New task</label><input id="task-title" maxlength="512" required><button>Add task</button></form><ul id="tasks"></ul></section>
+    <section><h2>Conversation</h2><ol id="conversation"></ol><p id="typing" class="quiet" aria-live="polite"></p>
+      <form id="message-form"><label for="message">Your message</label><textarea id="message" maxlength="4096" rows="4" disabled></textarea><button id="send" disabled>Send message</button></form>
+      <p class="quiet">The current peer commits each attempt. Recovery can exclude recent work; each original attempt remains available for review.</p>
+    </section>
+    <section class="receipts"><h2>Your attempts</h2><p>Retry checks the same intent. Reapply makes a new linked attempt after you review the recovered state.</p><ol id="operations"></ol></section>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

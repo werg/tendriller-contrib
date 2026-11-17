@@ -1,0 +1,943 @@
+{
+  "format": "chronolog-application-pilot/v2",
+  "status": "passed",
+  "passed": true,
+  "startedAt": "2026-11-16T23:57:39.166Z",
+  "command": [
+    "/home/runner/work/chronolog-db/chronolog-db/tools/application-pilot.ts",
+    "--contrib",
+    "artifacts/pilot-source/contrib",
+    "--tendriller-runtime",
+    "artifacts/pilot-source/tendriller/dist/runtime",
+    "--tendriller-engine",
+    "artifacts/pilot-source/tendriller/dist/engine",
+    "--wasm",
+    "artifacts/wasm",
+    "--output",
+    "artifacts/application-pilot/ci"
+  ],
+  "checks": [
+    "both contrib layouts compile from an explicit public application bundle, packaged Tendriller runtime and pinned WASM assets",
+    "the built scope recipe rejects a durably queued stale edit after reset and preserves the original accepted retry without another write",
+    "independent browser identities and OPFS replicas render one shared team-owned task through the actual selected Tendriller backend",
+    "typing traverses authenticated ephemeral frames, expires and leaves no durable event",
+    "with the finality clock held through inclusion, disconnected competing claims resolve by deterministic author order to one acceptance and one SQL rejection",
+    "a failed SQL guard emits no intent; the final winning intent runs the native worker once and records a correlated result that browser scope cannot forge",
+    "a delayed durable append reply preserves newer typing and cannot regress the already observed final receipt",
+    "Worker termination before reply delivery reopens durable identity and original operation; one message survives with its saved draft and original proposal ID",
+    "both layouts rebuild from retained final events without redispatching the worker or writing host application state",
+    "independent replicas receive identical task/chat final events over WebRTC after every host introduction socket has closed",
+    "warm authenticated WebRTC sessions finalize new chat while the host listener is stopped, with increasing RTC bytes and exactly zero host requests or signaling growth",
+    "fresh RTC introduction recovers the same signed history and exact outcomes after interruption, including four 192 KiB programs of sixteen 12 KiB events, with measured bytes and bounded queues"
+  ],
+  "revisions": {
+    "chronolog": {
+      "head": "733f215893b30b0990d3f27e5df91b76a441a396",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "7291598b566090d7893a209075861d57c29b1217",
+      "dirty": false
+    },
+    "tendrillerRuntime": {
+      "head": "4d63f48c9a0f8e9765fe4d90541d67648fa20340",
+      "dirty": false
+    }
+  },
+  "publicArtifacts": {
+    "runtimePackage": {
+      "name": "@tendriller/runtime",
+      "version": "0.3.0-rc.9",
+      "type": "module",
+      "description": "Released Tendriller runtime and public preview primitives",
+      "exports": {
+        "./kernel": {
+          "types": "./kernel.d.mts",
+          "import": "./assets/kernel.mjs"
+        },
+        "./voice": {
+          "types": "./voice.d.mts",
+          "import": "./assets/voice.mjs"
+        },
+        "./preview-support": {
+          "types": "./preview-support.d.mts",
+          "import": "./preview-support.mjs"
+        },
+        "./manifest": "./assets/manifest.json",
+        "./assets/*": "./assets/*",
+        "./preview": {
+          "types": "./preview.d.mts",
+          "import": "./preview.mjs"
+        }
+      },
+      "files": [
+        "assets",
+        "preview-support.mjs",
+        "preview-support.d.mts",
+        "preview.mjs",
+        "preview.d.mts",
+        "kernel.d.mts",
+        "voice.d.mts",
+        "inputs.json",
+        "build-metrics.json"
+      ],
+      "tendriller": {
+        "contract": 3,
+        "runtime": "e9b200c2c1ccf0953d9fc4b1aed9bd83a57a9403977ee29c4b1d7ef849a051dd"
+      }
+    },
+    "kernelSha256": "9f774ff790ba1456f898b78e449daebd312e16266181a9949cb15439415b27d3",
+    "peerIntroductionRecipeSha256": "a609eb75213404f8d9f6b1ace51fc59db5e6a38df263b93357d8d270a2e6e999",
+    "peerIntroductionBundleSha256": "3d94ea607f0983ecb7b96354f864b8b92ff66477c51f8cbd562ccb52e404c15e",
+    "wasmManifestSha256": "eb2d9a21be7803cea662afccbf4af46e936b45ab529a0300bf3ba47c63eb11ad",
+    "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+    "publicModuleSha256": "997058cd67a36137f360284f0ae11c4ba1b373a36380ec27f9359049bd04b841",
+    "scopeModuleSha256": "149bda33913a3afc6e0e06bc1c0e16a2d2c80acfc18d4e97f26ae71c63787aa2",
+    "specimenManifestSha256": "449dbdce80fce87dee15d69ec48da7d24193007cde989364709f1043ef8fcd6c"
+  },
+  "counts": {
+    "effectDispatches": 1,
+    "hostApplicationRequests": 0,
+    "hostApplicationWrites": 0
+  },
+  "browser": "158.0.8127.18",
+  "pageErrors": [],
+  "timingsMs": {
+    "coldBootstrap": 16393.143398,
+    "browserRejectedJob": 5130,
+    "nativeWorkerResult": 4071,
+    "browser1WorkerResult": 9054,
+    "browser0WorkerResult": 9836,
+    "routeReconnectAttachment": 317.97704699999304,
+    "routeReconnectCatchUp": 38312.742566999994
+  },
+  "diagnostics": {
+    "scopeReset": {
+      "acceptedProposalId": "tx_2e8d2ae75bc01ad601efe982e922a8078bced0d6d4a2ed2630bce2536ec906c0",
+      "staleProposalId": "tx_913932f9731336df236ea05bb90a6bbaea62c27d45d0378b8d014a917f096ddf",
+      "resetProposalId": "tx_9c8ad035f9fb0cf5214909c555cd68e9b9ccca2de880b184fc0e8d588e3ee23d",
+      "generation": 1,
+      "effectiveEvents": 3,
+      "rejectedCode": "assert:scope_generation_changed",
+      "closedRejectionCode": "FINALITY_TIMESTAMP_CLOSED",
+      "generationRejectedProposalId": "tx_0b88c5cd2f4c0f38e698e7a27269b593d773010b5b85412b8908190df38e3a4a",
+      "exactRetryAddsRecords": 0
+    },
+    "concurrentClaims": {
+      "clock": "native finality clock held only through disconnected authoring and inclusion of both claims",
+      "heldAtMs": 1794873483883,
+      "heldForMs": 1216,
+      "proposalTimestamps": "unchanged browser clocks",
+      "arbitraryOfflineAdmissionClaim": false
+    },
+    "routeReplay": {
+      "target": {
+        "records": 19,
+        "finalOrderLength": 18
+      },
+      "latest": [
+        {
+          "connected": true,
+          "records": 19,
+          "processedRecords": 19,
+          "finalOrderLength": 18,
+          "materializationPending": false,
+          "ingest": {
+            "phase": "waiting-for-record",
+            "phaseAgeMs": 35273,
+            "subscriptionRestarts": 0,
+            "retryRecords": 0
+          }
+        },
+        {
+          "connected": true,
+          "records": 19,
+          "processedRecords": 19,
+          "finalOrderLength": 18,
+          "materializationPending": false,
+          "ingest": {
+            "phase": "waiting-for-record",
+            "phaseAgeMs": 35404,
+            "subscriptionRestarts": 0,
+            "retryRecords": 0
+          }
+        }
+      ],
+      "elapsedMs": 36138.008719000005
+    },
+    "routes": {
+      "sessions": [
+        {
+          "id": 1,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:57:51.471Z",
+          "readyMs": 293.8753230000002,
+          "authenticatedMs": 303.0864930000007,
+          "closed": true,
+          "sampledPeakQueuedBytes": 309,
+          "sentBytes": 55753,
+          "receivedBytes": 46178,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 888,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 2,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:57:51.477Z",
+          "readyMs": 282.3860040000018,
+          "authenticatedMs": 288.5698360000006,
+          "closed": true,
+          "sampledPeakQueuedBytes": 309,
+          "sentBytes": 56312,
+          "receivedBytes": 46016,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 887,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 3,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:58:03.989Z",
+          "readyMs": 275.82740600000034,
+          "authenticatedMs": 486.5772520000028,
+          "closed": true,
+          "sampledPeakQueuedBytes": 702,
+          "sentBytes": 106076,
+          "receivedBytes": 89604,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 888,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 4,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:58:03.991Z",
+          "readyMs": 303.960328000001,
+          "authenticatedMs": 504.94562700000097,
+          "closed": true,
+          "sampledPeakQueuedBytes": 431,
+          "sentBytes": 128354,
+          "receivedBytes": 114591,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 888,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 5,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:58:37.101Z",
+          "readyMs": 267.5439699999988,
+          "authenticatedMs": 270.174629000001,
+          "closed": true,
+          "sampledPeakQueuedBytes": 432,
+          "sentBytes": 116248,
+          "receivedBytes": 107741,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 887,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 6,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:58:46.557Z",
+          "readyMs": 259.5743470000016,
+          "authenticatedMs": 261.58897799999977,
+          "closed": true,
+          "sampledPeakQueuedBytes": 702,
+          "sentBytes": 112338,
+          "receivedBytes": 109135,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 888,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 7,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:59:07.479Z",
+          "readyMs": 260.64462400000775,
+          "authenticatedMs": 263.33038800000213,
+          "closed": false,
+          "sampledPeakQueuedBytes": 198250,
+          "sentBytes": 966254,
+          "receivedBytes": 148840,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 888,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        },
+        {
+          "id": 8,
+          "route": "webrtc",
+          "startedAt": "2026-11-16T23:59:07.481Z",
+          "readyMs": 260.84651000000304,
+          "authenticatedMs": 275.94753400000627,
+          "closed": false,
+          "sampledPeakQueuedBytes": 198250,
+          "sentBytes": 936745,
+          "receivedBytes": 129815,
+          "nativeSignaling": {
+            "sentBytes": 715,
+            "receivedBytes": 887,
+            "sentDescriptions": 1,
+            "receivedDescriptions": 1,
+            "closed": true
+          }
+        }
+      ],
+      "failures": [],
+      "traceEvents": 76,
+      "recentTrace": [
+        {
+          "elapsedMs": 77194,
+          "channel": "bb12be40-ddac-495b-b7ce-9fb0ad9a98fa",
+          "boundary": "host-to-browser",
+          "bytes": 715,
+          "kind": "description"
+        },
+        {
+          "elapsedMs": 77195,
+          "channel": "bb12be40-ddac-495b-b7ce-9fb0ad9a98fa",
+          "boundary": "host-to-browser",
+          "bytes": 65,
+          "kind": "complete"
+        },
+        {
+          "elapsedMs": 77314,
+          "session": 7,
+          "event": "rtc-state",
+          "state": "connected"
+        },
+        {
+          "elapsedMs": 77314,
+          "session": 7,
+          "event": "rtc-channel",
+          "state": "connecting"
+        },
+        {
+          "elapsedMs": 77316,
+          "session": 8,
+          "event": "rtc-state",
+          "state": "connected"
+        },
+        {
+          "elapsedMs": 77316,
+          "session": 8,
+          "event": "rtc-channel",
+          "state": "connecting"
+        },
+        {
+          "elapsedMs": 77317,
+          "session": 7,
+          "event": "authenticated",
+          "authenticatedMs": 263
+        },
+        {
+          "elapsedMs": 77332,
+          "session": 8,
+          "event": "authenticated",
+          "authenticatedMs": 276
+        }
+      ],
+      "signaling": {
+        "opened": 8,
+        "sentMessages": 8,
+        "receivedMessages": 24,
+        "sentBytes": 5845,
+        "receivedBytes": 6968,
+        "activeSockets": 0,
+        "available": true
+      },
+      "unexpectedHostRequests": 0,
+      "engineSha256": "325f3269817099a9b600b40a97bd081f5d5e5078de0dd79670093468ed4b62b9",
+      "certificateSha256": "c6b57f5a5d3e041012feb0730470d15428709f3fd8176d0781b3bf82a347a4b5",
+      "topology": {
+        "signaling": [
+          "Chromium",
+          "local TLS bridge with synthetic page session",
+          "packaged workerd SDP rendezvous",
+          "native peer"
+        ],
+        "application": [
+          "Chromium Worker",
+          "WebRTC DataChannel over loopback UDP",
+          "native authenticated Chronolog peer"
+        ]
+      },
+      "limits": {
+        "frameBytes": 1114112,
+        "packetBytes": 16384,
+        "queueBytes": 4194304,
+        "queueFrames": 16,
+        "bufferedBytes": 262144,
+        "sdpBytes": 65536
+      },
+      "measurement": {
+        "queueSampleIntervalMs": 10,
+        "byteBoundary": "Logical authenticated peer frame payload bytes before RTC packet headers; SDP JSON envelopes counted separately",
+        "queueScope": "Sampled native send and receive queues; saturation and worst-case memory are separate transport tests",
+        "restrictedInterfaceEnumeration": false
+      },
+      "excludes": [
+        "RTC packet headers and credit messages",
+        "IP/UDP/DTLS/SCTP packet overhead",
+        "provider billing",
+        "public DNS/NAT",
+        "real identity provider",
+        "home/mobile/corporate network conditions"
+      ],
+      "browserSessions": [
+        [
+          {
+            "route": "webrtc",
+            "authenticatedMs": 115.60000000000582,
+            "sentBytes": 107741,
+            "receivedBytes": 116248,
+            "queuedBytes": 0
+          },
+          {
+            "route": "webrtc",
+            "authenticatedMs": 271.3099999999977,
+            "sentBytes": 129274,
+            "receivedBytes": 936454,
+            "queuedBytes": 0
+          }
+        ],
+        [
+          {
+            "route": "webrtc",
+            "authenticatedMs": 80.69500000000698,
+            "sentBytes": 109135,
+            "receivedBytes": 112338,
+            "queuedBytes": 0
+          },
+          {
+            "route": "webrtc",
+            "authenticatedMs": 260.7399999999907,
+            "sentBytes": 148050,
+            "receivedBytes": 966046,
+            "queuedBytes": 0
+          }
+        ]
+      ],
+      "browserSignaling": [
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 586,
+            "receivedBytes": 568
+          },
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 586,
+            "receivedBytes": 568
+          }
+        ],
+        [
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 587,
+            "receivedBytes": 568
+          },
+          {
+            "sentMessages": 1,
+            "receivedMessages": 1,
+            "sentBytes": 587,
+            "receivedBytes": 568
+          }
+        ]
+      ],
+      "pagePerformanceMetrics": [
+        {
+          "metrics": [
+            {
+              "name": "Timestamp",
+              "value": 301.200413
+            },
+            {
+              "name": "AudioHandlers",
+              "value": 0
+            },
+            {
+              "name": "AudioWorkletProcessors",
+              "value": 0
+            },
+            {
+              "name": "Documents",
+              "value": 1
+            },
+            {
+              "name": "Frames",
+              "value": 1
+            },
+            {
+              "name": "JSEventListeners",
+              "value": 114
+            },
+            {
+              "name": "LayoutObjects",
+              "value": 248
+            },
+            {
+              "name": "MediaKeySessions",
+              "value": 0
+            },
+            {
+              "name": "MediaKeys",
+              "value": 0
+            },
+            {
+              "name": "Nodes",
+              "value": 297
+            },
+            {
+              "name": "Resources",
+              "value": 0
+            },
+            {
+              "name": "ContextLifecycleStateObservers",
+              "value": 33
+            },
+            {
+              "name": "V8PerContextDatas",
+              "value": 2
+            },
+            {
+              "name": "WorkerGlobalScopes",
+              "value": 3
+            },
+            {
+              "name": "UACSSResources",
+              "value": 0
+            },
+            {
+              "name": "RTCPeerConnections",
+              "value": 2
+            },
+            {
+              "name": "ResourceFetchers",
+              "value": 4
+            },
+            {
+              "name": "AdSubframes",
+              "value": 0
+            },
+            {
+              "name": "DetachedScriptStates",
+              "value": 0
+            },
+            {
+              "name": "ArrayBufferContents",
+              "value": 14220
+            },
+            {
+              "name": "LayoutCount",
+              "value": 0
+            },
+            {
+              "name": "RecalcStyleCount",
+              "value": 0
+            },
+            {
+              "name": "LayoutDuration",
+              "value": 0
+            },
+            {
+              "name": "RecalcStyleDuration",
+              "value": 0
+            },
+            {
+              "name": "DevToolsCommandDuration",
+              "value": 0.00001
+            },
+            {
+              "name": "ScriptDuration",
+              "value": 0
+            },
+            {
+              "name": "V8CompileDuration",
+              "value": 0
+            },
+            {
+              "name": "TaskDuration",
+              "value": 0.000014
+            },
+            {
+              "name": "TaskOtherDuration",
+              "value": 0.000004
+            },
+            {
+              "name": "ThreadTime",
+              "value": 0.00007
+            },
+            {
+              "name": "ProcessTime",
+              "value": 27.46
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 7023656
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 8667136
+            },
+            {
+              "name": "FirstMeaningfulPaint",
+              "value": 229.54338
+            },
+            {
+              "name": "DomContentLoaded",
+              "value": 229.548105
+            },
+            {
+              "name": "NavigationStart",
+              "value": 229.511257
+            }
+          ]
+        },
+        {
+          "metrics": [
+            {
+              "name": "Timestamp",
+              "value": 301.20091
+            },
+            {
+              "name": "AudioHandlers",
+              "value": 0
+            },
+            {
+              "name": "AudioWorkletProcessors",
+              "value": 0
+            },
+            {
+              "name": "Documents",
+              "value": 1
+            },
+            {
+              "name": "Frames",
+              "value": 1
+            },
+            {
+              "name": "JSEventListeners",
+              "value": 78
+            },
+            {
+              "name": "LayoutObjects",
+              "value": 178
+            },
+            {
+              "name": "MediaKeySessions",
+              "value": 0
+            },
+            {
+              "name": "MediaKeys",
+              "value": 0
+            },
+            {
+              "name": "Nodes",
+              "value": 273
+            },
+            {
+              "name": "Resources",
+              "value": 0
+            },
+            {
+              "name": "ContextLifecycleStateObservers",
+              "value": 35
+            },
+            {
+              "name": "V8PerContextDatas",
+              "value": 2
+            },
+            {
+              "name": "WorkerGlobalScopes",
+              "value": 3
+            },
+            {
+              "name": "UACSSResources",
+              "value": 0
+            },
+            {
+              "name": "RTCPeerConnections",
+              "value": 2
+            },
+            {
+              "name": "ResourceFetchers",
+              "value": 4
+            },
+            {
+              "name": "AdSubframes",
+              "value": 0
+            },
+            {
+              "name": "DetachedScriptStates",
+              "value": 0
+            },
+            {
+              "name": "ArrayBufferContents",
+              "value": 5709
+            },
+            {
+              "name": "LayoutCount",
+              "value": 0
+            },
+            {
+              "name": "RecalcStyleCount",
+              "value": 0
+            },
+            {
+              "name": "LayoutDuration",
+              "value": 0
+            },
+            {
+              "name": "RecalcStyleDuration",
+              "value": 0
+            },
+            {
+              "name": "DevToolsCommandDuration",
+              "value": 0.000008
+            },
+            {
+              "name": "ScriptDuration",
+              "value": 0
+            },
+            {
+              "name": "V8CompileDuration",
+              "value": 0
+            },
+            {
+              "name": "TaskDuration",
+              "value": 0.000011
+            },
+            {
+              "name": "TaskOtherDuration",
+              "value": 0.000003
+            },
+            {
+              "name": "ThreadTime",
+              "value": 0.000056
+            },
+            {
+              "name": "ProcessTime",
+              "value": 27.55
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 6921928
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 8667136
+            },
+            {
+              "name": "FirstMeaningfulPaint",
+              "value": 238.964564
+            },
+            {
+              "name": "DomContentLoaded",
+              "value": 238.977122
+            },
+            {
+              "name": "NavigationStart",
+              "value": 238.941451
+            }
+          ]
+        }
+      ],
+      "replicaStates": [
+        {
+          "records": 19,
+          "recordDigest": "Do-nlzRjkkRicCD5wJW0j8L_VdxUhkO14BjbQgcLIb8",
+          "capabilityDigest": "spNtuZKaSz77R6hASb36xkziy9ZQhAqhf4IQdhvZl8g",
+          "finalOrderLength": 18
+        },
+        {
+          "records": 19,
+          "recordDigest": "Do-nlzRjkkRicCD5wJW0j8L_VdxUhkO14BjbQgcLIb8",
+          "capabilityDigest": "spNtuZKaSz77R6hASb36xkziy9ZQhAqhf4IQdhvZl8g",
+          "finalOrderLength": 18
+        }
+      ],
+      "nativeState": {
+        "records": 19,
+        "recordDigest": "Do-nlzRjkkRicCD5wJW0j8L_VdxUhkO14BjbQgcLIb8",
+        "capabilityDigest": "spNtuZKaSz77R6hASb36xkziy9ZQhAqhf4IQdhvZl8g",
+        "finalOrderLength": 18
+      },
+      "originalOperations": {
+        "before": [
+          [
+            {
+              "operationId": "c183631b-896e-44ca-b95e-aad2b5fa50db",
+              "proposalId": "tx_7c3453bf62808b1f9df2e040bbe4f76a1b28eb877b2194f5d97ddda0eb00f508",
+              "status": "final",
+              "outcome": "accepted"
+            },
+            {
+              "operationId": "0a56062c-87be-4b6c-95ad-ac3e10ca4d01",
+              "proposalId": "tx_b1fa8988c4d19f2d8791c16bcdc55a623ef1e40e7bf40c479788b6a6597014e4",
+              "status": "final",
+              "outcome": "accepted"
+            },
+            {
+              "operationId": "7ecb55f9-d60e-4763-949d-f58125ccb779",
+              "proposalId": "tx_b10ccfa51627d3de3c9b8b19b068dcb35cb06562849df153caaecf962d548bc5",
+              "status": "final",
+              "outcome": "accepted"
+            }
+          ],
+          [
+            {
+              "operationId": "55cb7947-0506-42fd-bccd-28f671c959fc",
+              "proposalId": "tx_4fa2d64bea37e15add2ec8a2dbf739260a36a2617e9977d903d49bc75a60b3e3",
+              "status": "rejected",
+              "outcome": "rejected",
+              "error": "assert:task_unavailable",
+              "message": "assert:task_unavailable at program step 0"
+            }
+          ]
+        ],
+        "after": [
+          [
+            {
+              "operationId": "c183631b-896e-44ca-b95e-aad2b5fa50db",
+              "proposalId": "tx_7c3453bf62808b1f9df2e040bbe4f76a1b28eb877b2194f5d97ddda0eb00f508",
+              "status": "final",
+              "outcome": "accepted"
+            },
+            {
+              "operationId": "0a56062c-87be-4b6c-95ad-ac3e10ca4d01",
+              "proposalId": "tx_b1fa8988c4d19f2d8791c16bcdc55a623ef1e40e7bf40c479788b6a6597014e4",
+              "status": "final",
+              "outcome": "accepted"
+            },
+            {
+              "operationId": "7ecb55f9-d60e-4763-949d-f58125ccb779",
+              "proposalId": "tx_b10ccfa51627d3de3c9b8b19b068dcb35cb06562849df153caaecf962d548bc5",
+              "status": "final",
+              "outcome": "accepted"
+            }
+          ],
+          [
+            {
+              "operationId": "55cb7947-0506-42fd-bccd-28f671c959fc",
+              "proposalId": "tx_4fa2d64bea37e15add2ec8a2dbf739260a36a2617e9977d903d49bc75a60b3e3",
+              "status": "rejected",
+              "outcome": "rejected",
+              "error": "assert:task_unavailable",
+              "message": "assert:task_unavailable at program step 0"
+            }
+          ]
+        ]
+      },
+      "hostOutage": {
+        "signalingBefore": {
+          "host": {
+            "opened": 6,
+            "sentMessages": 6,
+            "receivedMessages": 18,
+            "sentBytes": 4384,
+            "receivedBytes": 5226,
+            "activeSockets": 0,
+            "available": false
+          },
+          "browsers": [
+            [
+              {
+                "sentMessages": 1,
+                "receivedMessages": 1,
+                "sentBytes": 586,
+                "receivedBytes": 568
+              }
+            ],
+            [
+              {
+                "sentMessages": 1,
+                "receivedMessages": 1,
+                "sentBytes": 587,
+                "receivedBytes": 568
+              }
+            ]
+          ]
+        },
+        "signalingAfter": {
+          "host": {
+            "opened": 6,
+            "sentMessages": 6,
+            "receivedMessages": 18,
+            "sentBytes": 4384,
+            "receivedBytes": 5226,
+            "activeSockets": 0,
+            "available": false
+          },
+          "browsers": [
+            [
+              {
+                "sentMessages": 1,
+                "receivedMessages": 1,
+                "sentBytes": 586,
+                "receivedBytes": 568
+              }
+            ],
+            [
+              {
+                "sentMessages": 1,
+                "receivedMessages": 1,
+                "sentBytes": 587,
+                "receivedBytes": 568
+              }
+            ]
+          ]
+        },
+        "rtcBytesBefore": 1035937,
+        "rtcBytesAfter": 1088346,
+        "hostApplicationRequests": 0
+      },
+      "catchUp": {
+        "applicationStringBytes": 786432,
+        "eventsPerProposal": 16,
+        "eventBodyBytes": 12288,
+        "elapsedMs": 38312.742566999994,
+        "applicationBytesPerSecond": 20526.643286491824
+      },
+      "nativeHarnessPeakRssBytes": 542339072,
+      "finalEventDigest": "6758db04e4bfe5755f9fbb45a6a3f2c186035848f30ce2b62e64a28db18d19ad",
+      "notes": [
+        "Page JS heap snapshots exclude Worker/WASM memory; native peak RSS includes this qualification harness and excludes workerd/browser child processes.",
+        "RTC uses loopback UDP; signaling uses loopback TLS and synthetic host accounts. Production identity-provider login, public Internet NAT and optional TURN remain outside this gate."
+      ]
+    }
+  },
+  "error": ""
+}

@@ -1,0 +1,416 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-native-rtc",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "8fe998fbd5d3fac80ae55bc85b9ef33707dff1cc06641aeeaed4dcc09fe067cc",
+      "packages": [
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "4f1960c5b17f68501b0bfbff35725a816536474d",
+    "tree": "63d180c3d77dd3a8310c30990bb69eb2b7e4fdb1",
+    "dirty": true
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g5fbc7b18-rtc",
+      "sha256": "6e1d65697dd7ab17419f9cc03982fc43d3c4ee73a2f0adafb0eeaa82681837af",
+      "sourceCommit": "5fbc7b182e461e12100c8bc339c5f9f2431bdeb6",
+      "sourceTree": "711ea685498cca600c3271cbd2100f8493820062",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-rtc-consumer.mjs",
+      "sha256": "82c545867374411fc21ca094034bd1a41e2bab82554c8eb6fd32074826df01d4"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-host-client.mjs",
+      "sha256": "ec11404bfd404c8471d287e15776ee85d47f6e3f97ec115ab63448f8999fad55"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-scenario.mjs",
+      "sha256": "ad579548c2599b59babb0f77b9865e93e2f0a063ebadc5da357d0548401fe40d"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": null,
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "nativeOwnership": {
+    "secondOwnerRefused": true,
+    "implicitIdentityCreationRefused": true
+  },
+  "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+  "stage": "passed",
+  "retention": {
+    "peers": [
+      "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291"
+    ],
+    "storageIds": [
+      "3490a3c4-97ed-4d37-8089-983709f73b71"
+    ]
+  },
+  "lostReply": {
+    "injectedAfterPersistence": true,
+    "originalOperationId": "reply-lost",
+    "retriedOperationId": "reply-lost",
+    "originalReceipt": {
+      "payload": {
+        "applicationId": "e11fe857b034e1bbfb75d2886bf77fd5836ffd82321a814eab08a1b70ddee9cc",
+        "profile": "peer-generation-v1",
+        "generation": "d8e4f3a33f9adc7293d1432527eacda92b5bc1b5a4226fc5ab98c1eac474161e",
+        "sequence": 2,
+        "previousRoot": "1d58609988caf9c5da757e079c3df99713b8fded047ae3d4dc2fcd413de0c81e",
+        "attemptId": "89ee2fceaf319a52a4d4720ce8e46dad9aa703b92b0e4c03defa60657ba50be6",
+        "author": "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4",
+        "operationId": "reply-lost",
+        "bodyHash": "74e2e1d2f9295ad0a8674bd694157a471ec8bc93f8870e9b87b499cba6c20d6c",
+        "bodyBytes": 1570
+      },
+      "signature": "7accdd1251eae41b273b04900bc65b2c3630f6b1cd7908b8739ba0559f87ceb6a6d3b22b45a7c2460d87949b253a0227ad22307fc2fc09ac7a317d580f594e03",
+      "root": "9ae6d78d382bc82cdce4c42baeead28a655812ce43b3b34243be7f90159cce47"
+    },
+    "retriedReceipt": {
+      "payload": {
+        "applicationId": "e11fe857b034e1bbfb75d2886bf77fd5836ffd82321a814eab08a1b70ddee9cc",
+        "profile": "peer-generation-v1",
+        "generation": "d8e4f3a33f9adc7293d1432527eacda92b5bc1b5a4226fc5ab98c1eac474161e",
+        "sequence": 2,
+        "previousRoot": "1d58609988caf9c5da757e079c3df99713b8fded047ae3d4dc2fcd413de0c81e",
+        "attemptId": "89ee2fceaf319a52a4d4720ce8e46dad9aa703b92b0e4c03defa60657ba50be6",
+        "author": "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4",
+        "operationId": "reply-lost",
+        "bodyHash": "74e2e1d2f9295ad0a8674bd694157a471ec8bc93f8870e9b87b499cba6c20d6c",
+        "bodyBytes": 1570
+      },
+      "signature": "7accdd1251eae41b273b04900bc65b2c3630f6b1cd7908b8739ba0559f87ceb6a6d3b22b45a7c2460d87949b253a0227ad22307fc2fc09ac7a317d580f594e03",
+      "root": "9ae6d78d382bc82cdce4c42baeead28a655812ce43b3b34243be7f90159cce47"
+    },
+    "orderedRecords": {
+      "before": 2,
+      "after": 2
+    }
+  },
+  "hostOutage": {
+    "boundary": "portable-control-port",
+    "blocked": true,
+    "blockedProbeRejected": true,
+    "commandsApplied": 2,
+    "requests": {
+      "before": 3,
+      "after": 3
+    },
+    "applicationBodyBytes": {
+      "before": 0,
+      "after": 0
+    },
+    "observations": {
+      "before": {
+        "requests": 3,
+        "applicationBodyBytes": 0
+      },
+      "after": {
+        "requests": 3,
+        "applicationBodyBytes": 0
+      }
+    },
+    "finalityCapability": false,
+    "liveSignalsObserved": 1,
+    "peerReplicationObserved": true,
+    "transport": {
+      "before": {
+        "reliable": {
+          "sentBytes": 16961,
+          "receivedBytes": 16961
+        },
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        }
+      },
+      "after": {
+        "reliable": {
+          "sentBytes": 48970,
+          "receivedBytes": 48970
+        },
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        }
+      }
+    }
+  },
+  "recovery": {
+    "previousGeneration": "d8e4f3a33f9adc7293d1432527eacda92b5bc1b5a4226fc5ab98c1eac474161e",
+    "selectedGeneration": "a0f9d561ded2586515e14a6bc76446d8c89abb06928b076823a525dfe6b5de1b",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "sourceRemoved": true,
+    "coherentReset": true,
+    "recoveredDigest": "8f8463e30e78566f796d547da3fd99fcdb593f89fbe157aea5b0ee900d0f2d62",
+    "freshPeerDigest": "8f8463e30e78566f796d547da3fd99fcdb593f89fbe157aea5b0ee900d0f2d62",
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ],
+    "inheritedIdentityPreserved": true,
+    "abandonedEvidencePreserved": true,
+    "unknownLoss": true
+  },
+  "returningBranch": {
+    "generationBefore": "a0f9d561ded2586515e14a6bc76446d8c89abb06928b076823a525dfe6b5de1b",
+    "generationAfter": "a0f9d561ded2586515e14a6bc76446d8c89abb06928b076823a525dfe6b5de1b",
+    "digestBefore": "8f8463e30e78566f796d547da3fd99fcdb593f89fbe157aea5b0ee900d0f2d62",
+    "digestAfter": "8f8463e30e78566f796d547da3fd99fcdb593f89fbe157aea5b0ee900d0f2d62",
+    "oldAttemptReadmitted": false,
+    "excludedAncestorReadopted": false,
+    "thirdGenerationChecked": true,
+    "thirdGeneration": "d2d12fe678f9e75ee37cbf99399afd3bea2e15bc5df4f66da65f91c133e6ee8d"
+  },
+  "reapply": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "e8e5aacc8b2d0407681b5e9de20ea7da19020be710bf9a4e7136d56c22234aa7",
+    "newAttemptId": "955283701417396b7f39faaf21ee6044e188694a24c0a095be9d503aecd76af7",
+    "reapplyOf": "e8e5aacc8b2d0407681b5e9de20ea7da19020be710bf9a4e7136d56c22234aa7",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "reopen": {
+    "identityBefore": "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+    "identityAfter": "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+    "operationBefore": {
+      "status": "applied",
+      "attemptId": "955283701417396b7f39faaf21ee6044e188694a24c0a095be9d503aecd76af7",
+      "operationId": "reapplied-a",
+      "author": "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+      "generation": "a0f9d561ded2586515e14a6bc76446d8c89abb06928b076823a525dfe6b5de1b",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "operationAfter": {
+      "status": "applied",
+      "attemptId": "955283701417396b7f39faaf21ee6044e188694a24c0a095be9d503aecd76af7",
+      "operationId": "reapplied-a",
+      "author": "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+      "generation": "a0f9d561ded2586515e14a6bc76446d8c89abb06928b076823a525dfe6b5de1b",
+      "sequence": 1,
+      "outcome": "accepted",
+      "rejectionCode": null
+    }
+  },
+  "rtc": {
+    "implementation": "werift",
+    "version": "0.27.0",
+    "candidateSource": "explicit-loopback-only",
+    "interfaceEnumeration": "disabled-by-native-options",
+    "signalingBoundary": "one-off-in-process-sdp-mailbox",
+    "byteBoundary": "authenticated-reliable-application-frames",
+    "connections": [
+      {
+        "peers": [
+          "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+          "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4"
+        ],
+        "authenticated": true,
+        "connectedInMs": 2466.402973,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 18555,
+          "receivedBytes": 18555
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+          "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4"
+        ],
+        "authenticated": true,
+        "connectedInMs": 1182.0100030000003,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 48970,
+          "receivedBytes": 48970
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4",
+          "44f7a1b15d4c89e782187be89e0837f11c544f4dc35769223cc90fd71664ab69"
+        ],
+        "authenticated": true,
+        "connectedInMs": 636.2325580000006,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 96611,
+          "receivedBytes": 96611
+        },
+        "closed": true
+      },
+      {
+        "peers": [
+          "895a5bba42692a35a41decac21e82188dcd523d9baa071a846e3203f5037f291",
+          "fe5de1dcf7b174af70678f38c3150f2e60230f8885f1a89b7083e5bf0ff324a4"
+        ],
+        "authenticated": true,
+        "connectedInMs": 327.3839619999999,
+        "routes": [
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          },
+          {
+            "route": "direct",
+            "localCandidateType": "host",
+            "remoteCandidateType": "host"
+          }
+        ],
+        "signaling": {
+          "sentMessages": 2,
+          "sentBytes": 1137,
+          "closed": true
+        },
+        "reliable": {
+          "sentBytes": 58119,
+          "receivedBytes": 58064
+        },
+        "closed": true
+      }
+    ]
+  }
+}

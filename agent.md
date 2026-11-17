@@ -2,6 +2,12 @@
 
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
+Use the [common application session](guides/application-primitives.md): one command/query/event API and one journal across native and browser peers. Storage, transport and engine capabilities define roles. The host is an explicit filtered control/publication participant; ordinary application work travels between peers. applied() reports execution in the selected history; shared() separately observes retained coverage on another peer. Explicit recovery may abandon a recent suffix, including previously applied work. Preserve original identity on exact retry, reread after recovery and deliberately link any new reapplication.
+
+Keep author, sequencing, recovery, data membership, ownership and external-tool authority separate. Preserve verified requester provenance through effect journals; payload roles grant no private credentials. Irreversible work requires an explicitly configured protected checkpoint covering its prerequisites or a durable external-action service. Keep stable effect identities, authorization and reconciliation; reversible computation may follow an explicit rerun policy. Stronger guarantees are declared capabilities of the same application contract, not alternate runtime profiles.
+
+The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses the public applied()/shared() contract directly. Executable examples install an explicitly supplied matching @chronolog/peer-session archive. The [qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md) preserves clean native RTC, SQL and hosted runs with exact source and artifact hashes. Browser ownership, SDK recovery orchestration and deployed operating limits require their own evidence. Historical reports retain their source-specific scope and do not define another supported session API.
+
 Start from an [application journey](guides/use-cases.md) when the user names an outcome rather than a technical decision. Follow the person through first use, correction, completion, and return; preserve the evidence boundary of every claimed check.
 
 ### Choose inputs and algorithms
@@ -55,6 +61,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
+- [Share live signals without recording history](cookbooks/share-live-signals/COOKBOOK.md) — Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.
 - [Track routines without misleading progress](cookbooks/track-habits-and-routines/COOKBOOK.md) — Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
@@ -71,6 +78,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
+- [Build a peer application with explicit recovery](cookbooks/run-a-peer-application/COOKBOOK.md) — Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 - [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 

@@ -24,7 +24,13 @@ Use this when people need to correct mistakes, explore alternatives, or understa
 | Published evidence or decision | A new revision that preserves the earlier record. | Correct or supersede the interpretation without rewriting what was reviewed. |
 | External effect | Domain-specific compensation when supported. | Perform another action; the original effect still happened. |
 
-Tendriller has no default application-wide undo policy. Core's atomic conditional state writes supply the concurrency primitive; the application chooses which inverse is meaningful and retains the required history. Reading this guide installs neither history nor compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
+Tendriller has no default application-wide undo policy. The application definition supplies guarded commands and retained domain history through one session; it chooses which inverse is meaningful. Reading this guide installs neither history nor compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
+
+## Separate recovery from user Undo
+
+Explicit application recovery selects a complete retained prefix and can abandon a recent suffix, including applied work. The session publishes a recovery notice; the page replaces its coherent projection while preserving drafts and the original operation references. Adopted outcomes remain identifiable and abandoned attempts remain inspectable. Recovery does not invent new user intent.
+
+Undo of an accepted domain action is a newly reviewed guarded command. Redo is another new decision. Retrying an original operation instead recovers its exact saved attempt. An abandoned attempt cannot be retried as if its meaning still applied; deliberate reapplication creates a new linked operation after current review. External effects must never be dispatched merely because a view rebuilds or history is replayed.
 
 ## Make correction part of the normal journey
 
@@ -44,39 +50,32 @@ For shared records, retain stable object identity and the exact before/after rev
 
 ## Reverse accepted work against current truth
 
-A proposed inverse must be reviewed under current authority and task context. For example, undoing a rename from “A” to “B” should check that the object still has the reviewed resulting value before restoring “A.” If someone renamed it to “C,” the inverse is stale. Use core's `conditions` with `state.set` or `state.apply`: the authority checks the predicate and applies the whole batch atomically. No custom trusted transaction is needed merely to make that comparison safe.
+Review a proposed inverse under current authority and domain context. Undoing a rename from “A” to “B” should require the reviewed resulting value before restoring “A.” If someone renamed it to “C,” that inverse is stale. A value guard and a record-version guard intentionally differ when a value changes away and back. Select the policy, then enforce the predicate and inverse in one command transaction.
 
-Read a coherent current view with `await tendril.state.snapshot()`. A failed/offline read leaves the local history available but cannot establish current authority. `state.get()` may include optimistic ordinary writes, so do not pair it with `state.revision` to manufacture a base. Show the inverse and any intervening changes before offering an accepted shared reversal.
-
-For a history entry from the current task, assume `entry` retains its stable `itemId` and boolean `before`/`after` completion values. Items have an explicit deletion flag. Capture `reviewed` and its generations when preparing the Undo action, then retain these values until the person responds:
+For illustration, your definition can declare an `item` query and `reverseCompletion` command. A history entry retains the original operation ID, item ID and before/after completion values. The command checks author authority, existence, deletion status, expected version, and the expected resulting value before applying the inverse and recording its relation to the earlier operation:
 
 ```js
-const reviewed = await tendril.state.snapshot();
-const expected_generations = Object.fromEntries(
-  reviewed.scopes.map(scope => [scope.id, scope.generation]),
-);
-const result = await tendril.state.set(
-  ["items", entry.itemId, "done"], entry.before,
-  {expected_generations, conditions: [
-    {path: ["items", entry.itemId, "done"], equals: entry.after},
-    {path: ["items", entry.itemId, "deleted"], equals: false},
-  ]},
-);
+const reviewed = await session.query('item', { itemId: entry.itemId });
+if (!reviewed.value || reviewed.value.done !== entry.after) {
+  throw new Error('Review the changed item before reversing completion');
+}
+const operation = await session.command('reverseCompletion', {
+  itemId: entry.itemId,
+  expectedVersion: reviewed.value.version,
+  expectedDone: entry.after,
+  done: entry.before,
+  reverses: entry.operationId,
+}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
+const receipt = await operation.applied();
 ```
 
-The equality predicate retains the original resulting value; it does not adopt whatever is current during a retry. A different current completion conflicts. An unrelated note can still change. If changing away and back must also invalidate Undo, guard an application revision advanced by every cooperating edit, or use `expected_revision` with the original accepted global revision. The global guard is stricter and also rejects unrelated page changes. A revision from the new review protects that review interval, not the entire period since the original action. These are distinct correction policies.
+These names are illustrative application vocabulary. The UI check helps the person; the command must repeat all required checks inside actual execution. `basedOn` orders the command after the captured application revision and does not replace the domain predicates. A [guarded definition](../run-a-peer-application/snippets/peer-task-board.mjs) owns those rules for every caller.
 
-For restoring a truly absent record, `exists:false` can guard its stable ID before an explicit whole-record `set`. A tombstone is present: use `equals` on its reviewed value or revision instead. Missing and null are distinct. Conditions on the object and its task-generation protect against reusing a history entry for a different lifecycle; an old-task history entry needs a deliberate restore-as-new review, not silently refreshed guards.
+Restoring an absent record needs an explicit policy for identity, references, ordering and access. A tombstone is a retained record, not absence. Reusing a history entry for a new domain round must be an intentional restore-as-new decision. An arithmetic inverse is valid only when the domain explicitly treats the value as additive; subtracting an old increment can be wrong after someone set a chosen total.
 
-An arithmetic inverse may also be wrong. Subtracting a previous increment can be valid for an explicitly additive domain but not for a field that someone has subsequently set to a chosen total. Reversing a deletion may require preserving identity, references, ordering, and permissions; recreating a visually similar row is not necessarily the same object.
+Retain the new reversal's operation ID and inspect the session journal after interruption. Show locally saved and applied accepted/rejected separately. Retry uses `session.retry` for that same operation; it does not create another inverse. If recovery abandons either the original action or the reversal, reread the selected history before offering a new correction. Neither `applied()` nor retained coverage is an irreversible settlement promise.
 
-Each new browser write creates its own reversal command; automatic delivery retries retain that command's original predicates and generations. Keep the original operation's receipt available. A conditional inverse does not change the optimistic shared view: show “Undo pending” until `accepted`, retain it through `queued`, and offer comparison on `rejected`. Observe `state_result` for a terminal result after queuing. Do not invoke Undo again to retry delivery. A durable `state_conflict` remains rejected even if the predicate later becomes true; a fresh reviewed inverse is new intent. See the [browser API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md).
-
-Use the admitted result's `cid` to correlate this reversal. `state.pending()` and `state_queue` restore unsettled operations after reload; `state_result` includes their original normalized `ops` and predicates, so the affected item and inverse value remain identifiable without another outbox. If accepted history needs an explicit “reverses this earlier operation” link, write that application history record in the same conditional `apply` batch. The pending view is not retained rejection history; keep the person's recoverable draft according to the history policy. An empty unconditional inverse returns `unchanged`, which is not an accepted reversal.
-
-These predicates are optional cooperative guards. They do not authorize reversal of someone else's work or prevent another authorized writer from omitting them. Enforced role rules, approval revocation, and external compensation still need their actual authorized operations. For a shared file, restoration needs the current path revision; publication rollback changes the publication-head revision. Restoring earlier bytes does not reset those concurrency histories.
-
-A Redo after an accepted reversal is also new reviewed work, not permission to replay the original command with new meaning. Recheck current authority, generation, referenced evidence, and any external conditions.
+A Redo after accepted reversal is also newly reviewed work. Check the current domain version, author authority, referenced evidence and external conditions. A completed publication revision is changed through another signed publication with its real predecessor; restoring old bytes does not reset publication history. External compensation still needs its actual action authority, receipt and reconciliation policy.
 
 ## Keep evidence and decisions traceable
 
@@ -102,10 +101,10 @@ If an action cannot be undone, make that clear at its review point and provide a
 | The resulting value changes away and back | A value guard and a revision guard exhibit the deliberately chosen different policies. |
 | Reversal reply is lost | Retry reconciles the same reversal command without applying a second inverse. |
 | The inverse is queued or rejected and its predicate later becomes true | Pending UI does not claim success; a stored rejection stays terminal until the person reviews new intent. |
-| A task resets after the Undo offer is prepared | Original generations remain attached and the old inverse cannot alter the new task. |
+| A task resets after the Undo offer is prepared | Original domain guards remain attached and the old inverse cannot alter the new task. |
 | Deleted item is restored | Identity, references, ordering, and permissions follow the reviewed restoration policy. |
 | Evidence is corrected after approval | Earlier approval remains tied to its original evidence and requires reassessment when appropriate. |
 | Some batch items can no longer be reversed | Outcomes identify reversible, conflicted, and irreversible items explicitly. |
 | History retention expires or reader authority changes | Unavailable history and access limits are explained without leaking cached content. |
 
-The useful outcome is confidence to revise work while preserving an honest account of what happened. The exact history and compensation mechanisms remain page-owned or explicitly trusted application policy.
+The useful outcome is confidence to revise work while preserving an honest account of what happened. The definition owns domain history and guards; an explicit action capability owns external compensation.

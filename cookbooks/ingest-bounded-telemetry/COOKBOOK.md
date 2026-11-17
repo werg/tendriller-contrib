@@ -15,6 +15,14 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use an independent collector when data arrives while an agent is absent or a browser is closed. A browser-only connection may serve a short attended experiment. The collector owns acquisition and delivery reliability; the page owns interpretation and display. If only an occasional report is needed, a reviewed snapshot avoids an unnecessary always-running process.
 
+Choose whether the task needs retained observations before introducing a spool.
+A current-value instrument can send [ephemeral signals](../share-live-signals/COOKBOOK.md)
+and consume `latest`, with source identity and a visible freshness deadline. It
+needs neither a durable application log nor finality. Selected samples, required
+alarms and final summaries can be retained separately. The spooling and receipt
+guidance below applies when admitted observations must survive an outage; an
+ephemeral channel deliberately does not replay a backlog on reconnect.
+
 ## Start with an operator journey
 
 Imagine a remote training job that writes numeric records overnight. The operator needs to set up a source, confirm that the expected run is arriving, leave it running, identify a stalled or lossy feed, and close it without losing admitted records. A useful collector experience therefore includes setup validation, a first-record preview, delivery status, backlog inspection, and an explicit stop/drain choice.
@@ -24,7 +32,11 @@ The create response declares the pre-claim 1 MiB stream-retention ceiling
 (`unclaimed_limits.stream_retained_bytes`); running a collector first can fill
 it even in a normal first-use workflow. Choose its ongoing lifetime deliberately; producer activity neither claims a page nor proves that an agent is available. Keep the collector's scoped producer credential apart from the administrative handle. Show its safe source name and allowed streams in status views, never the credential.
 
-During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [current core collector reference](https://github.com/werg/tendriller/blob/master/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback. The `sources` links in the frontmatter are pinned historical provenance to retired contrib file locations, not links to files on current `main`.
+That provisioning path is the hosted collector. Peer applications instead use
+their selected log and scoped application grants; they do not enable the hosted
+stream backend as a second writer for the same observations.
+
+An independently running acquisition process opens the same owned application session. It declares stable source/run identities, uses bounded signals for transient readings, and submits retained observations through domain commands. Keep parsing, calibration and a bounded source spool separate from the maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) exposes the actual session; there is no second hosted stream/collector data protocol. Acquisition health, applied data, retained coverage and agent handling remain distinct. Keep credentials out of authored pages and exports.
 
 ## Choose acquisition and its failure meaning
 

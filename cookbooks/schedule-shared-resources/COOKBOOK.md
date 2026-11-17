@@ -45,38 +45,28 @@ An illustrative occupancy rule is a half-open interval `[start, end)`, where one
 
 Choose recurrence semantics deliberately. “Every Tuesday at 09:00 in this location” differs from repeating an elapsed number of hours. Preview affected occurrences, exceptions, resource changes, and known conflicts. Bound expansion and decide whether booking the series is atomic or per occurrence. Make partial success visible.
 
-## Put the guarantee at the authority boundary
+## Put the guarantee in the guarded application command
 
-For a simple fixed-slot model, use a coherent `await tendril.state.snapshot()` for review, then [one conditional state batch](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) to create the reservation and claim every selected slot. The following example assumes a validated resource, a nonempty bounded set of unique slot IDs, a new stable application `reservationId`, and scope generations retained with the reviewed proposal:
+Use one coherent query to review availability, then submit a bounded reservation command through the same session. The definition validates the authenticated author, resource policy, reservation identity, interval or slot set and every affected occupancy constraint inside one transaction. A browser read followed by an unguarded append cannot establish exclusivity.
+
+For illustration, a definition may declare `availability` and `reserveSlots`:
 
 ```js
-const result = await tendril.state.apply([
-  {
-    op: "set", path: ["reservations", reservationId],
-    value: { resourceId, slotIds, status: "confirmed" },
-  },
-  ...slotIds.map(slotId => ({
-    op: "set", path: ["occupancy", resourceId, slotId],
-    value: reservationId,
-  })),
-], {
-  conditions: [
-    { path: ["reservations", reservationId], exists: false },
-    ...slotIds.map(slotId => ({
-      path: ["occupancy", resourceId, slotId], exists: false,
-    })),
-  ],
-  expected_generations: reviewedGenerations,
-});
+const reviewed = await session.query('availability', { resourceId, slotIds });
+const operation = await session.command('reserveSlots', {
+  reservationId: crypto.randomUUID(),
+  resourceId,
+  slotIds: [...slotIds],
+  expectedPolicyVersion: reviewed.value.policyVersion,
+}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
+const receipt = await operation.applied();
 ```
 
-Core checks absence and writes the record and occupancy together. Two competing guarded requests cannot both acquire the same slot. Missing occupancy is intentional; a null entry is still present. All clients participating in this cooperative model must use the declared guarded operations. The conditions are optional public API inputs, so this example does not prevent an otherwise authorized writer from sending an unconditional replacement or enforce hidden eligibility rules. For that stronger policy, put validation at the trusted boundary; do not claim a hidden calendar cell is access control.
+The command, not the page, must check the complete bounded unique slot set and write the reservation and occupancy together. In a general interval model it checks every overlapping interval and capacity boundary. Resource eligibility and author rights belong to the same mandatory definition. `basedOn` is an ordering prerequisite; it does not assert current availability or replace these transaction checks. The [guarded SQL definition](../run-a-peer-application/snippets/peer-task-board.mjs) demonstrates atomic claim and signer enforcement through the same command API.
 
-For general intervals, capacity, active holds, private records, or approval requirements, the trusted operation must recheck current actor permission, resource policy, every affected interval, and applicable revisions/generations as one authoritative decision. Use core's transaction support for the policy's actual records. A browser read followed by an unguarded append remains vulnerable to concurrent writers.
+Retain the operation ID separately from the domain reservation ID. After a lost reply use the session journal and exact retry; do not create another reservation merely because the UI timed out. Changed terms or policy require new review and new intent. A resource label remains a display value, not identity or authority.
 
-Keep the application reservation identity separate from core's command identity. Core's runtime saves the exact guarded batch before sending it and retries that command after a lost reply; an application should not issue a new batch merely because the first returned `queued`. Bind the proposal to the exact resource, interval, quantity, and reviewed terms. A stale task generation or changed policy requires a fresh review, not automatic rebinding. A resource label is not authority and may change without changing its identity.
-
-For an external calendar or booking service, treat that service's result as authoritative and document its actual conflict/idempotency behavior. Tendriller can display and coordinate the experience, but its shared state cannot guarantee exclusivity in a separate system. If the integration cannot enforce exclusivity, call the page advisory and require final confirmation at the authority.
+Application exclusivity holds within its selected history. Explicit recovery can abandon a reservation suffix that was previously applied. Describe that recovery policy before treating the page as a consequential booking authority. Stronger guarantees require an explicit protected capability, or an external booking system whose actual result is authoritative. The light host participant does not provide another reservation executor. External conflicts and idempotency must be qualified at that external boundary; if it cannot enforce exclusivity, label the page advisory.
 
 ## Make pending states actionable
 
@@ -84,7 +74,7 @@ Distinguish selecting, checking availability, held, awaiting approval, submittin
 
 A confirmation receipt should name the reservation identity, resource, exact interval/timezone, quantity, current status, and allowed change/cancel actions. Avoid exposing another person's private booking details when only occupancy is needed. Notifications should carry the minimum useful information and their own delivery state; confirmation does not depend on a person reading a notification unless the policy explicitly requires it.
 
-Changing a reservation requires checking the new interval and releasing/replacing the old one under a defined transaction or external policy. In the fixed-slot model, guard the whole reviewed reservation with `{path:["reservations", reservationId], equals:reviewedReservation}` (or its reviewed global state revision), guard old occupancy with `equals: reservationId`, and guard newly acquired slots with `exists:false`. Update the reservation and release/acquire its occupancy within one `state.apply` batch. Shared old/new slots remain owned rather than being required absent. The record guard matters: if another editor extended the booking during review, checking only the previously known slots could leave the newly added slot orphaned. Cancellation needs the same reviewed-record guard while releasing its complete known occupancy. Do not cancel the old slot first and then discover the new slot was unavailable unless that risk is an explicit reviewed behavior.
+Changing a reservation requires checking its complete reviewed domain version and new interval, then releasing old occupancy and acquiring new occupancy in one guarded command or under the actual external booking policy. Verify the old occupancy still belongs to this reservation and new slots are available. Shared old/new slots remain owned rather than being required absent. The record guard matters: if another editor extended the booking during review, checking only the previously known slots could leave the newly added slot orphaned. Cancellation needs the same reviewed-record guard while releasing its complete known occupancy. Do not cancel the old slot first and then discover the new slot was unavailable unless that risk is an explicit reviewed behavior.
 
 ## Recover from races without losing the proposal
 
@@ -107,4 +97,4 @@ For offline use, allow a local proposed booking if useful, but label it as uncon
 | Change races with another booking | The old and new occupancy follow the real transaction policy without a hidden gap or double booking. |
 | One editor extends a reservation while another moves or cancels its older snapshot | The whole-record guard rejects the stale operation; no newly added slot remains occupied outside the accepted reservation. |
 
-Only actual trusted-host or external-service concurrency checks can establish the booking guarantee. A fixture calendar can exercise the user experience but cannot prove exclusivity.
+Only actual command execution and, where selected, protected-capability or external-service checks establish the declared booking guarantee. Include explicit history recovery in that qualification. A fixture calendar can exercise the interface but cannot prove exclusivity.

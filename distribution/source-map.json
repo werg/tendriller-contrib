@@ -341,6 +341,12 @@
       ]
     },
     {
+      "id": "run-a-peer-application",
+      "sources": [
+        "https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/packages/peer-session/README.md"
+      ]
+    },
+    {
       "id": "run-measurement-experiment",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/AGENT.md",
@@ -382,6 +388,12 @@
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "share-live-signals",
+      "sources": [
+        "https://github.com/werg/chronolog-db/blob/4efa3546f930734328879bdca3984282bd19156b/packages/signals/src/index.ts"
       ]
     },
     {

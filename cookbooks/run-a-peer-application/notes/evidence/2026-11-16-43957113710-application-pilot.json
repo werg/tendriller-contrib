@@ -1,0 +1,115 @@
+{
+  "format": "chronolog-application-pilot/v1",
+  "status": "passed",
+  "passed": true,
+  "startedAt": "2026-11-16T21:13:36.214Z",
+  "command": [
+    "/home/runner/work/chronolog-db/chronolog-db/tools/application-pilot.ts",
+    "--contrib",
+    "artifacts/pilot-source/contrib",
+    "--tendriller-runtime",
+    "artifacts/pilot-source/tendriller/dist/runtime",
+    "--wasm",
+    "artifacts/wasm",
+    "--output",
+    "artifacts/application-pilot/ci"
+  ],
+  "checks": [
+    "both contrib layouts compile from an explicit public application bundle, packaged Tendriller runtime and pinned WASM assets",
+    "the built scope recipe rejects a durably queued stale edit after reset and preserves the original accepted retry without another write",
+    "independent browser identities and OPFS replicas render one shared team-owned task through the actual selected Tendriller backend",
+    "typing traverses authenticated ephemeral frames, expires and leaves no durable event",
+    "both disconnected browsers author original competing claims; real authority reconnect produces one final acceptance and one retained final rejection",
+    "a failed SQL guard emits no intent; the final winning intent runs the native worker once and records a correlated result that browser scope cannot forge",
+    "a delayed durable append reply preserves newer typing and cannot regress the already observed final receipt",
+    "Worker termination before reply delivery reopens durable identity and original operation; one message survives with its saved draft and original proposal ID",
+    "both layouts rebuild from retained final events without redispatching the worker or writing host application state"
+  ],
+  "revisions": {
+    "chronolog": {
+      "head": "3780499f18435a8eddfa3dcecf511ca908e57087",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "8449017159b2657a2b0d9bde398322dac78ee2d1",
+      "dirty": false
+    },
+    "tendrillerRuntime": {
+      "head": "283f210c1fb9dc2c1d27e9bbd9e8813234a40a70",
+      "dirty": false
+    }
+  },
+  "publicArtifacts": {
+    "runtimePackage": {
+      "name": "@tendriller/runtime",
+      "version": "0.3.0-rc.9",
+      "type": "module",
+      "description": "Released Tendriller runtime and public preview primitives",
+      "exports": {
+        "./kernel": {
+          "types": "./kernel.d.mts",
+          "import": "./assets/kernel.mjs"
+        },
+        "./voice": {
+          "types": "./voice.d.mts",
+          "import": "./assets/voice.mjs"
+        },
+        "./preview-support": {
+          "types": "./preview-support.d.mts",
+          "import": "./preview-support.mjs"
+        },
+        "./manifest": "./assets/manifest.json",
+        "./assets/*": "./assets/*",
+        "./preview": {
+          "types": "./preview.d.mts",
+          "import": "./preview.mjs"
+        }
+      },
+      "files": [
+        "assets",
+        "preview-support.mjs",
+        "preview-support.d.mts",
+        "preview.mjs",
+        "preview.d.mts",
+        "kernel.d.mts",
+        "voice.d.mts",
+        "inputs.json",
+        "build-metrics.json"
+      ],
+      "tendriller": {
+        "contract": 3,
+        "runtime": "27bbcd2d6c7ae6056f6728e64e5e144ebd7a3d1a5a3782f1540f299972204b31"
+      }
+    },
+    "kernelSha256": "c795e788c146e6a0abd4511fff9f931abb34346993fd80d9aff1bd5cf00704be",
+    "wasmManifestSha256": "eb2d9a21be7803cea662afccbf4af46e936b45ab529a0300bf3ba47c63eb11ad",
+    "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+    "publicModuleSha256": "997058cd67a36137f360284f0ae11c4ba1b373a36380ec27f9359049bd04b841",
+    "scopeModuleSha256": "149bda33913a3afc6e0e06bc1c0e16a2d2c80acfc18d4e97f26ae71c63787aa2",
+    "specimenManifestSha256": "4d51dd5ee310267212180b552546ec3f512571ccb8ac8bd07205acfde32ff25b"
+  },
+  "counts": {
+    "effectDispatches": 1,
+    "hostApplicationWrites": 0
+  },
+  "browser": "158.0.8127.18",
+  "pageErrors": [],
+  "timingsMs": {
+    "browserRejectedJob": 7671,
+    "nativeWorkerResult": 256,
+    "browser0WorkerResult": 11398,
+    "browser1WorkerResult": 13695
+  },
+  "diagnostics": {
+    "scopeReset": {
+      "acceptedProposalId": "tx_04308d36a88721844aa048f55d882a85e5385765218c2ca27ec42f8e5d56c475",
+      "staleProposalId": "tx_d31da02c99f22b2bcfb903e7efbda3311d0c93f6b50d5f593e6530eed977f903",
+      "resetProposalId": "tx_aa50855f6f26ae82b9e8fd75e7b69f04dcc49e66cb2b5f801316fc0deee12dbc",
+      "generation": 1,
+      "effectiveEvents": 3,
+      "rejectedCode": "assert:scope_generation_changed",
+      "exactRetryAddsRecords": 0
+    }
+  },
+  "error": ""
+}

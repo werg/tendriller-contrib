@@ -1,0 +1,151 @@
+{
+  "format": "peer-webrtc-evidence-summary/v1",
+  "source": {
+    "chronolog": {
+      "head": "0f2730d14349d32f496a25427c52b1e6c72e2cd4",
+      "dirty": false
+    }
+  },
+  "runtime": {
+    "node": "v24.22.2",
+    "browser": "158.0.8127.18",
+    "native": "werift@0.27.0"
+  },
+  "topology": {
+    "transport": "webrtc",
+    "nativeImplementation": "werift",
+    "signaling": "loopback HTTP offer/answer fixture",
+    "networkDiscovery": "native binds loopback explicitly; optional interface enumeration disabled in fixture",
+    "browserStorage": "OPFS",
+    "channelOwner": "DedicatedWorker",
+    "hostStoppedAfterNegotiation": true,
+    "excludes": [
+      "packaged Tendriller signaling host",
+      "public NAT connectivity",
+      "TURN interoperability",
+      "provider billing"
+    ]
+  },
+  "checks": [
+    "native-browser-rtc-and-worker-ownership",
+    "both-original-operations-reach-accepted-finality",
+    "detached-body-after-signaling-host-stopped",
+    "exact-original-operation-retry",
+    "final-events-and-original-records-converge-with-host-unavailable"
+  ],
+  "signaling": {
+    "messages": 2,
+    "bytes": 1154,
+    "closedBeforeExchange": true,
+    "messagesAfterClosed": 0
+  },
+  "fixtureHost": {
+    "before": {
+      "requests": 4,
+      "requestBytes": 647,
+      "responseBytes": 555491,
+      "applicationRequests": 0,
+      "signalingMessages": 2,
+      "signalingBytes": 1154
+    },
+    "after": {
+      "requests": 4,
+      "requestBytes": 647,
+      "responseBytes": 555491,
+      "applicationRequests": 0,
+      "signalingMessages": 2,
+      "signalingBytes": 1154
+    }
+  },
+  "peerBytesAfterIntroduction": {
+    "browserSent": 13672,
+    "nativeSent": 538073
+  },
+  "records": {
+    "browserAuthored": 1,
+    "nativeAuthored": 2,
+    "atBrowser": 3,
+    "atNative": 3
+  },
+  "history": {
+    "browserSha256": "e983b04f7ae8c9791bab0191ed6005a2326db9ae2b7b0ae3a82efb357b775961",
+    "nativeSha256": "e983b04f7ae8c9791bab0191ed6005a2326db9ae2b7b0ae3a82efb357b775961",
+    "recordIds": [
+      "%mbFgvUZmaVQHkLAseBuIMxbB8uVNIxICoQ1+8YHR5as=.sha256",
+      "%md3Tfo1FY0Gk/zR4qd0PJfe/qXRfaQQEPMSW+nrYdgA=.sha256",
+      "%QHG7iaXiZvgVKdX5OvgZRyZRMgeZGAPOj3XWNDSBcoA=.sha256"
+    ]
+  },
+  "payload": {
+    "bytes": 524325,
+    "expectedSha256": "17fc7a9268bf0346c1069a0c01adedadd5e0f2dabe2503c7d40b5b9a4c0c9d7a",
+    "receivedSha256": "17fc7a9268bf0346c1069a0c01adedadd5e0f2dabe2503c7d40b5b9a4c0c9d7a"
+  },
+  "originalOperations": {
+    "browser": {
+      "proposalId": "tx_e419ac3ff80c606b3beb2e530a643104743c2f08970a227c8397935f385f4f75",
+      "outcome": {
+        "transactionId": "tx_e419ac3ff80c606b3beb2e530a643104743c2f08970a227c8397935f385f4f75",
+        "phase": "accepted",
+        "outcome": {
+          "type": "accepted"
+        },
+        "eventSetRevision": "5",
+        "materializedRevision": "1",
+        "orderKey": "1794870628082:0yN-cyuT0OyYyZZTVkYlMPk4bu3P0_KDHhHcUYAVERw:0:dHhfZTQxOWFjM2ZmODBjNjA2YjNiZWIyZTUzMGE2NDMxMDQ3NDNjMmYwODk3MGEyMjdjODM5NzkzNWYzODVmNGY3NQ",
+        "changedByReplay": false,
+        "admissible": true,
+        "final": true,
+        "observedAt": "2026-11-16T23:10:29.781Z"
+      }
+    },
+    "retry": {
+      "proposalId": "tx_e419ac3ff80c606b3beb2e530a643104743c2f08970a227c8397935f385f4f75",
+      "outcome": {
+        "transactionId": "tx_e419ac3ff80c606b3beb2e530a643104743c2f08970a227c8397935f385f4f75",
+        "phase": "accepted",
+        "outcome": {
+          "type": "accepted"
+        },
+        "eventSetRevision": "9",
+        "materializedRevision": "2",
+        "orderKey": "1794870628082:0yN-cyuT0OyYyZZTVkYlMPk4bu3P0_KDHhHcUYAVERw:0:dHhfZTQxOWFjM2ZmODBjNjA2YjNiZWIyZTUzMGE2NDMxMDQ3NDNjMmYwODk3MGEyMjdjODM5NzkzNWYzODVmNGY3NQ",
+        "changedByReplay": false,
+        "admissible": true,
+        "final": true,
+        "observedAt": "2026-11-16T23:10:32.099Z"
+      }
+    },
+    "native": {
+      "transactionId": "tx_eb78b11a58370f01dd17581b18dca9e2a59973b1081b52763ebd8c796c4a04db",
+      "phase": "accepted",
+      "outcome": {
+        "type": "accepted"
+      },
+      "eventSetRevision": "9",
+      "materializedRevision": "2",
+      "orderKey": "1794870629783:dwFt_s365vBgR5nVfsE5s1lWSmFLrgzrPjato6-Lu2g:0:dHhfZWI3OGIxMWE1ODM3MGYwMWRkMTc1ODFiMThkY2E5ZTJhNTk5NzNiMTA4MWI1Mjc2M2ViZDhjNzk2YzRhMDRkYg",
+      "changedByReplay": false,
+      "admissible": true,
+      "final": true,
+      "observedAt": "2026-11-16T23:10:32.053Z"
+    }
+  },
+  "retryAuthoredRecords": {
+    "browserAuthoredBefore": [
+      "%mbFgvUZmaVQHkLAseBuIMxbB8uVNIxICoQ1+8YHR5as=.sha256"
+    ],
+    "browserAuthoredAfter": [
+      "%mbFgvUZmaVQHkLAseBuIMxbB8uVNIxICoQ1+8YHR5as=.sha256"
+    ]
+  },
+  "retryComparison": "Compare proposal identity, transaction identity, phase, decision, order key, admissibility and finality. Preserve raw observation timestamps, replay flags and replica revisions without requiring them to remain unchanged.",
+  "qualification": "Actual browser/native RTC, converged signed history, intact detached payload and original final operations after the fixture host stops.",
+  "limits": [
+    "The report validator checks declared observations; it does not execute the scenario or authenticate the report.",
+    "Peer byte counters measure logical frame payloads; they exclude RTC packet headers, credit messages and IP/UDP/DTLS/SCTP overhead.",
+    "This fixture report does not establish packaged Tendriller page-host quiescence, deployed authentication, Internet reachability, provider costs or mixed SQL application behavior.",
+    "No direct ICE route is inferred from the use of WebRTC; preserve actual selected-candidate evidence separately."
+  ],
+  "rawReportSha256": "7644ffd618457d9b461231ec3975524dbb19fe7b2a2e9a4e91641964f16c6ee4"
+}

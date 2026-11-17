@@ -1,0 +1,375 @@
+{
+  "format": "peer-membership-cost-summary/v1",
+  "rawReportSha256": "282c429dcc3469b36192c934ff6e968e14c85e52de83defbd89977d4a5c1b342",
+  "source": {
+    "head": "c5edba7df30f2325f5f51de9b9ff04591be8c989",
+    "dirtyPaths": [
+      "M .github/workflows/ci.yml",
+      " M docs/snapshot-recovery.md",
+      " M package.json",
+      " M packages/agent-service/README.md",
+      " M packages/node-core/src/publisher.test.ts",
+      " M packages/runtime-browser/README.md",
+      " M pnpm-lock.yaml",
+      " M tools/lib/authority-recovery-child.ts",
+      "?? docs/authority-recovery.md",
+      "?? docs/device-boundary-qualification.md",
+      "?? tools/authority-recovery.ts",
+      "?? tools/lib/peer-route-fixture.ts"
+    ],
+    "files": {
+      "tools/membership-cost.ts": "9bf68427565bf77cd55b631d14f9d7d32ba1bbef8e3755822ab863123c7d6ac3",
+      "tools/thin-membership-native.ts": "009cdec2faf3c8c78009c6d6a8dee0648b847aba26953a8489df284aceccef29"
+    }
+  },
+  "setting": {
+    "route": "signed HTTP loopback",
+    "administratorStore": "NativeAgentStore SQLite WAL FULL",
+    "nativeAuthority": "separate identity and persistent stores, same process",
+    "applicationMaterializer": "actual native DoltLite",
+    "provider": null,
+    "browser": null,
+    "relay": null
+  },
+  "phases": [
+    {
+      "name": "baseline",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 0,
+      "administratorValueBytesWritten": 0,
+      "administratorRetainedValueBytes": 5112,
+      "nativeLiveFileBytes": 351300,
+      "processResources": {
+        "processUserCpuMicroseconds": 38209,
+        "processSystemCpuMicroseconds": 10962,
+        "sampledProcessPeakRssBytes": 135651328,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 27.26353000000006
+    },
+    {
+      "name": "schema-and-prime",
+      "candidates": 1,
+      "descriptorBytes": 142,
+      "detachedEnvelopeBytes": 640,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 2682,
+      "administratorRetainedValueBytes": 6289,
+      "nativeLiveFileBytes": 664043,
+      "processResources": {
+        "processUserCpuMicroseconds": 84203,
+        "processSystemCpuMicroseconds": 16953,
+        "sampledProcessPeakRssBytes": 145612800,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 114.27237600000001
+    },
+    {
+      "name": "four-small",
+      "candidates": 4,
+      "descriptorBytes": 568,
+      "detachedEnvelopeBytes": 2628,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 4655,
+      "administratorRetainedValueBytes": 8262,
+      "nativeLiveFileBytes": 1238360,
+      "processResources": {
+        "processUserCpuMicroseconds": 166980,
+        "processSystemCpuMicroseconds": 39785,
+        "sampledProcessPeakRssBytes": 153214976,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 230.01415299999996
+    },
+    {
+      "name": "four-large",
+      "candidates": 4,
+      "descriptorBytes": 576,
+      "detachedEnvelopeBytes": 789052,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 6636,
+      "administratorRetainedValueBytes": 10243,
+      "nativeLiveFileBytes": 11175359,
+      "processResources": {
+        "processUserCpuMicroseconds": 2031812,
+        "processSystemCpuMicroseconds": 251693,
+        "sampledProcessPeakRssBytes": 283508736,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 1737.6440389999998
+    },
+    {
+      "name": "eight-small",
+      "candidates": 8,
+      "descriptorBytes": 1136,
+      "detachedEnvelopeBytes": 5240,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 10202,
+      "administratorRetainedValueBytes": 13809,
+      "nativeLiveFileBytes": 14957984,
+      "processResources": {
+        "processUserCpuMicroseconds": 3535041,
+        "processSystemCpuMicroseconds": 347346,
+        "sampledProcessPeakRssBytes": 299343872,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 2963.166411
+    },
+    {
+      "name": "warm-empty-sync",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 0,
+      "administratorValueBytesWritten": 0,
+      "administratorRetainedValueBytes": 13809,
+      "nativeLiveFileBytes": 14962906,
+      "processResources": {
+        "processUserCpuMicroseconds": 1172767,
+        "processSystemCpuMicroseconds": 83270,
+        "sampledProcessPeakRssBytes": 287223808,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 895.0667309999999
+    },
+    {
+      "name": "approval-lost-reply",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 6,
+      "administratorValueBytesWritten": 15185,
+      "administratorRetainedValueBytes": 18722,
+      "nativeLiveFileBytes": 14967828,
+      "processResources": {
+        "processUserCpuMicroseconds": 1345659,
+        "processSystemCpuMicroseconds": 97760,
+        "sampledProcessPeakRssBytes": 286785536,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 1043.0319959999997
+    },
+    {
+      "name": "administrator-reopen-and-exact-retry",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 12,
+      "administratorValueBytesWritten": 21073,
+      "administratorRetainedValueBytes": 22653,
+      "nativeLiveFileBytes": 14972750,
+      "processResources": {
+        "processUserCpuMicroseconds": 1291443,
+        "processSystemCpuMicroseconds": 148436,
+        "sampledProcessPeakRssBytes": 301281280,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 1047.1149219999998
+    },
+    {
+      "name": "approval-exact-retry",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 432,
+      "administratorRetainedValueBytes": 22653,
+      "nativeLiveFileBytes": 14987516,
+      "processResources": {
+        "processUserCpuMicroseconds": 3092762,
+        "processSystemCpuMicroseconds": 478108,
+        "sampledProcessPeakRssBytes": 302882816,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 2486.233854
+    },
+    {
+      "name": "revoke-writer-and-rotate",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 16,
+      "administratorValueBytesWritten": 22358,
+      "administratorRetainedValueBytes": 29154,
+      "nativeLiveFileBytes": 14992438,
+      "processResources": {
+        "processUserCpuMicroseconds": 1302608,
+        "processSystemCpuMicroseconds": 367064,
+        "sampledProcessPeakRssBytes": 309612544,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 1154.021010999999
+    },
+    {
+      "name": "revoke-reader-and-rotate",
+      "candidates": null,
+      "descriptorBytes": null,
+      "detachedEnvelopeBytes": null,
+      "administratorPutCalls": 16,
+      "administratorValueBytesWritten": 23959,
+      "administratorRetainedValueBytes": 35031,
+      "nativeLiveFileBytes": 14997360,
+      "processResources": {
+        "processUserCpuMicroseconds": 1742556,
+        "processSystemCpuMicroseconds": 128442,
+        "sampledProcessPeakRssBytes": 280969216,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 1299.2335870000006
+    },
+    {
+      "name": "future-epoch-payload",
+      "candidates": 1,
+      "descriptorBytes": 142,
+      "detachedEnvelopeBytes": 4743,
+      "administratorPutCalls": 1,
+      "administratorValueBytesWritten": 18152,
+      "administratorRetainedValueBytes": 35812,
+      "nativeLiveFileBytes": 16059785,
+      "processResources": {
+        "processUserCpuMicroseconds": 3662205,
+        "processSystemCpuMicroseconds": 451987,
+        "sampledProcessPeakRssBytes": 322048000,
+        "rssSamplingIntervalMs": 10
+      },
+      "elapsedMs": 2949.731432999999
+    }
+  ],
+  "administrator": {
+    "putCalls": 65,
+    "valueBytesWritten": 131441,
+    "retainedValueBytes": 35812,
+    "categories": {
+      "membership/identity": {
+        "calls": 1,
+        "bytes": 86
+      },
+      "membership/provision": {
+        "calls": 1,
+        "bytes": 1779
+      },
+      "governance": {
+        "calls": 24,
+        "bytes": 15361
+      },
+      "membership/control": {
+        "calls": 14,
+        "bytes": 6596
+      },
+      "membership/ledger": {
+        "calls": 10,
+        "bytes": 101054
+      },
+      "enrollment": {
+        "calls": 7,
+        "bytes": 5455
+      },
+      "membership/revocations": {
+        "calls": 6,
+        "bytes": 654
+      },
+      "membership/revocation-result": {
+        "calls": 2,
+        "bytes": 456
+      }
+    }
+  },
+  "closedStorage": {
+    "administrator": {
+      "path": "private-administrator.sqlite",
+      "bytes": 77824
+    },
+    "device": {
+      "path": "private-device.sqlite",
+      "bytes": 12288
+    },
+    "native": {
+      "bytes": 11696235,
+      "files": [
+        {
+          "path": "private-native-state/.application.sqlite-lock",
+          "bytes": 0
+        },
+        {
+          "path": "private-native-state/application.sqlite",
+          "bytes": 5384299
+        },
+        {
+          "path": "private-native-state/native-control.sqlite",
+          "bytes": 1679360
+        },
+        {
+          "path": "private-native-state/native.sqlite",
+          "bytes": 4632576
+        }
+      ]
+    },
+    "nativeValues": [
+      {
+        "category": "authority-and-deduplication",
+        "valuesCount": 3,
+        "valueBytes": 14715
+      },
+      {
+        "category": "detached-payload",
+        "valuesCount": 19,
+        "valueBytes": 802899
+      },
+      {
+        "category": "feed-and-evidence",
+        "valuesCount": 73,
+        "valueBytes": 834087
+      },
+      {
+        "category": "operation-journal",
+        "valuesCount": 20,
+        "valueBytes": 2397002
+      },
+      {
+        "category": "other-native-state",
+        "valuesCount": 2,
+        "valueBytes": 204
+      },
+      {
+        "category": "verified-history",
+        "valuesCount": 1,
+        "valueBytes": 24630
+      }
+    ]
+  },
+  "traffic": {
+    "membershipRequests": 31,
+    "membershipRequestBytes": 17885,
+    "membershipResponseBytes": 29761,
+    "descriptorTransfers": 34,
+    "candidateDescriptorBytes": 2706,
+    "inlineControlDescriptorBytes": 10359,
+    "inlineControlEnvelopeBytes": 8167,
+    "applicationEnvelopeBytesToAdministrator": 0,
+    "unexpectedAdministratorRequests": 0,
+    "peerInboundBytes": 0,
+    "peerOutboundBytes": 0,
+    "descriptorBytesIncludingInlineControls": 13065,
+    "note": "Inline control envelope bytes are already inside inline control descriptor bytes. HTTP body totals include framing/certificates and repeated transfers."
+  },
+  "providerCosts": null,
+  "hostedPeerSavings": null,
+  "missing": [
+    "deployed hosted baseline and hibernation",
+    "public direct and relay routes",
+    "provider metered usage and account allocation",
+    "browser memory and replay",
+    "blob copies and backup lag",
+    "paired full application workload"
+  ],
+  "limits": [
+    "Native loopback measurement, not deployed Cloudflare, Internet routing, browser storage, or a hosted/peer cost comparison.",
+    "CPU and RSS cover the measurement process containing both native authority and administrator; they are not per-role billing.",
+    "Store put counts and value bytes are logical durable writes, not provider SQL row billing, block writes, or write amplification.",
+    "Live file sizes include SQLite WAL/SHM and materializer files; closed sizes are separate. Neither is time-integrated billed storage.",
+    "No backup was taken and no blob was replicated. A committed descriptor does not establish any second durable payload copy.",
+    "Inline control envelopes are a subset of inline control descriptor bytes. Traffic includes repeated transfers."
+  ]
+}

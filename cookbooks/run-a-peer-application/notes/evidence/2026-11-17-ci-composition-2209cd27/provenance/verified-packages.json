@@ -1,0 +1,39 @@
+{
+  "session-rtc": {
+    "archive": "session-rtc/chronolog-peer-session-2209cd27-rtc.tgz",
+    "sha256": "f324333578217977205bdc364b46b15332002feae4355ae7fe909c23eb339815",
+    "verifiedFiles": 107,
+    "provenanceSha256": "964d06d943c51cc9a3701bd3630b8dc497d442deab8ea8e72f9e2ff1d1a0aa1f"
+  },
+  "session-sql": {
+    "archive": "session-sql/chronolog-peer-session-2209cd27-sql.tgz",
+    "sha256": "37efb78909c5285b7f9e22fb0a2622e2f37b6adc4c9d76b4fb855d1361995c9f",
+    "verifiedFiles": 138,
+    "provenanceSha256": "9de46520cc66b4f5e8f3d6d91e8056ad5b34818eefcd7d8904ffa8d2fcdbbef0"
+  },
+  "@tendriller/core": {
+    "archive": "host-source/dist/tendriller-sdk-0.3.0-rc.9.tgz",
+    "sha256": "5cd12ae658ee8b12b3ff254464540fdbe4acb1d91376ea11f425b310542bce11"
+  },
+  "@tendriller/runtime": {
+    "archive": "host-source/dist/tendriller-runtime-0.3.0-rc.9.tgz",
+    "sha256": "276bb16d418e87f668f96a7bcf7995f950c17e280bb3c0e4d63fd9daf7d9c817"
+  },
+  "@tendriller/engine": {
+    "archive": "host-source/dist/tendriller-engine-0.3.0-rc.9.tgz",
+    "sha256": "80afc7054d72ec75cf85b376b190f0b990f576d27c041958a548f07dd2b445fa",
+    "verifiedFiles": 7
+  },
+  "composition": {
+    "sha256": "c1d5fc57086db4d044842f3b7173fd2e29f5ba3fcb542a62b11f79dbf0e97998",
+    "gates": [
+      "native-events",
+      "native-rtc",
+      "browser-worker",
+      "native-sql",
+      "hosted-participant",
+      "hosted-websocket-relay",
+      "browser-websocket-relay"
+    ]
+  }
+}

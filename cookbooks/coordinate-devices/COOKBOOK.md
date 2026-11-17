@@ -41,7 +41,7 @@ A three-device workshop uses the same distinctions: participant input, facilitat
 | Attention/audio focus | A preferred destination for output | Exclusive authority, guaranteed playback, or proof of hearing |
 | Presentation receipt | A particular result inserted into a view | Human reading, understanding, or approval |
 
-The server authorizes reads and mutations. A label such as “facilitator” or “projector” cannot establish those rights. A targeted reply may still be shared data; routing is not private storage. A shared projection should fetch only intentionally public information, never obtain private responses and hide them with CSS. Re-read current device/role state after the public runtime reports a change and invalidate in-flight private views when authority changes.
+The selected application's authorization policy controls reads and mutations. In a hosted application the service enforces it; in a peer application replicas verify signed capabilities. A label such as “facilitator” or “projector” cannot establish those rights. A targeted reply may still be shared data; routing is not private storage. A shared projection should fetch only intentionally public information, never obtain private responses and hide them with CSS. Re-read current device/role state after the public runtime reports a change and invalidate in-flight private views when authority changes.
 
 Keep administrative handles and private agent credentials out of page links, device labels, QR codes, and shared state. Use the [public browser contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) for actual device and receipt semantics instead of inventing authority in application events.
 
@@ -50,6 +50,15 @@ Keep administrative handles and private agent credentials out of page links, dev
 Bind every evidence request, annotation, and reply to the task and source version it concerns. If the phone captures a new frame while a laptop still displays the prior one, the old annotation remains attached to the prior frame. Show “Result for previous image” with a route back to it rather than overlaying the answer on current content.
 
 Keep authoritative progress, local edit buffers, display selections, stream-view cursors, and agent handled-work cursors separate. Sharing one “current position” across all devices can move a reviewer away from a source or skip unhandled agent work. Synchronize a selection only when joint attention is the intended feature, and provide a local follow/pause control when independent inspection is useful.
+
+Use [ephemeral signals](../share-live-signals/COOKBOOK.md) with `mode: 'latest'`
+for cursor motion, presence, live selections and attention suggestions that
+become irrelevant when the session ends. Give them short expiry and clear the
+view when the subscription ends or the application observes disconnection.
+These interactions need no transaction or finality service.
+Record an assignment, accepted handoff or lasting shared selection durably when
+it must be reconstructed after absence. A live attention cue does not establish
+that the recipient saw it or accepted responsibility.
 
 For remote navigation, prefer an explicit suggestion such as “Open reviewed image on this device.” If automatic following is appropriate for a display, make the mode visible and interruptible. Keyboard focus should remain with the user's action; a remote update can refresh a result region without focusing it.
 

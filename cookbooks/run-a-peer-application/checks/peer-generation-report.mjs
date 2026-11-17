@@ -1,0 +1,412 @@
+// Evidence validation for the independent packed peer-generation consumer.
+// This checks recorded observations; it never supplies missing measurements.
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
+import { validateRelayTraffic } from './peer-generation-relay-report.mjs';
+
+const hex = (value, size, name) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${size}}$`), name);
+const count = (value, name) => assert.ok(Number.isSafeInteger(value) && value >= 0, name);
+const nonempty = (value, name) => assert.ok(typeof value === 'string' && value.length > 0, name);
+const same = (left, right, name) => assert.deepEqual(left, right, name);
+const unchangedCounter = (value, name) => {
+  count(value?.before, `${name}.before`);
+  count(value?.after, `${name}.after`);
+  same(value.after, value.before, `${name} changed during the host-blocked workload`);
+};
+
+export function validatePeerGenerationReport(report) {
+  same(report?.format, 'peer-generation-consumer/v1', 'Wrong report format');
+  same(report.mode, 'runtime', 'A build cannot qualify runtime behavior');
+  same(report.profile, 'peer-generation-v1', 'Report the signed protocol version that was exercised');
+  hex(report.executionManifestDigest, 64, 'Missing exact execution manifest');
+  assert.ok(['independent-packed-peers', 'independent-native-rtc', 'independent-native-websocket'].includes(report.topology), 'Report the actual execution topology');
+  const rtc = report.topology === 'independent-native-rtc', relay = report.topology === 'independent-native-websocket';
+  same(report.passed, true, 'The consumer did not pass');
+  nonempty(report.runtime?.node, 'Missing actual Node version');
+  nonempty(report.runtime?.platform, 'Missing actual platform');
+  hex(report.source?.commit, 40, 'Missing exact consumer commit');
+  hex(report.source?.tree, 40, 'Missing exact consumer tree');
+  same(typeof report.source?.dirty, 'boolean', 'Consumer cleanliness must be observed');
+  assert.ok(Array.isArray(report.artifacts) && report.artifacts.length > 0, 'Missing packed artifacts');
+  assert.ok(report.artifacts.some(artifact => artifact.name === '@chronolog/peer-session'), 'Missing public session artifact');
+  for (const artifact of report.artifacts) {
+    nonempty(artifact.name, 'Missing artifact package');
+    nonempty(artifact.version, 'Missing artifact version');
+    hex(artifact.sha256, 64, 'Missing exact archive digest');
+    hex(artifact.sourceCommit, 40, 'Missing artifact source commit');
+    hex(artifact.sourceTree, 40, 'Missing artifact source tree');
+    same(typeof artifact.sourceDirty, 'boolean', 'Artifact cleanliness must be observed');
+  }
+  same(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native',
+    ...(rtc ? ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'] : []),
+    ...(relay ? ['@chronolog/peer-session/websocket'] : []),
+    ...(report.hostOutage?.boundary === 'tendriller-workerd-http' ? ['@tendriller/core/peers'] : [])], 'Use only the documented public session entry');
+  same(report.publicBoundary?.siblingSourceImports, 0, 'A sibling source checkout is not an independent consumer');
+  same(report.publicBoundary?.applicationRetryQueues, 0, 'The consumer must use the session journal');
+  same(report.publicBoundary?.residentRequired, false, 'The common session must not depend on a permanent resident');
+  const control = report.controlParticipant;
+  same(control?.owner, 'application-session', 'Lifecycle control must belong to the public application session');
+  same(control.role, 'control', 'The host must be an explicit selective participant');
+  same(control.attachRequests, 0, 'Attaching the control participant must not perform I/O');
+  same(control.definitionVerified, true, 'The session must verify the published definition');
+  same(control.recovery?.injectedAfterSelection, true, 'The control reply fault must follow durable selection');
+  same(control.recovery.journalSavedBeforeRetry, true, 'Takeover must save its exact signed transition before retry');
+  hex(control.recovery.originalRequest, 64, 'Missing original signed transition digest');
+  same(control.recovery.retriedRequest, control.recovery.originalRequest, 'Control retry changed the signed transition');
+  same(control.recovery.retriedSelection, control.recovery.originalSelection, 'Control retry created a new selection');
+  same(control.recovery.recoveryNoticeObserved, true, 'The owned control path must return its recovery notice');
+
+  const host = report.hostOutage;
+  assert.ok(['portable-control-port', 'tendriller-workerd-http'].includes(host?.boundary), 'Host traffic scope must be explicit');
+  const hosted = host.boundary === 'tendriller-workerd-http';
+  same(host?.blocked, true, 'Host endpoints were not blocked');
+  same(host.blockedProbeRejected, true, 'Blocking must be observed by an actual refused request');
+  count(host.commandsApplied, 'Missing completed command count');
+  assert.ok(host.commandsApplied > 0, 'The host-blocked workload applied no commands');
+  unchangedCounter(host.requests, 'Host requests');
+  unchangedCounter(host.applicationBodyBytes, 'Hosted application body bytes');
+  same(host.applicationBodyBytes.before, 0, 'Default commands must not upload application bodies');
+  same(host.finalityCapability, false, 'Applied progress must not claim finality');
+  if (hosted) {
+    assert.ok(rtc || relay, 'A real hosted gate also requires real peer transport');
+    same(report.host?.runtime, 'workerd', 'A mocked host cannot qualify HTTP controls');
+    same(report.host.identity, 'synthetic authenticated test accounts', 'Identity scope must be explicit');
+    same(report.host.participant?.protocol, 'chronolog-participant-v1', 'Host control must use the shared participant protocol');
+    same(report.host.participant.route, 'peers/participant', 'Separate ad hoc control routes do not qualify participant routing');
+    same(report.host.participant.transport, 'public-chronolog-participant', 'The consumer must use the public selective transport');
+    same(report.host.participant.clientFiltered, ['database.submit', 'content.chunk', 'ephemeral.signal'], 'Client filtering must exclude ordinary data and live UI traffic');
+    same(report.host.participant.hostRejected, report.host.participant.clientFiltered, 'The host must reject bypassed disallowed updates');
+    same(report.host.participant.clientFilteredHttpRequests, 0, 'Filtered updates must not reach the hosted transport');
+    const publication = report.host.publication;
+    hex(publication?.author, 64, 'Missing verified publication author');
+    hex(publication.nonPublisher, 64, 'Missing non-publisher rejection identity');
+    same(publication.administratorWithoutPublisher, true, 'An administrator without publisher authority must be rejected');
+    assert.notEqual(publication.author, publication.nonPublisher, 'Publication authority must be tested separately from ordinary membership');
+    for (const value of [publication.first, publication.second]) {
+      hex(value?.id, 64, 'Missing signed publication identity');
+      count(value.version, 'Missing served publication version');
+      hex(value.expectedCodeDigest, 64, 'Missing signed code digest');
+      same(value.servedCodeDigest, value.expectedCodeDigest, 'Served code must match its signed publication');
+    }
+    assert.notEqual(publication.first.id, publication.second.id, 'No signed code update happened');
+    assert.notEqual(publication.first.expectedCodeDigest, publication.second.expectedCodeDigest, 'Publication must update actual code bytes');
+    assert.ok(publication.second.version > publication.first.version, 'Code update did not advance the served version');
+    same(publication.second.previous, publication.first.id, 'Code publication lost its signed chain');
+    for (const field of ['sessionOwned', 'lostReplyAfterPersistence', 'savedIdentityRecovered',
+      'exactRetry', 'alteredBytesRejected', 'nonPublisherRejected', 'staleHeadRejected',
+      'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']) {
+      same(publication[field], true, `Missing publication observation: ${field}`);
+    }
+    same(report.host.publicImports, ['@tendriller/core/peers', '@tendriller/engine/testing'], 'Host fixture must consume public packages');
+    hex(report.host.fixtureSha256, 64, 'Missing exact workerd fixture');
+    hex(report.host.dependencies?.lockSha256, 64, 'Missing host dependency lock');
+    same(report.host.artifacts?.map(value => value.name), ['@tendriller/core', '@tendriller/engine'], 'Missing exact public host pairing');
+    for (const artifact of report.host.artifacts) {
+      nonempty(artifact.version, 'Missing host package version'); hex(artifact.sha256, 64, 'Missing host archive digest');
+      hex(artifact.sourceCommit, 40, 'Missing host source commit'); hex(artifact.sourceTree, 40, 'Missing host source tree');
+      same(typeof artifact.sourceDirty, 'boolean', 'Host cleanliness must be observed');
+    }
+    const before = host.observations?.before, after = host.observations?.after;
+    assert.ok(before?.worker.host && after?.worker.host, 'Missing complete actual workerd request counters');
+    for (const field of ['httpRequests', 'requestBodyBytes', 'rendezvousUpgrades', 'rendezvousSentBytes', 'rendezvousReceivedBytes']) {
+      count(before.worker.host[field], `Host ${field}`);
+      same(before.worker.host[field], after.worker.host[field], `Actual host ${field} changed during ordinary commands`);
+    }
+    assert.ok(before.worker.host.httpRequests > 0 && before.worker.host.rendezvousUpgrades >= 4, 'No actual hosted controls/reconnect introduction were observed');
+    unchangedCounter({ before: before.requestBodyBytes, after: after.requestBodyBytes }, 'Native host bridge body bytes');
+    same(before.worker.rendezvous, after.worker.rendezvous, 'Rendezvous traffic changed after introduction');
+    assert.ok(before.worker.rendezvous?.length >= 4 && before.worker.rendezvous.every(value => value.closed), 'Every hosted introduction must retire');
+  }
+  if (rtc) {
+    hex(report.runtime.dependencies?.lockSha256, 64, 'Missing exact RTC dependency lock');
+    assert.ok(report.runtime.dependencies.packages?.length > 0, 'Missing RTC dependency provenance');
+    assert.ok(report.runtime.dependencies.packages.every(item => item.path && item.version && item.integrity), 'Incomplete RTC dependency provenance');
+    const network = report.rtc;
+    same(network?.implementation, 'werift', 'Missing maintained native RTC adapter');
+    same(network.version, '0.27.0', 'RTC dependency must match the public adapter pin');
+    same(network.candidateSource, 'explicit-loopback-only', 'Do not infer representative interface discovery from a loopback fixture');
+    same(network.interfaceEnumeration, 'disabled-by-native-options', 'Record actual native candidate configuration');
+    same(network.signalingBoundary, hosted ? 'tendriller-workerd-rendezvous' : 'one-off-in-process-sdp-mailbox', 'The introduction boundary must be explicit');
+    same(network.byteBoundary, 'authenticated-reliable-application-frames', 'Byte scope must exclude unobserved wire overhead');
+    assert.ok(network.connections?.length >= 4, 'Recovery requires original, reconnect, fresh and returning-peer RTC sessions');
+    for (const link of network.connections) {
+      same(link.authenticated, true, 'RTC readiness alone is not peer authentication');
+      assert.ok(link.peers?.length === 2 && link.peers[0] !== link.peers[1], 'RTC must connect two distinct devices');
+      for (const peer of link.peers) hex(peer, 64, 'Missing authenticated device identity');
+      same(link.closed, true, 'RTC lifetime must be released');
+      same(link.signaling.closed, true, 'Introduction remains open');
+      same(link.signaling.sentMessages, 2, 'Signaling must carry one complete offer and answer');
+      assert.ok(link.signaling.sentBytes > 0, 'Missing actual SDP bytes');
+      assert.ok(link.reliable.sentBytes > 0 && link.reliable.receivedBytes > 0, 'RTC carried no authenticated application frames');
+      assert.ok(link.routes?.length === 2, 'Missing observed route states');
+      for (const route of link.routes) {
+        assert.ok(['direct', 'relay', 'unknown'].includes(route.route), 'Invented RTC route');
+        if (route.route === 'direct') assert.ok(['host', 'srflx', 'prflx'].includes(route.localCandidateType) && ['host', 'srflx', 'prflx'].includes(route.remoteCandidateType), 'Direct route requires both observed candidates');
+        if (route.route === 'relay') assert.ok(route.localCandidateType === 'relay' || route.remoteCandidateType === 'relay', 'Relay route requires an observed relay candidate');
+      }
+    }
+    const transport = host.transport;
+    assert.ok(transport?.after.reliable.sentBytes > transport?.before.reliable.sentBytes &&
+      transport?.after.reliable.receivedBytes > transport?.before.reliable.receivedBytes, 'Host outage must carry actual RTC application traffic');
+    same(transport.before.signaling, transport.after.signaling, 'Application work changed introduction traffic');
+    same(transport.after.signaling.closed, true, 'Host-independent commands require retired signaling');
+  }
+
+  if (relay) {
+    assert.ok(hosted, 'WebSocket fallback must exercise the actual hosted relay');
+    const network = report.relay;
+    same(network.forcedDirectFailure, true, 'Force direct failure to exercise fallback');
+    validateRelayTraffic(network, { implementation: 'native-websocket', minimumSockets: network.connections.length * 4 });
+    assert.ok(network.connections?.length >= 4, 'Exercise original, reopened, fresh and returning connections');
+    for (const link of network.connections) {
+      same(link.route, 'websocket-relay'); same(link.authenticated, true); same(link.closed, true);
+      same(link.directAttempts, 2, 'Each endpoint must attempt direct delivery');
+      assert.ok(link.peers.length === 2 && link.peers[0] !== link.peers[1]);
+      for (const peer of link.peers) hex(peer, 64, 'Missing authenticated relay peer');
+      assert.ok(link.reliable.sentBytes > 0 && link.reliable.receivedBytes > 0, 'The relay carried no application frames');
+    }
+    const reconnect = network.ownedReconnect;
+    same(reconnect?.owner, 'application-session');
+    for (const field of ['physicalLinksCut', 'reconnected', 'sameGeneration']) same(reconnect[field], true, `Missing relay reconnect observation: ${field}`);
+    hex(reconnect.identity, 64, 'Relay reconnection lost its device identity');
+    assert.ok(reconnect.afterConnections > reconnect.beforeConnections);
+    assert.ok(host.content?.bytes > 0 && host.content.retainedByPeer === true, 'The relay must transfer retained content');
+    hex(host.content.sha256, 64, 'Missing transferred content digest');
+    const transport = host.transport;
+    assert.ok(transport.after.reliable.sentBytes > transport.before.reliable.sentBytes && transport.after.reliable.receivedBytes > transport.before.reliable.receivedBytes);
+  }
+
+  const retry = report.lostReply;
+  same(retry?.injectedAfterPersistence, true, 'Lost reply must follow durable acceptance');
+  nonempty(retry.originalOperationId, 'Missing original operation identity');
+  same(retry.retriedOperationId, retry.originalOperationId, 'Retry changed intent identity');
+  same(retry.originalReceipt, retry.retriedReceipt, 'Retry changed the original ordered receipt');
+  assert.ok(retry.originalReceipt != null, 'Missing original receipt evidence');
+  unchangedCounter(retry.orderedRecords, 'Records on exact retry');
+
+  const recovery = report.recovery;
+  nonempty(recovery?.previousGeneration, 'Missing predecessor generation');
+  nonempty(recovery.selectedGeneration, 'Missing selected successor');
+  same(control.recovery.originalSelection, recovery.selectedGeneration, 'The recorded control retry did not select the recovered generation');
+  assert.notEqual(recovery.selectedGeneration, recovery.previousGeneration, 'No takeover happened');
+  count(recovery.previousHead, 'Missing previous head');
+  count(recovery.adoptedPosition, 'Missing adopted prefix');
+  assert.ok(recovery.adoptedPosition < recovery.previousHead, 'Recovery did not abandon a recent suffix');
+  same(recovery.sourceRemoved, true, 'The original coordinator remained a recovery source');
+  same(recovery.coherentReset, true, 'Application view/outcomes were not replaced coherently');
+  same(recovery.recoveredDigest, recovery.freshPeerDigest, 'A fresh peer did not replay the recovered history');
+  hex(recovery.recoveredDigest, 64, 'Missing complete replay digest');
+  assert.ok(Array.isArray(recovery.inheritedOperationIds) && recovery.inheritedOperationIds.length > 0, 'No adopted operation was checked');
+  assert.ok(Array.isArray(recovery.abandonedOperationIds) && recovery.abandonedOperationIds.length > 0, 'No abandoned operation was checked');
+  assert.ok(recovery.inheritedOperationIds.every(id => !recovery.abandonedOperationIds.includes(id)), 'An operation cannot be both inherited and abandoned');
+  same(recovery.inheritedIdentityPreserved, true, 'Inherited attempts lost their original identity');
+  same(recovery.abandonedEvidencePreserved, true, 'Abandoned signed evidence was discarded');
+
+  const projection = report.projection;
+  same(projection?.owner, 'application-session', 'A consumer-owned checkpoint does not qualify the public projection');
+  same(projection.id, 'conversation-counts'); same(projection.version, '1');
+  same(projection.initialReducerCalls, 1); same(projection.unchangedReadReducerCalls, 0);
+  same(projection.first?.state?.messages, 1);
+  same(projection.excludedCheckpointReopened, true, 'The excluded checkpoint must survive originator restart');
+  same(projection.recovered?.reset?.reason, 'recovery');
+  same(projection.recovered.reset.previousRevision, projection.excluded?.revision, 'Recovery must identify the excluded projection revision');
+  assert.ok(projection.excluded.state.messages > projection.recovered.state.messages, 'The projection retained abandoned state');
+  same(projection.recovered.revision.generation, recovery.selectedGeneration);
+  same(projection.reopened?.before?.state, projection.reopened?.after?.state, 'Reopening lost projection state');
+  same(projection.reopened.after.reset, null); same(projection.reopened.reducerCalls, 0, 'Unchanged reopening replayed old events');
+  same(projection.definitionReset?.snapshot?.reset?.reason, 'definition');
+  same(projection.definitionReset.snapshot.state, projection.reopened.after.state);
+  same(projection.definitionReset.reducerCalls, projection.definitionReset.snapshot.state.messages);
+
+  const old = report.returningBranch;
+  same(old?.generationBefore, old.generationAfter, 'The old branch replaced the selected generation');
+  same(old.generationAfter, recovery.selectedGeneration, 'The returned peer did not follow selection');
+  same(old.digestBefore, old.digestAfter, 'The old suffix changed selected application state');
+  hex(old.digestAfter, 64, 'Missing returning-branch digest');
+  same(old.oldAttemptReadmitted, false, 'An old attempt silently acquired a new generation');
+  same(old.excludedAncestorReadopted, false, 'A later takeover resurrected previously excluded history');
+  same(old.thirdGenerationChecked, true, 'Two generations do not prove repeated-takeover ancestry');
+
+  const reapply = report.reapply;
+  assert.ok(recovery.abandonedOperationIds.includes(reapply?.originalOperationId), 'Reapplication must identify abandoned intent');
+  nonempty(reapply.newOperationId, 'Missing new reapplication identity');
+  assert.notEqual(reapply.newOperationId, reapply.originalOperationId, 'Reapplication reused the original identity');
+  nonempty(reapply.originalAttemptId, 'Missing original attempt identity');
+  nonempty(reapply.newAttemptId, 'Missing new attempt identity');
+  assert.notEqual(reapply.newAttemptId, reapply.originalAttemptId, 'Reapplication reused original signed bytes');
+  same(reapply.reapplyOf, reapply.originalAttemptId, 'Reapplication lost its signed provenance');
+  same(reapply.outcome, 'accepted', 'Reviewed reapplication did not execute');
+  same(reapply.currentGuardsChecked, true, 'Reapplication bypassed current domain guards');
+
+  const reopening = report.reopen;
+  nonempty(reopening?.identityBefore, 'Missing retained device identity');
+  same(reopening.identityAfter, reopening.identityBefore, 'Reopening replaced device identity');
+  same(reopening.operationBefore, reopening.operationAfter, 'Reopening lost original operation state');
+  assert.ok(reopening.operationBefore != null, 'No operation was inspected after reopening');
+
+  const inherited = report.inheritedRecovery;
+  same(inherited?.owner, 'application-session', 'The session must recover its complete inherited ancestor');
+  nonempty(inherited.previousGeneration, 'Missing newer selected generation');
+  same(inherited.expectedGeneration, inherited.previousGeneration, 'Ancestor recovery must compare against the latest selection');
+  same(inherited.ancestor?.generation, recovery.previousGeneration, 'The survivor must retain the original selected ancestor');
+  count(inherited.ancestor.sequence, 'Missing complete ancestor cutoff');
+  assert.ok(inherited.ancestor.sequence > 0, 'An empty peer cannot manufacture recovery evidence');
+  hex(inherited.ancestor.root, 64, 'Missing complete ancestor root');
+  count(inherited.previousNumber, 'Missing newer selection number'); count(inherited.ancestorNumber, 'Missing ancestor number');
+  assert.ok(inherited.previousNumber >= inherited.ancestorNumber + 2, 'The fixture must miss a later inherited segment');
+  same(inherited.selectedNumber, inherited.previousNumber + 1, 'Recovery must select one successor');
+  nonempty(inherited.selectedGeneration, 'Missing ancestor recovery successor');
+  assert.notEqual(inherited.selectedGeneration, inherited.previousGeneration, 'No ancestor recovery happened');
+  same(inherited.adopted, inherited.ancestor, 'The selected successor did not adopt the complete retained ancestor');
+  for (const field of ['sourceRemoved', 'incompleteViewRejected', 'proposalDidNotPublishView', 'emptyPeerRejected',
+    'plannedHandoverRejected', 'journalSavedBeforeRetry', 'excludedSuffixAbsent', 'unknownLoss', 'commandResumed']) {
+    same(inherited[field], true, `Missing ancestor recovery observation: ${field}`);
+  }
+  hex(inherited.originalRequest, 64, 'Missing durable ancestor transition request');
+  same(inherited.retriedRequest, inherited.originalRequest, 'Lost-reply retry changed the ancestor proposal');
+  same(inherited.originalSelection, inherited.selectedGeneration, 'The first selection did not adopt the ancestor');
+  same(inherited.retriedSelection, inherited.originalSelection, 'Retry selected an additional generation');
+  hex(inherited.retainedDigest, 64, 'Missing original complete ancestor view');
+  same(inherited.restoredDigest, inherited.retainedDigest, 'Ancestor recovery restored a partial or excluded view');
+  same(inherited.freshPeerDigest, inherited.restoredDigest, 'Fresh replay differs from the recovered ancestor');
+  same(inherited.inheritedOperationBefore?.status, 'applied', 'Missing original applied ancestor operation');
+  same(inherited.inheritedOperationAfter, inherited.inheritedOperationBefore, 'Ancestor recovery changed inherited operation identity');
+  same(inherited.floor?.point?.generation, inherited.selectedGeneration, 'The floor must protect newly resumed work');
+  assert.ok(inherited.floor.point.sequence > 0, 'The floor must advance beyond the inherited prefix');
+  hex(inherited.floor.point.root, 64, 'Missing protected recovery root');
+  nonempty(inherited.floor.selectedGeneration, 'Missing floor selection');
+  assert.notEqual(inherited.floor.selectedGeneration, inherited.selectedGeneration, 'The control floor was not selected');
+  for (const field of ['localRejected', 'hostRejected', 'journalUnchanged', 'incompleteViewRejected']) {
+    same(inherited.floor[field], true, `Missing below-floor rejection observation: ${field}`);
+  }
+
+  const participation = report.participation;
+  same(participation?.owner, 'application-session', 'Discovery and recovery policy must belong to the session');
+  same(participation.entry, 'session.participate', 'The maintained participation entry must own the lifecycle');
+  same(participation.automaticConnections, true, 'Manually connected peers do not qualify owned introductions');
+  assert.ok(participation.observedPeerIdentities?.length === 2, 'Missing both authenticated participant identities');
+  for (const identity of participation.observedPeerIdentities) hex(identity, 64, 'Missing participant identity');
+  assert.notEqual(...participation.observedPeerIdentities, 'Two distinct participants are required');
+  for (const [phase, identity, peer] of [['coordinating', ...participation.observedPeerIdentities],
+    ['following', ...[...participation.observedPeerIdentities].reverse()]]) {
+    assert.ok(participation.statuses?.some(value => value.device === identity && value.phase === phase && value.connectedPeers.includes(peer)),
+      `No owned ${phase} connection was observed`);
+  }
+  const outage = participation.hostOutage, automatic = participation.automaticRecovery, broader = participation.broaderRecovery;
+  same(automatic.previousGeneration, inherited.floor.selectedGeneration, 'Owned participation did not resume after protected ancestor recovery');
+  same(outage?.blocked, true, 'The controller workload requires a real host outage');
+  same(outage.blockedProbeRejected, true, 'The controller outage must reject an actual probe');
+  assert.ok(outage.commandsApplied > 0, 'The controller applied no host-independent command');
+  count(outage.before?.requests, 'Missing controller host request observations');
+  same(outage.before?.applicationBodyBytes, 0, 'Application bodies reached the host');
+  same(outage.after, outage.before, 'The controller contacted the host during ordinary peer work');
+  const historyPoint = value => {
+    hex(value?.generation, 64, 'Missing verified recovery-point generation');
+    count(value?.sequence, 'Missing verified recovery-point sequence');
+    hex(value?.root, 64, 'Missing verified recovery-point root');
+  };
+  for (const value of [automatic, broader]) {
+    hex(value?.selectedGeneration, 64, 'Missing controller-selected generation'); historyPoint(value?.adopted);
+    assert.notEqual(value.selectedGeneration, value.adopted.generation, 'The controller selected no successor');
+  }
+  same(automatic.adopted.generation, automatic.previousGeneration, 'Automatic recovery changed the observed prefix scope');
+  assert.ok(Number.isSafeInteger(automatic.graceMs) && automatic.graceMs > 0, 'Missing reconnect grace');
+  assert.ok(Number.isFinite(automatic.elapsedMs) && automatic.elapsedMs >= automatic.graceMs, 'Automatic recovery skipped reconnect grace');
+  assert.ok(Number.isSafeInteger(automatic.freshnessBudgetMs) && automatic.freshnessBudgetMs > 0, 'Missing freshness budget');
+  const workload = automatic.workload;
+  same(workload?.commands, 32, 'The declared freshness workload must execute completely');
+  same(workload.textBytesPerCommand, 1024, 'The freshness workload payload must be measured');
+  same(workload.completion, 'applied', 'Ordinary commands must not wait for replication');
+  same(workload.retentionWaits, 1, 'Observe background retention once after the workload');
+  same(workload.clock, 'performance.now', 'Recovery age must use a local monotonic measurement');
+  const times = ['startedAtMs', 'appliedAtMs', 'retainedAtMs', 'disconnectedAtMs', 'recoveredAtMs'].map(field => {
+    assert.ok(Number.isFinite(workload[field]) && workload[field] >= 0, `Missing workload ${field}`); return workload[field];
+  });
+  assert.ok(times.every((value, index) => index === 0 || value >= times[index - 1]), 'Recovery workload observations are out of order');
+  same(workload.lastAppliedAtMs, workload.appliedAtMs, 'The measured prefix needs its observed applied time');
+  same(workload.observedAdoptedAgeMs, workload.disconnectedAtMs - workload.lastAppliedAtMs, 'Adopted age must be calculated from the observed prefix');
+  same(workload.recoveryReadyMs, workload.recoveredAtMs - workload.disconnectedAtMs, 'Recovery latency must be observed');
+  same(workload.recoveryReadyMs, automatic.elapsedMs, 'Recovery measurements must agree');
+  same(workload.targetMs, 300_000, 'The initial workload freshness target is five minutes');
+  assert.ok(workload.observedAdoptedAgeMs <= workload.targetMs, 'The observed complete prefix missed the freshness objective');
+  same(workload.adopted, automatic.adopted, 'The measured prefix was not the adopted one');
+  same(workload.retained?.payload?.point, automatic.adopted, 'Missing exact signed retention for the adopted prefix');
+  same(workload.retained.payload.peer, participation.observedPeerIdentities[1], 'The surviving peer must retain the prefix');
+  hex(workload.retained.signature, 128, 'Missing signed retention evidence');
+  nonempty(workload.coordinatorStorageId, 'Missing coordinator storage owner');
+  nonempty(workload.independentStorageId, 'Missing survivor storage owner');
+  assert.notEqual(workload.independentStorageId, workload.coordinatorStorageId, 'Two references to one store are not independent copies');
+  same(workload.retained.payload.storageId, workload.independentStorageId, 'Retention must identify the measured independent store');
+  same(workload.knownLostCommands, 0, 'This retained-workload boundary must preserve its commands');
+  same(workload.lastOperationId, 'freshness-31', 'The complete last workload operation must be identified');
+  nonempty(workload.scope, 'The freshness measurement must declare its operating envelope');
+  same(broader.adopted.generation, automatic.selectedGeneration, 'Broader recovery did not follow the automatic transition');
+  same(broader.reason, 'freshness-unknown', 'Unknown freshness must remain explicit');
+  same(broader.ageMs, null, 'Unknown freshness cannot become a fabricated age');
+  same(broader.approvalRequired, true, 'Broader recovery requires review');
+  same(broader.staleApprovalRejected, true, 'Approval must identify the displayed proposal');
+  hex(broader.proposalId, 64, 'Missing exact approved proposal');
+  same(broader.commandApplied, true, 'The reviewed successor must resume application work');
+  const delivery = participation.transport;
+  same(delivery?.boundary, hosted ? 'tendriller-sdk-introductions' : rtc ? 'loopback-rtc-fixture-discovery' : 'in-process-fixture-discovery', 'Record the actual owned introduction boundary');
+  if (hosted) {
+    const traffic = delivery.traffic?.worker;
+    assert.ok(traffic?.invitations?.length >= 2 && traffic.invitations.every(value => value.closed), 'Owned invitation listeners must be observed and released');
+    assert.ok(traffic.rendezvous?.length > (rtc ? report.rtc : report.relay).connections.length * 2 && traffic.rendezvous.every(value => value.closed), 'The factory must introduce and retire actual additional rendezvous sockets');
+  } else {
+    same(delivery.pendingIntroductions, 0, 'Unclaimed fixture invitations retained a transport');
+    assert.ok(delivery.connections?.length >= 2 && delivery.connections.every(value => value.closed), 'Owned transports must be released');
+  }
+
+  return {
+    format: 'peer-generation-consumer-summary/v1',
+    profile: report.profile,
+    executionManifestDigest: report.executionManifestDigest,
+    topology: report.topology,
+    source: report.source,
+    artifacts: report.artifacts,
+    controlParticipant: report.controlParticipant,
+    participation: report.participation,
+    projection: report.projection,
+    inheritedRecovery: report.inheritedRecovery,
+    ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
+    ...(relay ? { relay: report.relay } : {}),
+    ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
+    commandsWithHostBlocked: host.commandsApplied,
+    hostRequestsDuringCommands: host.requests.after - host.requests.before,
+    hostedControlApplicationBodyBytes: host.applicationBodyBytes.after,
+    recovery: {
+      previousGeneration: recovery.previousGeneration,
+      selectedGeneration: recovery.selectedGeneration,
+      previousHead: recovery.previousHead,
+      adoptedPosition: recovery.adoptedPosition,
+      inheritedOperationIds: recovery.inheritedOperationIds,
+      abandonedOperationIds: recovery.abandonedOperationIds,
+    },
+    reapplication: reapply,
+    limitations: [
+      relay ? 'Actual native WebSocket clients and workerd relay connected by a bounded loopback test bridge; this is not deployed WSS or Internet qualification.'
+        : rtc ? `Actual native loopback RTC with ${hosted ? 'Tendriller workerd rendezvous' : 'in-process SDP introduction'}; this is not a deployed-network or browser qualification.`
+        : 'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
+      hosted ? 'Tendriller HTTP controls and peer routing ran in workerd with synthetic authenticated accounts; deployed login was not exercised.'
+        : 'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
+      relay ? 'Control HTTP is blocked independently of the relay. Ciphertext transit consumes measured host bandwidth and depends on relay availability.'
+        : rtc ? 'Explicit loopback candidates do not qualify network-interface discovery, Internet routes, provider cost or a universal loss bound.'
+        : 'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
+    ],
+  };
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const { values } = parseArgs({ options: { report: { type: 'string' }, output: { type: 'string' } } });
+  if (!values.report || !values.output) throw Error('Usage: --report /exact/report.json --output /new/summary.json');
+  const raw = readFileSync(values.report);
+  const summary = validatePeerGenerationReport(JSON.parse(raw));
+  summary.reportSha256 = createHash('sha256').update(raw).digest('hex');
+  writeFileSync(values.output, `${JSON.stringify(summary, null, 2)}\n`, { flag: 'wx' });
+  console.log(`Validated ${summary.commandsWithHostBlocked} peer-generation commands with no application traffic on the control HTTP transport.`);
+}

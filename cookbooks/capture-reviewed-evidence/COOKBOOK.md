@@ -5,8 +5,8 @@ summary: "Design permission, review, durable submission, and recovery around evi
 group: "Collect evidence"
 tags: ["capture", "privacy", "drafts"]
 choices: ["File or typed fallback versus a live sensor", "Inline review versus a separate capture route", "Local draft lifetime and late rejection behavior"]
-capabilities: ["captures", "durable commands"]
-evidence: "exercised"
+capabilities: ["application content", "durable commands"]
+evidence: "explained"
 related: ["discover-capabilities", "annotate-a-frame", "recover-outdated-work", "document-a-field-inspection"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs"]
 ---
@@ -65,27 +65,21 @@ not be a dead end that asks the person to enable the sensor again.
 
 ## Preserve the meaning of pending work
 
-**Platform invariant:** a protected submission keeps its original command ID and captured concurrency generation across retry. If the task changed while upload was pending, do not silently bind the old evidence to the new question. Explain the rejection and let the person compose a new submission deliberately.
+Capture the task or question with one coherent `session.query` before asynchronous recording or processing. Retain its domain version and application revision with the draft. A submitted operation keeps its original signed attempt and domain inputs across retry. If the question changed while bytes were prepared, the definition's guard rejects the stale meaning instead of silently binding old evidence to a new question.
 
-**Conditional requirement:** use the current public capture/blob interface for durable bytes and the public command interface for submission. Do not expose raw device handles or private transport. Use the exact current core contract for operations and byte limits; this guide intentionally specifies behavior rather than preserving an obsolete capture wire format.
+Use `session.content.stage` for a bounded immutable content upload, complete it to obtain the content reference, and retain the required bytes with the session content API. Submit that exact reference and the reviewed task version through a command declared by the application definition. Use the same owned session for content, command delivery and observation; do not create a second host upload or capture queue.
 
-For the current browser API, `uploadEvent` creates a new durable operation and returns its runtime-owned `capture_id`. Give the reviewed snapshot a separate page-owned `submission_id` inside `data`; use `capture_queue` to associate that ID with the runtime operation, then correlate `upload_event` results by `capture_id`. Subscribe before reading `captures()` so initialization or reload cannot hide a pending item. Also associate the awaited result with its original snapshot: a local-storage rejection may never enter the queue. Use `retryCapture(capture_id)` for the original operation; calling `uploadEvent` again creates another submission. If local storage rejects the work before it becomes durable, retain the original bytes in memory and offer an explicit save or review action. Label that snapshot as present only in the open tab; do not promise interruption recovery when no durable copy exists.
+Keep a page-owned draft/submission ID for the person's reviewed snapshot and a stable `operationId` for its durable command. Inspect `session.operations` after reopening and use `session.retry(operationId)` to resume the same saved intent. `applied()` reports accepted or rejected execution in the selected history. `shared()` separately observes retained coverage; it does not make the submission irreversible. If recovery abandons the attempt, preserve the draft and offer deliberate reapplication under a new operation ID after reviewing the current question.
 
-For a protected capture, obtain `tendril.scopes.capture(scopeId)` when the person
-begins that action, before asynchronous recording, processing, or rendering. Pass
-its returned `scope` and `expected_generations` to the durable submission and keep
-them unchanged. Capturing a fresh generation only after a long recording could
-silently attach old evidence to a reset task. The
-[public capture contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/CAPTURES.md)
-defines that boundary and the separate upload, pin, and semantic-event phases.
+The captured `basedOn` revision is an ordering prerequisite, not a substitute for a task-version guard inside the definition. Retain both the reviewed domain values and the immutable bytes until the outcome is known. If storage rejects staging or command persistence, the current tab may still hold the original bytes; offer an explicit save or review action and describe that limited lifetime. Do not promise reload recovery without a durable copy.
 
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
 
 ## Separate verified bytes from accepted evidence
 
-The runtime coordinates the immutable upload and the later semantic capture command. A completed upload receipt means the service verified those bytes. The capture's accepted result means its original task context was admitted. Neither says the agent has completed its work. Keep queued, uploaded, accepted, and rejected meanings distinct even when the interface shows only one concise status at a time.
+The session separates content transfer from the semantic evidence command. A completed content stage identifies exact bytes; retention establishes the retained copy described by that receipt. An applied accepted command means the application's guards admitted the reference and context in the selected history. Neither says an agent has examined it. Keep locally saved, content retained, applied, rejected and abandoned meanings distinct even when the interface shows only one concise status at a time.
 
-Use the returned immutable content identity when later analysis or annotations must refer to the reviewed bytes. A mutable shared-file path can point to a newer object; a display URL alone does not grant authority or permanent retention. An accepted application event also does not automatically retain the bytes forever. If the task needs an archive, choose and verify the appropriate retained reference or pin; copying a blob ID into application JSON is insufficient. Do not infer participant-private media from an upload or a retained reference. The [private-response guide](../collect-private-responses/COOKBOOK.md) deliberately keeps that separate boundary explicit.
+Use the immutable content reference when analysis or annotations must refer to the reviewed bytes. A display URL alone does not establish access or permanent retention. An application event does not retain bytes forever: choose the retention policy, obtain the required actual copies, and test missing or partially transferred content. Replication and encryption follow application membership; placing a reference in a filtered query does not make media private from other authorized readers. The [private-response guide](../collect-private-responses/COOKBOOK.md) explains this separate boundary.
 
 ## Adapt the plan
 
@@ -100,12 +94,12 @@ Use the returned immutable content identity when later analysis or annotations m
 
 ## Different applications, same guarantees
 
-The [inline specimen](checks/inline/index.html) uses an ordinary file input, text area, local review, and explicit send. The [fullscreen sketch specimen](checks/fullscreen/index.html) uses a canvas capture route and a separate review step. Neither mounts a shared input component or assumes a universal event vocabulary. Both retain an immutable submitted snapshot and distinguish pending outcomes from new drafts.
+The [inline specimen](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/capture-reviewed-evidence/checks/inline/index.html) uses an ordinary file input, text area, local review, and explicit send. The [fullscreen sketch specimen](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/capture-reviewed-evidence/checks/fullscreen/index.html) uses a canvas capture route and a separate review step. Neither mounts a shared input component or assumes a universal event vocabulary. Both retained an immutable submitted snapshot and distinguished pending outcomes from new drafts. They are archived interaction evidence for a retired capture transport; current durable content and submission use the common application session.
 
 The additional evidence-tray, crop/redaction, and accessible review choices above
 are adaptation guidance; they are not added claims about the recorded pilot scope.
 
-Nine browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance is pending. The [pilot record](../../guides/pilot-evidence.json) names exact source and public artifacts. These recorded checks use deterministic fixture transport for UI failure cases and name their exact core baseline; repeat them when the underlying upload contract changes. Real authorization, durable byte retention, and transaction boundaries require the core service tests and an installed target service. Fixture success is not a claim about those guarantees.
+Nine historical browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance was pending. The [pilot record](../../guides/pilot-evidence.json) names those exact sources and public artifacts. Those retired transport fixtures do not qualify current content retention or command execution. The [common browser session gate](../run-a-peer-application/checks/README.md) separately exercises actual encrypted content, interrupted transfer, durable reopening and recovery; an adapted capture UI still needs its own interaction checks.
 
 ## Verify the flow
 

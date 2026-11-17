@@ -1,0 +1,234 @@
+{
+  "format": "chronolog-thin-membership/v1",
+  "passed": true,
+  "status": "passed",
+  "startedAt": "2026-11-16T19:37:03.088Z",
+  "command": [
+    "/home/runner/work/chronolog-db/chronolog-db/tools/thin-membership-pilot.ts",
+    "--tendriller-artifacts",
+    "artifacts/pilot-source/tendriller/dist",
+    "--wasm",
+    "artifacts/wasm",
+    "--output",
+    "artifacts/thin-membership/ci"
+  ],
+  "revisions": {
+    "chronolog": {
+      "head": "43efd510001c2608bc1e28ee4c7d100cb34c773b",
+      "dirty": false
+    },
+    "tendrillerArtifacts": {
+      "head": "43cac4e75b0bbe1e422f4879b7249d6db5988440",
+      "dirty": false
+    }
+  },
+  "artifacts": {
+    "sdk": {
+      "source": "/home/runner/work/chronolog-db/chronolog-db/artifacts/pilot-source/tendriller/dist/tendriller-sdk-0.3.0-rc.9.tgz",
+      "path": "/home/runner/work/chronolog-db/chronolog-db/artifacts/thin-membership/ci/inputs/sdk.tgz",
+      "sha256": "24f3da2394a151e97e368e1129b8e4ab725cdff0bfca62d858d4ca8e1e3a9042"
+    },
+    "engine": {
+      "source": "/home/runner/work/chronolog-db/chronolog-db/artifacts/pilot-source/tendriller/dist/tendriller-engine-0.3.0-rc.9.tgz",
+      "path": "/home/runner/work/chronolog-db/chronolog-db/artifacts/thin-membership/ci/inputs/engine.tgz",
+      "sha256": "6e8915ca86b788105c0e40c92d0cd610559c596fe76957f6c1f26fcd3e516832"
+    },
+    "wasmManifestSha256": "acf8da9aea85b440d2bdade18a3d8f665b1fb5522926211860c4205d2b60ab34",
+    "wasmSha256": "0aad5ad530b3a4393a4db45c1f891fe52ed397b06602755d63f3352105c00170",
+    "browserWorkerSha256": "8b2a5784d7f0cc2199b066e82ed0a31cdb55b3bc3ffa26e60274eece441d3df6",
+    "publicMembershipApiSha256": "1a27d539e8da7f0553244215568b6c48459e1ecef3492713bb7f4c7d3d5e66a3",
+    "membership": {
+      "repository": "werg/chronolog-db",
+      "source": "46b72ebc1c69f71b4cabab744ef19c6a4e50dfec",
+      "dirty": false,
+      "inputs": [
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/_md.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/_u64.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/crypto.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha2.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha256.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/utils.js",
+        "packages/canonical/src/bytes.ts",
+        "packages/canonical/src/cbor.ts",
+        "packages/canonical/src/errors.ts",
+        "packages/canonical/src/fixed.ts",
+        "packages/canonical/src/hash.ts",
+        "packages/canonical/src/index.ts",
+        "packages/canonical/src/schema.ts",
+        "packages/canonical/src/sync-hash.ts",
+        "packages/capabilities/src/admission.ts",
+        "packages/capabilities/src/codec.ts",
+        "packages/capabilities/src/index.ts",
+        "packages/capabilities/src/policy.ts",
+        "packages/capabilities/src/program-rights.ts",
+        "packages/capabilities/src/reducer.ts",
+        "packages/capabilities/src/types.ts",
+        "packages/crypto/src/epoch.ts",
+        "packages/crypto/src/hpke.ts",
+        "packages/crypto/src/index.ts",
+        "packages/crypto/src/keystore.ts",
+        "packages/node-core/src/async.ts",
+        "packages/node-core/src/cipher.ts",
+        "packages/node-core/src/enrollment.ts",
+        "packages/node-core/src/governance-activation.ts",
+        "packages/node-core/src/governance.ts",
+        "packages/node-core/src/history-policy.ts",
+        "packages/node-core/src/ledger-record.ts",
+        "packages/node-core/src/membership-wire.ts",
+        "packages/node-core/src/membership.ts",
+        "packages/node-core/src/operations.ts",
+        "packages/protocol/src/bytes.ts",
+        "packages/protocol/src/cbor.ts",
+        "packages/protocol/src/errors.ts",
+        "packages/protocol/src/events.ts",
+        "packages/protocol/src/index.ts",
+        "packages/protocol/src/messages.ts",
+        "packages/protocol/src/platform.ts",
+        "packages/protocol/src/primitives.ts",
+        "packages/protocol/src/program.ts",
+        "packages/protocol/src/schema.ts",
+        "packages/protocol/src/sql.ts",
+        "packages/records/src/feed-codec.ts",
+        "packages/records/src/index.ts",
+        "packages/records/src/payload.ts",
+        "packages/records/src/replication.ts",
+        "packages/records/src/store.ts",
+        "packages/records/src/transport.ts",
+        "packages/records/src/types.ts"
+      ],
+      "sha256": {
+        "index.mjs": "ff0a38c222c80d47cd5c05ac2f7beb1bf9791c4990b81b84fcf1abbb7bf0a090",
+        "index.d.ts": "b896da8326041c6563a988d968c99a1e10c071770fadf1d887517d8633921e2f"
+      }
+    }
+  },
+  "browser": "158.0.8127.18",
+  "checks": [
+    {
+      "name": "independent public SDK/engine and browser membership bundles build with pinned artifacts",
+      "evidence": {}
+    },
+    {
+      "name": "Cloudflare owns a durable membership-only root; the separate native signer owns application schema and ordering",
+      "evidence": {}
+    },
+    {
+      "name": "large SQL/event envelopes remain on full peers while descriptor traffic grows with candidate count",
+      "evidence": {
+        "small": {
+          "proposals": [
+            "tx_3fbf589e34d5e908d4c4800a43bbf3dc8fe1babba26d3f80be61a2c9ef6f61e0",
+            "tx_1a006ecc16798262f2a2a57eb47fd287d7d39d28f27cb928a9bb50474165213a",
+            "tx_a7fa8919a881907381cd02cd62a8965655311914cefca29f895df4bd88496a2b",
+            "tx_b9087c089f00a49b8ee5a07462b339e69b1bc342f70deab3cf89b8eb947dcf2f"
+          ],
+          "count": 4,
+          "descriptorBytes": 568,
+          "detachedEnvelopeBytes": 2668,
+          "finalThrough": 6
+        },
+        "large": {
+          "proposals": [
+            "tx_6ef0afffdd9b1a093c2d30b283c49d27aa85c1c9c2a717d480cacf1472ab3244",
+            "tx_67b91e2334234938a45b4a107a72f441d92e9711f132b6c8480135ddc1cb7a3c",
+            "tx_ab8f899f6beff897d82bfb737430d0361f2a8ce9d994160328248dbb261c0c0a",
+            "tx_81085b8a8cb71720e91c6adf63914e1b3d9a82c2bc22da582dee2818a50e52f5"
+          ],
+          "count": 4,
+          "descriptorBytes": 576,
+          "detachedEnvelopeBytes": 789092,
+          "finalThrough": 10
+        },
+        "more": {
+          "proposals": [
+            "tx_a5a1abc98e3e1a8555cef7d3061c21b5a0a7f6eab85d9c45bedba330e1263628",
+            "tx_9530d7929f5f01e302f225ab25a887eb4a578819c32c0942e9e16d8c196cf654",
+            "tx_e050e612b28d636415f04d1773e9bbe1fd6557ad27a700384253d7e6da622bc4",
+            "tx_8bb818eed5845e2de97a71357af1404e8e59b2116a99af416b8ba83f2d3cecf5",
+            "tx_07cb71be9ae96ed32ad0512b374f8383ad5766414a4678816e90911b4c5832cf",
+            "tx_4c4981974699f9f82c84a78fc55a7ea31243fb69845c64b26ac2fd382cc078a9",
+            "tx_0cabd61bc630b0fce709795851d81266ac0118a2f57a9b85b877b910bb0935e6",
+            "tx_0ce709ead986f5066b8512764db0ee268877f9e593a68c3a503295c864210f00"
+          ],
+          "count": 8,
+          "descriptorBytes": 1136,
+          "detachedEnvelopeBytes": 5320,
+          "finalThrough": 18
+        },
+        "traffic": {
+          "membershipRequests": 6,
+          "membershipRequestBytes": 3055,
+          "membershipResponseBytes": 10599,
+          "descriptorTransfers": 19,
+          "candidateDescriptorBytes": 2422,
+          "inlineControlDescriptorBytes": 1352,
+          "inlineControlEnvelopeBytes": 1056,
+          "applicationEnvelopeBytesToAdministrator": 0,
+          "unexpectedAdministratorRequests": 0,
+          "peerInboundBytes": 0,
+          "peerOutboundBytes": 0
+        }
+      }
+    },
+    {
+      "name": "host authentication binds device ownership and exact approval survives a lost reply plus real Durable Object eviction",
+      "evidence": {}
+    },
+    {
+      "name": "a fresh OPFS device verifies live approval and HPKE controls, then fetches detached history through authenticated peers",
+      "evidence": {
+        "elapsedMs": 1285
+      }
+    },
+    {
+      "name": "writer revocation defeats a direct native-path operation while host login survives and an accepted exact retry stays original",
+      "evidence": {
+        "value": {
+          "operationId": "device-after-writer-revocation",
+          "proposalId": "tx_a58dc1065dae42b4d22d3bf3b4fa55007420d07f792ce5a7e5e400a6225aa36c",
+          "final": true,
+          "outcome": {
+            "outcome": "rejected",
+            "rejectionCode": "WRITER_UNAUTHORIZED",
+            "failingStatementIndex": null
+          }
+        },
+        "elapsedMs": 4
+      }
+    },
+    {
+      "name": "abrupt Worker replacement reopens OPFS identity, grants and original accepted/rejected operations",
+      "evidence": {}
+    },
+    {
+      "name": "reader revocation rotates future keys without claiming to erase previously decrypted history",
+      "evidence": {}
+    }
+  ],
+  "pageErrors": [],
+  "final": {
+    "traffic": {
+      "membershipRequests": 21,
+      "membershipRequestBytes": 13115,
+      "membershipResponseBytes": 26251,
+      "descriptorTransfers": 33,
+      "candidateDescriptorBytes": 2706,
+      "inlineControlDescriptorBytes": 9552,
+      "inlineControlEnvelopeBytes": 7504,
+      "applicationEnvelopeBytesToAdministrator": 0,
+      "unexpectedAdministratorRequests": 0,
+      "peerInboundBytes": 57444,
+      "peerOutboundBytes": 1657484
+    },
+    "descriptor": {
+      "genesis": "owACAVkDQa0AAgFYINHmbRoHKWzonXOnczRlvyAocmiczZ9BBatJbU2YcarTAlggxHEvJmG5QWlZqXJUdEYbnTYYCujESNV2knX6T00ftVUDWCD_uoqyZERv6RmhPa3tAreIfSQov2JWC2EXBG562kPUEgRYIAAgVAAhm6X58ewWmmYDKQPl4BxRN4-ZvRViNdfnGhsPBVg1QC83cUtzbVJFYitrWm9UMnQ3UUszaUgwa0tMOWlWZ3RoRndSdWV0cEQxQkk9LmVkMjU1MTkGg6UAWCD_uoqyZERv6RmhPa3tAreIfSQov2JWC2EXBG562kPUEgFYIP-6irJkRG_pGaE9re0Ct4h9JCi_YlYLYRcEbnraQ9QSAgMDAAp4NUAvN3FLc21SRWIra1pvVDJ0N1FLM2lIMGtLTDlpVmd0aEZ3UnVldHBEMUJJPS5lZDI1NTE5pgBYIAAgVAAhm6X58ewWmmYDKQPl4BxRN4-ZvRViNdfnGhsPAVggACBUACGbpfnx7BaaZgMpA-XgHFE3j5m9FWI11-caGw8CAAMACVggMKvQiRpCKDzsXt8MFozIMRhyyotNWWO3BppgE-V-UxMKeDVAQUNCVUFDR2JwZm54N0JhYVpnTXBBK1hnSEZFM2o1bTlGV0kxMStjYUd3OD0uZWQyNTUxOaYAWCAAIFQAIZul-fHsFppmAykD5eAcUTePmb0VYjXX5xobDwFYIAAgVAAhm6X58ewWmmYDKQPl4BxRN4-ZvRViNdfnGhsPAgEDAAp4NUBBQ0JVQUNHYnBmbng3QmFhWmdNcEErWGdIRkUzajVtOUZXSTExK2NhR3c4PS5lZDI1NTE5C4T1gWEqgWEq9AeBogABAQEIowAZdTABGQPoAhkD6AmkABoAD0JAARknEAIYZAMYZAp4I0hQS0UtWDI1NTE5LUhLREYtU0hBMjU2LUFFUy0yNTYtR0NNCxsAAAGh5d0awQ2EAVggxHEvJmG5QWlZqXJUdEYbnTYYCujESNV2knX6T00ftVV4ImhfOTE4NTcyMDI3ODI2NDJiNGJmZmY0ODFjZWFiYTkxZTdYIAAgVAAhm6X58ewWmmYDKQPl4BxRN4-ZvRViNdfnGhsPAlhAtE5STF-92fh6QXxgRTU0eV544ACR6AZMMSWPmcKO658SYL8Uo7X6OIMaAYsQSsGNyhT2qezYcS9--07DWq57Cw",
+      "groupRoute": "JoL-Xa1W2K30clOeZFCAO8RMH2b46qGPT6Xs05PhS7Y"
+    },
+    "requestId": "r_dae6259a5a98d82ea69f5384066271ceaf75c72b53939cc1be5e034fbecf9072"
+  },
+  "error": "",
+  "limits": [
+    "The built Cloudflare Worker runs in the real local workerd test harness with synthetic authenticated accounts; this is not a deployed Cloudflare service or public-network qualification.",
+    "Descriptor/body byte counters cover the actual loopback membership and peer boundaries; they do not predict provider billing or NAT traversal."
+  ]
+}

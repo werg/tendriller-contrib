@@ -1,0 +1,241 @@
+{
+  "format": "peer-membership-evidence-summary/v2",
+  "rawReportSha256": "70f8ddb5c8133f517bb6d2598259fc9081ab6bfdcfc89d44c88e56240e240133",
+  "revisions": {
+    "chronolog": {
+      "head": "f58ace9850d9733f0e8ad2b2865285fab46a2c72",
+      "dirty": false
+    },
+    "tendrillerArtifacts": {
+      "head": "4d63f48c9a0f8e9765fe4d90541d67648fa20340",
+      "dirty": false
+    }
+  },
+  "browser": "158.0.8127.18",
+  "artifacts": {
+    "sdkSha256": "b95aa9785c44a4c97e16a087d6761e294acc6ebe1ee8e406837a1248d2109f19",
+    "engineSha256": "0c260b5f5ebd6d76dd44b1c7d785a957d6514aa9dffaa70dd8bd122342b3f5b0",
+    "wasmManifestSha256": "eb2d9a21be7803cea662afccbf4af46e936b45ab529a0300bf3ba47c63eb11ad",
+    "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+    "browserWorkerSha256": "2bf9928d6424e76591b23fa90c4125f1d33c5371193bb0c19e31a3e3e1f4b238",
+    "browserPageSha256": "3fd56ccc8e99834a2ed670e05703a4b1858f6843bf463f116f08062c532bfc5b",
+    "publicMembershipApiSha256": "abd8c6bcf7a1f2cf0c0a72018b5a0775fc1eaadcc02b83f7cbdc6191077747df"
+  },
+  "checks": [
+    "independent public SDK/engine and browser membership bundles build with pinned artifacts",
+    "Cloudflare owns a durable membership-only root; the separate native signer owns application schema and ordering",
+    "large SQL/event envelopes remain on full peers while descriptor traffic grows with candidate count",
+    "host authentication binds device ownership and exact approval survives a lost reply plus real Durable Object eviction",
+    "a fresh OPFS device verifies live approval and HPKE controls, then fetches detached history through authenticated WebRTC in its Worker",
+    "writer revocation defeats a direct native-path operation while host login survives and an accepted exact retry stays original",
+    "abrupt Worker replacement reopens OPFS identity, grants and original accepted/rejected operations",
+    "reader revocation rotates future keys without claiming to erase previously decrypted history",
+    "reopened actual Cloudflare metadata retains root, certified descriptor prefix, revoked roster, epoch decisions and exact action receipts without new application or control entries",
+    "reopened administrator uses restored historical epoch keys to approve a newly keyed read-only device while the removed account stays denied"
+  ],
+  "measurement": {
+    "applicationBytes": "Logical authenticated RTC frame payload; excludes framing headers/credit and SCTP/DTLS/IP overhead.",
+    "rtcSdpBytes": "UTF-8 bytes of the complete offer and answer SDP descriptions.",
+    "rtcSignalingRequestBytes": "Actual direct introduction HTTP request bodies, including the protocol JSON envelope; excludes HTTP headers.",
+    "rtcSignalingResponseBytes": "Actual direct introduction HTTP response bodies, including the protocol JSON envelope; excludes HTTP headers."
+  },
+  "rtc": {
+    "browser": {
+      "transport": "webrtc",
+      "channelOwner": "DedicatedWorker",
+      "introductions": [
+        {
+          "requests": 1,
+          "requestBytes": 696,
+          "responseBytes": 681,
+          "closed": true
+        },
+        {
+          "requests": 1,
+          "requestBytes": 696,
+          "responseBytes": 681,
+          "closed": true
+        },
+        {
+          "requests": 1,
+          "requestBytes": 697,
+          "responseBytes": 681,
+          "closed": true
+        }
+      ]
+    },
+    "native": {
+      "requests": 3,
+      "offers": 3,
+      "accepted": 3,
+      "rejected": 0,
+      "failed": 2,
+      "pending": 0,
+      "active": 1,
+      "closed": false,
+      "transport": "webrtc",
+      "nativeImplementation": "werift",
+      "restrictedInterfaceEnumeration": false,
+      "byteBoundary": "Logical authenticated peer frame payload; excludes framing headers/credit and SCTP/DTLS/IP overhead."
+    }
+  },
+  "traffic": {
+    "membershipRequests": 39,
+    "membershipRequestBytes": 23847,
+    "membershipResponseBytes": 161314,
+    "descriptorTransfers": 42,
+    "closureRecordTransfers": 179,
+    "closureRecordBytes": 74804,
+    "candidateDescriptorBytes": 2848,
+    "inlineControlDescriptorBytes": 15052,
+    "inlineControlEnvelopeBytes": 11828,
+    "applicationEnvelopeBytesToAdministrator": 0,
+    "unexpectedAdministratorRequests": 0,
+    "peerInboundBytes": 575305,
+    "peerOutboundBytes": 3257143,
+    "rtcSignalingRequests": 3,
+    "rtcSignalingRequestBytes": 2089,
+    "rtcSignalingResponseBytes": 2043,
+    "rtcSignalingDescriptions": 6,
+    "rtcSdpBytes": 3463
+  },
+  "qualification": "Actual fresh Chromium/OPFS enrollment, authenticated RTC history, writer and reader revocation, Worker replacement, durable administrator reopen and newly keyed read-only recovery with zero application-envelope bytes to the administrator.",
+  "limits": [
+    "The validator checks declared observations; the workflow supplies execution evidence.",
+    "The native handler reports accepted:3 and failed:2. This report has no terminal-error attribution; those counters are preserved without claiming an error-free lifecycle.",
+    "Peer traffic counts logical authenticated frame payloads and excludes framing, credit and SCTP/DTLS/IP overhead.",
+    "The administrator scans descriptor/control history during participant operations; this is not sparse-proof verification.",
+    "Loopback and synthetic host accounts do not establish public NAT, deployed identity-provider behavior, TURN or provider billing."
+  ],
+  "topology": {
+    "membership": [
+      "packaged workerd administrator",
+      "signed native membership HTTP"
+    ],
+    "introduction": [
+      "Window",
+      "one direct SDP HTTP offer/answer",
+      "resident native WebRTC handler"
+    ],
+    "application": [
+      "DedicatedWorker with OPFS/WASM",
+      "authenticated RTCDataChannel",
+      "native full replica and finality service"
+    ],
+    "nativeImplementation": "werift@0.27.0"
+  },
+  "timing": {
+    "scenarioTimeoutMs": 420000,
+    "hostProcessTimeoutMs": 540000,
+    "phases": [
+      {
+        "name": "membership configuration",
+        "startedAfterMs": 12324,
+        "elapsedMs": 264,
+        "status": "completed"
+      },
+      {
+        "name": "large and small native workloads",
+        "startedAfterMs": 12588,
+        "elapsedMs": 52404,
+        "status": "completed"
+      },
+      {
+        "name": "first device authorization and lost approval recovery",
+        "startedAfterMs": 64992,
+        "elapsedMs": 2682,
+        "status": "completed"
+      },
+      {
+        "name": "first fresh Worker authenticated history replay",
+        "startedAfterMs": 67674,
+        "elapsedMs": 20088,
+        "status": "completed"
+      },
+      {
+        "name": "writer revocation and original operation retry",
+        "startedAfterMs": 87762,
+        "elapsedMs": 20398,
+        "status": "completed"
+      },
+      {
+        "name": "abrupt Worker OPFS recovery",
+        "startedAfterMs": 108160,
+        "elapsedMs": 46194,
+        "status": "completed"
+      },
+      {
+        "name": "reader revocation and key rotation",
+        "startedAfterMs": 154354,
+        "elapsedMs": 37171,
+        "status": "completed"
+      },
+      {
+        "name": "administrator restart and retained decisions",
+        "startedAfterMs": 191525,
+        "elapsedMs": 19533,
+        "status": "completed"
+      },
+      {
+        "name": "second fresh Worker approval and full retained history",
+        "startedAfterMs": 211058,
+        "elapsedMs": 46668,
+        "status": "completed"
+      },
+      {
+        "name": "final RTC and administrative byte boundaries",
+        "startedAfterMs": 257726,
+        "elapsedMs": 10655,
+        "status": "completed"
+      },
+      {
+        "name": "completed",
+        "startedAfterMs": 268381,
+        "elapsedMs": 0,
+        "status": "completed"
+      }
+    ],
+    "connectionAndSyncCommands": [
+      {
+        "id": 6,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "connect",
+        "startedAfterMs": 68604,
+        "elapsedMs": 360,
+        "status": "completed"
+      },
+      {
+        "id": 7,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "sync",
+        "startedAfterMs": 69050,
+        "elapsedMs": 18685,
+        "status": "completed"
+      },
+      {
+        "id": 21,
+        "phase": "writer revocation and original operation retry",
+        "method": "connect",
+        "startedAfterMs": 106142,
+        "elapsedMs": 292,
+        "status": "completed"
+      },
+      {
+        "id": 44,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "connect",
+        "startedAfterMs": 218055,
+        "elapsedMs": 312,
+        "status": "completed"
+      },
+      {
+        "id": 45,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "sync",
+        "startedAfterMs": 218440,
+        "elapsedMs": 39247,
+        "status": "completed"
+      }
+    ]
+  }
+}

@@ -1,0 +1,940 @@
+{
+  "format": "chronolog-thin-membership/v2",
+  "passed": true,
+  "status": "passed",
+  "startedAt": "2026-11-16T23:50:29.301Z",
+  "command": [
+    "/home/runner/work/chronolog-db/chronolog-db/tools/thin-membership-pilot.ts",
+    "--tendriller-artifacts",
+    "artifacts/pilot-source/tendriller/dist",
+    "--wasm",
+    "artifacts/wasm",
+    "--output",
+    "artifacts/thin-membership/ci"
+  ],
+  "revisions": {
+    "chronolog": {
+      "head": "f58ace9850d9733f0e8ad2b2865285fab46a2c72",
+      "dirty": false
+    },
+    "tendrillerArtifacts": {
+      "head": "4d63f48c9a0f8e9765fe4d90541d67648fa20340",
+      "dirty": false
+    }
+  },
+  "topology": {
+    "membership": [
+      "packaged workerd administrator",
+      "signed native membership HTTP"
+    ],
+    "introduction": [
+      "Window",
+      "one direct SDP HTTP offer/answer",
+      "resident native WebRTC handler"
+    ],
+    "application": [
+      "DedicatedWorker with OPFS/WASM",
+      "authenticated RTCDataChannel",
+      "native full replica and finality service"
+    ],
+    "nativeImplementation": "werift@0.27.0"
+  },
+  "measurement": {
+    "applicationBytes": "Logical authenticated RTC frame payload; excludes framing headers/credit and SCTP/DTLS/IP overhead.",
+    "rtcSdpBytes": "UTF-8 bytes of the complete offer and answer SDP descriptions.",
+    "rtcSignalingRequestBytes": "Actual direct introduction HTTP request bodies, including the protocol JSON envelope; excludes HTTP headers.",
+    "rtcSignalingResponseBytes": "Actual direct introduction HTTP response bodies, including the protocol JSON envelope; excludes HTTP headers."
+  },
+  "artifacts": {
+    "sdk": {
+      "source": "/home/runner/work/chronolog-db/chronolog-db/artifacts/pilot-source/tendriller/dist/tendriller-sdk-0.3.0-rc.9.tgz",
+      "path": "/home/runner/work/chronolog-db/chronolog-db/artifacts/thin-membership/ci/inputs/sdk.tgz",
+      "sha256": "b95aa9785c44a4c97e16a087d6761e294acc6ebe1ee8e406837a1248d2109f19"
+    },
+    "engine": {
+      "source": "/home/runner/work/chronolog-db/chronolog-db/artifacts/pilot-source/tendriller/dist/tendriller-engine-0.3.0-rc.9.tgz",
+      "path": "/home/runner/work/chronolog-db/chronolog-db/artifacts/thin-membership/ci/inputs/engine.tgz",
+      "sha256": "0c260b5f5ebd6d76dd44b1c7d785a957d6514aa9dffaa70dd8bd122342b3f5b0"
+    },
+    "wasmManifestSha256": "eb2d9a21be7803cea662afccbf4af46e936b45ab529a0300bf3ba47c63eb11ad",
+    "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+    "browserWorkerSha256": "2bf9928d6424e76591b23fa90c4125f1d33c5371193bb0c19e31a3e3e1f4b238",
+    "browserPageSha256": "3fd56ccc8e99834a2ed670e05703a4b1858f6843bf463f116f08062c532bfc5b",
+    "publicMembershipApiSha256": "abd8c6bcf7a1f2cf0c0a72018b5a0775fc1eaadcc02b83f7cbdc6191077747df",
+    "membership": {
+      "repository": "werg/chronolog-db",
+      "source": "8476228ca7645ddd003be74e663a3617e3f5c758",
+      "dirty": false,
+      "inputs": [
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/_md.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/_u64.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/crypto.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha2.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/sha256.js",
+        "node_modules/.pnpm/@noble+hashes@1.8.0/node_modules/@noble/hashes/esm/utils.js",
+        "packages/canonical/src/bytes.ts",
+        "packages/canonical/src/cbor.ts",
+        "packages/canonical/src/errors.ts",
+        "packages/canonical/src/fixed.ts",
+        "packages/canonical/src/hash.ts",
+        "packages/canonical/src/index.ts",
+        "packages/canonical/src/schema.ts",
+        "packages/canonical/src/sync-hash.ts",
+        "packages/capabilities/src/admission.ts",
+        "packages/capabilities/src/codec.ts",
+        "packages/capabilities/src/index.ts",
+        "packages/capabilities/src/policy.ts",
+        "packages/capabilities/src/program-rights.ts",
+        "packages/capabilities/src/reducer.ts",
+        "packages/capabilities/src/types.ts",
+        "packages/crypto/src/epoch.ts",
+        "packages/crypto/src/hpke.ts",
+        "packages/crypto/src/index.ts",
+        "packages/crypto/src/keystore.ts",
+        "packages/crypto/src/sealed.ts",
+        "packages/node-core/src/async.ts",
+        "packages/node-core/src/cipher.ts",
+        "packages/node-core/src/enrollment.ts",
+        "packages/node-core/src/finality.ts",
+        "packages/node-core/src/governance-activation.ts",
+        "packages/node-core/src/governance.ts",
+        "packages/node-core/src/history-policy.ts",
+        "packages/node-core/src/ledger-record.ts",
+        "packages/node-core/src/membership-wire.ts",
+        "packages/node-core/src/membership.ts",
+        "packages/node-core/src/operations.ts",
+        "packages/protocol/src/bytes.ts",
+        "packages/protocol/src/cbor.ts",
+        "packages/protocol/src/errors.ts",
+        "packages/protocol/src/events.ts",
+        "packages/protocol/src/index.ts",
+        "packages/protocol/src/messages.ts",
+        "packages/protocol/src/platform.ts",
+        "packages/protocol/src/primitives.ts",
+        "packages/protocol/src/program.ts",
+        "packages/protocol/src/row-key.ts",
+        "packages/protocol/src/schema.ts",
+        "packages/protocol/src/sealed.ts",
+        "packages/protocol/src/sql.ts",
+        "packages/records/src/feed-codec.ts",
+        "packages/records/src/index.ts",
+        "packages/records/src/payload.ts",
+        "packages/records/src/replication.ts",
+        "packages/records/src/store.ts",
+        "packages/records/src/transport.ts",
+        "packages/records/src/types.ts"
+      ],
+      "sha256": {
+        "index.mjs": "605e9059f00ed0fbc8cdcea2d20ea11133ff51146ffe8a1d790d608ccb67b41e",
+        "index.d.ts": "9de403774fb67066579467a6de06bc1bdfaf1db5c50b190974acf5784118c0e5"
+      }
+    }
+  },
+  "browser": "158.0.8127.18",
+  "checks": [
+    {
+      "name": "independent public SDK/engine and browser membership bundles build with pinned artifacts",
+      "evidence": {}
+    },
+    {
+      "name": "Cloudflare owns a durable membership-only root; the separate native signer owns application schema and ordering",
+      "evidence": {}
+    },
+    {
+      "name": "large SQL/event envelopes remain on full peers while descriptor traffic grows with candidate count",
+      "evidence": {
+        "small": {
+          "proposals": [
+            "tx_daab0606ade58b0845adae93a6b5ccf183d36ff23962f0c2e57ee7aabea316e0",
+            "tx_be4d6e7e7fc521a7ae26aa0ffe0d9a909574a0839e013c68c1a75fd152dd2a25",
+            "tx_eb5685fd1210f72f3a016be815b0a3107e9aaa4cec9e69bff61c8040531cc5c7",
+            "tx_d5e5674e66e3b78d681ef454e704392681a5feff7422588b1da04c78fe061ffc"
+          ],
+          "count": 4,
+          "descriptorBytes": 568,
+          "detachedEnvelopeBytes": 2668,
+          "finalThrough": 23
+        },
+        "large": {
+          "proposals": [
+            "tx_7155bac9d4adcca01a6bde246603fbf524e1d05dc9def08123ae373fbcafc9cb",
+            "tx_3004f21209c1922ebef51fcb6d3b735103fcd659f0996c6fd04a6d1541fa3239",
+            "tx_58f9dba0d90aa5b85d9696add00b82cfa3044831431c3ece95e1fd88bbb6a0e4",
+            "tx_68851e60eeea7f6299eda2d6782967fbddf75f144845cb4fba7af69ab80ed94c"
+          ],
+          "count": 4,
+          "descriptorBytes": 576,
+          "detachedEnvelopeBytes": 789092,
+          "finalThrough": 40
+        },
+        "more": {
+          "proposals": [
+            "tx_34d042b4999a3449f604c13375ee4975a08be9adce373decebe1695ce758f95e",
+            "tx_9ed328df666a5dbe284fb3d2e7e2b8f726c4bc709513e138a9c2026f0ef1397c",
+            "tx_f7208aac2a2d350536fd5fea32a88e5ed475a90eed8c70da0df8cc7462b55dbe",
+            "tx_01a32672f4f9496ffff78bd8804e2b594097a579e283165ed769ba684a1aaa49",
+            "tx_d545dd261c0ce88817ae4a83ee0dc911f2316a63dbcf57922fc6c8369b1f364b",
+            "tx_952deb17e2457683f5a80e9e61fd37b4352c2d59be7ed76ca2dcb6c6ea7cd230",
+            "tx_fe0db081868dde3be4f90043b1374f3d75fe4f0cdb581d46e5c24f43a776a733",
+            "tx_3d72af2fa71cc0b20d126a1c36b8f93f5d02232d4555776dbddf7bbd83f123f7"
+          ],
+          "count": 8,
+          "descriptorBytes": 1136,
+          "detachedEnvelopeBytes": 5320,
+          "finalThrough": 74
+        },
+        "traffic": {
+          "membershipRequests": 6,
+          "membershipRequestBytes": 3183,
+          "membershipResponseBytes": 50569,
+          "descriptorTransfers": 19,
+          "closureRecordTransfers": 59,
+          "closureRecordBytes": 24644,
+          "candidateDescriptorBytes": 2422,
+          "inlineControlDescriptorBytes": 1352,
+          "inlineControlEnvelopeBytes": 1056,
+          "applicationEnvelopeBytesToAdministrator": 0,
+          "unexpectedAdministratorRequests": 0,
+          "peerInboundBytes": 0,
+          "peerOutboundBytes": 0,
+          "rtcSignalingRequests": 0,
+          "rtcSignalingRequestBytes": 0,
+          "rtcSignalingResponseBytes": 0,
+          "rtcSignalingDescriptions": 0,
+          "rtcSdpBytes": 0
+        }
+      }
+    },
+    {
+      "name": "host authentication binds device ownership and exact approval survives a lost reply plus real Durable Object eviction",
+      "evidence": {}
+    },
+    {
+      "name": "a fresh OPFS device verifies live approval and HPKE controls, then fetches detached history through authenticated WebRTC in its Worker",
+      "evidence": {
+        "elapsedMs": 18695,
+        "rtc": {
+          "sentBytes": 115855,
+          "receivedBytes": 1331000,
+          "sentPackets": 1381,
+          "receivedPackets": 1450,
+          "queuedSendBytes": 0,
+          "queuedReceiveBytes": 0,
+          "queuedReceiveFrames": 0
+        }
+      }
+    },
+    {
+      "name": "writer revocation defeats a direct native-path operation while host login survives and an accepted exact retry stays original",
+      "evidence": {
+        "value": {
+          "operationId": "device-after-writer-revocation",
+          "proposalId": "tx_80d5d35b470d785488a552c839da798fb85dde9da84d278e73e1eaf2ed390be3",
+          "final": true,
+          "outcome": {
+            "outcome": "rejected",
+            "rejectionCode": "ENCRYPTION_EPOCH_CLOSED",
+            "failingStatementIndex": null
+          }
+        },
+        "elapsedMs": 1653
+      }
+    },
+    {
+      "name": "abrupt Worker replacement reopens OPFS identity, grants and original accepted/rejected operations",
+      "evidence": {}
+    },
+    {
+      "name": "reader revocation rotates future keys without claiming to erase previously decrypted history",
+      "evidence": {
+        "identity": "PjLUUbJxIC62CpIRaBXBHOzr0PGFRqPARerSvXEBt0c",
+        "removedEpoch": "2",
+        "knownEpochs": [
+          "0",
+          "1",
+          "2"
+        ],
+        "availableEpochs": [
+          "0",
+          "1"
+        ],
+        "cannotReadPostRevocationEvent": true
+      }
+    },
+    {
+      "name": "reopened actual Cloudflare metadata retains root, certified descriptor prefix, revoked roster, epoch decisions and exact action receipts without new application or control entries",
+      "evidence": {
+        "before": {
+          "descriptor": {
+            "genesis": "owACAVkDVq0AAgFYINsdtsbaplX3Q5AtIoHXMhFcpOt8PZlaUbigWWlWa0jDAlgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV8DWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegRYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iBVg1QHpwbHV4MmEyc3poNkdyOEpkaUV5UFlSaTZwQ0VnWjBRUlFIalZLQVl4M289LmVkMjU1MTkGg6UAWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegFYIM6ZbsdmtrM4ehq_CXYhMj2EYuqQhIGdEEUB41SgGMd6AgMDAAp4NUB6cGx1eDJhMnN6aDZHcjhKZGlFeVBZUmk2cENFZ1owUVJRSGpWS0FZeDNvPS5lZDI1NTE5pgBYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAVggvm2hOJdLymIGjuCJiAXHu_sTrwakxTTrDrjpe3G8TiICAAMACVggIqedzl5Tk2u1paWS_rFVXI2bX-9Cj-DgHewnOMw-lz8KeDVAdm0yaE9KZEx5bUlHanVDSmlBWEh1L3NUcndha3hUVHJEcmpwZTNHOFRpST0uZWQyNTUxOaYAWCC-baE4l0vKYgaO4ImIBce7-xOvBqTFNOsOuOl7cbxOIgFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAgEDAAp4NUB2bTJoT0pkTHltSUdqdUNKaUFYSHUvc1Ryd2FreFRUckRyanBlM0c4VGlJPS5lZDI1NTE5C4T1gWEqgWEq9AeBogABAQEIowAZdTABGQPoAhkD6AmkABoAD0JAARknEAIYZAMYZAp4I0hQS0UtWDI1NTE5LUhLREYtU0hBMjU2LUFFUy0yNTYtR0NNCxsAAAGh5sUjNQ2GAVgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV94ImhfOGM4MzgyZGJmZGY0NGEzZGE5OGFlMmIwOGU3ZjM2YWFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4ic3NpZ25lZC1pbmNsdXNpb24tdjFAAlhAzfL9l9TuM1ZjAZLM-1TT2cAWK4Si1nbm70ROySArbz7oBcpw1XfREZ5s5J96iyh-IwbOaXV6DPEdUyNekEIyCA",
+            "groupRoute": "18rZYvhDXGF03C_LhRtDa4Q8dF4nEmUa2uSVtGp1EyU"
+          },
+          "identity": {
+            "accountId": "cec6a2c8-c655-43fe-9e9f-11c827b5bfec",
+            "administrator": true,
+            "requestPrefix": "account:cec6a2c8-c655-43fe-9e9f-11c827b5bfec:"
+          },
+          "requests": [
+            {
+              "id": "r_ce67f7e3ade52fe9e65bf2c3be8a98a3661f485ac3aae08c268101af7baabed7",
+              "accountId": "c0c12e80-a11d-4b8f-847f-00c940c639e5",
+              "signingPublicKey": "PjLUUbJxIC62CpIRaBXBHOzr0PGFRqPARerSvXEBt0c",
+              "readerPublicKey": "L9fpf49PjnVnKJRxVga44jE5tIk_QiW40Vsndurmc2U",
+              "transportAuthor": "@PjLUUbJxIC62CpIRaBXBHOzr0PGFRqPARerSvXEBt0c=.ed25519",
+              "requestId": "account:c0c12e80-a11d-4b8f-847f-00c940c639e5:native-browser-qualification",
+              "requestedRoles": [
+                "reader",
+                "writer"
+              ],
+              "writerProgram": {
+                "sql": true,
+                "topics": [
+                  "qualification"
+                ],
+                "signals": [],
+                "forwarded": false
+              },
+              "status": "revoked",
+              "createdAt": 1794873095803,
+              "signedApproval": "glkB5osCeElhY2NvdW50OmMwYzEyZTgwLWExMWQtNGI4Zi04NDdmLTAwYzk0MGM2MzllNTpuYXRpdmUtYnJvd3Nlci1xdWFsaWZpY2F0aW9uWCBfPbQNNTANArvWR45PFUdiHpvQgELGf1nD4UDK7oMi61gg2x22xtqmVfdDkC0igdcyEVyk63w9mVpRuKBZaVZrSMNYIMnaqkYDsIt-J48TGb4XmqBi1roZV2mCSKHDCXIsK21AAYJmcmVhZGVyZndyaXRlcoJYIFfSecc21qsreUnBfT-y4tAl78xvhJXfVzei10wypNrAWCCZSczyxPfGKMjb3GcwufgQd7tt8ENX15aVwXnagTXL0_WDWKOHBFgg2x22xtqmVfdDkC0igdcyEVyk63w9mVpRuKBZaVZrSMNtY2hyb25vbG9naWNhbHgiaF84YzgzODJkYmZkZjQ0YTNkYTk4YWUyYjA4ZTdmMzZhYRhVeEBkZDQzZjM4NzRmMDIyMTdjYjAwYzA2ODQxODZjYzkzYTA1YTUwYWY0MjgxZjc4Nzg5ZmIwYTA5OWExM2U2NjI2GwAAAaHmxfWqgQBYIN9l0hdtlqOXQZn8k-QdNq-OnJ4IK0g0kguhDGtidhlfhPWBbXF1YWxpZmljYXRpb26A9FhAaTkZxrdZiSFC8fTstpPwV0PGvSdbcQDNbTxUbCbRBwT88QzkK6xiil0ML-ygHknG1-wIOSrbsAToyjpwUrjBDQ",
+              "capabilityIds": [
+                "V9J5xzbWqyt5ScF9P7Li0CXvzG-Eld9XN6LXTDKk2sA",
+                "mUnM8sT3xijI29xnMLn4EHe7bfBDV9eWlcF52oE1y9M"
+              ],
+              "revokedCapabilityIds": [
+                "V9J5xzbWqyt5ScF9P7Li0CXvzG-Eld9XN6LXTDKk2sA",
+                "mUnM8sT3xijI29xnMLn4EHe7bfBDV9eWlcF52oE1y9M"
+              ]
+            }
+          ],
+          "progress": {
+            "verifiedThrough": 191,
+            "root": "95251b051ba41b368f3918fd16377928d1ad995a39639f6b3b1ad9b726620550"
+          },
+          "pendingActions": 0
+        },
+        "after": {
+          "descriptor": {
+            "genesis": "owACAVkDVq0AAgFYINsdtsbaplX3Q5AtIoHXMhFcpOt8PZlaUbigWWlWa0jDAlgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV8DWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegRYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iBVg1QHpwbHV4MmEyc3poNkdyOEpkaUV5UFlSaTZwQ0VnWjBRUlFIalZLQVl4M289LmVkMjU1MTkGg6UAWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegFYIM6ZbsdmtrM4ehq_CXYhMj2EYuqQhIGdEEUB41SgGMd6AgMDAAp4NUB6cGx1eDJhMnN6aDZHcjhKZGlFeVBZUmk2cENFZ1owUVJRSGpWS0FZeDNvPS5lZDI1NTE5pgBYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAVggvm2hOJdLymIGjuCJiAXHu_sTrwakxTTrDrjpe3G8TiICAAMACVggIqedzl5Tk2u1paWS_rFVXI2bX-9Cj-DgHewnOMw-lz8KeDVAdm0yaE9KZEx5bUlHanVDSmlBWEh1L3NUcndha3hUVHJEcmpwZTNHOFRpST0uZWQyNTUxOaYAWCC-baE4l0vKYgaO4ImIBce7-xOvBqTFNOsOuOl7cbxOIgFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAgEDAAp4NUB2bTJoT0pkTHltSUdqdUNKaUFYSHUvc1Ryd2FreFRUckRyanBlM0c4VGlJPS5lZDI1NTE5C4T1gWEqgWEq9AeBogABAQEIowAZdTABGQPoAhkD6AmkABoAD0JAARknEAIYZAMYZAp4I0hQS0UtWDI1NTE5LUhLREYtU0hBMjU2LUFFUy0yNTYtR0NNCxsAAAGh5sUjNQ2GAVgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV94ImhfOGM4MzgyZGJmZGY0NGEzZGE5OGFlMmIwOGU3ZjM2YWFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4ic3NpZ25lZC1pbmNsdXNpb24tdjFAAlhAzfL9l9TuM1ZjAZLM-1TT2cAWK4Si1nbm70ROySArbz7oBcpw1XfREZ5s5J96iyh-IwbOaXV6DPEdUyNekEIyCA",
+            "groupRoute": "18rZYvhDXGF03C_LhRtDa4Q8dF4nEmUa2uSVtGp1EyU"
+          },
+          "identity": {
+            "accountId": "cec6a2c8-c655-43fe-9e9f-11c827b5bfec",
+            "administrator": true,
+            "requestPrefix": "account:cec6a2c8-c655-43fe-9e9f-11c827b5bfec:"
+          },
+          "requests": [
+            {
+              "id": "r_ce67f7e3ade52fe9e65bf2c3be8a98a3661f485ac3aae08c268101af7baabed7",
+              "accountId": "c0c12e80-a11d-4b8f-847f-00c940c639e5",
+              "signingPublicKey": "PjLUUbJxIC62CpIRaBXBHOzr0PGFRqPARerSvXEBt0c",
+              "readerPublicKey": "L9fpf49PjnVnKJRxVga44jE5tIk_QiW40Vsndurmc2U",
+              "transportAuthor": "@PjLUUbJxIC62CpIRaBXBHOzr0PGFRqPARerSvXEBt0c=.ed25519",
+              "requestId": "account:c0c12e80-a11d-4b8f-847f-00c940c639e5:native-browser-qualification",
+              "requestedRoles": [
+                "reader",
+                "writer"
+              ],
+              "writerProgram": {
+                "sql": true,
+                "topics": [
+                  "qualification"
+                ],
+                "signals": [],
+                "forwarded": false
+              },
+              "status": "revoked",
+              "createdAt": 1794873095803,
+              "signedApproval": "glkB5osCeElhY2NvdW50OmMwYzEyZTgwLWExMWQtNGI4Zi04NDdmLTAwYzk0MGM2MzllNTpuYXRpdmUtYnJvd3Nlci1xdWFsaWZpY2F0aW9uWCBfPbQNNTANArvWR45PFUdiHpvQgELGf1nD4UDK7oMi61gg2x22xtqmVfdDkC0igdcyEVyk63w9mVpRuKBZaVZrSMNYIMnaqkYDsIt-J48TGb4XmqBi1roZV2mCSKHDCXIsK21AAYJmcmVhZGVyZndyaXRlcoJYIFfSecc21qsreUnBfT-y4tAl78xvhJXfVzei10wypNrAWCCZSczyxPfGKMjb3GcwufgQd7tt8ENX15aVwXnagTXL0_WDWKOHBFgg2x22xtqmVfdDkC0igdcyEVyk63w9mVpRuKBZaVZrSMNtY2hyb25vbG9naWNhbHgiaF84YzgzODJkYmZkZjQ0YTNkYTk4YWUyYjA4ZTdmMzZhYRhVeEBkZDQzZjM4NzRmMDIyMTdjYjAwYzA2ODQxODZjYzkzYTA1YTUwYWY0MjgxZjc4Nzg5ZmIwYTA5OWExM2U2NjI2GwAAAaHmxfWqgQBYIN9l0hdtlqOXQZn8k-QdNq-OnJ4IK0g0kguhDGtidhlfhPWBbXF1YWxpZmljYXRpb26A9FhAaTkZxrdZiSFC8fTstpPwV0PGvSdbcQDNbTxUbCbRBwT88QzkK6xiil0ML-ygHknG1-wIOSrbsAToyjpwUrjBDQ",
+              "capabilityIds": [
+                "V9J5xzbWqyt5ScF9P7Li0CXvzG-Eld9XN6LXTDKk2sA",
+                "mUnM8sT3xijI29xnMLn4EHe7bfBDV9eWlcF52oE1y9M"
+              ],
+              "revokedCapabilityIds": [
+                "V9J5xzbWqyt5ScF9P7Li0CXvzG-Eld9XN6LXTDKk2sA",
+                "mUnM8sT3xijI29xnMLn4EHe7bfBDV9eWlcF52oE1y9M"
+              ]
+            }
+          ],
+          "progress": {
+            "verifiedThrough": 191,
+            "root": "95251b051ba41b368f3918fd16377928d1ad995a39639f6b3b1ad9b726620550"
+          },
+          "pendingActions": 0
+        },
+        "writerRevocation": {
+          "membershipRevision": "l19_Ty63SWfzxqyBtEDjVkwhfdNCXZVzI8pbCyQP61s",
+          "epoch": "1",
+          "frontier": "hwRYINsdtsbaplX3Q5AtIoHXMhFcpOt8PZlaUbigWWlWa0jDbWNocm9ub2xvZ2ljYWx4ImhfOGM4MzgyZGJmZGY0NGEzZGE5OGFlMmIwOGU3ZjM2YWEYgXhAYWUwZDA5ZDM5ZGI4Mjc5YWY4NjMwMTMzNzhkMDZmNzRlYTA0Y2RjZThhN2I0NjZlOTA1YmU4MmUwNmZkMzM0MxsAAAGh5saMXA"
+        },
+        "readerRevocation": {
+          "membershipRevision": "vYMV_jksQ2q3rg_euFRN1Vqt13SdimM0IbYVRqHNzhg",
+          "epoch": "2",
+          "frontier": "hwRYINsdtsbaplX3Q5AtIoHXMhFcpOt8PZlaUbigWWlWa0jDbWNocm9ub2xvZ2ljYWx4ImhfOGM4MzgyZGJmZGY0NGEzZGE5OGFlMmIwOGU3ZjM2YWEYpXhAOWY1YTQ4MmU0OThjMTNmZWMzYWMxOTVkMGI2NzU5YjZlMTE1NjQ2ZDc4ZDkyYzFmYjZjMDVmZDNkZjcxN2U0MhsAAAGh5sdPDA"
+        },
+        "nativeBeforeRestore": {
+          "historyId": "h_8c8382dbfdf44a3da98ae2b08e7f36aa",
+          "position": 191,
+          "root": "95251b051ba41b368f3918fd16377928d1ad995a39639f6b3b1ad9b726620550"
+        },
+        "nativeAfterRestore": {
+          "historyId": "h_8c8382dbfdf44a3da98ae2b08e7f36aa",
+          "position": 196,
+          "root": "31c648df36269218b0421da7903d690094a7c22477f10817d0650b91e36408c8"
+        },
+        "retainedReceipts": 191,
+        "newClosureRecords": 4
+      }
+    },
+    {
+      "name": "reopened administrator uses restored historical epoch keys to approve a newly keyed read-only device while the removed account stays denied",
+      "evidence": {
+        "identity": "qUiQG0SuCD_WClnb9utVwuGc5WxZWO2tElxaNnXXOTk",
+        "accountId": "761797b9-4b86-4545-ad65-36682b7781d5",
+        "roles": [
+          "reader"
+        ],
+        "availableEpochs": [
+          "0",
+          "1",
+          "2"
+        ],
+        "recoveredEpoch": "2",
+        "elapsedMs": 39275
+      }
+    }
+  ],
+  "phase": "completed",
+  "timing": {
+    "scenarioTimeoutMs": 420000,
+    "hostProcessTimeoutMs": 540000,
+    "phases": [
+      {
+        "name": "membership configuration",
+        "startedAfterMs": 12324,
+        "elapsedMs": 264,
+        "status": "completed"
+      },
+      {
+        "name": "large and small native workloads",
+        "startedAfterMs": 12588,
+        "elapsedMs": 52404,
+        "status": "completed"
+      },
+      {
+        "name": "first device authorization and lost approval recovery",
+        "startedAfterMs": 64992,
+        "elapsedMs": 2682,
+        "status": "completed"
+      },
+      {
+        "name": "first fresh Worker authenticated history replay",
+        "startedAfterMs": 67674,
+        "elapsedMs": 20088,
+        "status": "completed"
+      },
+      {
+        "name": "writer revocation and original operation retry",
+        "startedAfterMs": 87762,
+        "elapsedMs": 20398,
+        "status": "completed"
+      },
+      {
+        "name": "abrupt Worker OPFS recovery",
+        "startedAfterMs": 108160,
+        "elapsedMs": 46194,
+        "status": "completed"
+      },
+      {
+        "name": "reader revocation and key rotation",
+        "startedAfterMs": 154354,
+        "elapsedMs": 37171,
+        "status": "completed"
+      },
+      {
+        "name": "administrator restart and retained decisions",
+        "startedAfterMs": 191525,
+        "elapsedMs": 19533,
+        "status": "completed"
+      },
+      {
+        "name": "second fresh Worker approval and full retained history",
+        "startedAfterMs": 211058,
+        "elapsedMs": 46668,
+        "status": "completed"
+      },
+      {
+        "name": "final RTC and administrative byte boundaries",
+        "startedAfterMs": 257726,
+        "elapsedMs": 10655,
+        "status": "completed"
+      },
+      {
+        "name": "completed",
+        "startedAfterMs": 268381,
+        "elapsedMs": 0,
+        "status": "completed"
+      }
+    ],
+    "commands": [
+      {
+        "id": 1,
+        "phase": "first device authorization and lost approval recovery",
+        "method": "prepare",
+        "startedAfterMs": 64994,
+        "elapsedMs": 24,
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "phase": "first device authorization and lost approval recovery",
+        "method": "open",
+        "startedAfterMs": 65021,
+        "elapsedMs": 1422,
+        "status": "completed"
+      },
+      {
+        "id": 3,
+        "phase": "first device authorization and lost approval recovery",
+        "method": "request",
+        "startedAfterMs": 66475,
+        "elapsedMs": 7,
+        "status": "completed"
+      },
+      {
+        "id": 4,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "approval",
+        "startedAfterMs": 67676,
+        "elapsedMs": 19,
+        "status": "completed"
+      },
+      {
+        "id": 5,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "history",
+        "startedAfterMs": 67878,
+        "elapsedMs": 715,
+        "status": "completed"
+      },
+      {
+        "id": 6,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "connect",
+        "startedAfterMs": 68604,
+        "elapsedMs": 360,
+        "status": "completed"
+      },
+      {
+        "id": 7,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "sync",
+        "startedAfterMs": 69050,
+        "elapsedMs": 18685,
+        "status": "completed"
+      },
+      {
+        "id": 8,
+        "phase": "first fresh Worker authenticated history replay",
+        "method": "events",
+        "startedAfterMs": 87740,
+        "elapsedMs": 14,
+        "status": "completed"
+      },
+      {
+        "id": 9,
+        "phase": "writer revocation and original operation retry",
+        "method": "publish",
+        "startedAfterMs": 87764,
+        "elapsedMs": 534,
+        "status": "completed"
+      },
+      {
+        "id": 10,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 88302,
+        "elapsedMs": 63,
+        "status": "completed"
+      },
+      {
+        "id": 11,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 88471,
+        "elapsedMs": 49,
+        "status": "completed"
+      },
+      {
+        "id": 12,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 88625,
+        "elapsedMs": 63,
+        "status": "completed"
+      },
+      {
+        "id": 13,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 88792,
+        "elapsedMs": 42,
+        "status": "completed"
+      },
+      {
+        "id": 14,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 88939,
+        "elapsedMs": 27,
+        "status": "completed"
+      },
+      {
+        "id": 15,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 89088,
+        "elapsedMs": 81,
+        "status": "completed"
+      },
+      {
+        "id": 16,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 89438,
+        "elapsedMs": 23,
+        "status": "completed"
+      },
+      {
+        "id": 17,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 89566,
+        "elapsedMs": 4950,
+        "status": "completed"
+      },
+      {
+        "id": 18,
+        "phase": "writer revocation and original operation retry",
+        "method": "status",
+        "startedAfterMs": 94521,
+        "elapsedMs": 9629,
+        "status": "completed"
+      },
+      {
+        "id": 19,
+        "phase": "writer revocation and original operation retry",
+        "method": "disconnect",
+        "startedAfterMs": 104155,
+        "elapsedMs": 10,
+        "status": "completed"
+      },
+      {
+        "id": 20,
+        "phase": "writer revocation and original operation retry",
+        "method": "publish",
+        "startedAfterMs": 106008,
+        "elapsedMs": 131,
+        "status": "completed"
+      },
+      {
+        "id": 21,
+        "phase": "writer revocation and original operation retry",
+        "method": "connect",
+        "startedAfterMs": 106142,
+        "elapsedMs": 292,
+        "status": "completed"
+      },
+      {
+        "id": 22,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 106488,
+        "elapsedMs": 62,
+        "status": "completed"
+      },
+      {
+        "id": 23,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 106666,
+        "elapsedMs": 53,
+        "status": "completed"
+      },
+      {
+        "id": 24,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 106824,
+        "elapsedMs": 43,
+        "status": "completed"
+      },
+      {
+        "id": 25,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 106990,
+        "elapsedMs": 32,
+        "status": "completed"
+      },
+      {
+        "id": 26,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 107127,
+        "elapsedMs": 96,
+        "status": "completed"
+      },
+      {
+        "id": 27,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 107328,
+        "elapsedMs": 59,
+        "status": "completed"
+      },
+      {
+        "id": 28,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 107501,
+        "elapsedMs": 71,
+        "status": "completed"
+      },
+      {
+        "id": 29,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 107677,
+        "elapsedMs": 24,
+        "status": "completed"
+      },
+      {
+        "id": 30,
+        "phase": "writer revocation and original operation retry",
+        "method": "operation",
+        "startedAfterMs": 107806,
+        "elapsedMs": 315,
+        "status": "completed"
+      },
+      {
+        "id": 31,
+        "phase": "writer revocation and original operation retry",
+        "method": "publish",
+        "startedAfterMs": 108126,
+        "elapsedMs": 13,
+        "status": "completed"
+      },
+      {
+        "id": 32,
+        "phase": "abrupt Worker OPFS recovery",
+        "method": "open",
+        "startedAfterMs": 108191,
+        "elapsedMs": 27582,
+        "status": "completed"
+      },
+      {
+        "id": 33,
+        "phase": "abrupt Worker OPFS recovery",
+        "method": "approval",
+        "startedAfterMs": 135783,
+        "elapsedMs": 9447,
+        "status": "completed"
+      },
+      {
+        "id": 34,
+        "phase": "abrupt Worker OPFS recovery",
+        "method": "status",
+        "startedAfterMs": 145234,
+        "elapsedMs": 9104,
+        "status": "completed"
+      },
+      {
+        "id": 35,
+        "phase": "abrupt Worker OPFS recovery",
+        "method": "operation",
+        "startedAfterMs": 154342,
+        "elapsedMs": 4,
+        "status": "completed"
+      },
+      {
+        "id": 36,
+        "phase": "abrupt Worker OPFS recovery",
+        "method": "operation",
+        "startedAfterMs": 154348,
+        "elapsedMs": 3,
+        "status": "completed"
+      },
+      {
+        "id": 37,
+        "phase": "reader revocation and key rotation",
+        "method": "history",
+        "startedAfterMs": 156512,
+        "elapsedMs": 15573,
+        "status": "completed"
+      },
+      {
+        "id": 38,
+        "phase": "reader revocation and key rotation",
+        "method": "events",
+        "startedAfterMs": 191507,
+        "elapsedMs": 11,
+        "status": "completed"
+      },
+      {
+        "id": 39,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "prepare",
+        "startedAfterMs": 211065,
+        "elapsedMs": 51,
+        "status": "completed"
+      },
+      {
+        "id": 40,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "open",
+        "startedAfterMs": 211117,
+        "elapsedMs": 1430,
+        "status": "completed"
+      },
+      {
+        "id": 41,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "request",
+        "startedAfterMs": 212560,
+        "elapsedMs": 7,
+        "status": "completed"
+      },
+      {
+        "id": 42,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "approval",
+        "startedAfterMs": 214915,
+        "elapsedMs": 19,
+        "status": "completed"
+      },
+      {
+        "id": 43,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "history",
+        "startedAfterMs": 215819,
+        "elapsedMs": 2233,
+        "status": "completed"
+      },
+      {
+        "id": 44,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "connect",
+        "startedAfterMs": 218055,
+        "elapsedMs": 312,
+        "status": "completed"
+      },
+      {
+        "id": 45,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "sync",
+        "startedAfterMs": 218440,
+        "elapsedMs": 39247,
+        "status": "completed"
+      },
+      {
+        "id": 46,
+        "phase": "second fresh Worker approval and full retained history",
+        "method": "events",
+        "startedAfterMs": 257692,
+        "elapsedMs": 8,
+        "status": "completed"
+      },
+      {
+        "id": 47,
+        "phase": "final RTC and administrative byte boundaries",
+        "method": "rtcStats",
+        "startedAfterMs": 268307,
+        "elapsedMs": 3,
+        "status": "completed"
+      },
+      {
+        "id": 48,
+        "phase": "completed",
+        "method": "close",
+        "startedAfterMs": 268383,
+        "elapsedMs": 11,
+        "status": "completed"
+      }
+    ]
+  },
+  "pageErrors": [],
+  "final": {
+    "traffic": {
+      "membershipRequests": 39,
+      "membershipRequestBytes": 23847,
+      "membershipResponseBytes": 161314,
+      "descriptorTransfers": 42,
+      "closureRecordTransfers": 179,
+      "closureRecordBytes": 74804,
+      "candidateDescriptorBytes": 2848,
+      "inlineControlDescriptorBytes": 15052,
+      "inlineControlEnvelopeBytes": 11828,
+      "applicationEnvelopeBytesToAdministrator": 0,
+      "unexpectedAdministratorRequests": 0,
+      "peerInboundBytes": 575305,
+      "peerOutboundBytes": 3257143,
+      "rtcSignalingRequests": 3,
+      "rtcSignalingRequestBytes": 2089,
+      "rtcSignalingResponseBytes": 2043,
+      "rtcSignalingDescriptions": 6,
+      "rtcSdpBytes": 3463
+    },
+    "rtc": {
+      "browser": {
+        "transport": "webrtc",
+        "channelOwner": "DedicatedWorker",
+        "introductions": [
+          {
+            "requests": 1,
+            "requestBytes": 696,
+            "responseBytes": 681,
+            "closed": true
+          },
+          {
+            "requests": 1,
+            "requestBytes": 696,
+            "responseBytes": 681,
+            "closed": true
+          },
+          {
+            "requests": 1,
+            "requestBytes": 697,
+            "responseBytes": 681,
+            "closed": true
+          }
+        ]
+      },
+      "native": {
+        "requests": 3,
+        "offers": 3,
+        "accepted": 3,
+        "rejected": 0,
+        "failed": 2,
+        "pending": 0,
+        "active": 1,
+        "closed": false,
+        "transport": "webrtc",
+        "nativeImplementation": "werift",
+        "restrictedInterfaceEnumeration": false,
+        "byteBoundary": "Logical authenticated peer frame payload; excludes framing headers/credit and SCTP/DTLS/IP overhead."
+      }
+    },
+    "descriptor": {
+      "genesis": "owACAVkDVq0AAgFYINsdtsbaplX3Q5AtIoHXMhFcpOt8PZlaUbigWWlWa0jDAlgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV8DWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegRYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iBVg1QHpwbHV4MmEyc3poNkdyOEpkaUV5UFlSaTZwQ0VnWjBRUlFIalZLQVl4M289LmVkMjU1MTkGg6UAWCDOmW7HZrazOHoavwl2ITI9hGLqkISBnRBFAeNUoBjHegFYIM6ZbsdmtrM4ehq_CXYhMj2EYuqQhIGdEEUB41SgGMd6AgMDAAp4NUB6cGx1eDJhMnN6aDZHcjhKZGlFeVBZUmk2cENFZ1owUVJRSGpWS0FZeDNvPS5lZDI1NTE5pgBYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAVggvm2hOJdLymIGjuCJiAXHu_sTrwakxTTrDrjpe3G8TiICAAMACVggIqedzl5Tk2u1paWS_rFVXI2bX-9Cj-DgHewnOMw-lz8KeDVAdm0yaE9KZEx5bUlHanVDSmlBWEh1L3NUcndha3hUVHJEcmpwZTNHOFRpST0uZWQyNTUxOaYAWCC-baE4l0vKYgaO4ImIBce7-xOvBqTFNOsOuOl7cbxOIgFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4iAgEDAAp4NUB2bTJoT0pkTHltSUdqdUNKaUFYSHUvc1Ryd2FreFRUckRyanBlM0c4VGlJPS5lZDI1NTE5C4T1gWEqgWEq9AeBogABAQEIowAZdTABGQPoAhkD6AmkABoAD0JAARknEAIYZAMYZAp4I0hQS0UtWDI1NTE5LUhLREYtU0hBMjU2LUFFUy0yNTYtR0NNCxsAAAGh5sUjNQ2GAVgg32XSF22Wo5dBmfyT5B02r46cnggrSDSSC6EMa2J2GV94ImhfOGM4MzgyZGJmZGY0NGEzZGE5OGFlMmIwOGU3ZjM2YWFYIL5toTiXS8piBo7giYgFx7v7E68GpMU06w646XtxvE4ic3NpZ25lZC1pbmNsdXNpb24tdjFAAlhAzfL9l9TuM1ZjAZLM-1TT2cAWK4Si1nbm70ROySArbz7oBcpw1XfREZ5s5J96iyh-IwbOaXV6DPEdUyNekEIyCA",
+      "groupRoute": "18rZYvhDXGF03C_LhRtDa4Q8dF4nEmUa2uSVtGp1EyU"
+    },
+    "requestId": "r_ce67f7e3ade52fe9e65bf2c3be8a98a3661f485ac3aae08c268101af7baabed7"
+  },
+  "error": "",
+  "limits": [
+    "The built Cloudflare Worker runs in the real local workerd test harness with synthetic authenticated accounts; this is not a deployed Cloudflare service or public-network qualification.",
+    "Descriptor/body byte counters cover the actual loopback membership and peer boundaries; they do not predict provider billing or NAT traversal.",
+    "Application peer bytes are logical authenticated RTC frame payloads, excluding framing headers/credit and SCTP/DTLS/IP overhead. SDP HTTP body bytes are measured separately."
+  ]
+}

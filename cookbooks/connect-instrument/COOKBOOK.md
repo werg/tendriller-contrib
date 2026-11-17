@@ -55,7 +55,7 @@ An example sample record can contain run ID, source identity, channel, sequence,
 
 Bound the in-memory model and render cadence separately from acquisition. A chart need not redraw for every accepted sample. Apply the [bounded telemetry guide](../ingest-bounded-telemetry/COOKBOOK.md) when the producer or network cannot keep up. Report lost or rejected samples and gaps rather than interpolating them into observations. Quiet telemetry should not wake an agent unless a task-specific intervention is useful.
 
-Use the [public collector guidance](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/tools/COLLECTOR.md) for an independently running producer. Browser connection success, collector process health, service admission, and agent handling are distinct states. Keep producer/admin credentials out of page-owned public files and exports.
+An independently running acquisition process opens the same owned application session. It declares stable source/run identities, uses bounded signals for transient readings, and submits retained observations through domain commands. Keep parsing, calibration and a bounded source spool separate from the maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) exposes the actual session; there is no second hosted stream/collector data protocol. Acquisition health, applied data, retained coverage and agent handling remain distinct. Keep credentials out of authored pages and exports.
 
 ## Interruption and accessibility
 

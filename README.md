@@ -19,9 +19,41 @@ with both a browser and Python's default `urllib` user agent after deployment.
 
 Your page owns its HTML, CSS, JavaScript, state vocabulary, and interaction model.
 Copied snippets become editable application source. Core owns the public runtime,
-service guarantees, and optional [publishing, preview, bridge, and collector tools](https://github.com/werg/tendriller/tree/master/tools).
+service guarantees, and optional [session, publishing, and preview tools](https://github.com/werg/tendriller/tree/master/tools).
 The default core installs no application workflow. Deliberately selected trusted
 references live beside the cookbook that explains their policy.
+
+For application architecture, start with
+[application primitives and roles](guides/application-primitives.md). Every
+application uses one public Chronolog session, command/query/event API and
+operation journal. Native and browser peers supply storage, transport and engine
+capabilities. The host is a filtered control/publication participant: membership,
+recovery selections and signed page code use Chronolog envelopes; ordinary
+application work travels between peers.
+
+`applied()` reports execution in the selected history; `shared()` separately
+observes retained coverage on another peer. Explicit recovery may abandon a
+recent suffix, including previously applied work. Irreversible external work
+requires an explicitly configured protected checkpoint or durable external-action
+service. These stronger guarantees are capabilities of the same application
+model, not alternative profile-selected runtimes.
+
+The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md)
+uses the public API directly. Its
+[independent qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
+links exact clean native RTC, SQL and hosted package results and states the
+remaining browser, recovery-policy and deployment gates. Executable examples
+require an explicitly supplied matching `@chronolog/peer-session` archive. The
+[historical implementation guide](guides/finalized-peer-applications.md) preserves
+older results under their original guarantees; the superseded runtime fixtures
+have been retired.
+
+[Live signals](cookbooks/share-live-signals/COOKBOOK.md) cover typing, presence,
+cursors, progress and transient messages without a database. The
+[standalone composition check](cookbooks/share-live-signals/checks/README.md)
+uses the public signal module for live readings and token previews.
+Authenticated provenance, application authorization and recovery-aware journals
+govern agent work; irreversible actions have a separate declared guarantee.
 
 ## Use the collection
 
@@ -99,6 +131,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
+- [Share live signals without recording history](cookbooks/share-live-signals/COOKBOOK.md) — Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.
 - [Track routines without misleading progress](cookbooks/track-habits-and-routines/COOKBOOK.md) — Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
@@ -115,6 +148,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
+- [Build a peer application with explicit recovery](cookbooks/run-a-peer-application/COOKBOOK.md) — Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 - [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 

@@ -44,6 +44,15 @@ Choose progress measures that have a defensible denominator. “300 of 500 recor
 
 Keep metric, log, machine-status, result, and control information distinguishable. Preserve source/run identity and attempt identity so resumed, retried, or concurrent work is not merged accidentally. Keep source time and receipt time when their difference matters; clock skew and delayed ingestion can otherwise make old work appear current.
 
+Use [live signals](../share-live-signals/COOKBOOK.md) for replaceable progress
+percentages, current activity and disposable token previews. A `latest`
+subscription suits a complete progress value; distinct preview chunks use FIFO
+and detect missing indexes. Record required milestones and the complete final
+result durably. The final result replaces a partial preview, and an expired
+progress signal means “current progress unknown,” not that the job failed. This
+keeps high-frequency display traffic independent of transaction and finality
+work.
+
 Choose polling or events from the source's actual capabilities. A collector should use scoped append credentials and run independently of the administrative agent handle. Bound read pages, log bytes, chart points, and diagnostic retention. Raw server retention and visible buffers have different owners; dropping an old log row from the DOM does not delete it from storage or create an archive.
 
 Display the age of the last meaningful observation next to the state. Choose stale thresholds from the expected cadence and known pauses. A heartbeat proves the reporter is alive, not necessarily that the job is progressing. When history expires, preserve an explicit gap rather than joining disconnected points with a continuous line. Label simulations and fixture data in the interface and exported records.

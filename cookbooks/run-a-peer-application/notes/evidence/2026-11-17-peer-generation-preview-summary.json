@@ -1,0 +1,52 @@
+{
+  "format": "peer-generation-consumer-summary/v1",
+  "profile": "peer-generation-v1",
+  "topology": "independent-packed-peers",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "917abcf62c240278bf330b211f8c220b0fb13d6d",
+    "tree": "5cc71eb165cd6069ce3d73e7604c0f87900af1cc",
+    "dirty": true
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g4efa3546-dirty",
+      "sha256": "f8dffca220e8b0aaa57e0e3e616cda48ab7cd2922fada6750afbbcf89c3c49c1",
+      "sourceCommit": "4efa3546f930734328879bdca3984282bd19156b",
+      "sourceTree": "2924663de85fcf9a709377c99de3a49c41bc026b",
+      "sourceDirty": true
+    }
+  ],
+  "commandsWithHostBlocked": 2,
+  "hostRequestsDuringCommands": 0,
+  "hostedApplicationBodyBytes": 0,
+  "recovery": {
+    "previousGeneration": "b909942a3d83e57c8421ce988b396f61721d87e470ccc482487d2a8c90f25f65",
+    "selectedGeneration": "bc595e574e8e39f3f8caab3896559ae93e1582c1f4f687544a60cf3734cfeb21",
+    "previousHead": 6,
+    "adoptedPosition": 4,
+    "inheritedOperationIds": [
+      "reply-lost"
+    ],
+    "abandonedOperationIds": [
+      "abandoned-a",
+      "isolated-a"
+    ]
+  },
+  "reapplication": {
+    "originalOperationId": "abandoned-a",
+    "newOperationId": "reapplied-a",
+    "originalAttemptId": "2e6e441d372f62fb88f8308792e7a0581a4b39e34d00c8b8eb641699f8669bbc",
+    "newAttemptId": "376c14212495aaab6af51b90ecead7f77bdcf94ccd7d9a6f4932222be73deb2a",
+    "reapplyOf": "2e6e441d372f62fb88f8308792e7a0581a4b39e34d00c8b8eb641699f8669bbc",
+    "outcome": "accepted",
+    "currentGuardsChecked": true
+  },
+  "limitations": [
+    "Independent packed runtime execution; this is not a deployed-network or browser qualification.",
+    "Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.",
+    "No physical route, provider cost, universal loss bound or unavailable optional service is inferred."
+  ],
+  "reportSha256": "20b8a8d03b5487447b8e95216017ce95898fba5b143f0698e6254ca3009e77e2"
+}

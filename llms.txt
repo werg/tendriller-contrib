@@ -2,6 +2,7 @@
 
 > Adaptable reasoning for page-owned applications. No UI package or install graph.
 
+- [Common application session](guides/application-primitives.md)
 - [Application journeys](guides/use-cases.md)
 - [Agent reading index](agent.md)
 - [Catalog](catalog.json)

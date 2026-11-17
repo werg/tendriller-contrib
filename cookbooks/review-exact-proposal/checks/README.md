@@ -1,5 +1,13 @@
-# Approval reference checks
+# Proposal review qualification boundary
 
-The [shared actual-host harness](../../collect-private-responses/checks/README.md) installs the private-response and proposal-review references deliberately through public core artifacts. It exercises exact version, owner authority, response/execution expiry, immutable approved payload, and a stable downstream execution key.
+The [historical actual-host evidence](../../collect-private-responses/checks/README.md)
+records the retired workflow reference's exact-version and owner checks,
+response/execution expiry, approved content and stable downstream execution key.
+It remains evidence of those exact artifacts only.
 
-[Recorded artifact and reference hashes](../../collect-private-responses/checks/evidence.json) identify the exercised pairing. Synthetic identities bypass OAuth setup; downstream exactly-once behavior remains outside this reference.
+A current application declares proposal commands and coherent queries through
+the [common owned session](../../run-a-peer-application/COOKBOOK.md). Ordinary
+`applied()` success is recoverable and does not authorize an irreversible effect.
+Such an action needs an explicit protected checkpoint or independently durable
+action service, with its own authority, idempotency and reconciliation tests.
+The common session gates do not claim this stronger capability.

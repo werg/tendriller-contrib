@@ -1,0 +1,16 @@
+{
+  "repository": "werg/tendriller",
+  "source": "7a6187213ebdaeaf676a3d1e2804b0281f76588c",
+  "sourceTree": "2137762f8bc126978e114a40df6bda33f54e26fb",
+  "dirty": false,
+  "storageSchemaRevision": 9,
+  "files": {
+    "worker.mjs": "99ab048d326c93ba4a1046fca9c6875f6852f45296bf599a2b78d0f5572e1d89",
+    "index.d.mts": "fbd0bd2ef7b91ae9a7cfb4f04c8ce5b6c3358210fd2aa6a61b3620e6423aaf18",
+    "testing.mjs": "7cff4df5559b3c556c12045fe5e001fc78f785aec1a48e533e3f82cf2019cc4e",
+    "testing.d.mts": "1ee6ee29c39999faa58a9b8201574f1e7fe9a548d4fe2416a2aedccf30421f21",
+    "migrations/0001_accounts.sql": "9624479dfee2521bf0e3cc6e553c59a9e90c28005e48aff1e49d078218cbb21d",
+    "package.json": "803b148edc11c87ebc40a572595876f1ca3e925d1a5f47d4b3ca36cc9fe8502e",
+    "peer-generation-provenance.json": "02c42111978ee10ee89266dcc2561a2e2ab1ba8a6f58efe52b105f32c9ef5524"
+  }
+}

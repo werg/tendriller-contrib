@@ -46,10 +46,15 @@ Implementation is checkpointed in small commits and coordinated with
 
 ## Event delivery transport
 
-Core owns asynchronous wake delivery through the authenticated agent WebSocket,
-webhook and MCP Events endpoints. HTTP `GET /events` and named consumer reads
-replay retained records immediately; long polling and the former `wait` query
-parameter are not part of the public API. Cookbooks should describe which host
-receiver wakes the intended conversation, then keep delivered and handled
-checkpoints separate. Scheduled checks remain an explicitly delayed fallback,
-not a held HTTP request.
+An agent observes changes and reads coherent events through its owned Chronolog
+application session, using the same contract as browser and native peers. The
+session owns the operation journal, retained history and peer connections. A
+receiver adapter may turn a pending-work notice into a wake for the intended
+conversation; cookbooks must explain that receiver and keep delivered and
+handled checkpoints separate.
+
+Tendriller hosts the page and supplies explicit lifecycle operations and the
+filtered Chronolog participant transport for control, publication, discovery and
+invitations. Ordinary application events and live signals travel through the
+peer session. Agent wake adapters consume that session without adding another
+application event log, cursor HTTP service or WebSocket command protocol.

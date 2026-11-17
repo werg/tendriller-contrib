@@ -1,0 +1,327 @@
+{
+  "format": "chronolog-webrtc-qualification/v2",
+  "passed": true,
+  "source": {
+    "chronolog": {
+      "head": "289ca401c61fa177a43989bc806202723223ad43",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "15053301742f617f8b07c4b403d495c8b57a6ea1",
+      "dirty": false
+    }
+  },
+  "artifacts": {
+    "residentRecipeSha256": "2ad0ba865ed4f22f25622956a3dbecae634e0c85c3cde908afa0694d1074f189",
+    "residentBundleSha256": "156993e8ad268ffac81c5016fba6d43069b2c0011b2b4c5b7a1686eabea19c42"
+  },
+  "runtime": {
+    "node": "v24.22.2",
+    "browser": "158.0.8127.18",
+    "native": "werift@0.27.0"
+  },
+  "topology": {
+    "transport": "webrtc",
+    "nativeImplementation": "werift",
+    "signaling": "public direct HTTP offer/answer client and native handler on loopback",
+    "networkDiscovery": "native binds loopback explicitly; optional interface enumeration disabled in fixture",
+    "browserStorage": "OPFS",
+    "channelOwner": "DedicatedWorker",
+    "hostStoppedAfterNegotiation": true,
+    "excludes": [
+      "packaged Tendriller signaling host",
+      "public NAT connectivity",
+      "TURN interoperability",
+      "provider billing"
+    ]
+  },
+  "checks": [
+    {
+      "id": "native-browser-rtc-and-worker-ownership",
+      "passed": true
+    },
+    {
+      "id": "public-resident-supervisor-reconnects-once-and-preserves-original-operations",
+      "passed": true
+    },
+    {
+      "id": "both-original-operations-reach-accepted-finality",
+      "passed": true
+    },
+    {
+      "id": "detached-body-after-signaling-host-stopped",
+      "passed": true
+    },
+    {
+      "id": "exact-original-operation-retry",
+      "passed": true
+    },
+    {
+      "id": "final-events-and-original-records-converge-with-host-unavailable",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "signalingMessages": 4,
+    "signalingBytes": 2309,
+    "signalingMessagesAfterClosed": 0,
+    "signalingClosed": true,
+    "hostApplicationRequests": 0,
+    "host": {
+      "before": {
+        "requests": 6,
+        "requestBytes": 1393,
+        "responseBytes": 597266,
+        "applicationRequests": 0,
+        "signalingMessages": 4,
+        "signalingBytes": 2309
+      },
+      "after": {
+        "requests": 6,
+        "requestBytes": 1393,
+        "responseBytes": 597266,
+        "applicationRequests": 0,
+        "signalingMessages": 4,
+        "signalingBytes": 2309
+      }
+    },
+    "bytesAfterSignalingClosed": {
+      "browserSent": 14096,
+      "nativeSent": 538464
+    },
+    "records": {
+      "browserAuthored": 2,
+      "nativeAuthored": 2,
+      "atBrowser": 4,
+      "atNative": 4
+    },
+    "history": {
+      "browserSha256": "71f55cbe3fd55138c0d574c58433be3317aa6b5fb25287c4351ae35dc346c378",
+      "nativeSha256": "71f55cbe3fd55138c0d574c58433be3317aa6b5fb25287c4351ae35dc346c378",
+      "recordIds": [
+        "%IaLhfYFYHgov8DQiVpAhbqPvhzxJCfj0aoR51wM+rIY=.sha256",
+        "%nnolu/UAO2aoW0gSDK/9OEtid9DNuhckjVzBc/OIi2A=.sha256",
+        "%SFuNnaKs1Y4hnjqUbBF3wqYvwwZdug+dxzCTLk+6h/Q=.sha256",
+        "%zKHSC2WlkI9rk8I90M59ipqqwudOW3ku51XdDT0ny7A=.sha256"
+      ]
+    },
+    "payload": {
+      "bytes": 524325,
+      "expectedSha256": "17fc7a9268bf0346c1069a0c01adedadd5e0f2dabe2503c7d40b5b9a4c0c9d7a",
+      "receivedSha256": "17fc7a9268bf0346c1069a0c01adedadd5e0f2dabe2503c7d40b5b9a4c0c9d7a"
+    },
+    "outcomes": {
+      "browser": {
+        "proposalId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+        "outcome": {
+          "transactionId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+          "phase": "accepted",
+          "outcome": {
+            "type": "accepted"
+          },
+          "eventSetRevision": "9",
+          "materializedRevision": "2",
+          "orderKey": "1794903255477:fKFBNLZES-aSpRCXDbhb9qVoIdTIcNEQ7QfBbh5APMw:0:dHhfNzEwMDI4ZWJiMGJlMzhmMGE5YjUzMmZkMWZjOWQyMTAxNmZlNDIzYTk4MjkxYjAwZjE5M2M3Y2Y5NmIzOGI4Zg",
+          "changedByReplay": false,
+          "admissible": true,
+          "final": true,
+          "observedAt": "2026-11-17T08:14:17.516Z"
+        }
+      },
+      "retry": {
+        "proposalId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+        "outcome": {
+          "transactionId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+          "phase": "accepted",
+          "outcome": {
+            "type": "accepted"
+          },
+          "eventSetRevision": "13",
+          "materializedRevision": "3",
+          "orderKey": "1794903255477:fKFBNLZES-aSpRCXDbhb9qVoIdTIcNEQ7QfBbh5APMw:0:dHhfNzEwMDI4ZWJiMGJlMzhmMGE5YjUzMmZkMWZjOWQyMTAxNmZlNDIzYTk4MjkxYjAwZjE5M2M3Y2Y5NmIzOGI4Zg",
+          "changedByReplay": false,
+          "admissible": true,
+          "final": true,
+          "observedAt": "2026-11-17T08:14:19.600Z"
+        }
+      },
+      "native": {
+        "transactionId": "tx_f1934a30fe69bfab4d166883e79dc79ae8127e6185e13da85291bca520e8b2fd",
+        "phase": "accepted",
+        "outcome": {
+          "type": "accepted"
+        },
+        "eventSetRevision": "13",
+        "materializedRevision": "3",
+        "orderKey": "1794903257654:VgYjhdhfNNEWwNd5kU7c7Qh8chnDwumOi-nOappgSlk:0:dHhfZjE5MzRhMzBmZTY5YmZhYjRkMTY2ODgzZTc5ZGM3OWFlODEyN2U2MTg1ZTEzZGE4NTI5MWJjYTUyMGU4YjJmZA",
+        "changedByReplay": false,
+        "admissible": true,
+        "final": true,
+        "observedAt": "2026-11-17T08:14:19.509Z"
+      },
+      "events": {
+        "transactions": [
+          {
+            "proposalId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+            "events": [
+              {
+                "id": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad:0",
+                "proposalId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+                "eventOrdinal": 0,
+                "topic": "chat",
+                "payload": {
+                  "text": "original operation before a forced RTC interruption"
+                }
+              }
+            ]
+          },
+          {
+            "proposalId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+            "events": [
+              {
+                "id": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f:0",
+                "proposalId": "tx_710028ebb0be38f0a9b532fd1fc9d21016fe423a98291b00f193c7cf96b38b8f",
+                "eventOrdinal": 0,
+                "topic": "chat",
+                "payload": {
+                  "text": "browser after signaling host stopped"
+                }
+              }
+            ]
+          },
+          {
+            "proposalId": "tx_f1934a30fe69bfab4d166883e79dc79ae8127e6185e13da85291bca520e8b2fd",
+            "events": [
+              {
+                "id": "tx_f1934a30fe69bfab4d166883e79dc79ae8127e6185e13da85291bca520e8b2fd:0",
+                "proposalId": "tx_f1934a30fe69bfab4d166883e79dc79ae8127e6185e13da85291bca520e8b2fd",
+                "eventOrdinal": 0,
+                "topic": "chat",
+                "payload": {
+                  "text": "native after signaling host stopped"
+                }
+              }
+            ]
+          }
+        ],
+        "scannedThrough": "hnNjaHJvbm9sb2cvZXZlbnRzL3YxeKQwYTI1MTBhN2YwZmUwYWViMjMxNmI0ZDljMjlhNDQzZTA4Njg0ZjJmZDM2MmZiN2Q4NmU5ZDkyYzAwNGEwZWU0LzYxMWUzYjQxZTJlYjUwODFiMThmMTkwMTBkYWU0NTVhNzZiZmQ1OTA5NGFlNDI5OGQ3ODVjMTEwY2I3ZGViY2QvaF8yYjlhNGZmMGJlNGY0ZjNhOTRkZDcwY2Y0ODkzMmU4M_YDAHiGNzQ3ODVmNjYzMTM5MzMzNDYxMzMzMDY2NjUzNjM5NjI2NjYxNjIzNDY0MzEzNjM2MzgzODMzNjUzNzM5NjQ2MzM3Mzk2MTY1MzgzMTMyMzc2NTM2MzEzODM1NjUzMTMzNjQ2MTM4MzUzMjM5MzE2MjYzNjEzNTMyMzA2NTM4NjIzMjY2NjQ",
+        "hasMore": false,
+        "revision": "h3FjaHJvbm9sb2cvdmlldy92MXikMGEyNTEwYTdmMGZlMGFlYjIzMTZiNGQ5YzI5YTQ0M2UwODY4NGYyZmQzNjJmYjdkODZlOWQ5MmMwMDRhMGVlNC82MTFlM2I0MWUyZWI1MDgxYjE4ZjE5MDEwZGFlNDU1YTc2YmZkNTkwOTRhZTQyOThkNzg1YzExMGNiN2RlYmNkL2hfMmI5YTRmZjBiZTRmNGYzYTk0ZGQ3MGNmNDg5MzJlODNlZmluYWwDA3iGNzQ3ODVmNjYzMTM5MzMzNDYxMzMzMDY2NjUzNjM5NjI2NjYxNjIzNDY0MzEzNjM2MzgzODMzNjUzNzM5NjQ2MzM3Mzk2MTY1MzgzMTMyMzc2NTM2MzEzODM1NjUzMTMzNjQ2MTM4MzUzMjM5MzE2MjYzNjEzNTMyMzA2NTM4NjIzMjY2NjT2"
+      }
+    },
+    "retry": {
+      "browserAuthoredBefore": [
+        "%IaLhfYFYHgov8DQiVpAhbqPvhzxJCfj0aoR51wM+rIY=.sha256",
+        "%zKHSC2WlkI9rk8I90M59ipqqwudOW3ku51XdDT0ny7A=.sha256"
+      ],
+      "browserAuthoredAfter": [
+        "%IaLhfYFYHgov8DQiVpAhbqPvhzxJCfj0aoR51wM+rIY=.sha256",
+        "%zKHSC2WlkI9rk8I90M59ipqqwudOW3ku51XdDT0ny7A=.sha256"
+      ]
+    },
+    "channels": {
+      "browser": {
+        "sentBytes": 22012,
+        "receivedBytes": 545929,
+        "sentPackets": 338,
+        "receivedPackets": 370,
+        "queuedSendBytes": 0,
+        "queuedReceiveBytes": 0,
+        "queuedReceiveFrames": 0
+      },
+      "native": {
+        "sentBytes": 546134,
+        "receivedBytes": 22093,
+        "sentPackets": 376,
+        "receivedPackets": 344,
+        "queuedSendBytes": 0,
+        "queuedReceiveBytes": 0,
+        "queuedReceiveFrames": 0
+      }
+    },
+    "introduction": {
+      "requests": 2,
+      "offers": 2,
+      "accepted": 2,
+      "rejected": 0,
+      "failed": 1,
+      "pending": 0,
+      "active": 1,
+      "closed": false
+    },
+    "reconnect": {
+      "readiness": "authenticated",
+      "introductions": [
+        {
+          "requests": 1,
+          "requestBytes": 697,
+          "responseBytes": 681,
+          "closed": true
+        },
+        {
+          "requests": 1,
+          "requestBytes": 696,
+          "responseBytes": 681,
+          "closed": true
+        }
+      ],
+      "elapsedMs": 323.7532390000001,
+      "original": {
+        "proposalId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+        "outcome": {
+          "transactionId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+          "phase": "accepted",
+          "outcome": {
+            "type": "accepted"
+          },
+          "eventSetRevision": "5",
+          "materializedRevision": "1",
+          "orderKey": "1794903253376:fKFBNLZES-aSpRCXDbhb9qVoIdTIcNEQ7QfBbh5APMw:0:dHhfNTk0NWUwY2Y5MTg5ZWNlZGMxZjllM2JiZmRiMWUzZTUyZWI5ZjBhYzMwNTlmNjllMDY1MDllNTE0YmM4YzVhZA",
+          "changedByReplay": false,
+          "admissible": true,
+          "final": true,
+          "observedAt": "2026-11-17T08:14:15.088Z"
+        }
+      },
+      "retry": {
+        "proposalId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+        "outcome": {
+          "transactionId": "tx_5945e0cf9189ecedc1f9e3bbfdb1e3e52eb9f0ac3059f69e06509e514bc8c5ad",
+          "phase": "accepted",
+          "outcome": {
+            "type": "accepted"
+          },
+          "eventSetRevision": "5",
+          "materializedRevision": "1",
+          "orderKey": "1794903253376:fKFBNLZES-aSpRCXDbhb9qVoIdTIcNEQ7QfBbh5APMw:0:dHhfNTk0NWUwY2Y5MTg5ZWNlZGMxZjllM2JiZmRiMWUzZTUyZWI5ZjBhYzMwNTlmNjllMDY1MDllNTE0YmM4YzVhZA",
+          "changedByReplay": false,
+          "admissible": true,
+          "final": true,
+          "observedAt": "2026-11-17T08:14:15.443Z"
+        }
+      },
+      "browserAuthoredBefore": [
+        "%zKHSC2WlkI9rk8I90M59ipqqwudOW3ku51XdDT0ny7A=.sha256"
+      ],
+      "browserAuthoredAfter": [
+        "%zKHSC2WlkI9rk8I90M59ipqqwudOW3ku51XdDT0ny7A=.sha256"
+      ],
+      "expectedTerminations": [
+        "WEBRTC_CONNECTION_ENDED"
+      ],
+      "routes": [
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        },
+        {
+          "route": "direct",
+          "localCandidateType": "prflx",
+          "remoteCandidateType": "host"
+        }
+      ]
+    },
+    "byteBoundary": "Logical authenticated peer frame payload bytes; excludes framing headers/credit and SCTP/DTLS/IP overhead."
+  }
+}

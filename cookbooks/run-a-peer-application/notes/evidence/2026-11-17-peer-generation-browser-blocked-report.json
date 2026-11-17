@@ -1,0 +1,138 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-browser-native-rtc",
+  "passed": false,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64",
+    "dependencies": {
+      "lockSha256": "82d35d14ce42b14728e624c12ccec380db1ce3d6833a115356a94168cce59b0b",
+      "packages": [
+        {
+          "path": "node_modules/@leichtgewicht/ip-codec",
+          "version": "2.0.5",
+          "integrity": "sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw=="
+        },
+        {
+          "path": "node_modules/@types/dom-mediacapture-transform",
+          "version": "0.1.12",
+          "integrity": "sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw=="
+        },
+        {
+          "path": "node_modules/@types/dom-webcodecs",
+          "version": "0.1.13",
+          "integrity": "sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ=="
+        },
+        {
+          "path": "node_modules/base64-js",
+          "version": "1.5.1",
+          "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+        },
+        {
+          "path": "node_modules/buffer",
+          "version": "6.0.3",
+          "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA=="
+        },
+        {
+          "path": "node_modules/dns-packet",
+          "version": "5.6.1",
+          "integrity": "sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw=="
+        },
+        {
+          "path": "node_modules/ieee754",
+          "version": "1.2.1",
+          "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+        },
+        {
+          "path": "node_modules/mediabunny",
+          "version": "1.66.0",
+          "integrity": "sha512-0Zff/qLkY1ZRyjBEt2vQjLeMigmU/dFKwJLpiPyCiskIel2f2R2kqMxaLYbeHN+rmyz4PVwwLSnU9anjUHHeJQ=="
+        },
+        {
+          "path": "node_modules/multicast-dns",
+          "version": "7.2.5",
+          "integrity": "sha512-2eznPJP8z2BFLX50tf0LuODrpINqP1RVIm/CObbTcBRITQgmC/TjcREF1NeTBzIcR5XO/ukWo+YHOjBbFwIupg=="
+        },
+        {
+          "path": "node_modules/playwright",
+          "version": "1.65.0",
+          "integrity": "sha512-F3AMWcR44qMBt4kq+6Kb6mX7bjGXshktKFOPULd7reED6ZJWevjbNRqysP7q+AATE9kdPEZBibex1BYsvpVoeA=="
+        },
+        {
+          "path": "node_modules/playwright-core",
+          "version": "1.65.0",
+          "integrity": "sha512-vNSKgH6YqtN7cdT/L334zo0a+YwkrpicyrHJlWWPIm/Q+Nn2SWInil01oT0mbu96U4GgoRtCYQD9CzJQgju+lA=="
+        },
+        {
+          "path": "node_modules/thunky",
+          "version": "1.1.0",
+          "integrity": "sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA=="
+        },
+        {
+          "path": "node_modules/werift",
+          "version": "0.27.0",
+          "integrity": "sha512-JgFfqVXZ4s3A+VE2DxMo5QympNAnravCuQdNqQeBiKIrojtpjghYahgnl5Vc+sh0Porsx/LHODNMdZKM/JbksA=="
+        }
+      ]
+    }
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "83af44064b708011c2ac0c2d11d721949c210b67",
+    "tree": "6bf451196e13ce98ab9ba7224fb7a7358617ca1b",
+    "dirty": true
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g784414c9-rtc",
+      "sha256": "79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c",
+      "sourceCommit": "784414c95e77f797083866f9c314c1ecd4183661",
+      "sourceTree": "9dce09719e51b11d3d875fb36f08b7e6b195ef07",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-consumer.mjs",
+      "sha256": "be7b187348a9ec0ddfcad6b186410018103209b2070f735eb4d32a944eedd9c2"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-page.mjs",
+      "sha256": "11301467fb2636f85478c9f6bc5e24aa6ba4856e1d54ec023f40df45b5253124"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-browser-worker.mjs",
+      "sha256": "08f30e3a3368405900b0c8e386f1cf3f99a41df2059e579e8ff88f159c59b523"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": "browserType.launch: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,HttpsUpgrades,HttpsFirstBalancedModeAutoEnable,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,AvoidCorsURLLoaderRestartOnRedirect,TcpPortRandomizationWin,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,PreconnectToSearch,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface,SkipListAccountsWithoutGaiaCookies --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --enable-unsafe-swiftshader --edge-skip-compat-layer-relaunch --disable-stack-profiler --disable-infobars --disable-sync --do-not-de-elevate --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-dev-shm-usage --enable-experimental-web-platform-features --user-data-dir=/tmp/playwright_chromiumdev_profile-ORkvDE --remote-debugging-pipe --no-startup-window\n<launched> pid=56\n[pid=56][err] [56:56:1117/135600.274898:FATAL:chrome/browser/process_singleton_posix.cc:297] Check failed: . socket() failed: Operation not permitted (1)\n[pid=56][err] [1117/135600.417239:ERROR:third_party/crashpad/crashpad/util/linux/scoped_ptrace_attach.cc:27] ptrace: Operation not permitted (1)\nCall log:\n\u001b[2m  - <launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,HttpsUpgrades,HttpsFirstBalancedModeAutoEnable,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,AvoidCorsURLLoaderRestartOnRedirect,TcpPortRandomizationWin,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,PreconnectToSearch,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface,SkipListAccountsWithoutGaiaCookies --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --enable-unsafe-swiftshader --edge-skip-compat-layer-relaunch --disable-stack-profiler --disable-infobars --disable-sync --do-not-de-elevate --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-dev-shm-usage --enable-experimental-web-platform-features --user-data-dir=/tmp/playwright_chromiumdev_profile-ORkvDE --remote-debugging-pipe --no-startup-window\u001b[22m\n\u001b[2m  - <launched> pid=56\u001b[22m\n\u001b[2m  - [pid=56][err] [56:56:1117/135600.274898:FATAL:chrome/browser/process_singleton_posix.cc:297] Check failed: . socket() failed: Operation not permitted (1)\u001b[22m\n\u001b[2m  - [pid=56][err] [1117/135600.417239:ERROR:third_party/crashpad/crashpad/util/linux/scoped_ptrace_attach.cc:27] ptrace: Operation not permitted (1)\u001b[22m\n\u001b[2m  - [pid=56] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=56] <kill>\u001b[22m\n\u001b[2m  - [pid=56] <will force kill>\u001b[22m\n\u001b[2m  - [pid=56] <process did exit: exitCode=null, signal=SIGABRT>\u001b[22m\n\u001b[2m  - [pid=56] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=56] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=56] <gracefully close end>\u001b[22m\n\n    at /workspace/scratch/bd98147e453b/tendriller-contrib/test-results/browser-peer-baseline-2/consumer/peer-generation-browser-consumer.mjs:27:28",
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/browser",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/webrtc",
+      "@chronolog/peer-session/webrtc-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "rtc": {
+    "implementation": "Chromium and werift",
+    "nativeVersion": "0.27.0",
+    "candidateSource": "native-explicit-loopback/browser-discovered",
+    "byteBoundary": "authenticated-reliable-application-frames",
+    "signalingBoundary": "one-off-loopback-http-test-mailbox",
+    "connections": []
+  },
+  "runnerError": "Error: Consumer failed with exit code 1\n    at file:///workspace/scratch/bd98147e453b/tendriller-contrib/cookbooks/run-a-peer-application/checks/run-peer-generation.mjs:110:34"
+}

@@ -13,64 +13,51 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Recover from queued, repeated, and outdated work
 
-Use this whenever a command can outlive the current connection or task revision. Network loss often happens after the server accepted work but before the browser saw its acknowledgement. Retrying should ask for the original result, not silently create a second action or rebind old intent to new state.
+Use this whenever a command can outlive its current connection or reviewed task. A peer may apply work before the requester receives its reply. Exact retry should recover that operation, not create another action or attach old intent to a different question.
 
-## Give pending work a place people can understand
+## Make pending work understandable
 
-Imagine a person completing an inspection in weak connectivity. They send a note, write the next note, and later discover that the task was reset while the first one was queued. A useful interface keeps both notes, explains which context the first belonged to, and offers a reviewed path forward. An endless spinner or a silent resubmission would lose that meaning.
+Imagine an inspector sends a note, starts another draft, and later learns that the task changed while the first note waited. Keep both pieces of work, explain the original context, and offer a reviewed path forward. An endless spinner or silent resubmission would hide that meaning.
 
-Use a per-request activity list or a compact outbox when several operations can be pending. Show a readable intent summary, creation time, original task/run, current transport/application state, and the most relevant next action. Keep sensitive payloads hidden until authorized to display them. Request details should expose enough evidence to distinguish a retry from a separate action without showing tokens or internal credentials.
+Use a per-request activity list with a readable snapshot, stable operation ID, original task version, actual outcome and useful next action. It is a view of the session journal, not another delivery queue. Reauthorize before showing sensitive payloads.
 
-| Observed state | Useful message | Appropriate next action |
+| Observation | Honest meaning | Next action |
 | --- | --- | --- |
-| Persisted locally, not accepted | “Queued on this device.” | Wait or inspect the pending snapshot; cancellation depends on actual queue support. |
-| Accepted, follow-up pending | “Saved; awaiting processing.” | Inspect its receipt rather than sending a duplicate. |
-| Outcome unknown | “Checking whether this request succeeded.” | Reconcile the original command and any external effect. |
-| Rejected as stale | “The task changed before this could be applied.” | Compare with current context and deliberately compose new work. |
-| Rejected by policy or validation | A task-specific reason tied to the submitted snapshot. | Correct a new draft or obtain the required authority. |
-| Completed | An outcome or result linked to the original request. | Continue, inspect, or make a separate revision. |
+| Saved locally | The signed attempt is durable on this device. | Wait, inspect or retry that operation; do not imply remote execution. |
+| Applied accepted | The command executed successfully in the selected history. | Show its receipt and any separately required follow-up. |
+| Applied rejected | The definition rejected the original intent. | Preserve the snapshot and review current domain state. |
+| Shared coverage | Another peer retained the covered prefix. | Show coverage separately from execution and recovery policy. |
+| Abandoned by recovery | The selected history excludes that attempt. | Inspect what was lost and deliberately reapply only after review. |
+| External outcome unknown | Another system may have performed an action. | Reconcile its original execution identity before another dispatch. |
 
-A Retry button should mean retrying the same immutable intent. A “Use this in the current task” action creates a new reviewed intent with a new identity. Keep those actions visually and semantically distinct. If a retry budget is exhausted, retain a recoverable record and explain the next step instead of silently discarding it.
+Neither `applied()` nor `shared()` is irreversible finality. A Retry button resumes the exact saved attempt. “Use this in the current task” means newly reviewed intent with a new identity. Keep those meanings distinct, and preserve unresolved work when an automatic retry budget ends.
 
-Let the person filter unresolved work and inspect failure details without losing focus as acknowledgements arrive. Announce meaningful transitions, not every reconnect attempt. A new result must not steal focus from a draft, dismiss an error the user is reading, or scroll an outbox unexpectedly.
+## Use one maintained journal
 
-## Name the outcomes
+The owned application session persists command identity, signed inputs and captured application context before delivery. Browser and native applications use that same contract. Restore the operation list through `session.operations`, query an original operation by ID, and use `session.retry(operationId)` after a lost reply. Do not reconstruct a command from whichever form fields are currently visible.
 
-Queued means the client has pending work, not that the server accepted it. Accepted means the server committed the command under its contract, not that an agent or external service completed every resulting effect. Rejected can arrive immediately or later after reconnect. A page should preserve enough context to explain each state.
+A coherent `session.query` returns an application revision with its value. Retain that revision as `basedOn` and retain the domain versions the command must check. The revision is an ordering prerequisite; mandatory field, version and author checks belong inside the deterministic definition. A read followed by an unguarded mutation cannot protect a reviewed decision. The [concurrent editing guide](../reconcile-concurrent-edits/COOKBOOK.md) shows the common pattern.
 
-**Platform invariant:** core records the operation identity and relevant generations before sending a browser durable command, and retains both for every retry. High-level capture, state writes, and timer mutations own their command IDs in the runtime; page-owned correlation IDs remain ordinary data. Agent/SDK callers must retain the original explicit command envelope. Reading the newest generation and attaching it to an old payload changes its meaning. After stale rejection, a person or agent may deliberately compose a new command from reviewed current state, with a new ID and context.
+A stored rejection retains its meaning. If conditions later change, the person can review a new command; exact retry does not silently rewrite the original inputs. If history recovery abandons an attempt, use deliberate `session.reapply` after current review so the new attempt links to the excluded one. Never refresh a generation, domain version or operation ID merely to make old work pass.
 
-For shared-state work, use core's `conditions` or `expected_revision` to check and mutate atomically. For timer edits/removal, retain the reviewed `expected_revision`. Do not implement a browser read-then-write substitute or automatically replace a failed guard with a newer value. State conflicts and classified timer domain rejections retain their original decision receipts; a later change that would permit the operation does not turn an exact retry into new intent. Current access checks, malformed commands, and failures to store a receipt have distinct limits documented in the [core durability contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md).
+Storage failure before durable admission is a failure to save. Keep any surviving in-memory draft, offer an appropriate export, and explain that it may disappear when the tab closes. An optimistic indicator cannot create durability.
 
-Use [core's inspectable pending commands](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md), including `state.pending()` and `timers.pending()`, to rebuild the page's pending-work view after reload. Their queue events and result events retain original operations or timer settings and command IDs. Keep human-readable draft context, but do not introduce another mutation outbox solely to discover what core is already delivering. A local storage failure before durable admission must stay an explicit failure to save; it cannot be described as successfully queued work.
+## Keep content and code publication separate from execution
 
-## Distinguish transfer from application acceptance
+`session.content` stages and retains immutable application bytes. Completing transfer does not mean the domain accepted the evidence reference or that an agent examined it. A semantic command can reject after the content is already retained. Obtain and test the required retention coverage rather than assuming a content ID in JSON is a permanent archive.
 
-A byte upload has its own durable session and receipt. Completing that transfer does not mean a capture event, shared-file write, or publication switch was accepted. Preserve each operation's original identity across its own retries and show the application outcome that the person cares about. A successfully uploaded object may remain unattached when the later semantic command is rejected.
+A domain file or document is an application record whose command checks its reviewed version and immutable content reference. There is no second hosted shared-file writer. A changed byte snapshot is new intent and needs review; it cannot reuse an earlier digest as proof.
 
-For a shared file, preserve the reviewed path revision. For a publication, preserve the reviewed publication-head revision. Preserve any relevant task generations as well. A reference conflict asks for a fresh review; it is not a transient upload error and must not trigger an automatic overwrite with newly fetched guards.
+Page code uses the session-owned control participant's publication facet. `control.preparePublication` durably records the exact signed complete graph and predecessor under its operation ID. After a lost publication response, prepare the same intent and retry the same signed publication. A publication-head conflict needs a new review; it does not justify replacing the captured predecessor. The [publication guide](../publish-coherent-updates/COOKBOOK.md) explains that independent revision chain.
 
-Bind a single-file task through the generic scope registry, using the complete canonical path as one path segment:
+## Preserve drafts through recovery
 
-```js
-{
-  paths: [["files", "reports/field-notes.txt"]],
-  operations: []
-}
-```
+Keep submitted text, evidence and original context separate from later typing. Clear only the acknowledged snapshot when that matches the page policy. A delayed acceptance cannot erase a new draft, and a delayed rejection cannot replace it. Offer comparison, copy, discard or deliberate reapplication according to the task.
 
-Path and operation bindings select commands independently. Adding `operations: ["file.write"]` also protects writes to every other shared file; it does not narrow the binding to that one path. Keep the file's revision guard and the selected scope generations in the original command. File metadata does not declare its own authoritative scope.
+Follow the session's recovery notice and reread a coherent selected-history view. Do not combine events from a new generation with an old SQL projection. Preserve adopted identities, inspect abandoned attempts and explain the available retained prefix. A missing coordinator does not authorize a page to invent a new local authority.
 
-Retiring a scope invalidates commands that captured its old generation. It does not create a permanent access restriction or freeze the file. A newly reviewed deletion uses the current file revision and any remaining active guards through the ordinary file operation. Use the authorization model for access policy, and the scope registry for detecting outdated intent.
-
-If a resume record represents specific bytes, changing those bytes creates new work. Keep the earlier result or failure available for reconciliation. The user may intentionally resubmit the edited content, but reusing the old command identity for it breaks receipt meaning.
-
-## Keep drafts separate
-
-Snapshot submitted text, evidence, and task identity. New typing belongs to a new draft while the original snapshot is pending. Clear only the submitted snapshot that was accepted; a delayed acceptance must not erase later typing. A delayed rejection should preserve rejected work without replacing the current draft. Recovery can offer comparison, copy, discard, or explicit resubmission according to the task.
-
-Choose local draft persistence according to sensitivity and durability needs. Core owns persistence of its admitted commands; a deliberately selected external integration needs equivalent support from its actual authority or client. Validate current-system persisted application data; corrupt or unavailable storage should have visible behavior. No old-system migration is part of this design.
+An external action needs its own stable execution identity, verified requester authority and reconciliation record. Recovery of ordinary application history must not blindly replay an irreversible effect. Qualify the explicit protected checkpoint or durable action service before offering that capability.
 
 ## Verify
 
-Disconnect before send, after acceptance but before acknowledgement, and during evidence upload. Reset a protected scope while work is pending. Reconnect several times and verify stable IDs and original generations. Type a new draft before delayed acceptance/rejection. Crash after an external effect and use its explicit deduplication/reconciliation policy; a durable command receipt alone cannot prove exactly-once external execution.
+Disconnect before delivery and after durable acceptance but before the reply. Reopen the same device and inspect the same operation. Change a domain version while work waits. Recover to an older prefix and inspect adopted and abandoned attempts. Type a new draft before a delayed outcome. Interrupt content transfer and distinguish bytes from accepted evidence. Lose a persisted publication reply and recover its exact signed identity. Crash after an external action and reconcile its real result; an application receipt alone cannot prove exactly-once external execution.

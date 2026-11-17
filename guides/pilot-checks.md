@@ -3,6 +3,42 @@
 The pilot guides separate shared semantic guarantees from layout choices. Executable
 specimens are evidence for adaptation and failure behavior, not stable page packages.
 
+The current [peer application checks](../cookbooks/run-a-peer-application/checks/README.md)
+exercise one public session with native events, SQL, browser Worker, native RTC
+and hosted-control adapters. Use `test:peer-generation`, `test:peer-browser` and
+`test:peer-host` with exact supplied archives. Their reports record the actual
+scenarios and runtime boundaries; stronger capabilities do not select another
+application API or journal.
+
+## Historical resident observations
+
+The following records describe earlier source snapshots. They preserve what ran,
+not an alternate maintained recipe. Their exact source commits retain the former
+resident runners and connection snippets.
+
+The [reviewed pairing in run 43957113710](../cookbooks/run-a-peer-application/notes/qualification-review-43957113710.md)
+passed nine application checks: build, the native captured-generation reset
+recipe and seven browser/runtime assertions across both layouts. It recorded one
+resident effect dispatch and zero host application writes. The separate default
+Cloudflare membership gate passed seven runtime assertions plus its build/import
+check using a fresh independently keyed browser, actual workerd and a separate
+native authority. New raw reports preserve exact source/package hashes and
+descriptor/control/payload measurements. The layouts use pregranted fixture
+identities; the thin gate exercises live approval and revocation. Neither result
+establishes deployed network or identity-provider behavior.
+
+The initial [run 43940378818 and unaltered reports](../cookbooks/run-a-peer-application/notes/thin-membership-administration.md#recorded-public-artifact-qualification)
+remain attached to contrib `a3797d5`. The reviewed pairing uses `8449017`, whose
+focused Node checks cover malformed domain events, coherent-read failure
+boundaries, exact editor snapshots and review of an observed missing operation.
+The new browser report establishes its recorded scenarios, without adding
+browser claims for every focused model case. These peer-application records
+remain separate from the historical browser results below. The
+[qualification matrix](../cookbooks/run-a-peer-application/notes/implementation-and-qualification.md)
+keeps actual SQL/OPFS, native authority, provider effects, network routes, and cost
+measurements at their respective evidence boundaries; none are inferred from a
+read-handle fixture or a screenshot.
+
 | Pilot | Distinct adaptations | Observed browser behavior | Passed scenarios |
 | --- | --- | --- | --- |
 | Measurements | Dense desktop panels/table and a nested mobile instrument | Source/run identity, exact missing values, bounded ingestion, coherent checkpoints, retention gaps, and invalidation of delayed reads or paints after revoked access. | 8 |
@@ -40,7 +76,7 @@ and [host record](https://github.com/werg/tendriller-contrib/blob/0ff8a7a29de4a9
 remain unchanged, with their earlier source and artifact history. The successful
 intermediate [rc5 run](https://github.com/werg/tendriller-contrib/actions/runs/43871230786)
 also retains its [exact evidence](https://github.com/werg/tendriller-contrib/actions/runs/43871230786/artifacts/14228690589).
-The 33-scenario browser harness and three host cases are unchanged across these
+The archived 33-scenario browser harness and three host cases were unchanged across those
 candidate pairings. Stale-retry checks still subscribe before clicking Retry and
 await the next public rejection for the exact capture before checking the two
 identical commands. Every result remains attached to its own source and artifact pair.
@@ -49,7 +85,7 @@ The preceding cookbook-only refactor remains separately preserved: its
 [30-browser record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/guides/pilot-evidence.json)
 and [three-host record](https://github.com/werg/tendriller-contrib/blob/c62452f86e7c387daff029847681ef19744e00e0/cookbooks/collect-private-responses/checks/evidence.json)
 pair contrib `1ade2ae0fb220e7ec9417536092dae0bd6eb08ed` with core
-`dc4997e2d728d790ede4d893613342fd51f80898`. The current run re-exercises every earlier
+`dc4997e2d728d790ede4d893613342fd51f80898`. That recorded run re-exercised every earlier
 scenario and adds the immutable-upload recovery case against the completed storage
 contract; results from the two artifact pairs are not combined.
 
@@ -70,19 +106,9 @@ unless a separate record names the actual scenarios and artifacts exercised.
 `npm run check` validates reading metadata/links, generated discovery, complete source
 accounting, and deterministic snippets. It does not launch a service or install core.
 
-`npm run test:pilots -- --tools /path/to/core/dist/tools --playwright /path/to/playwright/index.mjs`
-consumes explicitly supplied built public tools/runtime and browser automation artifacts.
-Add `--browser /path/to/chromium` to select an installed browser. The runner rejects
-missing inputs, records each independent scenario, and fails on uncaught browser errors.
-It does not import sibling private source, complete missing page assets, or install a
-retired component graph.
+The maintained executable gates are the [common public session checks](../cookbooks/run-a-peer-application/checks/README.md): direct/native RTC, browser Worker, guarded SQL, and the actual hosted control/publication participant. They consume explicit packed archives and produce separate scenario reports. Run the commands documented there against the exact artifacts being assessed.
 
-`node cookbooks/collect-private-responses/checks/run-host.mjs --artifacts /path/to/core/dist`
-creates a temporary consumer of the public SDK/engine archives and exercises the actual
-Worker with fresh storage and synthetic identities. It records archive/source digests
-and individual scenario outcomes. These tests establish private projections, revision
-conflicts, exact receipt replay, text archive/reset, immutable approved content, expiry,
-and stable execution identity for the selected references.
+The former seven-layout preview harness and hosted workflow-reference runner were removed with the hosted application data APIs. Their [last source snapshot](https://github.com/werg/tendriller-contrib/tree/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f) retains the executable fixtures. The records above remain attached to their original sources and archives; they do not qualify the current session, private application membership, or protected external actions.
 
 ## Evidence boundaries
 

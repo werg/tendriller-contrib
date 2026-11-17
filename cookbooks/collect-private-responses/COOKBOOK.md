@@ -5,83 +5,81 @@ summary: "Keep answers and assignments private while giving a facilitator an exp
 group: "Guide and coordinate work"
 tags: ["privacy", "collaboration", "transactions"]
 choices: ["Public poll or authorized private records", "Revisioned answers or append-only revisions", "Reviewed aggregate and atomic round reset"]
-capabilities: ["explicit trusted extension", "private records", "transactions"]
-evidence: "exercised"
+capabilities: ["application membership", "guarded commands", "coherent queries"]
+evidence: "explained"
 related: ["review-exact-proposal", "choose-data-model", "coordinate-devices", "manage-sensitive-data"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/server.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/workflows/test/sessions.test.mjs", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/facilitated-session/AGENT.md"]
 ---
 
 # Collect private responses and publish a reviewed aggregate
 
-Use this for a workshop, interview, peer review, or check-in where participants should not read each other's raw responses. If every answer may be public, a shared poll can be much simpler. If privacy matters, a hidden panel, device role, targeted conversation message, or obscure state path cannot supply it. The server must authorize every read and mutation of private records.
+Use this for a workshop, interview, peer review or check-in where participants should not read each other's raw responses. A public poll is simpler when every answer may be shared. If privacy matters, define exactly who can obtain plaintext before designing the form. Hidden panels, filtered queries and device-purpose labels do not limit the data an authorized application reader can replicate.
 
-## Decide the policy before the interface
+## Choose the reader boundary first
 
-| Question | Reasonable starting policy | Alternative and consequence |
+The current host is a selective Chronolog participant for membership controls, discovery and signed page publication. It does not provide a private-response database or execute application workflows. Private and shared application data use the same owned session API, with reader membership and keys appropriate to each history.
+
+One possible design gives each participant and the facilitator access to a separate response application, while a shared results application contains only intentionally published aggregates. These are distinct data audiences using the same protocol, commands and journal; they are not alternative runtime implementations. Decide whether the operational cost of several memberships is justified. A single history whose readers include all participants cannot keep their raw answers private from one another by returning different query projections.
+
+The application must establish participant identity and actual membership before opening a response view. Test encrypted bytes and key distribution as well as UI visibility. Revoking future access cannot make a reader forget plaintext or keys already obtained. Private attachments need the same explicit audience and retention review as text.
+
+| Question | Starting policy | Consequence |
 | --- | --- | --- |
-| Who may respond? | Explicit authenticated participant identities. | Anonymous responses require a separate abuse and identity design; do not infer anonymity from missing display names. |
-| Who reads raw answers? | The author and an authorized facilitator. | A blind review may deliberately hide authors from reviewers; enforce the projection on the server. |
-| Can answers change? | Revision-checked edits while a prompt is open. | Append-only revisions preserve a fuller record but need a clear active version. |
-| How is a summary shared? | Facilitator reviews an explicit aggregate snapshot and publishes it intentionally. | Automatic counts can be useful for low-sensitivity tasks; small groups can still reveal individual answers. |
-| What does reset mean? | Archive a complete round and retained media, then rotate its generation in one transaction. | Delete without an archive if retention is inappropriate; state that choice before collection. |
+| Who may respond? | Explicit authenticated participant identities. | Missing display names do not provide anonymity. |
+| Who reads raw answers? | The author and an authorized facilitator. | Separate their history from the shared display's history. |
+| Can answers change? | A guarded command checks prompt and answer versions. | Preserve the old draft when review becomes stale. |
+| How is a summary shared? | Publish an explicit facilitator-reviewed snapshot. | Small groups and quotations can still reveal identity. |
+| What does close/reset mean? | Close the domain round and preserve the chosen archive within its actual storage boundary. | Across separate applications there is no implied atomic transaction. |
 
-Assignments and feedback can be as sensitive as answers. A participant should read only the assignments and feedback intended for that identity. A display device's purpose is useful for presentation; it does not grant the right to fetch private data. Treat an agent's read authority separately from its ability to publish a summary.
+Assignments and feedback can be as sensitive as answers. A facilitator's ability to read raw responses does not automatically grant publication or external-tool authority. A display device's purpose supplies neither reader membership nor access to private keys.
 
-## Required server boundary
+## Declare guarded domain commands
 
-The default core installs no application workflow. This cookbook's [private-response reference](snippets/private-responses.mjs) is deliberately selected and adapted through the public trusted host. Reading this guide never activates it. Review its operation names, identities, record projection, limits, and generation policy for the actual task before deployment.
+Define queries and commands through the [common application session](../run-a-peer-application/COOKBOOK.md). For example, your definition may declare an assignment query, a response command and a round-close command. The command checks the verified author, assignment identity, prompt version, answer version and closed status inside one deterministic transaction. These are domain operations you implement; there is no installed private-response vocabulary.
 
-The shipped reference accepts text only. It rejects media-bearing records because ordinary page blob access is not a participant-private media boundary. Private media requires a separately reviewed storage and authorization implementation before enabling that branch. The text-only archive/reset checks do not establish private-media retention.
+Capture a coherent query result before the person begins or reviews a draft. Retain both its application revision and the domain versions needed by the command. `basedOn` orders the attempt after a captured revision; it does not replace those transactional guards. Use a stable operation ID for the submitted snapshot, inspect the maintained journal after reopening, and retry that exact operation after a lost reply. Applied rejection needs review; an abandoned attempt after explicit history recovery needs a deliberately linked new operation.
 
-Keep application vocabulary and record shapes in the selected extension. The host supplies authenticated identity, transactional mutation, concurrency protection, private storage, retained media references, and post-commit behavior. Do not write raw answers into shared state and rely on the UI to filter them. Browser fixtures cannot validate these guarantees.
-
-**Platform invariants:** retries retain the original command and generation; stale work is rejected; authorized operations and private reads are checked on the server. **Conditional requirements:** if archive/reset is offered, the archive, media retention, active-state reset, and generation change must commit together or not at all. **Example choices:** prompt names, assignment structure, grouping, facilitator layout, and aggregation algorithms belong to this application.
+Within one application, archive metadata and round closure can be one guarded transaction. Content retention is a separate receipt that must be obtained and checked. If the design splits private responses across applications, closure and aggregation span histories: show individual coverage and partial failures, or introduce an explicitly qualified coordination capability. Do not label several independent commands an atomic reset.
 
 ## Make each person's journey complete
 
-For a workshop check-in, begin with a plain explanation of who reads raw answers, what may be shared, whether answers may change, and what happens when the round closes. “Private” should name its readers; do not imply anonymity merely because the public screen omits names.
+Explain who reads raw answers, what may be published, whether answers may change, and how long drafts and archives remain. “Private” should name its readers. A shared screen that omits names does not make the protocol anonymous.
 
-The participant first sees the current authorized assignment and its prompt, then a local draft and an intentional submit action. Their receipt distinguishes queued, accepted, rejected, and superseded responses. If the facilitator changes the assignment, keep the old draft associated with its original context and ask for review. A late rejection must not erase a newer edit. Show a useful closed-round state with the disposition of pending work instead of an empty form that looks broken.
+The participant sees the current authorized assignment, a local draft and an intentional submit action. Distinguish saved locally, applied accepted or rejected, retained coverage, and recovery that abandoned a prior result. A facilitator changing the prompt must not relabel an old pending answer. Keep its original context and preserve later typing separately.
 
-The facilitator needs a different view: eligible assignments, received and missing responses, revision freshness, private review, and a separate aggregate draft. Missing is not a negative answer. A denominator should explain whether it counts invited participants, active assignments, or received answers. Before sharing, review whether a rare category, identifying quotation, or small group reveals someone indirectly. The application must decide its aggregation and quotation policy; this reference does not automatically anonymize text.
+The facilitator sees expected, received and missing responses, source revisions, private review and a separate aggregate draft. Missing is not a negative answer. Explain whether a denominator counts invitations, active assignments or received answers. Review identifying quotations and rare categories before sharing; aggregation does not automatically anonymize text.
 
-The shared display opens directly onto the last intentionally published aggregate with its source revision and review time. A new private response can make that aggregate outdated without silently changing what the room sees. Show that a new review is available in the facilitator view, and publish a replacement only after the appropriate intentional action. Do not show raw-response previews on a projector while preparing the summary.
+The shared display reads only the intentionally published aggregate from its own authorized application. A newer private response may make the aggregate outdated without changing what the room sees. Show that a new review is available to the facilitator, and require a deliberate publication command. Cross-application publication records the reviewed source references and coverage without copying private records or keys.
 
-Use clear keyboard-accessible forms, labels and error summaries on participants' phones. Keep a local recoverable draft where the privacy and device policy allow it, but explain that local storage on a shared device can be inappropriate. Closing a round should stop further collection under the authoritative generation without restarting sensors or deleting a participant's recoverable unsent text without explanation.
-
-## Choose extensions deliberately
-
-The shipped reference supports assignment, private text submission and revision, controller review, owner publication, and atomic archive/reset. It does not implement anonymous participation, participant deletion, private attachments, automatic moderation, blind reviewer assignment, or a general feedback inbox. These can be useful features, but require an explicit policy and verified implementation rather than merely adding controls to the specimen.
-
-For several prompts, decide whether assignments are independent or must be submitted together. For a withdrawal request, decide whether a response can be removed before publication, what happens to an already shared aggregate, and how retained archives are handled. For feedback, create an authorized recipient projection rather than reusing shared conversation targeting as privacy. Explain those decisions before collecting data.
-
-Keep facilitation convenience separate from access. A participant display name or a device purpose does not establish identity. A collaborator invited to help summarize may need a different authorized projection from an owner who can archive/reset. If the selected host cannot express that distinction, simplify the role design or deliberately implement the missing policy.
+Use keyboard-accessible forms and meaningful labels. Store recoverable drafts only where the device and privacy policy permit it. When identity or authority changes, clear private surfaces and invalidate pending read continuations before they can repaint. Reauthorize before displaying a restored draft; the presence of a cached page is not evidence of current access.
 
 ## Adapt the plan
 
-1. List every actor and operation: participant submission/edit, own-record read, facilitator review, assignment, feedback, public aggregate, archive/reset. Write the authorization rule for each.
-2. Choose stable prompt and participant identifiers. Separate definition revisions from response revisions and server concurrency generations.
-3. Build the smallest selected trusted implementation. Return only the authorized projection; test that another participant cannot fetch raw records by guessing IDs.
-4. Design the participant form around a clear question, privacy explanation, draft, submit status, and revision conflict. Build the facilitator console independently around review and uncertainty.
-5. Make the shared display read only the intentionally published aggregate. Never connect it to the facilitator's raw-response fetch and merely hide fields.
-6. Clear private forms, receipts, summaries, and review panels immediately when identity or authority changes. Invalidate every pending read/write continuation, including failures; a delayed error must not redisplay an answer from the former view. Read a local draft only after the current authorized projection identifies its assignment.
-7. Bind a submitted answer to the original prompt/version before asynchronous work. On conflict, show what changed and preserve the local draft for review.
-8. Publish an aggregate from an explicit reviewed snapshot. Include denominators, missing responses, and limitations. Avoid exposing individual text through small-group summaries.
-9. If offered, close/archive/reset through one authoritative transaction. Enforce archive privacy and retained media permissions after reset as well as before.
+1. List every reader, writer, administrator and external actor. Decide which application histories each can access and how enrollment obtains keys.
+2. Choose stable prompt, participant and response identities. Distinguish domain round versions from application recovery generations.
+3. Implement the smallest guarded definition. Test a malicious signed command, a guessed record ID and direct encrypted-content access, not only disabled controls.
+4. Build the participant form and facilitator review independently around their different tasks. Keep new drafts separate from immutable submitted snapshots.
+5. Give the shared display access only to the results application. Do not connect it to raw responses and merely omit fields from the rendering.
+6. Publish an aggregate from an explicit reviewed snapshot. Record coverage, denominators, omissions and source revisions without exposing private values.
+7. Define close, withdrawal, correction, deletion and archive policy. Show partial progress honestly when the operation spans applications or content stores.
+8. Exercise recovery: retain original operation identities, show abandoned work and require review before reapplication.
 
-## Adaptation and checks
+## Verify the actual boundaries
 
-The [facilitator console specimen](checks/facilitator/index.html) combines authorized private review with a separate aggregate publication step. The [minimal participant form](checks/participant/index.html) shows one assigned prompt and its own submission receipt. The [shared projection](checks/display/index.html) reads only reviewed shared state and contains no private-read operation. They have different DOM, navigation, and data access; none requires a universal sessions schema.
+| Scenario | Required observation |
+| --- | --- |
+| Two participants connect and request each other's history or keys. | The actual membership and encryption boundary refuses access; a filtered query alone is insufficient. |
+| A participant submits a facilitator-only command directly. | Verified author checks reject it inside execution. |
+| Two edits race from the same response version. | The guarded definition accepts only the permitted result and preserves the stale draft. |
+| A response reply is lost. | Retry recovers the same signed attempt and outcome without duplicate answers. |
+| The facilitator publishes an aggregate. | The display history contains only reviewed results and intended provenance. |
+| A round closes while a participant is offline. | Old intent retains its original domain version and cannot silently reopen the round. |
+| Recovery abandons a response or aggregate. | The application shows the selected history and affected operations; it does not silently resubmit. |
+| Reader membership changes. | New access follows actual control and key policy; cached private UI clears without claiming past plaintext was erased. |
+| Content retention or one cross-application close fails. | The result identifies the missing coverage instead of reporting atomic completion. |
 
-The reference and its [checks](checks/) are application-specific examples, not an installed product catalog. Service tests must create fresh identities and records and exercise actual host transactions. The browser checks are only evidence of interaction behavior.
+## Historical interaction evidence
 
-- Submit as two participants; neither can read the other's answer or assignment through direct requests.
-- Attempt facilitator operations as a participant and as a display. Both are denied regardless of UI controls.
-- Revise the same answer concurrently. One stale revision fails without losing the author's local draft.
-- Retry after acknowledgement loss. The original receipt is returned without duplicate responses.
-- Publish a summary; verify the shared response includes no raw-answer fields or private media references.
-- Fill storage or force a transaction failure during archive/reset. The active round, retained media, and generation remain coherent.
-- Reset while a participant is offline. Their old queued work remains associated with the old generation and is rejected on reconnect.
-- Request old archive/media as an unauthorized identity. Privacy still holds after active records are reset.
+The [archived facilitator](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/collect-private-responses/checks/facilitator/index.html), [participant](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/collect-private-responses/checks/participant/index.html) and [shared display](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/collect-private-responses/checks/display/index.html) used different DOM, navigation and data access. Their [browser record](../../guides/pilot-evidence.json) preserves the interaction-continuity and revoked-view observations of that retired transport.
 
-**Evidence:** the text-only private policy and proposal reference were exercised against the actual packaged public host with fresh identities and storage. The [record](checks/evidence.json) identifies exact artifacts and scope. Thirteen browser scenarios across the three independent views passed; their [separate fixture record](../../guides/pilot-evidence.json) covers interaction continuity and revoked-view races, and does not establish server privacy. This guide does not claim an anonymous protocol, end-to-end encryption, or exactly-once external actions.
+The [actual-host record](checks/evidence.json) preserves the exact artifacts and text-only reference digests for the former hosted workflow executor. The [archive note](checks/README.md) explains its boundary. Those results do not establish current private application membership, private media, anonymous participation or a protected external action. The design above requires fresh qualification against its actual readers, keys, commands and recovery policy.

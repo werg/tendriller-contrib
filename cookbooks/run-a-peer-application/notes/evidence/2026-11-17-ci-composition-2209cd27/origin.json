@@ -1,0 +1,181 @@
+{
+  "format": "peer-application-ci-evidence/v1",
+  "recordedOn": "2026-11-17",
+  "run": {
+    "repository": "werg/chronolog-db",
+    "id": 44151716927,
+    "job": 134281576851,
+    "conclusion": "success",
+    "url": "https://github.com/werg/chronolog-db/actions/runs/44151716927"
+  },
+  "artifact": {
+    "id": 14359087557,
+    "name": "application-44151716927-1",
+    "bytes": 9349316,
+    "sha256": "b23f8a7991912d924ba63ff756a7406d3c94fbd669cc6cf7e1155f226ecc670e"
+  },
+  "sourceBranchHead": "73ffcad9cb74a924e94862e71ef01a00b456b9ca",
+  "actualCiCheckout": "2209cd271ef3661d24ea3421f665146c2f8c76fc",
+  "identicalSourceTree": "ac8bf1387d3601d20eb4b18391f8fb556d21bff8",
+  "sources": [
+    {
+      "repository": "werg/chronolog-db",
+      "commit": "2209cd271ef3661d24ea3421f665146c2f8c76fc",
+      "tree": "ac8bf1387d3601d20eb4b18391f8fb556d21bff8",
+      "dirty": false
+    },
+    {
+      "repository": "werg/tendriller",
+      "commit": "50810422bfa1003ae5690eda32c8e71ecaf31e72",
+      "tree": "838202323b42442b3cb6cc31873d33573d9d4bdc",
+      "dirty": false
+    },
+    {
+      "repository": "werg/tendriller-contrib",
+      "commit": "03c601b4ca744af34ab197149d1b795e1bb38250",
+      "tree": "144cde06ecd7a2ad385394eddd93c792e638f42e",
+      "dirty": false
+    }
+  ],
+  "compositionSha256": "c1d5fc57086db4d044842f3b7173fd2e29f5ba3fcb542a62b11f79dbf0e97998",
+  "revalidation": "All seven raw report hashes match the CI manifest; local assembly deep-equals its unchanged JSON; 107 RTC, 138 SQL and 7 host-engine file digests and all archive digests verified.",
+  "scope": {
+    "nativeRelay": "Forced direct failure and automatic relay selection; shared owner reconnects after a cut without changing generation.",
+    "browserRelay": "Actual Worker-owned WebSocket, OPFS, live/content/recovery/reopen through explicit transport fixtures; the browser gate does not independently measure introductions fallback policy.",
+    "browserSql": "Native/WASM engine comparisons are separate from complete browser SQL/OPFS application integration, which remains unqualified."
+  },
+  "verification": {
+    "run": 44151716573,
+    "main": {
+      "job": 134281605688,
+      "conclusion": "success",
+      "filesPassed": 65,
+      "filesSkipped": 1,
+      "testsPassed": 572,
+      "testsSkipped": 6,
+      "skippedFile": "wasm-conformance.test.ts",
+      "coveragePercent": {
+        "statements": 91.93,
+        "branches": 86.02,
+        "functions": 90.45
+      }
+    },
+    "linuxConformance": {
+      "job": 134281605191,
+      "conclusion": "success"
+    },
+    "macosConformance": {
+      "job": 134281605713,
+      "statusAtArchive": "queued"
+    },
+    "workflowConclusionAtArchive": null
+  },
+  "nativeWasm": {
+    "run": 44151716443,
+    "job": 134281639776,
+    "conclusion": "success",
+    "engineComparisonsPassed": 6
+  },
+  "files": {
+    "composition.json": {
+      "sha256": "c1d5fc57086db4d044842f3b7173fd2e29f5ba3fcb542a62b11f79dbf0e97998",
+      "bytes": 527317
+    },
+    "native-sql/public-boundary-report.json": {
+      "sha256": "5f15bcefa60931e5b21a4f71c26c066b21ace36e433379cf913025bb3580778f",
+      "bytes": 1618
+    },
+    "provenance/session-rtc.json": {
+      "sha256": "964d06d943c51cc9a3701bd3630b8dc497d442deab8ea8e72f9e2ff1d1a0aa1f",
+      "bytes": 21303
+    },
+    "provenance/session-sql.json": {
+      "sha256": "9de46520cc66b4f5e8f3d6d91e8056ad5b34818eefcd7d8904ffa8d2fcdbbef0",
+      "bytes": 28753
+    },
+    "provenance/host.json": {
+      "sha256": "4dca0a32068b70366944f0d363335bad59eeaf0f5d6f0e0927f2e142f432b332",
+      "bytes": 829
+    },
+    "provenance/host-engine.json": {
+      "sha256": "db25c2101fa1b05f5f896591e68be7d57d1d70d5c54e99246e021c8d557b6142",
+      "bytes": 867
+    },
+    "provenance/embedded-control.json": {
+      "sha256": "02c42111978ee10ee89266dcc2561a2e2ab1ba8a6f58efe52b105f32c9ef5524",
+      "bytes": 2418
+    },
+    "provenance/verified-packages.json": {
+      "sha256": "d581c3864afe3b8c02077852566348150e761da2533c5957f2adb8b0835e7cf9",
+      "bytes": 1456
+    },
+    "native-events/report.json": {
+      "sha256": "b0b05a064fa8252106382ec50ad8f6be2e126a339f2bc7e044b8c9d940d6f1ac",
+      "bytes": 44314
+    },
+    "native-events/summary.json": {
+      "sha256": "299f3df21730eb12a1b9bce06c20b8531cb343211ea741d98438e542542ffada",
+      "bytes": 38408
+    },
+    "native-rtc/report.json": {
+      "sha256": "8d11186f94de6377cb747dcbe522cb7bcc7dfcde9b2e4f220d3fb5408218787e",
+      "bytes": 49988
+    },
+    "native-rtc/summary.json": {
+      "sha256": "0ccf24928fc88ee0d9d4e09590c481b318a491eb6b05ff314a2986bff38c236b",
+      "bytes": 43243
+    },
+    "browser-worker/report.json": {
+      "sha256": "b70d40a4069d1d43deabf8e703d22e9c644ede02c37632eb28dbc8f2e7e4c562",
+      "bytes": 37172
+    },
+    "browser-worker/summary.json": {
+      "sha256": "6d3f21f15887e1bd266e8a787c25e318c3e3a6a54742d1473a4fb03f33d79adc",
+      "bytes": 15496
+    },
+    "native-sql/report.json": {
+      "sha256": "806a486853d4a57a633144fd44a21dbffb1240b7dfeba254da5c24d6b2e9acd7",
+      "bytes": 23001
+    },
+    "native-sql/summary.json": {
+      "sha256": "c11324a60f2ec44630b5d6e1e1c4c8b84344b526dbd2bb33e0f42f6ae0bd91b7",
+      "bytes": 22265
+    },
+    "hosted-participant/report.json": {
+      "sha256": "70912081ae734173be2ae6ab0a0c4ae9570691aa5a3c5d474353a427c0e72b48",
+      "bytes": 112141
+    },
+    "hosted-participant/summary.json": {
+      "sha256": "8cf6477b7d3f5f59dc8bded8562b3e59b0c15e98033272b04affbd9a8ef10045",
+      "bytes": 105206
+    },
+    "hosted-websocket-relay/report.json": {
+      "sha256": "1aa471b76165cda053b4ec141c8a8e8d8921053cbcc706266d40ab5412cd5c91",
+      "bytes": 123657
+    },
+    "hosted-websocket-relay/summary.json": {
+      "sha256": "1dc1ea03d8810366530754e41491047b8cf2ada6753c5303729da9277c10aac7",
+      "bytes": 117142
+    },
+    "browser-websocket-relay/report.json": {
+      "sha256": "86e855ab92333eeccfaeb5dc9c9164d5829fe97239af949974a330903d369f78",
+      "bytes": 89573
+    },
+    "browser-websocket-relay/summary.json": {
+      "sha256": "bb20f45149f0328d54badcdadd11b97e70ca3dd32450dcb0d49c0617f3a66bc3",
+      "bytes": 70708
+    },
+    "hosted-participant/host-artifacts.json": {
+      "sha256": "1bb583f7376c715b8bf679506c1c9e5f796ba42ed71d386fec0c98d3ed5579a3",
+      "bytes": 43793
+    },
+    "hosted-websocket-relay/host-artifacts.json": {
+      "sha256": "1bb583f7376c715b8bf679506c1c9e5f796ba42ed71d386fec0c98d3ed5579a3",
+      "bytes": 43793
+    },
+    "browser-websocket-relay/host-artifacts.json": {
+      "sha256": "1bb583f7376c715b8bf679506c1c9e5f796ba42ed71d386fec0c98d3ed5579a3",
+      "bytes": 43793
+    }
+  }
+}

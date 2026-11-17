@@ -1,0 +1,139 @@
+name: Independent peer-generation consumer
+on:
+  push:
+    paths:
+      - '.github/workflows/peer-generation.yml'
+      - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-session-artifact*'
+      - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
+      - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/peer-generation.yml'
+      - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-session-artifact*'
+      - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
+      - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
+  workflow_dispatch:
+    inputs:
+      chronolog_ref:
+        description: Exact Chronolog source commit containing the public peer-session package
+        required: false
+        type: string
+        default: 'a66b3e7b7578a2b3541b86246714cf0e360d7b07'
+      tendriller_ref:
+        description: Exact Tendriller source commit for the hosted participant gate
+        required: false
+        type: string
+        default: 'c5054c396e5edc7f72a552bbcb61db466c600b48'
+permissions:
+  contents: read
+concurrency:
+  group: peer-generation-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}
+  cancel-in-progress: true
+jobs:
+  public-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        transport: [direct, native-rtc, browser-native, native-sql, hosted, relay, browser-relay]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.12.4'
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/chronolog-db
+          ref: ${{ inputs.chronolog_ref || 'a66b3e7b7578a2b3541b86246714cf0e360d7b07' }}
+          path: .chronolog-build
+      - name: Install pinned build dependencies and the patched engine when SQL is selected
+        working-directory: .chronolog-build
+        run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && '--ignore-scripts' || '' }}
+      - name: Build clean public session archive
+        working-directory: .chronolog-build
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native' || matrix.transport == 'hosted') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
+      - uses: actions/checkout@v4
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
+        with:
+          repository: werg/tendriller
+          ref: ${{ inputs.tendriller_ref || 'c5054c396e5edc7f72a552bbcb61db466c600b48' }}
+          path: .tendriller-build
+      - name: Build the actual public hosted participant
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
+        working-directory: .tendriller-build
+        run: npm ci && npm run build
+      - name: Install pinned Chromium and browser system dependencies
+        if: ${{ matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
+        run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
+      - name: Exercise independent application through the packed public API
+        shell: bash
+        run: |
+          archives=(.chronolog-build/artifacts/peer-session/chronolog-peer-session-*.tgz)
+          test "${#archives[@]}" -eq 1
+          if [ "${{ matrix.transport }}" = browser-native ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs --artifact "${archives[0]}" --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = hosted ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --transport websocket --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = browser-relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --transport websocket --browser --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = native-sql ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --domain tasks --output test-results/peer-generation
+          else
+            node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --transport "${{ matrix.transport }}" --output test-results/peer-generation
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-peer-generation-${{ matrix.transport }}-evidence
+          path: |
+            test-results/peer-generation/report.json
+            test-results/peer-generation/summary.json
+            test-results/peer-generation/consumer/package-lock.json
+            test-results/peer-generation/peers/report.json
+            test-results/peer-generation/peers/summary.json
+            test-results/peer-generation/peers/consumer/package-lock.json
+            test-results/peer-generation/peers/*.png
+            test-results/peer-generation/peers/assets/*
+            test-results/peer-generation/host-artifacts.json
+            test-results/peer-generation/host/package-lock.json
+            .tendriller-build/dist/provenance.json
+            .tendriller-build/dist/*.tgz
+            .chronolog-build/artifacts/peer-session/*.tgz
+            .chronolog-build/artifacts/peer-session/package/provenance.json
+
+  composition:
+    needs: public-session
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: independent-peer-generation-*-evidence
+          path: evidence
+      - name: Bind all independently observed gates to one exact composition
+        shell: bash
+        run: |
+          args=()
+          while IFS= read -r -d '' report; do args+=(--report "$report"); done < <(find evidence -type f -name report.json -print0)
+          node cookbooks/run-a-peer-application/checks/peer-composition.mjs "${args[@]}" --output composition.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualified-local-peer-composition
+          path: composition.json
