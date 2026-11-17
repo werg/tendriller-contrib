@@ -13,117 +13,59 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Choose the right home for application data
 
-Use this before adding application data. Different information has different owners and lifetimes; one shared object rarely serves every draft, measurement, command, and private answer. Begin with the person's task and the question each record must answer. A one-person checklist may need only a local draft and an agreed progress value. Add history, private records, and immutable evidence when their distinct guarantees matter.
+Start with authority, lifetime, ordering, privacy and recovery. A draft, a live cursor, an accepted task claim, immutable evidence and signed page code have different meanings even when all can be represented as JSON. Use the same application/session contract for durable meaning and choose explicit facets and capabilities for the different exchanges.
 
-The [primitive and role guide](../../guides/application-primitives.md) is the
-short architecture entry. Treat a live signal, a durable event, a transaction
-and an external effect as separate choices. Their names should communicate their
-actual guarantees to both application authors and implementing agents.
+## Work backward from the person's journey
 
-## Work backward from a real journey
+For an inspection, distinguish the editable local note, the exact submitted snapshot, a retained photograph, the applied observation, an agent's interpretation and a reviewed decision. A global “Saved” badge hides which of those facts actually exists. Ask who can read each item, which version a decision reviewed, what must survive interruption, and whether explicit recovery may abandon it.
 
-Consider a field inspection: a person drafts a note, attaches a photograph, submits an observation, receives an interpretation, and later corrects the conclusion. On reopening the page they should understand what was saved, what remains private to this device, and what another person can see. That experience needs several records, even if its interface is one form.
+Keep display choices such as filters and expanded panels separate from shared domain state. A shared selection should be intentional; another person's chart zoom should not rewrite a task decision. Give records stable IDs independent of labels, row position and current filters.
 
-| User-visible thing | Candidate home | Identity and recovery question |
+## Match the facet to the guarantee
+
+| Information | Mechanism | Boundary |
 | --- | --- | --- |
-| Unsent note and selected photo | Local draft, with a disclosed persistence policy | Can this device restore it, and may this reader still see it? |
-| Submitted observation | Durable event and application receipt | Which exact snapshot was accepted, and is its follow-up still pending? |
-| Current agreed inspection status | Shared state | Who may change it, and which revision or generation was reviewed? |
-| Original photograph | Immutable bytes with an intentional retention reference | Which bytes were reviewed, and how long will they remain available? |
-| Latest editable report | Shared-file reference | Which previous path revision does an edit replace? |
-| Private reviewer assignment | Authorized private record when the policy requires it | Can the service enforce its reader set? |
-| Reading position or expanded panel | Local view preference | Would losing it change domain meaning, or merely convenience? |
+| Unsubmitted draft | Page-owned state with an explicit local persistence policy. | Storage failure and shared-device privacy remain visible. |
+| Typing, cursor or replaceable live reading | Session live signals with bounded expiry. | No durable replay, history or completion guarantee. |
+| Commands, conversation and retained events | One application definition and owned session journal. | Applied outcomes belong to selected recoverable history. |
+| Relational guards and queries | The same definition/session with an explicit SQL engine capability. | Actual deterministic execution and schema binding must be qualified. |
+| Immutable application bytes | Session content staging, transfer and retention. | A reference in JSON does not itself retain another usable copy. |
+| Membership and recovery authority | Signed controls exchanged with the selective host participant. | Host availability is needed for those lifecycle changes, not every command. |
+| Authored page code | Signed publication through the same participant envelope. | Independent predecessor chain and exact file hashes; no application-data rollback. |
+| Irreversible external action | An explicit protected checkpoint or durable action capability. | Ordinary applied/shared outcomes cannot authorize irreversible replay. |
 
-These are example choices, not a common inspection schema. If a task needs no ordered replay, do not create a stream merely because another application uses one. If the record must be private, a different tab or an obscure state key is insufficient.
+Event-only applications avoid an unnecessary SQL engine. SQL adds transactional guards and relational projections without adding another command API, retry queue or backend selection. Browser and native transports own different storage and networking resources; they expose the same commands, queries, events and operation inspection. The host is a participant with narrower rules, not a second hosted data implementation.
 
-## Match the mechanism to the guarantee
+## Declare the transaction in the definition
 
-| Mechanism | Good fit | What it does not establish |
-| --- | --- | --- |
-| Shared state | Current agreed values and atomic, conditional batches over them. | Complete history, privacy between readers, or automatic conflict resolution. |
-| Ephemeral signals | Live information whose loss is acceptable: cursors, typing, presence, progress or transient messages. | Offline delivery, retained history, a transaction or finality. |
-| Durable events | A recorded fact or intent that consumers must be able to recover and replay. | That the consumer handled it, or that repeated delivery is new intent. |
-| Retained streams | Ordered observations with retention and cursors. | Infinite history, exact external execution, or acknowledgement from a callback. |
-| Local draft | Unsent typing, sketch, or temporary view choice. | Cross-device durability or current authorization for cached private data. |
-| Immutable bytes | A specific image, document, or asset with verified length and digest. | A current named file, accepted application input, or permanent retention. |
-| Shared-file reference | Current file at a canonical path, updated against its previous revision. | Immutable meaning for that path, coherent multi-file publication, or privacy. |
-| Publication | Complete reviewed file graph and entry served with its exact runtime. | That individual uploads already changed the live page. |
-| Private records | Authorized answers, assignments, or protected policy records. | Privacy after copying them into shared state, logs, or public summaries. |
+Use a coherent `session.query` or captured read view for review. Retain its application revision and any domain versions or values that influenced the decision. Submit a stable operation ID with `basedOn` for the application ordering prerequisite. The definition must still check the authenticated author, domain predicates and allowed transition inside actual execution.
 
-For each kind of information, record its writer, readers, authoritative owner, ordering, lifetime, and failure behavior. A compact design worksheet should also name the unit, schema version when needed, maximum size, and deletion policy. Use stable IDs independent of position and editable labels. Keep application state vocabulary local to the page; familiar names such as `session` do not activate server behavior.
+A field-value guard permits unrelated edits and may permit change-and-change-back. A record version can reject every relevant intervening mutation if the definition advances it consistently. Choose the domain policy deliberately. The [editing guide](../reconcile-concurrent-edits/COOKBOOK.md) and [guarded SQL definition](../run-a-peer-application/snippets/peer-task-board.mjs) show that common boundary.
 
-Use [signal FIFO delivery](../share-live-signals/COOKBOOK.md) for distinct live
-messages, or opt into `latest` for replaceable values. A durable event-only
-Chronolog group avoids SQL but still supplies retained history and finality;
-it is a different mechanism from an ephemeral channel.
+A command can assert prerequisites, change SQL and emit its domain event atomically. An event-only definition can make its chosen deterministic transition through the same command contract. Independent commands, membership changes, content retention and external effects are not automatically one transaction. Model an explicit intermediate state and recovery when a decision crosses those boundaries.
 
-## Make saving legible
+## Make saving and recovery legible
 
-### Select one backend for durable application meaning
+Distinguish a local draft, a saved signed attempt, an applied accepted or rejected result, retained coverage and a separately completed effect. Inspect original operations after reopening. Exact retry preserves the signed attempt; a new decision needs new reviewed input. Do not build another mutation outbox merely to display pending work.
 
-For an application with an always-running native agent, the
-[peer application approach](../run-a-peer-application/COOKBOOK.md) puts SQL state,
-conversation, durable events, and worker intent in one Chronolog history. A
-mixed change can assert a condition, update SQL, and publish its effective event
-atomically. An event-only group can omit the SQL engine. The page's selected
-application backend owns writes and the durable proposal outbox; it does not
-submit a second copy through the hosted state or conversation queue.
+Explicit application recovery selects a complete retained prefix. It can abandon a recent suffix, including work that was previously applied. Preserve adopted operation identities, show abandoned attempts and offer deliberate linked reapplication after reviewing the current domain. Queries and events must come from one coherent selected-history view. Neither `applied()` nor `shared()` is irreversible settlement.
 
-The hosted backend remains an independent selection for applications that use
-its service availability. Its JSON-state programs and the peer backend's SQL
-programs have explicit capability boundaries. Do not simulate SQL through opaque
-state keys or assume that using one backend authorizes a hot switch to another.
-New pre-release pages can adopt the clean interface directly without a legacy
-conversion path.
+New typing remains a different draft. A delayed result updates its original submitted snapshot and cannot clear newer work. A view replacement should preserve useful focus, selection and explanatory context while removing claims that no longer hold in the selected history.
 
-For the peer profile, topics filter one group history and are not private
-collections. A revision-scoped read captures the task query and effective events
-together. Keep private agent data elsewhere, expiring presence out of durable
-history, and blobs on an explicit byte-retention path. The SQL revision, event
-scan cursor, consumer processed checkpoint, and backup progress answer different
-questions.
+## Keep privacy in the reader boundary
 
-Display persistence at the level the person cares about: “Draft on this device,” “Submission queued,” “Accepted,” and “Awaiting review” have different meanings. Do not show a global green “Saved” indicator while a selected photo is only in memory or its semantic submission was rejected. Associate failures with their object, preserve the draft, and offer a useful next action.
+All readers authorized for an application history may obtain its replicated plaintext. Topic names, query filters and hidden panels are not private collections. Use separate application membership and keys when audiences differ, with explicit cross-application aggregate publication if needed. See [private responses](../collect-private-responses/COOKBOOK.md).
 
-A submitted snapshot must remain separate from later typing. When acknowledgement arrives, clear only the accepted snapshot. An interpretation can change without rewriting its original evidence; link it to the exact evidence revision and show superseded conclusions. For two or more hosted JSON-state changes that must commit together, use `state.apply(ops, options)`. For a peer application's SQL and events, submit one program through its selected backend. If the effects span another authority, use its actual transaction or model an explicit intermediate state.
+Verified authorship, permission to submit, recovery authority, page ownership and external-tool credentials are separate roles. A payload field called `owner` cannot grant authority. Preserve verified requester provenance through agent work and recheck required rights at the actual action boundary. Revocation limits future authorized access; it cannot erase plaintext already obtained.
 
-Choose display state separately from domain state. Changing a chart filter or opening a section should not overwrite an agreed decision. For collaboration, distinguish a personal filter from a deliberately shared selection. Announce save and conflict transitions accessibly without repeatedly stealing focus; retain labels and error text when a form rerenders.
+## Preserve content and cursor identity
 
-## Use the selected backend's concurrency primitives
+An annotation or proposal should name the immutable bytes it reviewed. A mutable domain document reference can advance only through its guarded command. Page code has its own signed publication head. Neither a display URL nor a copied content ID supplies permanent retention or new read authority.
 
-The JSON-state calls below apply to the hosted backend. A peer-selected page uses
-its Chronolog program assertions and captured read views, as shown in the
-[peer application guide](../run-a-peer-application/COOKBOOK.md). It does not open a
-second hosted writer to obtain these JSON-state operations.
+An event cursor, a materialized view checkpoint, an agent's handled position and retained replication coverage answer different questions. Keep them with their actual owner and generation. Persist a derived view with its matching cursor and coverage, or rebuild it; restoring a cursor without its model silently skips data. A live signal has no replay position.
 
-The [browser state API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) separates a useful local view from an authoritative review snapshot. `state.get()` includes pending ordinary writes; `state.revision` alone does not make that view a coherent server snapshot. Use `await state.snapshot()` to obtain matching `{state, rev, scopes}` while connected. Keep that observation with the draft being reviewed; a later save must not silently substitute newer values or scope generations.
+Bound records, retained bytes, pending work and diagnostic payloads. Show missing history or unavailable content honestly. Export only the authorized domain data and provenance the task needs; credentials and private device journals are not a portable application format.
 
-`set`, `delete`, `patch`, and `apply` accept `conditions` and `expected_revision`. Conditions check exact JSON values or presence against one server snapshot before any batch mutation. Guard an item's value when unrelated items may change independently. Use the global revision when any intervening shared-state write must require review, including a value that changed and later returned to its original value. All supplied conditions are checked together, and their read paths participate in scope-generation protection alongside write paths. Capture relevant `expected_generations` from the reviewed snapshot or the task's reviewed scope context.
+## Verify through user outcomes
 
-Missing and null have different meanings. Arrays are whole values, and an explicit path cannot silently replace an existing array, scalar, or null ancestor with an object. Use literal array paths for keys containing dots. Deliberately replacing a parent is an explicit `set`; a merge `patch` follows its documented replacement and null-deletion semantics. These are core semantics to design around, not separate rules each page should reimplement.
-
-A conditional write stays pending until accepted; it does not claim optimistic ownership or approval. A conflict leaves every covered value unchanged and returns an actionable result. The same command's accepted or state-conflict receipt survives retries. Keep the user's proposed change for a new decision instead of automatically upgrading its guards. These optional concurrency checks do not restrict another authorized writer's operations or enforce arbitrary domain policy; additional permission and business rules still belong at a trusted boundary.
-
-## Preserve identity through history and retention
-
-A stream cursor belongs to one consumer or materialized view. An agent's handled cursor advances after effects succeed; a chart's cursor advances after records enter its model. Reusing either for the other can lose work. If only current values matter, choose a deliberate latest-value model and explain that earlier samples are not retained.
-
-Keep immutable content identity separate from mutable names. An annotation or approved document should name the bytes or file revision it reviewed, because a path can later resolve to different content. A named-file update and a publication switch have different authoritative revisions. A task generation protects application meaning across these operations; it does not replace their revision guards or grant permission.
-
-Unreferenced uploads have bounded expiry whether a page or agent created them. Inspect returned retention reasons and expiry instead of treating an upload as an archive. A live shared-file head, retained file history, publication, pin, or icon can retain an object; an arbitrary ID inside shared state is not itself a retention root. Equal digests can share physical bytes while their handles retain separate metadata and lifetime decisions. Explain what a delete action removes, what referenced material remains, and whether restoration is possible.
-
-Private policy belongs in a deliberately installed trusted extension when ordinary access rules are insufficient. Read the [public core entry](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/agent.md) and verify the deployed capability; reading this guide installs nothing. Minimize cached private content and reauthorize before restoring it after identity changes.
-
-## Verify the model through user outcomes
-
-| Scenario | Expected observation |
-| --- | --- |
-| Reload after drafting but before submission | Restore only data covered by the stated draft policy; make any lost in-memory attachment explicit. |
-| Acceptance arrives after a new note is typed | The original snapshot receives its receipt; the new note remains intact. |
-| Another writer changes the report | The stale update is rejected or reconciled under an explicit policy; no silent overwrite. |
-| Photograph retention expires | Show unavailable evidence with its known identity; do not invent or substitute an image. |
-| Reader loses access | Cached private material cannot restore itself into the visible page. |
-| Task resets while a command is queued | The original command remains tied to its original generations and fails visibly if stale. |
-| A two-part save fails halfway | The real transaction rejects both, or the documented intermediate state remains recoverable. |
-
-Trace each outcome to an authoritative record and an available recovery action. That exercise usually reveals whether the model is sufficient before more fields or mechanisms are added.
+Race independent sessions on the same guarded record. Lose a reply and reopen the original operation. Recover an older prefix and inspect consistent SQL, events and abandoned attempts. Interrupt content transfer and verify actual retained bytes. Remove reader authority and test direct access, not only rendering. Publish signed code without changing application state. Exercise optional capabilities independently and name their actual runtime and storage evidence.

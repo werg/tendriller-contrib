@@ -17,7 +17,7 @@ Use this when a page expects an agent to respond after its current turn ends. A 
 
 ## Design the person's delivery experience first
 
-For a maintenance page, a person might send a question, return to their task, and come back when an answer is ready. Separate the states they can reasonably rely on: composing, queued on this device, accepted by the service, awaiting an agent, answered, and unable to deliver. “Sent” must not imply “read” or “finished.” A delayed reply should remain attached to the original request even if the user has moved to another task.
+For a maintenance page, a person might send a question, return to their task, and come back when an answer is ready. Separate the states they can reasonably rely on: composing, queued on this device, applied in the selected application history, awaiting an agent, answered, and unable to deliver. “Sent” must not imply “read” or “finished.” A delayed reply should remain attached to the original request even if the user has moved to another task.
 
 Provide a compact delivery panel with the last verified connection time, unresolved requests, and a recovery action. Keep private host session IDs and credentials out of that panel. When the receiver is unavailable, preserve accepted work and explain whether it will be retried, checked on a schedule, or requires reconnection. Do not make people resubmit because the agent is slow; duplicate requests create uncertainty about intent.
 
@@ -32,32 +32,32 @@ Offer explicit cancellation or supersession only if the application has a define
 | Authenticated webhook or routine | Server wake notice routes to a known host session. | Authentication, delivery retries, and whether it starts a new session instead. |
 | No idle wake | Scheduled queue checks. | The schedule remains active and the person knows the expected delay. |
 
-Tendriller no longer offers HTTP long polling. `GET /events?after=<cursor>` is a nonblocking replay read, and `wait` (including `wait=0`) is rejected. Receive asynchronous wakes through the agent WebSocket, an authenticated webhook or an MCP Events subscription, then read the pending batch and acknowledge only after the work succeeds. The core `tendril-wait.mjs` and CLI `tendril wait` now use WebSockets; the shell long-poll helper was removed.
+The agent is an application participant using the same owned session as browsers and other native peers. It reads coherent queries/events and observes session changes. A host adapter may turn a safe pending-work notice into an actual conversation wake, but it does not define another application event log, cursor HTTP service or WebSocket command protocol.
 
-Specific host products change. Read [current core bridge reference](https://github.com/werg/tendriller/blob/master/docs/tools/AGENT_HOSTS.md) and inspect the actual installed host. Historical host documents explain patterns, not present-day feature availability. A detached watcher that only writes a log cannot arrange a future agent turn by itself.
+The [native session CLI](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) loads an explicit module that opens the actual session. Use its query, events, watch and operation inspection commands for that application. A watcher that prints a line cannot itself arrange a future agent turn; inspect and test the actual host's admission mechanism.
 
-Choose persistence deliberately. A short task may use a host-managed wait that must be rearmed; an ongoing task may justify a persistent service with a named owner, private installation path, restart policy, and teardown procedure. Do not claim a page is continuously monitored merely because its collector continues reporting measurements.
+Choose process ownership deliberately. A bounded task must be rearmed when it finishes; an ongoing participant needs durable device storage, a named owner, restart policy and teardown. Device identity and the command journal belong to the session. A measurement process continuing to run does not prove an agent conversation can resume.
 
 ## Commission the complete path
 
 1. Identify the page, intended host conversation, and authorized owner. Store the administrative handle privately, separate from published source and user-facing URLs.
 2. Inspect the service contract and the host's supported admission mechanism. Set up the receiver against the exact conversation; refuse an accidental rebind to another session.
 3. Restore the page-bound handled checkpoint or start from a deliberate initial position. A successful connection must also check already pending work, not wait only for a new notice.
-4. Send an end-to-end delivery probe with `tendril events send --wake` or the standalone `tendril-events /private/page.json send --wake` helper. End the current agent turn, confirm that the intended conversation resumes, and acknowledge through the probe's authenticated path.
+4. Submit a harmless probe command declared by the actual application through its ordinary session. End the current agent turn, confirm that the intended conversation resumes, reads the verified request and records its handling through the maintained journal.
 5. Handle work, rearm or remain listening, and run a second probe. The second round detects one-shot integrations that appeared healthy during setup.
 6. Send a real page request, observe the reply in the intended interface, and verify that a new draft typed during delivery survives. Record the tested receiver identity privately and expose a safe readiness summary.
 
-First publication of an interactive page requires established delivery under the public contract. A readiness probe proves the tested path at that moment; it is not a guarantee that the host will never stop. Preserve monitoring and recovery after setup.
+Signed code publication and application-agent readiness are separate. Before promising an agent response, complete the actual two-probe rehearsal. A readiness result describes that tested moment; preserve monitoring and recovery afterward.
 
 ## Keep delivered and handled progress separate
 
-Maintain receiver identity, private credentials, read/delivered cursor, and handled cursor separately. Wake notices should contain counts or safe pointers, not private page text. The resumed agent fetches the authorized queue and treats ordinary page events as application data. Only an authenticated owner `instruction` event carries owner-instruction authority; device purpose and payload labels do not promote other events.
+Maintain receiver identity, private credentials, read/delivered cursor, and handled cursor separately. Wake notices should contain counts or safe pointers, not private page text. The resumed agent reads authorized application events and retains their verified signer provenance. The definition and explicit action policy decide which requests carry authority; topic names, device purpose and payload role labels do not promote ordinary data into instructions.
 
 Process batches in order under the selected consumer policy. Advance the handled checkpoint only after the corresponding replies, updates, or other required effects succeed. When one event fails, do not skip past it accidentally; use a documented retry, quarantine, or operator-resolution policy that retains its identity. Coalesce wake notices behind pending work while continuing to drain all read pages.
 
 External side effects need their own deduplication or reconciliation. If a worker crashes after an external action but before acknowledgement, first find the action's authoritative result. Blindly repeating it is unsafe, while marking it handled without evidence loses the request. A durable Tendriller receipt does not make another system exactly once. A chart checkpoint is unrelated to this consumer acknowledgement.
 
-Where multiple host processes can consume a queue, use the public named-consumer coordination when appropriate or an explicit single-owner design. Do not let two uncoordinated receivers overwrite one handled cursor. Keep checkpoint files page-bound and validate corruption or mismatch instead of silently resetting to the latest sequence. `tendril-events` stores a private `<handle>.events.json` with separate `handled_cursor` and `delivered_cursor`; the `events`/`wait` read cursor is not acknowledgement. The pinned `sources` above record historical contrib origins, not current source paths.
+Use the maintained application/effect journal and actual device ownership rules for concurrent or restarted agents. Do not let multiple uncoordinated processes overwrite a handled position or invent a second checkpoint file beside the session. Recovery notices can abandon applied events: reversible computation may follow a declared rerun policy, while irreversible work requires an explicit protected checkpoint or independently durable action capability. The pinned sources record historical origins, not an alternate active bridge implementation.
 
 ## Recover and retire visibly
 

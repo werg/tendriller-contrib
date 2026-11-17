@@ -36,7 +36,7 @@ That provisioning path is the hosted collector. Peer applications instead use
 their selected log and scoped application grants; they do not enable the hosted
 stream backend as a second writer for the same observations.
 
-During setup, compare one original record with its proposed output: source, run, time, units, selected fields, and approximate size. Do not launch a command source while merely previewing configuration. Treat partial provisioning as recoverable partial work: created streams or a received credential may exist even if a later step fails. Follow [current core collector reference](https://github.com/werg/tendriller/blob/master/docs/tools/COLLECTOR.md) for exact commands and recovery files rather than retrying setup with assumptions of rollback. The `sources` links in the frontmatter are pinned historical provenance to retired contrib file locations, not links to files on current `main`.
+An independently running acquisition process opens the same owned application session. It declares stable source/run identities, uses bounded signals for transient readings, and submits retained observations through domain commands. Keep parsing, calibration and a bounded source spool separate from the maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) exposes the actual session; there is no second hosted stream/collector data protocol. Acquisition health, applied data, retained coverage and agent handling remain distinct. Keep credentials out of authored pages and exports.
 
 ## Choose acquisition and its failure meaning
 

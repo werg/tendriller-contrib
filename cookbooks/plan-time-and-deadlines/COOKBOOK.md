@@ -43,61 +43,27 @@ A timezone label is not a fixed offset. Keep the intended IANA zone for calendar
 
 An agenda often works better than a full calendar on a phone. A team schedule may need simultaneous reference-zone and local-zone views. Both should preserve the same underlying intent.
 
-## Use the actual durable timer contract
+## Use an explicit scheduling capability
 
-Core has real server timers. The [public timer guide](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) documents durable, guarded commands through the agent and owner-page interfaces. The owner must claim the page, and the page lifetime must cover the schedule. A timer does not keep an expired ad-hoc page alive. Inspect the deployed limits and lifetime before offering a long-lived reminder.
+A date in application data does not install a durable timer. The light host participant does not run application schedules, notifications or workflows. Store deadline and reminder intent through ordinary guarded commands, and connect an explicitly configured scheduling participant or external service when work must occur after tabs close.
 
-With the initialized public browser `runtime`, call [the timer API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md#durable-timers) once when the person confirms a reviewed reminder. This example expresses a weekday review in Berlin and asks core to calculate its first occurrence:
+The scheduler uses the same application query, command and operation model. It observes a declared time policy, uses stable occurrence identities, and submits a guarded occurrence command that checks the current schedule version and duplicate status. A durable record of schedule intent, actual scheduler enrollment, a due occurrence, an external notification receipt and human completion are separate observations.
 
-```js
-const result = await runtime.timers.create({
-  title: "Review unresolved work",
-  timezone: "Europe/Berlin",
-  repeat: { at: "09:00", days: [1, 2, 3, 4, 5] },
-  missed: "fire_once",
-  notify: true,
-});
-```
+Choose calendar semantics in the domain: a named time zone, interval versus wall-clock recurrence, ambiguous or nonexistent local times, missed occurrences and bounded expansion. Do not infer a universal cron, holiday or daylight-saving policy from the session API. Preview the actual next occurrences and expose unsupported rules.
 
-The runtime owns and persists the command ID and retries the exact command after a lost response. `result.status` is `queued`, `accepted`, or `rejected`, with `cid` identifying this intention. For `accepted`, `result.value` is the timer receipt, including its ID and revision. For `queued`, show “Reminder request saved; awaiting service” rather than an enabled reminder. On return, `runtime.timers.pending()` restores the outstanding intents; `timer_queue` and `timer_result` keep that view current. Do not call `create` again to retry an already queued intention.
+## Choose lateness and delivery policy
 
-Use `runtime.timers.list()` to read the current schedule and lifetime, and `history()` for occurrences and delivery. An accepted receipt describes the original command: the timer may already have fired, advanced, or been removed when a delayed reply arrives. Refresh the list before presenting a recovered receipt as current scheduling status.
+A late reminder may still be useful, may coalesce several missed occurrences or may be skipped. Define the policy and record what happened without treating missing observation as task completion. A foreground timeout is suitable only when the promise explicitly ends with the active page.
 
-Core also retains valid commands rejected with `quota`, `lifetime_required`, `unclaimed`, `timer_conflict`, `not_found`, `already_fired`, or a semantic `bad_request`. Their exact retries return the original decision, even after a slot opens or the page lifetime changes. Error details describe that earlier decision, including its observed revision or expiration. Refresh the schedule, address the cause, and review a new intent before calling the browser method again; the runtime then creates its new CID. Current authorization, malformed-command, generation, transport, and receipt-storage failures have different [receipt boundaries](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md#timer-mutation-receipts). Keep unresolved `queued` work visible until the runtime resolves it.
+Provider acceptance does not prove display or reading. Notifications can repeat after uncertain delivery, and unavailable delivery must leave the underlying task discoverable. Preserve the external action's stable identity and use its actual reconciliation support. An ordinary applied occurrence can be abandoned by history recovery; irreversible external work requires the selected protected boundary rather than automatic replay.
 
-Omit `repeat` for a one-shot timer with the intended `due_at`; interval recurrence uses `every_minutes`. Calendar days use Sunday as zero. The public contract does not advertise arbitrary cron expressions, monthly recurrences, or holiday calendars; choose an additional explicit policy when those are needed.
+## Reschedule without conflicting intent
 
-Core's calendar policy skips nonexistent spring-transition wall times and uses the first occurrence of a repeated autumn wall time once on that date. An explicit first `due_at` overrides the initially computed occurrence; the calendar rule controls later runs. Preview upcoming occurrences when the rule could surprise the person, and explain this behavior instead of implying all local-time intentions have the same interpretation.
+Capture the current schedule domain version with a coherent query. A schedule-change command validates the authenticated author, reviewed version and proposed rule before updating the domain record. `basedOn` retains application ordering; it does not replace the schedule guard. Use a stable operation ID, exact retry and journal inspection after a lost reply.
 
-## Choose lateness and reminder policy
+If the actual scheduler has separate state, confirm its accepted update and current schedule before claiming a reminder changed. Show partial progress explicitly. A rejected old operation cannot become a newly reviewed schedule merely because a quota, date or version changed. A future correction needs a new operation after review.
 
-Core's `missed:"fire_once"` coalesces missed repeating occurrences into one run before advancing to a future occurrence. `missed:"skip"` records an occurrence as skipped when it is more than two minutes late. Choose according to the task: an overdue review can still be useful, while a reminder for a concluded meeting may no longer help. Neither policy means the application can ignore the unresolved task itself.
-
-Timer occurrence, agent processing, push delivery, and human completion remain separate records. The [durability contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md) records the occurrence/event/notification intent atomically, then delivers push through bounded retries. Its history reports delivery states and errors. Provider acceptance does not prove display or reading, and retries after uncertain outcomes can repeat delivery.
-
-Use the stable timer run ID for retry-safe downstream work where the receiving service supports it. A timer event is ordinary page data; it does not automatically authorize an external action or make that action exactly-once. For notifications, verify service readiness and an eligible owner-device subscription through the [public notification contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PUSH_NOTIFICATIONS.md). Keep the underlying task visible if notification delivery is unavailable.
-
-## Reschedule without creating conflicting intent
-
-Keep the task's deadline, reminder policy, actual timer ID, and scheduling receipt distinct. Moving a deadline may require a timer update, but should not silently change an already completed task or unrelated recurrence. Show old and new interpretations before saving changes that affect collaborators or downstream actions.
-
-Each timer's `revision` starts at 1 and advances on edits and alarm transitions. Preserve the revision that the person reviewed, including while they edit a form. For an existing `reviewedTimer`, cancellation is:
-
-```js
-const result = await runtime.timers.update(
-  reviewedTimer.id,
-  { state: "cancelled" },
-  { expected_revision: reviewedTimer.revision },
-);
-```
-
-Removal uses `runtime.timers.remove(id, { expected_revision })` and returns an accepted deletion receipt in `value`. A second editor or an alarm may have changed the revision first. `timer_conflict` then rejects the stale command atomically; show the current schedule beside the retained proposal and let the person decide again. Do not automatically substitute a newer revision. Competing clients use these core preconditions without a single scheduling writer.
-
-When a task scope protects `timer.write`, capture its original generations with the reviewed intention and pass `scope`/`expected_generations` in the browser context. Stale generations require renewed review too. Agent SDK and HTTP callers supply `cid`, `expected_generations`, and the reviewed revision explicitly; retain that complete command for exact retries. Reusing a CID for different work returns `command_conflict`.
-
-An accepted edit or deletion cancels outstanding notification retries in the same transaction. A queued cancellation has not yet stopped server work, and an already accepted provider request cannot be recalled. Local mute remains immediately available. A stale notice opens current task state and explains the changed schedule; cancellation does not erase occurrence history.
-
-A foreground countdown should derive remaining time from the intended deadline, then refresh after suspension. Decrementing a local counter on every tick drifts when callbacks are delayed. The countdown can aid an active task, but durable execution belongs to the selected server mechanism.
+Local mute can stop sound immediately while a remote cancellation remains unresolved. An already dispatched provider request may still arrive after cancellation. Opening that notice should read current authorized task state and explain obsolete work; it must not restore an old schedule from a historical receipt.
 
 ## Make time usable and accessible
 

@@ -59,47 +59,19 @@ When two devices edit the same occurrence, choose a revision or conflict policy.
 
 Offer reminders after the routine itself is useful. Explain the chosen time, device/audience, quiet behavior, and how to pause or stop. A reminder is an invitation to act, not evidence that action occurred. Keep notification text discreet where it might appear on a locked screen.
 
-Tendriller's [public timer contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/EXPERIENCES.md#timers-that-survive-a-closed-page) distinguishes interval repeats from local clock-time repeats and exposes time zone and missed-run policy. Inspect the actual next occurrence and page lifetime before promising a schedule. The owner must claim the page. An application field containing a date does not create a service timer by itself; more elaborate recurrence rules need an explicit additional scheduling policy.
+The common session stores routine definitions and guarded observations. Durable reminders require an explicitly configured scheduling participant or external service; the light host does not run an application timer executor. Qualify the actual scheduler before offering a reminder that survives a closed page.
 
-Use the [browser timer API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md#durable-timers) once for each reviewed reminder choice. For example, with an initialized public `runtime`, this asks for a weekday equipment-check reminder in the site's zone:
+Keep routine identity, definition version, intended occurrence, reminder request and actual delivery receipt separate. The scheduling integration should use stable occurrence IDs and the same application command journal for domain observations. A delayed notification or its duplicate does not establish another completed routine. Read current schedule state at its actual authority before displaying an old receipt as an active reminder.
 
-```js
-const result = await runtime.timers.create({
-  title: "Review the equipment checklist",
-  timezone: "Europe/Berlin",
-  repeat: { at: "18:00", days: [1, 2, 3, 4, 5] },
-  missed: "skip",
-  notify: true,
-});
-```
-
-The runtime creates and persists the CID and retries the exact command after a lost reply. Calling `create` again is a new intention, so do not use repeated calls as a retry loop. A `queued` result means “Routine saved; reminder request awaiting service.” Restore that pending view with `timers.pending()` and follow `timer_queue`/`timer_result`. An `accepted` result supplies the original timer receipt in `value`; keep its ID with the routine's reminder setting. A `rejected` result needs an actionable explanation. Routine persistence and reminder scheduling are separate outcomes.
-
-Core retains timer-domain decisions such as `unclaimed`, `lifetime_required`, `quota`, and `timer_conflict`. Claiming the page, extending its lifetime, or changing its schedule cannot turn the same rejected CID into an accepted reminder. After resolving the cause, show current information and let the person review a new reminder call; the runtime creates its new CID. A replayed conflict describes the original rejection, not today's schedule. Current authorization and failures outside that receipt boundary remain distinct; use the runtime's pending/result status rather than assuming every HTTP failure was a saved timer decision.
-
-Read `timers.list()` for current timer revisions and next occurrences, and `timers.history()` for runs. An accepted creation receipt may arrive after the timer already fired or was removed; it should not restore an obsolete scheduled indicator. When a scope binds `timer.write`, retain the reviewed `scope` and `expected_generations` in the timer operation's context. Agent/HTTP callers supply their stable CID and guards explicitly and retry the unchanged command.
-
-The [durability contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/DURABILITY.md) persists timer occurrences and bounded notification intents, while delivery remains at least once. Use stable run identity when processing repeated notices; do not credit a duplicate notification as another completed routine. Provider acceptance is not a human read receipt or a device-display guarantee.
-
-For push, verify service readiness and have each eligible owner device opt in through the [public notification flow](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PUSH_NOTIFICATIONS.md). Keep agent credentials private. Do not make foreground browser timers carry a promise that must survive a closed tab. Show unavailable, failed, or cancelled delivery separately from the routine's task state.
+Preview time-zone and recurrence interpretation, including daylight-saving boundaries and missed-run policy. Unsupported calendar rules remain unsupported. Show unavailable, pending, failed and cancelled delivery independently from whether the routine was completed. Provider acceptance is not proof of display or a human response.
 
 ## Handle exceptions and changes humanely
 
-Let the person pause a routine, skip a day, reduce a target, or retire it without erasing useful history. A routine's definition revision and its timer's revision describe different records. Use the timer revision that the person reviewed when changing a reminder:
+Let the person pause, skip, reduce or retire a routine without erasing useful history. A guarded command checks the reviewed routine version and author, then records that domain decision. Exact retry retains the original operation; a changed definition requires new review. A scheduling service may need a separate accepted change, so show partial progress when that boundary is unresolved.
 
-```js
-const result = await runtime.timers.update(
-  reviewedTimer.id,
-  { state: "cancelled" },
-  { expected_revision: reviewedTimer.revision },
-);
-```
+Local mute should work immediately while a remote cancellation waits. An in-flight provider request may still display. A late accepted receipt must not resurrect a schedule that was subsequently replaced. Read the current routine and actual scheduling state before showing the outcome.
 
-The same guard is required by `timers.remove(id, {expected_revision})` when retiring a reminder. Alarm advancement also increments timer revisions. If another device edits the schedule or an alarm fires first, `timer_conflict` leaves the current timer unchanged. Refresh the schedule, retain the proposed pause or revision, and ask the person to review what should happen next. Do not overwrite the new revision automatically or treat a conflict as a completed routine.
-
-A pause should explain which future expectations stop and when they resume. If the routine is paused locally while its timer cancellation is queued, show both states and keep local mute available. Only an accepted timer edit cancels its outstanding notification intents; an already accepted provider request cannot be recalled. Cancellation and deletion leave useful occurrence history within its normal retention bounds, and neither erases recorded completion observations.
-
-If a missed-run policy emits one catch-up notification, that does not mean all missed occurrences happened. Offer a compact review of unknowns instead of an automatic burst of overdue alerts. When travelling, changing a time zone, or crossing a daylight-saving boundary, show the next planned times and choose how existing occurrence identities are retained. A date correction is deliberate new work, not a retry silently moved into today's window.
+Application history recovery may abandon a recent observation or scheduling intent. Keep the original attempts inspectable and offer deliberate reapplication after current review. External effects follow their qualified action journal and protected boundary; do not blindly repeat them when a view rebuilds. Travel, illness or a changed goal should remain a meaningful domain adjustment, not a hidden failure or fictional completed day.
 
 ## Present progress with an honest denominator
 
@@ -117,7 +89,7 @@ Offer a reflection prompt that helps adjust the routine: whether the time, size,
 | Two devices change the same reminder revision. | One change wins; the rejected proposal remains reviewable and does not cancel the winner's notification intents. |
 | A reminder runs while its pause form is open. | The alarm's newer revision rejects an obsolete cancellation; a fresh review decides whether to cancel the current schedule. |
 | Pause is requested offline, or a provider accepts a push before cancellation. | Local mute works; pending server cancellation and possible late notification remain clear; the task is not marked done. |
-| A delayed accepted receipt arrives after removal. | Current `timers.list()` status stays authoritative; the routine does not show its old reminder as active. |
+| A delayed accepted receipt arrives after removal. | The actual current scheduling state stays authoritative; the routine does not show its old reminder as active. |
 | A completion is replayed, corrected, or changed from Done to Skip on another device. | The observation's own identity and conflict policy prevent duplicate credit or an unexplained lost correction. |
 | No observations exist for the review period. | The summary says unknown or unreported, with an honest denominator and accessible date labels. |
 
