@@ -1,5 +1,9 @@
 # RTC application and resident qualification
 
+The later [final qualification](rtc-final-qualification-2026-11-17.md) records
+all four runtime gates at the admission-corrected `84e22999` source. The source
+pairings and observations below remain historical evidence for their own runs.
+
 The task/chat application passed all twelve checks in
 [workflow 43980256890](https://github.com/werg/chronolog-db/actions/runs/43980256890).
 It used two independent Chromium/OPFS replicas, a separate native SQL/finality

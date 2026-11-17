@@ -1,0 +1,98 @@
+{
+  "format": "chronolog-resident-webrtc-qualification/v1",
+  "passed": true,
+  "source": {
+    "chronolog": {
+      "head": "e866e1176a000b1a67bc4a4aff758af37c1fecd3",
+      "dirty": false
+    },
+    "contrib": {
+      "head": "7291598b566090d7893a209075861d57c29b1217",
+      "dirty": false
+    }
+  },
+  "runtime": {
+    "node": "v24.22.2",
+    "native": "werift@0.27.0"
+  },
+  "artifacts": {
+    "recipeSha256": "b34d09f13844d4b5a44b2215965a2b67a7c9feb39fe4d7ad2689250386ef33e8",
+    "bundleSha256": "960dec9256aa884327d7b2a05d3d4d660191fad729f4e203594ecfd0fff672ec"
+  },
+  "checks": [
+    "exact HTTPS resident recipe starts independently and rejects unmatched routes, origins and missing admission credentials",
+    "an admitted HTTPS caller with an ungranted signing key receives no authenticated application history",
+    "a cold native client completes one direct HTTPS offer and authenticates through the actual resident context",
+    "the authenticated RTC channel retains original native signed records without more HTTPS introduction work",
+    "resident task abort closes the HTTPS listener and authenticated peer lifetime without retained entries or abort listeners",
+    "synchronous abort before listening and bind failure both dispose the handler and external abort listeners"
+  ],
+  "metrics": {
+    "signaling": {
+      "requests": 1,
+      "requestBytes": 681,
+      "responseBytes": 681,
+      "closed": true
+    },
+    "beforeApplication": {
+      "requests": 6,
+      "offers": 2,
+      "accepted": 1,
+      "rejected": 3,
+      "failed": 1,
+      "pending": 0,
+      "active": 1,
+      "closed": false
+    },
+    "afterApplication": {
+      "requests": 6,
+      "offers": 2,
+      "accepted": 1,
+      "rejected": 3,
+      "failed": 1,
+      "pending": 0,
+      "active": 1,
+      "closed": false
+    },
+    "logicalPeerFrames": {
+      "sentBytes": 9634,
+      "receivedBytes": 11236,
+      "sentPackets": 175,
+      "receivedPackets": 175,
+      "queuedSendBytes": 0,
+      "queuedReceiveBytes": 0,
+      "queuedReceiveFrames": 0
+    },
+    "records": 2,
+    "recordIds": [
+      "%aX+2TcCY9wE2ozNxaOw7ln8fbDp48Qk8QrHOsI9d9V8=.sha256",
+      "%w5wRRhLe2zEu335SOZR5tYHuHDRk0dFF9U4AFYOI0yI=.sha256"
+    ],
+    "originalOutcome": {
+      "transactionId": "tx_3e18ee38ccc3f99ed9b3f6c7af44a04a6178db5f28f47ed80d00e6f642cd9fa8",
+      "phase": "accepted",
+      "outcome": {
+        "type": "accepted"
+      },
+      "eventSetRevision": "5",
+      "materializedRevision": "1",
+      "orderKey": "1794874149976:wW4QsVuccwAuTR5X89sn8Dv34P3DN7ma58b3XaHaLf8:0:dHhfM2UxOGVlMzhjY2MzZjk5ZWQ5YjNmNmM3YWY0NGEwNGE2MTc4ZGI1ZjI4ZjQ3ZWQ4MGQwMGU2ZjY0MmNkOWZhOA",
+      "changedByReplay": false,
+      "admissible": true,
+      "final": true,
+      "observedAt": "2026-11-17T00:09:11.958Z"
+    },
+    "certificateSha256": "45de14e1a0933774fd5279787eaaed1856fd54987bf786aefd9a7d86e1a0617b",
+    "byteBoundary": "Logical peer frame payload bytes exclude RTC headers, credits and IP/UDP/DTLS/SCTP overhead.",
+    "network": "Both native RTC peers use loopback UDP. HTTPS verifies the generated loopback certificate; no TLS checks are disabled.",
+    "excludes": [
+      "browser RTCDataChannel transfer",
+      "packaged Tendriller host",
+      "production certificate provisioning",
+      "public NAT",
+      "TURN",
+      "provider billing"
+    ]
+  },
+  "error": ""
+}

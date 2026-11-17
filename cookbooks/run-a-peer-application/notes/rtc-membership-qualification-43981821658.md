@@ -1,5 +1,8 @@
 # Fresh-device membership over RTC
 
+The later [final qualification](rtc-final-qualification-2026-11-17.md) records
+the admission-corrected `84e22999` source. This note preserves the earlier run.
+
 The thin membership/v2 scenario passed all ten checks in
 [workflow 43981821658](https://github.com/werg/chronolog-db/actions/runs/43981821658).
 It exercised actual Chromium/OPFS devices, the packaged Cloudflare administrator

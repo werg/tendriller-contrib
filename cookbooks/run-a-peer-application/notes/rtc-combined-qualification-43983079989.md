@@ -1,5 +1,8 @@
 # Combined RTC application and membership qualification
 
+The later [final qualification](rtc-final-qualification-2026-11-17.md) records
+the admission-corrected `84e22999` source. This note preserves the earlier run.
+
 [Workflow 43983079989](https://github.com/werg/chronolog-db/actions/runs/43983079989)
 completed successfully with all twelve application checks and all ten thin
 membership checks at the same clean Chronolog source. The application continued

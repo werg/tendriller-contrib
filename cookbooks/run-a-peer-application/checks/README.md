@@ -208,14 +208,14 @@ measure logical authenticated frame payloads; RTC packet headers, credit
 messages and IP/UDP/DTLS/SCTP overhead are excluded. Host SDP JSON envelopes are
 counted separately, and these byte counters are not provider billing exports.
 
-The [combined RTC application and membership run](../notes/rtc-combined-qualification-43983079989.md)
+The [final RTC qualification](../notes/rtc-final-qualification-2026-11-17.md)
 passed all twelve task/chat checks and all ten fresh-device membership checks
-at the same clean `264e753c` source pairing. Its application used the packaged
-host, two browser replicas and a native authority. Exact raw reports and strict
-summaries preserve both outcomes. The
-[earlier application and later browser/resident quick gates](../notes/rtc-application-qualification-2026-11-16.md)
-retain their own source pairings. The combined pass does not erase the earlier
-closed-timestamp fixture failure or qualify subsequent fixture corrections.
+at the clean `84e22999` source pairing, after correcting the acceptance
+fixtures' admission-clock control. Its application used the packaged host, two
+browser replicas and a native authority. The same tested source passed the
+direct browser/native and native HTTPS resident gates. Exact raw reports and
+checked summaries preserve each outcome; earlier source reports keep their
+original observations and scope.
 
 Qualification covers these observations:
 
@@ -293,6 +293,9 @@ HTTPS resident-task checks under exact clean source and recipe pins.
 The [later deadline-corrected quick run](../notes/rtc-application-qualification-2026-11-16.md#later-public-direct-introduction-and-resident-lifecycle)
 preserves another five browser and six resident passes at the recorded
 `c3a7fd40` source, separately from the earlier task/chat source pairing.
+The [final qualification](../notes/rtc-final-qualification-2026-11-17.md) passes
+those gates and the full application/membership workflow at the same clean
+tested `84e22999` source pairing.
 
 Record the exact source heads, public bundle digest, native engine/WASM identity,
 browser version and per-scenario outcome. A screenshot or fixture-only browser
@@ -384,9 +387,9 @@ RTC observations for all three introductions, retired signaling and complete
 separate administrator/application counters. The small
 [membership report validator](membership-report.mjs) checks those recorded
 observations; its synthetic tests are not an enrollment qualification.
-The [combined RTC run](../notes/rtc-combined-qualification-43983079989.md)
+The [final RTC qualification](../notes/rtc-final-qualification-2026-11-17.md)
 passed all ten membership checks alongside all twelve application checks at
-the same recorded `264e753c` source. Its three introductions cover enrollment,
+the same recorded `84e22999` source. Its three introductions cover enrollment,
 reconnect after writer revocation and a newly keyed reader after administrator
 restart; Worker replacement is a separate durable recovery assertion. Exact raw
 reports, checked summaries and archive hashes are preserved. The earlier
