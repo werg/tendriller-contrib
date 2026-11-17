@@ -24,12 +24,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '09318099ec7d5b29b645e6d8c654fab710aa37a9'
+        default: 'f5e016843ce062e27aa56445ca74f15f046ecb2a'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '56f758ce9a0b5556e61462b4444995147d1b4533'
+        default: 'ed2509358c01a2a1a7c9db7691f4775347bb27c0'
 permissions:
   contents: read
 concurrency:
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || '09318099ec7d5b29b645e6d8c654fab710aa37a9' }}
+          ref: ${{ inputs.chronolog_ref || 'f5e016843ce062e27aa56445ca74f15f046ecb2a' }}
           path: .chronolog-build
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
@@ -66,7 +66,7 @@ jobs:
         if: ${{ matrix.transport == 'hosted' }}
         with:
           repository: werg/tendriller
-          ref: ${{ inputs.tendriller_ref || '56f758ce9a0b5556e61462b4444995147d1b4533' }}
+          ref: ${{ inputs.tendriller_ref || 'ed2509358c01a2a1a7c9db7691f4775347bb27c0' }}
           path: .tendriller-build
       - name: Build the actual public hosted participant
         if: ${{ matrix.transport == 'hosted' }}
