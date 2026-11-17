@@ -292,7 +292,7 @@ async function serve() {
         close(index) { closed[index] = true; }, closed: () => closed.every(Boolean),
         snapshot: () => ({ closed: closed.every(Boolean), sentMessages, sentBytes }),
       };
-      item.native = { async send(value) { item.send(0, value); }, async *messages() { yield await item.receive(0); }, close: () => item.close(0) };
+      item.native = { async send(value) { item.send(0, value); }, messages: (async function* () { yield await item.receive(0); })(), close: () => item.close(0) };
       sessions.set(id, item); return item;
     },
     async close() { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); },

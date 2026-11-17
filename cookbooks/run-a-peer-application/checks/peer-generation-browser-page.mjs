@@ -72,7 +72,7 @@ window.peerFixture = {
       return result.json();
     };
     const signaling = { async send(description) { await request('send', description); },
-      async *messages() { const result = await request('next'); if (result !== null) yield result; },
+      messages: (async function* () { const result = await request('next'); if (result !== null) yield result; })(),
       async close() { if (retired) return; retired = true; await request('close'); } };
     connection = await connectWorkerApplicationWebRtc(worker, { role: 'answerer', expectedPeerId: peerId, signaling, timeoutMs });
     return { peerId: connection.peerId, stats: connection.stats, route: await connection.rtc.getRoute(), signalingClosed: retired };
