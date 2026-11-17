@@ -36,10 +36,10 @@ try {
   };
   let publisherDevice = await device('publisher-a');
   const otherPublisherDevice = await device('publisher-b'), dataA = await device('data-a'), dataB = await device('data-b');
-  const initial = await host.state(), trust = { applicationId: fixture.applicationId, controlPublicKey: initial.controlPublicKey };
-  await verifyReleaseState(initial, trust);
   const publisherPolicy = await host.configure({ requestId: 'initial-publishers', expectedPolicy: null,
     publishers: [publisherDevice, otherPublisherDevice].map(value => ({ publicKey: value.identity.publicKey })) });
+  const initial = await host.state(), trust = { applicationId: fixture.applicationId, controlPublicKey: initial.controlPublicKey };
+  await verifyReleaseState(initial, trust);
   let publisher = await openReleasePublisher({ device: publisherDevice, host, ...trust }); resources.push(publisher);
   const other = await openReleasePublisher({ device: otherPublisherDevice, host, ...trust }); resources.push(other);
   const observerStore = new NativeBytesStore(join(directory, 'stores', 'release-observer.sqlite')); resources.push(observerStore);

@@ -24,7 +24,7 @@ export async function openReleaseBrowser({ bridge, config, executablePath, direc
   const page = await context.newPage();
   page.on('pageerror', error => failures.push(error.message));
   const ready = async () => {
-    await page.waitForFunction(() => document.documentElement.dataset.ready === 'true' || document.documentElement.dataset.failed === 'true', { timeout: 30_000 });
+    await page.waitForFunction(() => document.documentElement.dataset.ready === 'true' || document.documentElement.dataset.failed === 'true', undefined, { timeout: 30_000 });
     assert.equal(await page.locator('#error').textContent(), '');
   };
   await page.goto(base.href); await ready();
