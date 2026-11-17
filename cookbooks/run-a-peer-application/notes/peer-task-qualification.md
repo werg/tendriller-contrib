@@ -57,3 +57,10 @@ graph. The report records those exact input and output hashes. Chromium could
 not start in this workspace because its process-singleton socket was denied.
 It records `passed: false`; no SQL browser, OPFS or task-form runtime success is
 claimed by that attempt. CI runs this explicit task domain with both engines.
+
+The [later local investigation](peer-browser-runtime-status.md#later-local-sql-investigation)
+records a supported browser launch, precise SQL startup stages, and a separately
+labeled instrumented run that reached RTC gathering without browser candidates.
+Those attempts preserve the original errors and remain unsuccessful runtime
+evidence; they do not replace the independent native task result or a required
+clean browser task result.

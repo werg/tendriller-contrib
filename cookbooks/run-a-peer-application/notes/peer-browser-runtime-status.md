@@ -32,3 +32,38 @@ The earlier packed native RTC evidence remains scoped to native peers.
 Later public Worker-client, page and SQL changes require their own exact clean
 archive and a fresh report. Building or checking those files does not update
 this failed runtime result.
+
+## Later local SQL investigation
+
+The supported Playwright 1.65 headless shell, Chromium 158.0.8127.18, subsequently
+launched under the existing workspace restrictions. The
+[clean SQL attempt](evidence/2026-11-17-peer-generation-browser-task-local-report.json)
+uses consumer `1029c7cfb69a16a0f7b403a9e654b962b0304260` and the combined
+Chronolog `c685d393` archive. The consumer was installed beneath a Chronolog
+checkout to reproduce the CI directory layout. All 19 browser bundle inputs
+resolved to the installed public package or frozen consumer fixtures. An empty
+esbuild configuration now prevents inheritance of producer source aliases; the
+strict bundle-input check remains in place.
+
+That attempt opened the owned browser device and fetched its authority, but
+the public SQL runtime did not finish within the fixture's 30-second startup
+limit. The page was secure and isolated, with OPFS and Web Locks available. The
+report records `passed: false` and the observed startup stages. It does not
+establish a SQL runtime defect or successful task interactions.
+
+A separate [diagnostic report](evidence/2026-11-17-peer-generation-browser-task-diagnostic-report.json)
+has `mode: "diagnostic"`. Its copied installed `sql-browser.mjs` was instrumented
+with stage messages after schema verification, engine fetch and verification,
+WASM compilation and instantiation, SAH pool opening, and materializer opening.
+Those startup stages completed, as did Worker ownership checks. RTC then timed
+out: the browser entered ICE gathering but reported no candidates, and only the
+native offer reached signaling. The recorded endpoint failures distinguish
+browser `APPLICATION_WORKER_CONNECTION_TIMEOUT` from native
+`WEBRTC_NEGOTIATION_TIMEOUT`.
+
+The diagnostic is not an unmodified artifact qualification. Its artifact fields
+identify the original archive, while its browser asset hashes identify the
+instrumented execution. Neither local report qualifies SQL forms, peer data
+exchange, or recovery. No product timeouts, transport policy, or workspace
+restrictions were changed to obtain these observations. The full SQL scenario
+requires its separate clean CI result.
