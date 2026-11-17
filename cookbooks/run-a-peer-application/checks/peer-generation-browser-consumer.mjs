@@ -77,7 +77,8 @@ try {
     signalingBoundary: 'loopback-fixture-http', controlBoundary: 'portable-registry-over-loopback-http',
     nativeCandidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
     pageErrors: [], consoleErrors: [] };
-  page = await browser.newPage();
+  const context = await browser.newContext();
+  page = await context.newPage();
   page.on('pageerror', error => report.browser.pageErrors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') report.browser.consoleErrors.push(message.text()); });
   await page.goto(origin);
