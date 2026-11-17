@@ -1,23 +1,22 @@
 # Choose application primitives by their guarantees
 
-**Implementation status:** `peer-generation-v1` is the adopted target for new
-peer applications. The encrypted replica, public session/native/browser entries,
-framed network transport and maintained RTC composition are implemented as a
-preview; qualification is in progress. `operation.applied()` returns an accepted
-or rejected result at a specific generation and sequence. Explicit recovery may
-abandon a recent suffix, including previously applied work. This profile has no
-`final()` wait or irreversible-finality capability. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
-uses the public APIs alongside an independent consumer; using those APIs
-requires an explicitly supplied matching `@chronolog/peer-session` archive.
-The [historical implementation guide](finalized-peer-applications.md) records the
-older packages' immutable-prefix guarantee and its original evidence. Their
-checks do not qualify generation recovery or add finality to the new profile.
+**Application contract:** one public Chronolog session owns commands, queries,
+events, replication and the operation journal. Native and browser runtimes use
+that contract with explicit storage, transport and engine capabilities. There is
+no application profile selector or separate hosted data implementation.
+`operation.applied()` returns an accepted or rejected result at a selected
+history position. Recovery may abandon a recent suffix, including previously
+applied work; the current session exposes no `final()` wait.
 
-The preserved package report uses separate native/events stores over an in-process
-link with dirty-source provenance. Maintained RTC code and its independent
-consumer now exist, but their exact-archive result, browser behavior and deployed
-Internet readiness require separate evidence. No declaration or method name
-promotes that earlier run to those qualifications.
+The [peer application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
+uses packed public artifacts directly. Its
+[independent qualification record](../cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
+records exact clean native RTC, SQL and hosted runs and identifies the remaining
+browser, SDK recovery-policy and deployed-operation gates. An implementation or
+method name alone does not establish those additional qualifications.
+The [historical implementation guide](finalized-peer-applications.md) preserves
+older source-specific results; their runtime fixtures and compatibility paths
+are not part of the supported composition.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application
@@ -43,8 +42,7 @@ strong finality necessary.
 
 ## Follow the authenticated selected history
 
-The peer-first design uses `peer-generation-v1`: an authorized coordinating peer
-orders commands during one session generation. Other peers retain the original
+An authorized coordinating peer orders commands during one session generation. Other peers retain the original
 signed attempts, verify delegated order and replay it independently. The
 coordinator is a temporary role. The creator and a native process are ordinary
 participants with explicit capabilities.
@@ -62,22 +60,16 @@ inspectable and may be deliberately reapplied as a new attempt. A returning old
 branch never silently merges. If G2 excluded G1 positions 81–100, G3 cannot
 readopt them merely because an old peer returns with valid signatures.
 
-This profile is the adopted target composition. Implementation and independent
-qualification are in progress. Its evidence gate defines required checks;
-the recipe and reports identify which exact public packages and runtime scenarios
-actually pass.
-The [historical implementation guide](finalized-peer-applications.md) preserves
-the earlier chronological implementation and its source-specific evidence. It is
-not a prerequisite for ordinary applications. The adopted model has one selected
-history and explicit recovery; stronger settlement is a separately declared
-capability.
+The public runtime and independent consumers exercise this selected-history
+contract. Stronger settlement is a separately declared capability. The evidence
+record states which exact package and runtime scenarios have run, without
+promoting local results to browser or deployment readiness.
 
 All participants use one public session, command/query vocabulary and journal.
 Storage, transport and declared capability policies supply different roles; they
 do not introduce incompatible application stacks. A lost peer never triggers an
-automatic hosted fallback. Existing certificates and author
-timestamps retain their original meanings; they are not a way to fabricate
-generation ordering.
+automatic hosted fallback. Signed protocol format versions identify verified wire data; they do not select
+a different application API or turn author timestamps into generation order.
 
 ## One protocol with participant-specific interests
 
@@ -141,7 +133,7 @@ Neither promises that an operation survives a later permitted recovery.
 | Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
 
 Reserve `final` for an explicitly supported irrevocable-settlement capability.
-Do not alias a final wait to `applied()` or leave it pending in this profile.
+Do not alias a final wait to `applied()` or expose an unsupported wait that never resolves.
 
 Applied outcomes are stable while their position remains in the selected
 ancestry. Inherited attempts keep their original identity and outcome. An

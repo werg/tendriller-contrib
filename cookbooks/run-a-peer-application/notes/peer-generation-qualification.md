@@ -1,129 +1,134 @@
-# Qualify the peer-generation composition independently
+# Qualify the common application session independently
 
-`peer-generation-v1` has a different order and recovery contract from the
-historical resident/finalized recipes. Their reports remain valid for their
-recorded revisions; they do not qualify this profile.
+## Application contract and plan scope
+
+The implementation follows one public session, command/query/event API,
+operation journal and authenticated replication model. Browser and native
+runtimes provide explicit storage, transport and SQL engine capabilities. The
+host is a light participant with a dedicated filtered transport for controls,
+discovery, invitations and signed code publication. It does not execute ordinary
+application commands or receive their required bodies.
+
+The user's subsequent instructions supersede the plan's migration and parallel
+profile provisions: this is pre-release software, with no compatibility aliases,
+legacy-profile preservation or migration layer. Historical reports retain their
+original factual scope; their retired runtime fixtures are not another supported
+application composition. Signed wire format versions remain protocol evidence,
+not application selectors.
 
 The [evidence validator](../checks/peer-generation-report.mjs) defines the
-independent package gate. Its [small synthetic tests](../checks/peer-generation-report.test.mjs)
-check whether incomplete or contradictory evidence is refused. Passing those
-tests is not evidence that a peer session, browser, network or deployment ran.
+independent packed-package gate. Its [synthetic tests](../checks/peer-generation-report.test.mjs)
+refuse incomplete or contradictory reports; passing those tests alone does not
+prove that a runtime, browser or deployment ran.
 
-## Preserved development run
+## Clean public-package checkpoints
 
-The [2026-11-17 development report](evidence/2026-11-17-peer-generation-preview-report.json)
-and its [checked summary](evidence/2026-11-17-peer-generation-preview-summary.json)
-record a successful independent native/events execution using the packed public
-session. They cover exact retry after a lost reply, two commands with the portable
-control port blocked, recovery from sequence 6 to a retained prefix at sequence 4,
-a fresh peer replay, returning old-branch isolation, deliberate linked reapplication,
-a third-generation ancestry check, and reopening the same durable device.
+| Run | Exact sources | Preserved evidence | What actually ran |
+| --- | --- | --- | --- |
+| Native RTC | Chronolog `d70939f5a10d51259879d53e19f1de9667c7bf9b`; contrib `94b4a751c700bd4df3e1857e544e8b39c952755e` | [Raw report](evidence/2026-11-17-common-session-native-d70939f5-report.json), [checked summary](evidence/2026-11-17-common-session-native-d70939f5-summary.json) | Public native sessions, independent durable stores and real authenticated loopback RTC; session-owned control/publication APIs and exact retry. |
+| Native SQL | Same exact Chronolog and contrib sources as the native RTC row | [Raw report](evidence/2026-11-17-common-session-sql-d70939f5-report.json), [checked summary](evidence/2026-11-17-common-session-sql-d70939f5-summary.json) | The real patched native SQL engine through common `prepareSqlApplication`/`openSqlApplication` with an explicit engine capability; transactional authorization, coherent recovery and durable reopen. |
+| Hosted participant | Chronolog `095a04cf027a7c753c028306d1d8311d70e415fe`; Tendriller `d252a1e10e6632fba35c07a9e45f22fce38b9d81`; contrib `f44ac7a77146df2b2542d46d85b6b87ec56117ca` | [Raw report](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-report.json), [checked summary](evidence/2026-11-17-common-session-hosted-095a04cf-d252a1e1-summary.json) | Installed Tendriller SDK/engine, actual local workerd HTTP and rendezvous, synthetic authenticated accounts, real native RTC and served signed HTML/JavaScript. |
 
-Both source checkouts were dirty in that run. Its package archive SHA-256 is
-`f8dffca220e8b0aaa57e0e3e616cda48ab7cd2922fada6750afbbcf89c3c49c1`.
-This preserves the observed development result; it does not qualify a clean
-release artifact, actual HTTP control routes, physical WebRTC, browser storage,
-deployed networks, or a recovery-age bound. Those scopes need their own execution.
+All named package sources and consumer checkouts were clean at capture. The
+reports name source trees, package versions, fixture digests, runtime versions,
+installed dependency locks and artifact SHA-256 values. The checked summaries
+hash their exact raw inputs. A later commit or package is a new pairing and
+requires its own run; these checkpoints do not automatically qualify it.
 
-The `Independent peer-generation consumer` workflow builds an exact pinned
-Chronolog source revision and runs the same isolated public consumer through both
-direct session links and the maintained native RTC composition. A manual run can
-select another exact source revision.
-It uploads its artifact, provenance, raw report and checked summary even when a
-later assertion fails. Its existence is not a claim that CI has run.
+The Chronolog native RTC archive at `d70939f5` has SHA-256
+`f7df9cd6028f1ad2aec4b4f328beab04f1be1349897fa0a3fb64c7f87cbf6a13`.
+The SQL archive at that source has SHA-256
+`72a413408c6bc704c742777b6ac3622b28a577981d8a8a4248ca23b4a2f1801a`.
+The hosted checkpoint's Chronolog RTC archive has SHA-256
+`7e61730a2f21180e7be5558c86a0c77008cd570c20a377dc6cc1eef92e41d656`;
+its report records the separate Tendriller SDK/runtime/engine hashes.
 
-## Preserved native RTC development run
+The native scenario recovered the original saved operation after a lost reply,
+completed two commands while its control boundary was blocked, recovered from
+sequence 6 to a complete prefix at 4, reconstructed a fresh peer, excluded a
+returning branch across a third generation, linked a reviewed reapplication and
+reopened the original signing identity. Control attachment performed no I/O;
+a lost selection reply retried the same saved signed request.
 
-The [native RTC report](evidence/2026-11-17-peer-generation-rtc-preview-report.json)
-and [checked summary](evidence/2026-11-17-peer-generation-rtc-preview-summary.json)
-record the full recovery scenario on four actual authenticated ICE/DTLS/SCTP
-connections. The package came from clean Chronolog
-`5fbc7b182e461e12100c8bc339c5f9f2431bdeb6`; its archive SHA-256 is
-`6e1d65697dd7ab17419f9cc03982fc43d3c4ee73a2f0adafb0eeaa82681837af`.
-The consumer recorded its uncommitted explicit-loopback fixture change as dirty.
+The SQL task scenario accepted one competing claim, refused completion by the
+wrong signer, reset SQL and events together to a complete older prefix, preserved
+inherited operation identity, rejected an abandoned retry and continued after
+the creator closed. Reopening recovered the same device, stored keys and outcome.
 
-Two commands completed while the portable control boundary was blocked. Reliable
-application-frame traffic increased by 32,009 logical bytes; the retired
-introduction stayed at two SDP descriptions and 1,137 bytes. Live typing arrived
-without appending history. The run retained the lost-reply operation, recovered
-sequence 6 to prefix 4, replayed on a fresh peer, preserved abandoned evidence,
-linked a deliberate reapplication, rejected ancestor-tail resurrection in the
-third generation, and reopened the original durable identity.
+The hosted scenario verified actual authored HTML and JavaScript, publication
+hashes, exact signed retry after a persisted reply was lost, rejection of altered
+bytes, unauthorized authors and stale heads, retention of previous code, and
+survival of the selected publication across host restart. Ordinary database,
+content and live-signal updates were filtered before HTTP and refused at raw
+host ingress. Full host request/body/rendezvous counters stayed unchanged while
+host-blocked ordinary commands increased authenticated peer traffic.
 
-Each observed route selected host candidates. The fixture explicitly supplies
-loopback candidates and disables interface enumeration through public native
-options. It does not exercise network-interface discovery, Internet reachability,
-TURN, browser ownership, Tendriller HTTP, deployed login or provider billing.
-The byte boundary excludes RTC/SCTP/DTLS/IP overhead. This development report is
-preserved separately from later clean-consumer or hosted/browser qualification.
+## Implementation-plan gates
 
-## Clean native RTC pairing
+These rows distinguish implementation and local observations from full gate
+completion. In particular, the checkpoints above use explicit recovery calls;
+they do not establish SDK-owned reconnect grace, recovery freshness policy or
+eligible-candidate selection.
 
-The [clean-consumer report](evidence/2026-11-17-peer-generation-rtc-clean-report.json)
-and [checked summary](evidence/2026-11-17-peer-generation-rtc-clean-summary.json)
-repeat the complete native RTC scenario with both source checkouts clean:
+| Plan gate | Implementation and recorded observations | Remaining acceptance boundary |
+| --- | --- | --- |
+| G0 — Executable authenticated order and recovery contract | Public sessions execute signed selected order; the actual native SQL consumer demonstrates original-signer authorization and coherent SQL/events. Shared control verification fences excluded ancestry and recovery selections. | The complete adversarial authority/continuity/floor matrix belongs to the core suite. This independent report does not substitute for every core security test or native/WASM equality run. |
+| G1 — Remove hosted steady-state commands | The native and real workerd/native RTC runs pass the blocked-host workload, complete unchanged host counters, zero required hosted application-body bytes and explicit filtered participant rules. | Browser and deployed runs must demonstrate the same boundary with their actual transports. Loopback does not measure TURN or public network traffic. |
+| G2 — Recover with accepted recent loss | Explicit selection adopts an older complete prefix, preserves adopted identities, exposes abandoned work, reconstructs a fresh peer and excludes an old branch across three generations. Lost control replies preserve the saved selection request. | Maintained SDK orchestration for reconnect grace, freshest eligible source and broader-loss approval still needs implementation and an independent consumer. No five-minute recovery-age workload or universal loss bound is claimed. |
+| G3 — Independent developer/agent experience | Empty-directory consumers install public archives, use one journal, query/command/retry/recover/reapply and reopen without changing identity. Native SQL and the real host use that same session API. | Browser Worker ownership and second-tab behavior require an actual browser result for the exact pairing. A fresh-agent usability exercise with coaching, elapsed time and mistakes recorded has not been run here. |
+| G4 — Real network, cost and operating envelope | The local reports expose the actual measured byte and runtime boundaries. Cost calculation keeps absent measurements unknown. | Deployed login, home/mobile/restrictive routes, TURN, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
-- Chronolog: `784414c95e77f797083866f9c314c1ecd4183661`.
-- Consumer: `8d308a6e5cfb12de4fe3eb6d7da6c2132407a039`.
-- Session archive SHA-256: `79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c`.
-
-That run used the exact Chronolog source above. The workflow separately pins
-the source for its current qualification. The recorded run verifies
-native SQLite ownership, real loopback RTC, exact operation retry, selected-prefix
-recovery and old-branch exclusion. Its portable-control boundary does not qualify
-Tendriller HTTP or browser Worker ownership; those remain separate gates.
+The local browser attempt could not launch Chromium: the environment refused
+its singleton socket before any page or Worker ran. A writable workspace profile
+and temporary directory produced the same prelaunch failure. This is a blocked
+browser qualification, not a pass and not a browser-application assertion failure.
+The HTTP e2e runner similarly failed before tests when Wrangler could not enumerate
+network interfaces. These restrictions do not replace the actual workerd
+integration result above or the still-required browser/deployed gates.
 
 ## Public consumer boundary
 
-The runtime consumer must install an explicitly supplied `@chronolog/peer-session`
-archive in a new directory with a fresh offline package cache and lifecycle
-scripts disabled. It imports only the public package and native entry. A fixture
-may inject faults into its transport/control boundary, but the application uses
-the maintained session for commands, exact retry, views and recovery. It may not
-import core test fixtures, copy RPC/RTC lifecycle code or introduce another outbox.
+Install the explicitly supplied `@chronolog/peer-session` archive in a new
+directory, with a fresh package cache and lifecycle scripts disabled. Import only
+public package entries. Fault injection may interrupt real transport/control
+boundaries; application work must use the maintained session for commands, exact
+retry, coherent views and recovery. No private core test fixture, copied
+RPC/RTC lifecycle, second command queue or profile-dependent application is an
+acceptable substitute.
 
-Record archive SHA-256, package version, exact source commit/tree and observed
-source cleanliness. The report names the consumer commit/tree separately. A
-branch name is not an immutable source identity, and a clean consumer cannot
-make a dirty package source clean.
+The workflow has direct, native RTC, native SQL, browser/native and real hosted
+lanes. Each builds immutable pinned sources and uploads artifacts, provenance,
+raw reports and checked summaries even when a later assertion fails. A configured
+workflow is not evidence that a particular lane passed. Preserve the execution
+URL or its actual report for every claimed run.
 
-## Required runtime observations
-
-| Scenario | Required observation |
+| Fault or boundary | Required observation |
 | --- | --- |
-| Current-generation host outage | A real host probe fails while ordinary commands complete. Complete request counters stay unchanged; hosted application bodies remain zero. |
-| Selective hosted participant | Bootstrap and controls use `chronolog-participant-v1` through `peers/participant`. Ordinary database, content and live-signal updates are suppressed before HTTP, and bypassing that suppression still receives an explicit host rejection. |
-| Signed code/page publication | Actual served HTML and module bytes follow the authenticated publication chain; exact retry preserves the selected version. Altered bytes, unauthorized authors and stale publication heads are rejected, and the selected code survives a host restart without changing application authority. |
-| Lost reply after persistence | The original operation, ordered receipt and record count survive exact retry. |
-| Coordinator loss | Remove its process/store from usable recovery sources. Another peer adopts a complete earlier prefix. |
-| Coherent recovery | SQL/events/outcomes switch together; a fresh peer reconstructs the same selected state. |
-| Retained and abandoned work | Adopted operations keep their identities; the excluded suffix keeps its signed evidence and is visibly abandoned. |
-| Returning old coordinator | Its old branch cannot replace selected state or admit old attempts into the successor. |
-| Later takeover | A third generation cannot resurrect a suffix excluded by an earlier transition. |
-| Deliberate reapplication | A new operation and attempt link the abandoned original and check current domain guards. |
-| Reopen | The public native constructor reuses the stored signing identity and original operation state. |
+| Current-generation host outage | An actual host probe fails; ordinary work progresses; every host counter remains unchanged. |
+| Selective host participant | Client filtering and independent host rejection both enforce the declared facet policy. |
+| Signed page code | Actual served assets follow the authenticated publication chain and survive host restart. |
+| Lost persisted reply | Exact operation, ordered receipt and record count survive retry. |
+| Missing coordinator | Its process/store is unavailable as a recovery source; a survivor offers a complete usable prefix. |
+| Coherent recovery | SQL, events and outcomes switch together; a fresh peer reconstructs the same selected state. |
+| Retained and abandoned work | Adopted identities persist and the excluded suffix remains inspectable as abandoned evidence. |
+| Returning branch and later takeover | An excluded ancestor suffix cannot reenter selected history despite valid old signatures. |
+| Deliberate reapplication | A new operation links the original intent and checks current domain guards. |
+| Reopen | The stored signing identity, keys and original operation state return through the public constructor. |
 
-The report format is `peer-generation-consumer/v1`. Its topology is
-`independent-packed-peers`, explicitly an independent package/runtime exercise.
-It does not imply physical RTC, browser storage, real login or deployed discovery.
-The checked summary preserves those limitations and hashes the raw input.
+Measure the five-minute freshness objective under a named workload with a second
+usable peer. Report actual adopted-state age, known abandoned work and unknown
+loss. A heartbeat cannot establish a universal maximum. Provider-cost comparisons
+require equivalent outcomes and explicitly stated retention/settlement guarantees;
+see [measurement guidance](measuring-application-costs.md).
 
-## Additional gates
+## Earlier source-specific evidence
 
-The portable authority/model gate must separately cover unauthorized recovery,
-coordinator impersonation, missing bodies, continuity conflicts, restrictive
-controls and protected floors. Production adapters must use that same verifier.
-
-The browser/native gate must exercise real Worker ownership, second-tab behavior,
-unsupported capabilities, interrupted transfer and authenticated RTC. The deployed
-gate adds actual enrollment, home/mobile/restrictive networks, TURN, suspension,
-quota pressure, large content and measured provider usage.
-
-Measure the five-minute recovery-freshness objective under a named workload with
-a second usable peer available. Report actual adopted-state age and unknown loss;
-never turn an unmeasured heartbeat into a universal maximum. Compare provider cost
-only for equivalent workloads with the different retention/finality guarantee
-stated explicitly.
-
-No result in this note marks those additional gates passed. A preserved runtime
-report and its exact public artifact pairing are required for each claim.
+The [dirty native/events development report](evidence/2026-11-17-peer-generation-preview-report.json)
+and [summary](evidence/2026-11-17-peer-generation-preview-summary.json),
+[partially dirty RTC development report](evidence/2026-11-17-peer-generation-rtc-preview-report.json)
+and [summary](evidence/2026-11-17-peer-generation-rtc-preview-summary.json), and
+[earlier clean RTC pairing](evidence/2026-11-17-peer-generation-rtc-clean-report.json)
+and [summary](evidence/2026-11-17-peer-generation-rtc-clean-summary.json) retain
+their original provenance and limitations. They describe the exact artifacts
+named in those files. They neither qualify a later source nor require keeping
+superseded runtime code or fixtures active.

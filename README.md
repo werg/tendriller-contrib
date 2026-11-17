@@ -19,42 +19,41 @@ with both a browser and Python's default `urllib` user agent after deployment.
 
 Your page owns its HTML, CSS, JavaScript, state vocabulary, and interaction model.
 Copied snippets become editable application source. Core owns the public runtime,
-service guarantees, and optional [publishing, preview, bridge, and collector tools](https://github.com/werg/tendriller/tree/master/tools).
+service guarantees, and optional [session, publishing, and preview tools](https://github.com/werg/tendriller/tree/master/tools).
 The default core installs no application workflow. Deliberately selected trusted
 references live beside the cookbook that explains their policy.
 
-For new application architecture, start with
-[application primitives and roles](guides/application-primitives.md):
-`peer-generation-v1` is the adopted target, with implementation and qualification
-in progress. `applied()` reports execution in the selected generation; `shared()`
-separately observes retained coverage on another peer. Explicit recovery may
-abandon a recent suffix, including previously applied work. This profile has no
-`final()` wait. Irreversible external work requires an explicitly configured
-protected checkpoint or durable external-action service. The
-[peer application preview](cookbooks/run-a-peer-application/COOKBOOK.md) develops
-the target APIs with an independent consumer; executable examples require an
-explicitly supplied matching `@chronolog/peer-session` archive.
-Examples use that public API directly. The [historical implementation guide](guides/finalized-peer-applications.md)
-records the older packages' immutable-prefix guarantee and original test scope.
-Method names alone do not imply that guarantee, and those checks do not establish
-generation API availability or qualification.
-[Live signals](cookbooks/share-live-signals/COOKBOOK.md)
-cover typing, presence, cursors, progress and transient messages without requiring
-a database or finality service.
-The [standalone composition check](cookbooks/share-live-signals/checks/README.md)
-uses an actual public signal module for live readings and token previews. For
-peer applications, completion is scoped to the selected history. Authenticated
-provenance, application authorization and recovery-aware journals govern agent
-work; irreversible actions have a separate declared guarantee.
+For application architecture, start with
+[application primitives and roles](guides/application-primitives.md). Every
+application uses one public Chronolog session, command/query/event API and
+operation journal. Native and browser peers supply storage, transport and engine
+capabilities. The host is a filtered control/publication participant: membership,
+recovery selections and signed page code use Chronolog envelopes; ordinary
+application work travels between peers.
 
-For a shared application, start with the
-[peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md).
-The peer-generation composition uses replaceable coordinating peers, coherent
-views and explicit recovery. Its separate evidence gate defines the required
-runtime observations. The archived resident reports retain the historical
-chronological implementation's scope; their executable fixtures have been retired. Each
-qualification report names its exact source, public artifacts and measured
-boundary; historical results do not qualify the new profile.
+`applied()` reports execution in the selected history; `shared()` separately
+observes retained coverage on another peer. Explicit recovery may abandon a
+recent suffix, including previously applied work. Irreversible external work
+requires an explicitly configured protected checkpoint or durable external-action
+service. These stronger guarantees are capabilities of the same application
+model, not alternative profile-selected runtimes.
+
+The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md)
+uses the public API directly. Its
+[independent qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
+links exact clean native RTC, SQL and hosted package results and states the
+remaining browser, recovery-policy and deployment gates. Executable examples
+require an explicitly supplied matching `@chronolog/peer-session` archive. The
+[historical implementation guide](guides/finalized-peer-applications.md) preserves
+older results under their original guarantees; the superseded runtime fixtures
+have been retired.
+
+[Live signals](cookbooks/share-live-signals/COOKBOOK.md) cover typing, presence,
+cursors, progress and transient messages without a database. The
+[standalone composition check](cookbooks/share-live-signals/checks/README.md)
+uses the public signal module for live readings and token previews.
+Authenticated provenance, application authorization and recovery-aware journals
+govern agent work; irreversible actions have a separate declared guarantee.
 
 ## Use the collection
 
