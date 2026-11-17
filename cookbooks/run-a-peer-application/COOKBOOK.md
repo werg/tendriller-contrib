@@ -233,7 +233,8 @@ the executed outcome (`accepted` or `rejected`). A terminal rejection is
 `{ status: 'final', outcome: 'rejected' }`. Native operation handles expose
 `local()` for the executed result at its current position and `final()` for its
 immutable result; both return accepted or rejected outcomes. Inspect
-`result.outcome.type` before dependent work. The browser adapter exposes the
+`result.outcome.type` after `final()` before dependent work, and handle a final
+rejection explicitly. The browser adapter exposes the
 same decision through `operations.subscribe`. Submission resolving is not by
 itself permission to proceed.
 
