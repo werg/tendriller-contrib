@@ -8,7 +8,7 @@ choices: ["Signals, events or SQL/events", "Applied outcomes or protected action
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
-sources: ["https://github.com/werg/chronolog-db/blob/bc281a356d387cf9b7b67cb1798ca8337ee54ef8/packages/peer-session/README.md"]
+sources: ["https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/packages/peer-session/README.md"]
 ---
 
 # Build a peer application with explicit recovery
@@ -38,7 +38,7 @@ certificate or backup acknowledgement. Cloudflare supplies publication,
 discovery, enrollment and occasional authenticated generation selection.
 
 The [primitive and role guide](../../guides/application-primitives.md) explains
-the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/bc281a356d387cf9b7b67cb1798ca8337ee54ef8/docs/peer-generation-v1.md)
+the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
