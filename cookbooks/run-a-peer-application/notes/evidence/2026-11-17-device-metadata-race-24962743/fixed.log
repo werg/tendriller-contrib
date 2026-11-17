@@ -1,0 +1,29 @@
+
+ RUN  v3.2.7 /workspace/scratch/f3460a050d13/chronolog-db
+
+ ✓ packages/peer-session/src/device.test.ts (9 tests) 260ms
+ ✓ packages/peer-session/src/session.test.ts (21 tests) 23340ms
+   ✓ public peer application sessions > owns a single saved attempt, exposes authenticated current results and isolates cancelled waiters  2175ms
+   ✓ public peer application sessions > keeps a cut after durable ordering recoverable as the same exact attempt  745ms
+   ✓ public peer application sessions > emits applied changes only when the coherent application revision advances  427ms
+   ✓ public peer application sessions > atomically resets recovery views, preserves abandoned evidence and links a deliberate reapplication  1394ms
+   ✓ public peer application sessions > keeps device identity and applied outcomes across close/reopen and rejects another owner  374ms
+   ✓ public peer application sessions > retains recovered authority in protocol metadata before reopening without data  395ms
+   ✓ public peer application sessions > seeds a fresh peer with the selected inherited prefix before its application view is ready  1283ms
+   ✓ public peer application sessions > exchanges a retained prefix between followers regardless of connection argument order  704ms
+   ✓ public peer application sessions > persists the exact recovery request across a lost hosted reply and device reopen  1072ms
+   ✓ public peer application sessions > keeps inherited recovery private until selection and retries its exact ancestor base after reopen  2276ms
+   ✓ public peer application sessions > does not journal an ancestor transition without current recovery authority  2256ms
+   ✓ public peer application sessions > does not journal an ancestor transition without current coordinator authority  2763ms
+   ✓ public peer application sessions > closes an unanswered hosted recovery wait while retaining its exact saved request  682ms
+   ✓ public peer application sessions > requires an exact retained prefix before selecting another eligible coordinator  2419ms
+   ✓ public peer application sessions > fences a cancelled recovery owner while preserving its exact request for later resolution  910ms
+   ✓ public peer application sessions > adopts a typed hosted conflict and never resubmits its superseded saved request  1202ms
+   ✓ public peer application sessions > bounds a CLI takeover wait without discarding the saved transition or closing its session  632ms
+   ✓ public peer application sessions > binds Tendriller to applied views and authenticated operations without hosted command calls  967ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  21:01:40
+   Duration  29.87s (transform 3.81s, setup 0ms, collect 6.21s, tests 23.60s, environment 0ms, prepare 781ms)
+
