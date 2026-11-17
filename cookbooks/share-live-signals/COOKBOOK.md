@@ -112,9 +112,13 @@ authenticated hosted session, not fields supplied in the payload.
 For native or standalone use, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
 authorization callback, bounded frame transport and optional credential. Attach
-each connection with `channel.attachRoute({ send, close })`, pass its incoming
+each connection with `channel.attachRoute({ trySend, close })`, pass its incoming
 frames to the returned route's `receive(frame)`, and close that route when the
-connection ends. Set `relay: true` only when the channel should forward verified
+connection ends. `trySend` resolves `true` after local dispatch or `false` when
+busy before accepting bytes. Actual failures throw. A refused attempt is never
+queued or retried, and an application send fails with `SIGNAL_BACKPRESSURE` when
+all routes refuse. This transport contract needs no Chronolog error class.
+Set `relay: true` only when the channel should forward verified
 original frames to its other routes; standalone relay is disabled by default.
 No group history, reader grant,
 SQL engine, durable proposal or finality provider is required by the standalone
@@ -132,20 +136,22 @@ an explicit application choice.
 The governed peer service owns routes for browser and resident replicas.
 Applications using that service call `peer.connectPeer(...)` or
 `context.connectPeer(...)` instead of adding another frame-forwarding loop.
-An otherwise valid, authorized expired frame is dropped without closing the
-durable peer connection.
+Expired frames and valid signed frames denied by current writer/topic policy
+are dropped without closing a still-authorized reader's durable peer connection.
+Reader admission is checked separately; invalid signatures, malformed frames
+and physical failures still end the owning session.
 
 The [executable standalone composition](checks/README.md) creates two public
 channels from an explicitly supplied `@chronolog/signals` build. It combines
 replaceable instrument readings with ordered token previews, deliberately loses
-a chunk, refuses an unauthorized topic, disconnects and sends a fresh reading
-after reconnect. Its transport is an in-process route so the check isolates
+a chunk, refuses an unauthorized topic, recovers from congestion, disconnects and
+sends a fresh reading after reconnect. Its transport is an in-process route so the check isolates
 these primitives without opening a database or starting finality. Replace that
 route with the chosen live transport; keep its access, confidentiality and
 lifecycle policy explicit.
 
 Each channel is constructed with `{ scope, identity, authorize }`. Its explicit
-`attachRoute({ send(frame, { signal }) })` returns a route with `receive(frame)`
+`attachRoute({ trySend(frame, { signal }) })` returns a route with `receive(frame)`
 and `close()`. Receive verifies the sender and, when relay is enabled, forwards
 the original frame to other live routes without rewriting the signature,
 identity or expiry. Closing a route cancels its pending sends. Closing the channel ends

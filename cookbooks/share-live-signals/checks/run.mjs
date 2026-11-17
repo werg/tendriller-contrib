@@ -21,15 +21,20 @@ const sender = new SignalChannel({ scope: 'live-workbench', identity: identities
 const receiver = new SignalChannel({ scope: 'live-workbench', identity: identities[1], authorize });
 const lifetime = new AbortController();
 const signal = AbortSignal.any([lifetime.signal, AbortSignal.timeout(10_000)]);
-let dropNext = false, frames = 0;
-const toReceiver = { async send(frame, { signal }) {
-  signal.throwIfAborted(); frames++;
-  if (dropNext) { dropNext = false; return; }
+let dropNext = false, congested = false, frames = 0;
+const toReceiver = { async trySend(frame, { signal }) {
+  signal.throwIfAborted();
+  if (congested) return false; // Refuse before dispatch; do not queue a retry.
+  frames++;
+  // Simulate network loss after local dispatch, so this is still a successful dispatch.
+  if (dropNext) { dropNext = false; return true; }
   await receiverRoute.receive(frame);
+  return true;
 } };
-const toSender = { async send(frame, { signal }) {
+const toSender = { async trySend(frame, { signal }) {
   signal.throwIfAborted(); frames++;
   await senderRoute.receive(frame);
+  return true;
 } };
 let senderRoute = sender.attachRoute(toReceiver);
 const receiverRoute = receiver.attachRoute(toSender);
@@ -68,6 +73,17 @@ try {
 
   await assert.rejects(sender.send('administration', { role: 'owner' }), { code: 'SIGNAL_UNAUTHORIZED' });
   checks.push('payload role claims cannot authorize a disallowed live topic');
+
+  congested = true;
+  const beforeCongestion = frames;
+  await assert.rejects(sender.send('reading', { source: 'thermometer', run: 'run-1', value: 98 }), { code: 'SIGNAL_BACKPRESSURE' });
+  assert.equal(frames, beforeCongestion);
+  congested = false;
+  const recoveredReading = reading.next();
+  await sender.send('reading', { source: 'thermometer', run: 'run-1', value: 22.5 });
+  assert.equal((await recoveredReading).value.payload.value, 22.5);
+  assert.equal(frames, beforeCongestion + 1);
+  checks.push('congestion refuses local dispatch without closing the route or retrying the discarded observation');
 
   senderRoute.close();
   const beforeDisconnected = frames;
