@@ -1,5 +1,4 @@
 // Evidence and pricing are separate inputs. Missing measurements stay unknown.
-import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -7,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
 export const COST_BOUNDARIES = ['hosting', 'membership', 'relay', 'blob', 'native-agent', 'backup', 'observability'];
-export const WORKLOADS = ['table-and-contested-claim', 'chat-and-transient-progress', 'final-intent-crash-recovery',
+export const WORKLOADS = ['table-and-contested-claim', 'chat-and-transient-progress', 'protected-action-crash-recovery',
   'first-device-catch-up-and-reconnect', 'capture-and-blob', 'enrollment-retry-restart-revocation'];
 export const MEASUREMENTS = ['cloudflare-active-duration', 'cloudflare-requests', 'storage-row-writes', 'retained-storage',
   'relay-egress', 'agent-cpu-disk-network', 'browser-memory-replay', 'history-growth', 'backup-lag',
@@ -148,68 +147,15 @@ export function calculateCosts(usage, pricebook) {
     scope: 'Incremental charge for the measured workload at the supplied account baseline; include allocated fixed charges as explicit meters. Not an invoice forecast.' };
 }
 
-export function summarizeNativeMembership(raw, digest) {
-  requireValue(raw?.format === 'chronolog-membership-cost/v2' && raw.passed === true, 'A passing native compact-proof membership measurement is required');
-  requireValue(SHA256.test(digest), 'Raw report SHA-256 required');
-  const traffic = raw.final?.traffic;
-  requireValue(traffic && Array.isArray(raw.phases), 'Observed traffic and measurement phases are required');
-  assert.equal(traffic.applicationEnvelopeBytesToAdministrator, 0, 'Administrator received application envelopes');
-  assert.equal(traffic.candidateDescriptorBytes, 0, 'Administrator received application descriptors');
-  assert.equal(traffic.unexpectedAdministratorRequests, 0, 'Administrator attempted an unexpected endpoint');
-  for (const field of ['inlineControlDescriptorBytes', 'inlineControlEnvelopeBytes', 'closureRecordBytes'])
-    requireValue(Number.isSafeInteger(traffic[field]) && traffic[field] > 0, `Observed ${field} required`);
-  requireValue(traffic.inlineControlEnvelopeBytes <= traffic.inlineControlDescriptorBytes, 'Control envelopes must be contained in their descriptors');
-  const byName = new Map(raw.phases.map(phase => [phase.name, phase]));
-  requireValue(byName.size === raw.phases.length, 'Measurement phases must be distinct');
-  const workloads = ['schema-and-prime', 'four-small', 'four-large', 'eight-small', 'warm-empty-sync'];
-  const baseline = byName.get(workloads[0])?.progress?.verifiedThrough;
-  requireValue(Number.isSafeInteger(baseline) && baseline > 0, 'The initial verified control count is required');
-  let receiptThrough = 0;
-  for (const name of workloads) {
-    const phase = byName.get(name);
-    requireValue(phase, `Missing measured phase: ${name}`);
-    assert.equal(phase.progress?.verifiedThrough, baseline, `${name}: application work must not grow control history`);
-    requireValue(Number.isSafeInteger(phase.progress.receiptThrough) && phase.progress.receiptThrough >= receiptThrough,
-      `${name}: receipt coverage must be observed separately and remain monotonic`);
-    if (['four-small', 'four-large', 'eight-small'].includes(name))
-      requireValue(phase.progress.receiptThrough > receiptThrough, `${name}: application receipt coverage must progress`);
-    receiptThrough = phase.progress.receiptThrough;
-    assert.equal(phase.traffic?.candidateDescriptorBytes, 0, `${name}: administrator received application descriptors`);
-    assert.equal(phase.traffic?.applicationEnvelopeBytesToAdministrator, 0, `${name}: administrator received application envelopes`);
-  }
-  requireValue(Number.isSafeInteger(raw.final.verifiedThrough) && raw.final.verifiedThrough >= baseline &&
-    Number.isSafeInteger(raw.final.receiptThrough) && raw.final.receiptThrough >= receiptThrough &&
-    Number.isSafeInteger(raw.final.checkpointThrough) && raw.final.checkpointThrough === raw.final.receiptThrough + 1,
-  'Final control and application receipt coverage are required');
-  const phases = raw.phases.map(phase => ({ name: phase.name, candidates: phase.result?.count ?? null,
-    descriptorBytes: phase.result?.descriptorBytes ?? null, detachedEnvelopeBytes: phase.result?.detachedEnvelopeBytes ?? null,
-    administratorPutCalls: phase.administrator.durablePutCalls, administratorValueBytesWritten: phase.administrator.durableValueBytesWritten,
-    administratorRetainedValueBytes: phase.administrator.after.retainedValueBytes,
-    nativeLiveFileBytes: phase.nativeStorage.after.bytes, processResources: phase.resources, elapsedMs: phase.elapsedMs,
-    verifiedControls: phase.progress.verifiedThrough, receiptThrough: phase.progress.receiptThrough, traffic: phase.traffic }));
-  return { format: 'peer-membership-cost-summary/v2', rawReportSha256: digest, source: raw.source,
-    setting: raw.topology, phases, administrator: raw.final.administrator, closedStorage: raw.final.closedStorage,
-    controlProof: { verifiedControls: raw.final.verifiedThrough, receiptThrough: raw.final.receiptThrough, checkpointThrough: raw.final.checkpointThrough,
-      workloadControlCount: baseline, applicationDescriptorsTransferred: false },
-    traffic: { ...traffic, descriptorBytesIncludingInlineControls: traffic.inlineControlDescriptorBytes,
-      note: 'Inline control envelope bytes are already inside inline control descriptor bytes. HTTP body totals include framing/certificates and repeated transfers.' },
-    providerCosts: null, hostedPeerSavings: null, missing: ['deployed hosted baseline and hibernation', 'public direct and relay routes',
-      'provider metered usage and account allocation', 'browser memory and replay', 'blob copies and backup lag', 'paired full application workload'],
-    limits: raw.limits };
-}
-
 async function main() {
   const { values } = parseArgs({ options: { template: { type: 'boolean', default: false },
-    usage: { type: 'string' }, prices: { type: 'string' }, 'native-report': { type: 'string' }, output: { type: 'string' } } });
+    usage: { type: 'string' }, prices: { type: 'string' }, output: { type: 'string' } } });
   requireValue(Boolean(values.output), 'Supply --output with a new JSON file');
-  const modes = Number(values.template) + Number(Boolean(values['native-report'])) + Number(Boolean(values.usage));
-  requireValue(modes === 1, 'Choose --template, --native-report FILE, or --usage FILE --prices FILE');
+  const modes = Number(values.template) + Number(Boolean(values.usage));
+  requireValue(modes === 1, 'Choose --template or --usage FILE --prices FILE');
   let result;
   if (values.template) result = createUsageTemplate();
-  else if (values['native-report']) {
-    const raw = await readFile(resolve(values['native-report']));
-    result = summarizeNativeMembership(JSON.parse(raw.toString('utf8')), createHash('sha256').update(raw).digest('hex'));
-  } else {
+  else {
     requireValue(Boolean(values.prices), 'Supply --prices separately from measured usage');
     const usage = await readFile(resolve(values.usage)), prices = await readFile(resolve(values.prices));
     result = { ...calculateCosts(JSON.parse(usage.toString('utf8')), JSON.parse(prices.toString('utf8'))),

@@ -1,96 +1,55 @@
 # Measure application work before assigning a price
 
-This is the executable measurement and calculation path for
-[issue #15](https://github.com/werg/tendriller-contrib/issues/15). The native
-measurement runs the actual portable administrator, signed HTTP membership
-handler, separate authority identity, durable stores and SQL materializer. The
-cost calculator consumes usage and prices as separate files. Provider usage that
-has not been measured remains unknown; it cannot silently become a zero charge
-or a savings claim.
+The current application has one Chronolog session and one command, query, event
+and journal model. Native and browser deployments select storage, SQL engines
+and transports as explicit capabilities. Tendriller participates through the
+filtered control/publication transport. A hosted native process can run the same
+session; hosting location does not introduce a second application data API.
 
-The [2026-11-16 native before/after evidence](membership-cost-review-2026-11-16.md)
-records the executed workload, exact raw reports and the measured reduction in
-administrator writes from atomic page ingestion.
+The [independent qualification record](peer-generation-qualification.md) preserves
+actual native RTC, native SQL and packaged Tendriller observations, including the
+exact public artifacts, complete host counters and authenticated peer-frame
+bytes. The cost calculator consumes measured usage and dated prices as separate
+files. Missing usage remains unknown; a passing local scenario is not a provider
+bill or a savings result.
 
-The [published compact proof and resident recovery evidence at `89aee742`](compact-membership-resident-qualification-2026-11-17.md)
-records a source-bound v2 native cost report: application descriptors and bodies stay
-out of administrator traffic while a single verified control covers increasing
-application receipt positions. It also preserves measured browser/native RTC
-recovery and host-outage results. Provider costs and hosted/peer savings remain
-unmeasured. These historical results do not qualify a later package pairing.
+The [2026-11-16 before/after evidence](membership-cost-review-2026-11-16.md) and
+[earlier compact-proof evidence](compact-membership-resident-qualification-2026-11-17.md)
+are historical measurements of their named sources. Their author-time finality
+and membership implementations are retired. Preserve their raw facts when
+comparing a historical baseline; do not build or retain those implementations as
+another supported runtime or feed their reports into a compatibility parser.
 
-The author-time finality provider also retains signed closure markers and can
-advance its frontier during a bounded idle period after new receipts. Record its
-signed future-admission window, cutoff lag, closure interval and certificate
-polling cadence with each new measurement.
-The earlier before/after reports predate those markers and do not measure that
-additional retained history or idle traffic.
+## Measure the common session and selective host
 
-For the [WebRTC architecture](peer-network.md), record three separate windows:
-cold page/enrollment/introduction, warm application work with fixed membership,
-and an explicit participant update. The warm window must show unchanged host
-request and body-byte counters while authenticated peer bytes and real
-application outcomes progress. Stop the host after establishment and repeat
-the operation before claiming independence. A zero hosted application-write
-counter alone does not exclude host event sockets, health polls or relayed
-payloads. The compact membership protocol commits the complete control
-projection in each signed closure. Participant operations fetch control changes
-and a bounded checkpoint, without application descriptors or bodies. Their cost
-still depends on governance history, key wraps and participant decisions; it is
-not a claim that every participant update has a fixed cost.
+Run the packed consumers described in the
+[application cookbook](../COOKBOOK.md). Preserve each raw report and its checked
+summary. The native and SQL consumers install the supplied archive into a fresh
+directory; the hosted consumer additionally installs exact Tendriller SDK and
+engine artifacts and exercises a real local Worker. These gates do not require
+production credentials and do not measure account charges.
 
-## Run the native measurement
+Record three separate windows: cold enrollment and peer introduction, warm
+application work with fixed membership, and an explicit control or publication
+update. Warm work must increase authenticated peer bytes and actual application
+outcomes while every host request and body-byte counter remains unchanged.
+Block the host and repeat that work. The host transport must filter ordinary
+database, content and live-signal messages before HTTP, and raw attempts to send
+them must fail at host ingress. A zero application-write counter alone does not
+exclude unrelated polling or an application payload hidden in another route.
 
-In an exact Chronolog checkout with its pinned dependencies and native engine:
+Count signed membership/control envelopes, code publications and page asset
+reads separately from ordinary peer replication. Publication asset bytes are
+expected at the host because serving signed page code is its declared role.
+Control changes include grants, key wraps and selected recovery prefixes; their
+cost depends on governance history and participant decisions. There is no
+per-command host acknowledgement or constant-cost claim for all control changes.
 
-```sh
-node --import tsx tools/membership-cost.ts --output /new/membership-cost-evidence
-```
-
-The current report format is `chronolog-membership-cost/v2`. The output directory
-must be new. The runner checkpoints `report.json` after
-each phase and writes a failed result on error. It records source head, dirty
-paths, measurement/fixture source hashes, Node/OS/architecture, commands and
-timestamps. It requires native loopback HTTP and SQLite/DoltLite, but neither a
-browser nor a Cloudflare account. Preserve its raw report; the adjacent private
-stores contain private identities and must remain protected local state.
-
-Its twelve phases include bootstrap observation, schema priming, four small
-candidates, four 192-KiB candidates, eight small candidates, an empty warm sync,
-lost approval reply, administrator reopen/exact retry, conflicting decision
-refusal, writer and reader revocation/rotation, and future-epoch application
-data. The body-size and candidate-count dimensions vary independently.
-
-Each phase records:
-
-- Actual signed HTTP request/response bodies, descriptor transfers, inline
-  controls and unexpected endpoint calls. Inline envelope bytes are **already
-  inside** inline-control descriptor bytes; do not add them twice.
-- Administrator durable put calls, written value bytes, retained value bytes,
-  and structural storage categories. Values and private keys are not exported.
-- Native file sizes, including live WAL/SHM, followed by separately measured
-  closed sizes and logical payload/feed/journal/authority categories.
-- Process CPU time and sampled peak RSS. The administrator and native authority
-  share this measurement process, so these are combined local resource costs.
-
-A logical `put` is not a provider-billed SQL row, and a file size is not a
-time-integrated GB-month. The fixture does not use a tunnel, relay, blob provider,
-browser or deployed Durable Object; their costs stay unmeasured.
-
-Create a concise derived report from contrib without changing the raw input:
-
-```sh
-node cookbooks/run-a-peer-application/checks/cost-report.mjs \
-  --native-report /new/membership-cost-evidence/report.json \
-  --output /new/membership-cost-summary.json
-```
-
-The `peer-membership-cost-summary/v2` summary hashes the exact raw report,
-preserves per-phase traffic/storage and sets `providerCosts` and
-`hostedPeerSavings` to `null`. Its validator requires zero administrative
-application descriptor/body bytes in every application workload phase and an
-unchanged verified control count while application receipt coverage advances.
-Old descriptor-scan reports cannot qualify the compact protocol.
+Local reports contain public evidence, not private stores. Keep signing keys,
+epoch keys, login credentials and durable device databases outside published
+reports. A logical store write is not a provider-billed SQL row, a file size is
+not a time-integrated GB-month, and an observed process peak is not a per-role
+resource bill.
 
 ## Prepare comparable deployment samples
 
@@ -101,7 +60,10 @@ node cookbooks/run-a-peer-application/checks/cost-report.mjs \
   --template --output /new/application-cost-usage.json
 ```
 
-It contains hosted, peer-direct and peer-relayed cases. Fill only observations
+It contains a hosted baseline, peer-direct and peer-relayed comparison cases.
+These are measurement labels, not runtime profiles. Name whether the baseline
+runs the same session on a hosted peer or is a preserved historical measurement;
+a historical source cannot qualify the current implementation. Fill only observations
 backed by the cited raw evidence. `unmeasured` requires a reason. `not-used`
 requires both topology evidence and a reason; an unavailable meter is
 `unmeasured`, never `not-used`. Unsupported routes remain unmeasured cases.
@@ -109,7 +71,7 @@ requires both topology evidence and a reason; an unavailable meter is
 Pin the actual deployed public artifacts and bootstrap, native runtime,
 browser/device versions, network path, measurement window and workload trace
 SHA-256. Use the same trace, counts, payload distribution, user/device counts,
-idle periods, retention interval and fault schedule in each case. Replay final
+idle periods, retention interval and fault schedule in each case. Replay selected
 events and compare the accepted/rejected business outcomes; a similar screenshot
 does not establish equivalent work.
 
@@ -117,22 +79,22 @@ does not establish equivalent work.
 | --- | --- |
 | Shared edits and contested claim | Original operations, one winner/loser, final rows/events and exact retries |
 | Chat and transient progress | Durable message bytes and separate expiring signal counts/bytes |
-| Final agent intent and crash recovery | Dispatch journal, provider idempotency/reconciliation result and any unknown outcome |
+| Protected external action and crash recovery | Dispatch journal, provider idempotency/reconciliation result and any unknown outcome |
 | Fresh device and reconnect | Enrollment stages, history transferred, replay duration, browser memory, no duplicate commands |
 | Capture/blob | Original bytes, metadata receipt, successful authorized reads, actual copy count and independent backup lag |
 | Membership lifecycle | Size/count workloads, approval response loss, restart, revocation and future-key delivery |
 
-### Measure the hosted baseline's actual idle behavior
+### Measure the deployed baseline's actual idle behavior
 
-The reviewed hosted implementation already accepts page and agent WebSockets
-through the hibernation API and configures automatic ping responses. See pinned
-[page sockets](https://github.com/werg/tendriller/blob/283f210c1fb9dc2c1d27e9bbd9e8813234a40a70/server/src/page.ts),
-[agent sockets](https://github.com/werg/tendriller/blob/283f210c1fb9dc2c1d27e9bbd9e8813234a40a70/server/src/agent.ts)
-and [automatic responses](https://github.com/werg/tendriller/blob/283f210c1fb9dc2c1d27e9bbd9e8813234a40a70/server/src/tendril.ts).
-Do not estimate its cost as an always-active server merely because sockets are
-connected. Run a quiet connected interval, a realistic active interval and a
-reconnect interval. Preserve alarms, other pending work and outbound connections
-that can affect eligibility.
+Run a quiet interval, a realistic active interval and a reconnect interval for
+the exact deployed topology. Preserve alarms, pending work and outbound
+connections that affect idle behavior. A hosted peer process and the Tendriller
+control participant are separate resource consumers. Measure each one instead
+of estimating that every connected application keeps a Durable Object active.
+
+If a comparison uses an older hosted baseline, retain its source and original
+socket/hibernation measurements with that baseline. They describe that historical
+implementation, not an application socket service available in the current host.
 
 Cloudflare's [duration rules](https://developers.cloudflare.com/durable-objects/platform/pricing/)
 distinguish activity and hibernation eligibility. Its
@@ -155,7 +117,7 @@ unsupported-network evidence from
 
 Measure native CPU, disk, network and browser memory/replay over the same window.
 Record the sampling method and distinguish a process peak from a per-role peak.
-The current browser/native RTC gates report logical authenticated peer frame
+The current native RTC gates report logical authenticated peer frame
 payload bytes, excluding RTC packet headers and credit messages as well as
 IP/UDP/DTLS/SCTP overhead. The packaged-host application gate counts SDP JSON
 envelopes separately. Preserve those exact boundaries when comparing results;
@@ -165,12 +127,12 @@ integral; keep the original samples and the integration rule. Record history
 growth and the newest independently recoverable backup position/time. A backup
 that was never created has unknown or absent durability, not zero lag.
 
-For blobs, record the upload/retention receipt, content hash/length, authorized
+For content, record the storage/retention receipt, content hash/length, authorized
 read from every claimed copy and an independent restore test. The metadata event
 and the object are separate retention obligations. A copied descriptor or an
-accepted metadata transaction is not a receipt for a second blob copy. The
-[blob metadata recipe](https://github.com/werg/chronolog-db/blob/c5edba7df30f2325f5f51de9b9ff04591be8c989/examples/blob-metadata.ts)
-keeps that distinction in the application protocol.
+accepted metadata transaction is not a receipt for a second blob copy. Use the session content facet for the bytes and a guarded domain command for
+their application reference. A signed publication is the separate mechanism for
+the complete page-code graph.
 
 ## Apply dated prices only to measured quantities
 
@@ -232,7 +194,7 @@ not an automatic verification of operator-supplied evidence or a monthly invoice
 Completing issue #15 needs an actual deployed hosted/peer pair, Cloudflare account
 analytics and its monthly baseline, native host/provider usage, real browser
 devices, qualified Internet routes and real blob/backup services. None is
-substituted by the native runner or calculator. The local evidence can establish
+substituted by a local package gate or the calculator. The local evidence can establish
 payload exclusion, metadata write/retention behavior and named resource samples;
 it cannot establish production prices paid, hibernation duration, NAT behavior,
 backup availability or the application's complete hosting savings.
