@@ -1,20 +1,24 @@
 # Choose application primitives by their guarantees
 
 **Implementation status:** `peer-generation-v1` is the adopted target for new
-peer applications. Its implementation and qualification are in progress. Design
-around the generation-scoped session, applied/shared/abandoned outcomes and
-protected-effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
+peer applications. Its implementation and qualification are in progress. The
+unified contract uses `local()` for a result applied here and `final()` for a
+result committed and applied under the selected history. Explicit recovery may
+abandon a recent suffix, including work previously reported final. Design around
+that recovery exception and the effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
 develops the target APIs alongside an independent consumer; using those APIs
 requires an explicitly supplied matching `@chronolog/peer-session` archive.
-The existing pinned finalized packages expose the separate chronological
-`local()` / `final()` contract described in the [stronger-profile guide](finalized-peer-applications.md).
-Those APIs and their historical checks do not establish generation API availability
-or qualification.
+The preview currently spells its execution wait `applied()`; use the actual API
+of the supplied archive, without inventing aliases or additional protocol stages.
+The [historical implementation guide](finalized-peer-applications.md) records the
+older packages' immutable-prefix guarantee. That guarantee comes from their
+implementation, not from the name `final()`, and their checks do not qualify
+generation recovery.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application
 history after recovery. A resource reservation needs a guarded transaction.
-An email or payment needs a separately protected decision before dispatch.
+External work needs a journal and an explicit policy for recovery and uncertain outcomes.
 
 ## Choose the smallest sufficient mechanism
 
@@ -25,7 +29,7 @@ An email or payment needs a separately protected decision before dispatch.
 | Shared conversation or recorded observations | Peer application events | Exact signed attempts and deterministic replay; a selected recovery may abandon a recent suffix. |
 | A conditional shared state transition | One SQL/event program | Assertions, mutations and effective events succeed or fail together in the selected order. |
 | Administration that must not be rolled back | Signed control transition or protected administrative action | Monotonic permissions and recovery floors survive application-tail loss. |
-| An irreversible external action | An explicitly stronger action service or finality profile | Stable effect identity, authorized dispatch, provider idempotency and reconciliation. |
+| External work | An authorized effect worker with a reset-aware journal | Stable effect identity and reconciliation; protect a prerequisite only when the application requires it to survive recovery. |
 
 Use the [signal guide](../cookbooks/share-live-signals/COOKBOOK.md) for typing,
 presence, cursors, readings, previews and disposable progress. An events-only
@@ -33,7 +37,7 @@ application needs no SQL engine. Add SQL when assertions and relational updates
 make the domain simpler. Neither an agent nor a native process makes SQL or
 strong finality necessary.
 
-## Select an authenticated history profile
+## Follow the authenticated selected history
 
 The peer-first design uses `peer-generation-v1`: an authorized coordinating peer
 orders commands during one session generation. Other peers retain the original
@@ -58,23 +62,16 @@ This profile is the adopted target composition. Implementation and independent
 qualification are in progress. Its evidence gate defines required checks;
 the recipe and reports identify which exact public packages and runtime scenarios
 actually pass.
-Existing timestamp-ordered, finalized histories retain their own meaning; the
-[stronger-profile guide](finalized-peer-applications.md) documents their separate
-APIs and evidence. There is no conversion or compatibility layer between these
-contracts.
+The [historical implementation guide](finalized-peer-applications.md) preserves
+the earlier chronological implementation and its source-specific evidence. It is
+not a second architecture to select for ordinary applications. The adopted model
+has one selected history and an explicit recovery exception; completion names do
+not add protocol stages or promise survival beyond that contract.
 
-| Guarantee | Peer generation | Chronological finality profile |
-| --- | --- | --- |
-| Application order | Delegated sequence within the selected ancestry | Signed author time and deterministic tie-breakers |
-| Completion | Accepted/rejected at a generation and position | Final accepted/rejected outcome after verified closure |
-| Recovery | May abandon a recent suffix | Must preserve the profile's promised final prefix |
-| Ordinary host dependency | None in an established generation | Depends on the explicitly selected finality provider |
-| Irreversible effects | Separately declared stronger boundary | Configured final-intent worker with its own authorization |
-
-An application chooses one backend and one authenticated profile. A lost peer
-never triggers an automatic hosted fallback. Do not reinterpret old certificates,
-forge author timestamps to impose sequence order, or call `applied()` a synonym
-for `final()`.
+An application uses one backend and authenticated selected history. A lost peer
+never triggers an automatic hosted fallback. Existing certificates and author
+timestamps retain their original meanings; they are not a way to fabricate
+generation ordering.
 
 ## Keep authority roles separate
 
@@ -87,7 +84,7 @@ for `final()`.
 | Recovery requester | May initiate a policy-permitted transition | Eligibility for an arbitrary peer or adoption of an excluded branch |
 | Hosted control selector | Authenticated atomic selection and monotonic controls | SQL execution proof or permanent survival of ordinary edits |
 | Replica | Retains and verifies usable history | Permission to write, coordinate or discard another participant's work |
-| Effect worker | Performs explicitly authorized protected actions | Authority derived from payload claims or lossy applied events |
+| Effect worker | Performs authorized work and reconciles it across recovery | Authority derived from payload claims or permission to repeat a completed effect |
 
 Chronolog owns shared authority verification. Tendriller hosts the control
 participant and provides account integration. Discovery advertisements, account
@@ -99,17 +96,23 @@ A payload's `author`, `role` or `instruction` property is domain data. It cannot
 replace the verified signer, grant private tools or impersonate a missing device.
 A stable application/team identity must outlive the creating device.
 
-## Distinguish saved, applied, shared and abandoned
+## Distinguish completion from recovery
+
+These are observations, not a required ladder of protocol stages. The target
+method names describe scope: `local()` is applied here; `final()` is committed
+and applied in the selected history. The current preview's `applied()` spelling
+remains an implementation detail of that archive.
 
 | Observation | What it establishes |
 | --- | --- |
 | Saved | The exact attempt is durably recorded locally with its original generation and guards. |
 | Waiting | The original attempt is retained; no current execution outcome is known. |
+| Local | The program has an execution result on this replica. |
 | Applied accepted | The selected sequence executed the complete program successfully at a stated position. |
 | Applied rejected | That execution rejected the complete program; no partial mutation or effective event escaped. |
 | Shared | A named independent peer retained a complete usable prefix; reachability may change. |
 | Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
-| Final | Only a profile or explicit stronger boundary that actually promises finality may report this. |
+| Final | The accepted or rejected result is committed and applied under the selected history; explicit recovery may later abandon it. |
 
 Applied outcomes are stable while their position remains in the selected
 ancestry. Inherited attempts keep their original identity and outcome. An
@@ -166,26 +169,32 @@ its producer's claim; it does not by itself prove correct SQL execution.
 
 ## Keep external effects explicit
 
-Ordinary peer-generation applied events cannot drive `FinalEventSource` or an
-automatic irreversible effect worker. An abandoned edit cannot undo an email,
-payment or external deletion. Provider idempotency may prevent duplicate calls;
-it cannot make a rolled-back business precondition true.
+Ordinary effects can follow committed selected-history events through a worker
+that handles resets. Keep stable intent identities and a dispatch journal whose
+completed effects are not forgotten with an abandoned application suffix.
+Reconcile uncertain calls and use provider idempotency where available. A reset
+must not automatically repeat a completed effect. An abandoned edit cannot undo
+an email, payment or external deletion; the application's recovery policy must
+account for that possibility.
 
-Use a declared protected checkpoint or durable action service for those actions,
-with stable effect identity, current authorization and reconciliation of uncertain
-outcomes. A required protected prefix that no longer exists makes that stronger
-recovery unavailable. This does not stop unrelated ordinary collaboration.
-Reversible computations and replaceable previews may rerun under an explicit
-application policy.
+Only when an application requires a prerequisite to survive recovery, protect
+the complete accepted program and its dependencies with a recovery floor or an
+explicitly protected action boundary. If that required prefix is unavailable,
+report the protected action unavailable without stopping unrelated collaboration.
+This is a requirement of that action, not a second default architecture.
+
+The existing `FinalEventSource` adapter assumes an immutable accepted-event
+history. It needs an explicit reset-aware contract before consuming generation
+events; renaming an execution wait does not provide that behavior.
 
 ## Give an implementing agent a short contract
 
 1. Choose signals-only, events-only, or SQL/events according to domain needs.
-2. Name the authenticated profile and the loss/finality guarantees it offers.
+2. Use the unified selected-history contract and state its explicit recovery exception.
 3. Establish device identity and explicit author, coordinator and recovery rights.
 4. Use the public session for query, command, operation inspection and recovery.
 5. Preserve exact attempts across lost replies; deliberately review reapplication.
-6. Keep protected administration and irreversible tools outside the lossy path.
+6. Journal and reconcile ordinary effects across resets; protect whole-program prerequisites only where required.
 7. Qualify the packed composition against host outage, coordinator loss, returning
    old branches and close/reopen without replacing device identity.
 

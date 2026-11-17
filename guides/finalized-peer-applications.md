@@ -1,12 +1,13 @@
-# Use an explicitly finalized peer profile
+# Historical chronological implementation and checks
 
-This guide describes the explicitly selected stronger chronological finality
-profiles and their existing packaged APIs. New application architecture follows
-the [adopted peer-generation target](application-primitives.md), whose implementation
-and qualification are in progress. Select this chronological profile explicitly
-when its immutable final-prefix contract is required. Its `local()` / `final()`
-methods and existing checks do not define or qualify the generation-scoped
-applied/shared/abandoned contract.
+This guide preserves the earlier chronological implementation, its packaged
+APIs and the original scope of its checks. It is historical implementation
+guidance, not a second architecture to choose for new applications. Follow the
+[unified peer-generation target](application-primitives.md): `local()` means
+applied here, and `final()` means committed and applied under the selected
+history, with an explicit recovery exception. The older implementation below
+promises an immutable final prefix; that guarantee comes from its implementation,
+not from those method names. Its reports do not qualify generation recovery.
 
 Start with what must survive. A live cursor can disappear. A submitted message
 must be recoverable. A resource reservation must satisfy its condition. Sending
@@ -29,13 +30,13 @@ delivery for distinct transient messages and choose `mode: 'latest'` only when a
 new value replaces the old value. Neither mode makes disconnected delivery
 durable.
 
-For durable peer work, [the peer application guide](../cookbooks/run-a-peer-application/COOKBOOK.md)
-connects event-only and mixed SQL/event profiles to public APIs. Choose one
+The [retained resident recipe](../cookbooks/run-a-peer-application/notes/finalized-resident-recipe.md)
+connects the historical event-only and mixed SQL/event implementation to its public APIs. Choose one
 durable application backend for each application. A hosted backend and a peer
 backend have different execution and availability contracts; the UI should not
 submit the same intent to both.
 
-## Select chronological live collaboration explicitly
+## Historical chronological collaboration contract
 
 Chronolog's chronological peer backend uses live collaboration: peers share one timestamp-ordered
 application history, may show a provisional local view, and observe final

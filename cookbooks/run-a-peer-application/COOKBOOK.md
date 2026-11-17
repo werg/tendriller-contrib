@@ -16,7 +16,12 @@ sources: ["https://github.com/werg/chronolog-db/blob/3567468a921d3968c606efdef94
 **Implementation preview:** This recipe targets the paired `@chronolog/peer-session`
 composition under active qualification. Its consumer and source APIs are developed
 together. No report here yet establishes browser/RTC or deployed readiness;
-existing pinned finalized packages retain their [separate contract](notes/finalized-resident-recipe.md).
+existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
+
+The unified target uses `local()` for applied-here results and `final()` for
+committed/applied results under the selected history, with an explicit recovery
+exception. This preview currently calls its execution wait `applied()`; the code
+below uses that actual API spelling and adds no aliases or protocol stages.
 
 Use this approach for shared applications that can lose a recent unreplicated
 tail when peers disappear. A temporary coordinating peer orders commands; other
@@ -34,8 +39,8 @@ the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
-Existing [finalized resident applications](notes/finalized-resident-recipe.md)
-remain an explicitly selected stronger composition, with their original reports.
+The [retained resident recipe](notes/finalized-resident-recipe.md) preserves the
+older immutable-prefix implementation and the original scope of its reports.
 
 ## Choose one of three entry paths
 
@@ -63,7 +68,8 @@ never trigger an automatic switch to hosted JSON state or a stronger profile.
    revision. Keep that revision with any intent based on the displayed state.
 4. **Post.** Submit one schema-validated domain command with a stable operation
    ID. The session persists the exact signed attempt before sending it. Applied
-   accepted means that the selected sequence executed it, not that it is final.
+   accepted means that the selected sequence executed it; it does not promise
+   survival across explicit recovery.
 5. **Lose a reply.** Look up or retry the original operation. Do not allocate a
    replacement ID merely because a waiter timed out.
 6. **Lose the coordinator.** An eligible survivor may select a successor from its
@@ -195,7 +201,7 @@ restore broader access through an old SQL snapshot.
 The events-only package check does not prove SQL replay or native/WASM
 conformance. The SQL path needs its own exact engine/profile/artifact evidence.
 The earlier [board/chat specimen](checks/README.md) remains a regression for the
-explicitly finalized profile; relabeling its outcomes would not qualify SQL under
+historical chronological implementation; relabeling its outcomes would not qualify SQL under
 `peer-generation-v1`.
 
 ## Keep live signals and external work separate
@@ -205,11 +211,14 @@ outbox. A lost live message does not become a queued application command. Large
 content lives outside command envelopes and needs authorized peer/provider reads;
 a content reference does not guarantee every peer still retains the bytes.
 
-A generation-applied event cannot automatically dispatch an irreversible email,
-payment or external deletion. Use an explicitly stronger action boundary with
-stable effect identity, authorization, provider idempotency and reconciliation.
-Provider idempotency alone cannot preserve a precondition that recovery abandons.
-Reversible computations and replaceable caches can follow an explicit rerun policy.
+Ordinary effects need authorization, stable intent identity, a reset-aware
+dispatch journal and reconciliation of uncertain outcomes. Recovery must not
+repeat completed work merely because its intent left the selected history.
+Provider idempotency prevents some duplicates but cannot preserve a precondition
+that recovery abandons. Protect the complete prerequisite program only when the
+application requires it to survive recovery; this does not require a second
+default architecture. Reversible computations and replaceable caches can follow
+an explicit rerun policy.
 
 ## Exercise the public composition
 
