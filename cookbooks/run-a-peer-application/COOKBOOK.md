@@ -18,19 +18,19 @@ composition under active qualification. The public encrypted session and
 maintained network/RTC composition are implemented. The qualification note
 preserves independent native/events and clean native RTC reports with their exact
 source and archive hashes. Those runs do not establish browser, Internet or deployed readiness;
-existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
+earlier finalized implementations retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
 
 `operation.applied()` returns execution in the selected generation.
 `operation.shared()` separately observes retained coverage on another peer.
 Either observation can later become abandoned during permitted recovery.
-This profile exposes no `final()` wait or automatic irreversible-effect dispatch.
+The session exposes no `final()` wait or automatic irreversible-effect dispatch.
 
 Use this approach for shared applications that can lose a recent unreplicated
 tail when peers disappear. A temporary coordinating peer orders commands; other
 peers retain signed history and independently execute the selected sequence.
 The creator and an optional native agent have no permanent special role.
 
-The authenticated `peer-generation-v1` profile distinguishes **applied**,
+The authenticated application history distinguishes **applied**,
 **shared** and **abandoned** work. Current-generation commands, reads, signals and
 replication run over established peer connections without a host append,
 certificate or backup acknowledgement. Cloudflare supplies publication,
@@ -41,8 +41,8 @@ the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db
 owns the wire rules; this cookbook does not implement a second authority policy.
 The [qualification note](notes/peer-generation-qualification.md) separates the
 independent packed session exercise from real browser/RTC and deployed evidence.
-The [retained resident recipe](notes/finalized-resident-recipe.md) preserves the
-older immutable-prefix implementation and the original scope of its reports.
+The [historical resident archive](notes/finalized-resident-recipe.md) preserves the
+older immutable-prefix evidence and the original scope of its reports.
 
 ## Choose one of three entry paths
 
@@ -54,7 +54,7 @@ older immutable-prefix implementation and the original scope of its reports.
 
 An agent can use any path. Its presence does not require a durable transaction
 for every preview or a fixed native authority for ordinary collaboration.
-Choose one application backend and one authenticated profile. Unavailable peers
+Use the same application session and backend for every participant. Unavailable peers
 never select a second command API or journal. Stronger guarantees are explicit
 capabilities on the same session contract.
 

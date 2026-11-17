@@ -1,251 +1,100 @@
-# Thin membership administration and detached payloads
+# Membership through the control participant
 
-This records the implemented boundary and its measured qualification for the paired
-[Tendriller #35](https://github.com/werg/tendriller/pull/35) and
-[Chronolog #1](https://github.com/werg/chronolog-db/pull/1) work. On 2026-11-16 the
-complete packaged Cloudflare/native/browser gate passed, including live enrollment,
-restart, revocation and measured exclusion of application payloads from the
-administrator. The actual Worker runs in a local workerd harness with synthetic
-authenticated accounts. Deployed Cloudflare authentication, public-network routes,
-provider cost and operational recovery remain separate qualification work.
+The host is a participant in the same Chronolog protocol as the application
+peers. It has a control role and a dedicated delivery policy. It does not open a
+second database, materializer or application journal to manage permissions.
+The [participant transport guide](peer-network.md) lists the allowed facets and
+the [implementation map](implementation-and-qualification.md) identifies the
+remaining independent qualification boundaries.
 
-The historical measurements below describe earlier receipt and descriptor-scan
-implementations. The current protocol is `signed-inclusion-v2`: each native
-closure commits the complete finalized control projection, and the administrator
-receives controls plus one signed checkpoint. It downloads **zero application
-descriptors and zero application bodies**. Full replicas independently audit that
-projection against the original complete receipt ledger. Application execution
-remains deterministic signed author-time order; the native authority owns
-inclusion and closed time. Current qualification requires membership report v3
-and native cost report v2. Historical reports remain unchanged and do not qualify
-these new formats.
+## Keep permissions separate from deployment roles
 
-## Put membership administration on Cloudflare by default
+Application grants declare reader, writer, coordinator eligibility and
+administrator rights independently. A browser, native agent or optional always
+available process uses the same session contract. Being online longer does not
+make an agent an authority; having an authenticated host account does not grant
+application reader or writer rights.
 
-The portable administrator owns the root membership identity, durable enrollment
-decisions and roster changes. Its default host is Cloudflare. A native resident
-peer owns the selected coordinated application authority, retains application
-payloads and runs the application materializer and effect workers. Browsers are
-full application replicas with their own device identities, authorized keys and
-local storage. These are separate responsibilities even when a deployment places
-more than one of them in the same process.
-
-| Participant | Retains and verifies | Executes or authorizes |
+| Participant | Receives | Owns |
 | --- | --- | --- |
-| Cloudflare membership administrator | Complete signed control projection, one closure checkpoint and durable membership decisions | Enrollment, grants, revocations and key distribution at proved author-time boundaries |
-| Native finality provider and full replica | Descriptor history, inclusion/closure evidence and required detached application envelopes | Inclusion and closed-frontier certificates; canonical application replay and designated resident services |
-| Authorized browser full replica | The same required application history and its own durable device operations | Local application execution, coherent reads and authorized signed changes |
-| Relay or payload source | The explicitly configured bytes and transport state | Transport and exact content retrieval; no implied membership or finality authority |
+| Browser or native application peer | Authorized signed control updates, encrypted commands, retained content and permitted live signals | One device identity, exact-attempt journal and coherent application view |
+| Selected coordinating peer | The same protocol and data as an eligible application peer, plus commands for ordering | Ordering within the selected generation; no permanent authority or unique decryption role |
+| Host control participant | Explicit control, publication, discovery and invitation messages admitted by its policy | Durable control selection, signed page publication projection and route hints |
 
-Membership authority must not silently grant the administrator application reader
-or writer rights. Any retained key material and distribution policy must be
-explicit. A host login identifies a person to the host; signed device requests,
-approved capabilities and their verified activation establish group access.
-Application SQL team invitations are a separate feature and cannot substitute
-for this process.
+The host policy rejects database submission, content chunks and live application
+signals. The client transport filters those messages before HTTP and the host
+independently rejects bypassed envelopes. The host must not receive ordinary
+commands merely to keep its control state current. Device catch-up transfers
+application history and content from authorized peers.
 
-The administrator uses durable metadata storage. A Cloudflare SQLite-backed
-Durable Object can supply that storage without loading or executing the
-**application** SQL engine. Tests must distinguish those two uses of SQL.
+## Use the owned session for lifecycle actions
 
-Signed genesis selects the initial application schema administrator separately
-from the membership root. Every full replica initializes its SQL ownership model
-from that same signed schema key. The native schema owner can create application
-tables without making the Cloudflare root an application writer, group member or
-SQL executor. A fixture-specific local root override is not a valid substitute.
+Pre-session bootstrap obtains the pinned descriptor, application definition,
+controls and authorized keys through the public participant transport. Once the
+application is open, attach that transport with
+`session.connectControlParticipant({ exchange })`. Attaching performs no I/O.
+The returned control port verifies definitions and authority and retains a
+monotonic record of publication heads. Ordinary commands, coherent queries,
+operation waits and live signals continue through the same session while that
+host transport is unavailable.
 
-## Certify controls and keep application history on peers
+A survivor uses `session.recovery.takeover(control)` at an explicit recovery
+boundary. Planned retirement uses `session.recovery.handover(control, ...)` with
+verified retained coverage from the successor. These actions persist their exact
+signed transition before sending it. A lost response retries that identity and
+base; it does not silently select a more recent prefix or invent a second
+application history.
 
-The implementation replaces opaque, payload-sized log entries with canonical typed descriptors.
-Each application candidate commits its exact signed envelope hash and length,
-group, record type and epoch. Small signed capability and epoch envelopes travel
-inline. Their cumulative signed projection lets the administrator verify
-membership history without downloading intervening application descriptors.
-The projection binds each control's original receipt and first activation cutoff;
-an unsigned server-side filter cannot establish completeness. Full replicas fetch detached application envelopes from
-their authorized peer path and verify them against the committed descriptor
-before using them.
+A restrictive control update must fence newly forbidden work as soon as its
+verified authority is learned, including while required application content is
+missing. The application can keep a previously coherent view visible with an
+explicit unavailable state; it cannot present that view as current authority.
+Reader revocation rotates future access under the epoch rules. It cannot erase
+plaintext or keys already held by a device.
 
-This is a clean prerelease format change. Do not add old/new envelope conversion,
-parallel histories or a second page-owned proposal queue. Existing public
-application operations keep their meaning: one durable signed operation, exact
-retry, one ordered history and one application result.
+## Qualify actual membership updates independently
 
-The membership `after` cursor counts controls. The signed checkpoint separately
-reports application receipt coverage and closed author time, so application-only
-activity advances neither retained control history nor its cursor. A fresh device
-verifies that proof to restore grants and keys before authenticating a WebRTC
-peer; original application history then arrives over that connection.
+The maintained [hosted public-artifact gate](../checks/README.md) runs the real
+packed Tendriller engine in workerd and the packed native session over RTC. It
+checks host interest filtering, zero host requests during established
+application work, selected-prefix recovery and signed page-code publication.
+Those checks do not by themselves establish a live enrollment or revocation
+campaign.
 
-Descriptor verification and ordering are distinct from payload availability and
-application execution. A full
-replica missing the corresponding body, decryption key or execution support must
-not label that application prefix applied final, emit its events or advance a
-processed event cursor beyond the unresolved input. It can continue to show its
-previous coherent applied view while identifying the blocked progress.
+Membership qualification additionally needs device-created identities after
+bootstrap; review and signed activation through the public host participant;
+authorized key delivery; and actual peer catch-up before readiness. Drop the
+control response after persistence, restart the host and retry the exact
+operation. A changed decision under the same operation ID must be refused.
 
-Detached transaction envelopes are also distinct from photos or capture bytes.
-The existing [file/capture metadata recipe](../COOKBOOK.md#adapt-the-executable-specimen)
-still needs its upload receipt and retention policy. Ordering a descriptor, or
-committing blob metadata, does not establish another durable payload copy.
+Revoke a writer while its host login remains valid and verify that a newly
+signed direct peer command fails. Preserve the original result of an accepted
+exact retry. Then revoke a reader, rotate future access and verify that it
+cannot receive new keys or authorized future content. Restart the device and
+host to check that neither a cached grant nor a stale control response restores
+revoked rights. Keep these observations separate from transport authentication
+and from merely receiving a successful administration response.
 
-## Exercise live membership through the public boundary
+Measure actual encoded request and response bytes at the host boundary. Compare
+fixed command count with increasing body sizes, then fixed body size with
+increasing command counts. Host application-data bytes and request counts must
+remain unchanged in both established-work windows. Measure participant updates
+separately: grants, key wraps, control history and published assets legitimately
+have their own traffic and storage costs.
 
-The qualification fixture must construct the actual portable administrator on
-the public Cloudflare host composition, with a durable root identity and store.
-The native authority is a separate participant. Devices create their own keys;
-they are not pregranted in genesis and do not receive a fixture's raw epoch key.
+## Historical evidence
 
-The enrollment flow is observable as separate steps: device request, host review,
-durable signed approval, ordered and verified capability activation, authorized
-key delivery, payload catch-up, then application readiness. A successful approval
-HTTP response alone is insufficient. The browser must verify the approved scope
-and history before it reports readiness.
+The retired membership/finality implementation and its complete acceptance table
+remain available at their [exact source snapshot](https://github.com/werg/tendriller-contrib/blob/11c445e4d25e7b8ca415f3327c8049fcadc9f547/cookbooks/run-a-peer-application/notes/thin-membership-administration.md).
+Its reports describe those artifacts, including real workerd restarts, browser
+enrollment and revocation. They do not qualify the common session or its current
+participant envelope:
 
-Revocation must be exercised through the same public administrator. A writer's
-new direct-to-native proposal must fail after its revocation becomes effective,
-even while its host login remains valid. A previously accepted exact retry keeps
-its original result. A replacement grant does not revive intent signed against
-an older revoked grant. Reader removal rotates future access as defined by the
-epoch protocol; it cannot erase plaintext or keys already held by that device.
+- [Initial thin-membership raw report](evidence/2026-11-16-thin-membership.json).
+- [Initial application report](evidence/2026-11-16-application-pilot.json).
+- [The reviewed source/artifact pairing](qualification-review-43957113710.md).
+- [Later compact-control evidence](compact-membership-resident-qualification-2026-11-17.md).
 
-An approval reply can be lost after durable commit. Restarting the administrator
-and retrying the same operation must return the original decision and proposal,
-without a new grant or accidental widening of rights. Changing the reviewed
-request under that operation ID must fail explicitly. Portability uses the same
-administrator core and identity/history contract in another supported host; it
-does not imply automatic failover or two simultaneously active root stores.
-
-## Historical qualification after the earlier review
-
-The [earlier source/artifact pairing](qualification-review-43957113710.md) passed in
-[workflow 43957113710](https://github.com/werg/chronolog-db/actions/runs/43957113710),
-using public Tendriller source `283f210c`, membership `cc18d15e` and contrib
-`8449017`. It retains seven thin runtime assertions plus the build/import audit,
-zero administrator application-envelope bytes and separately measured full-peer
-traffic. The updated application pilot has nine checks, including the exact built
-scope/reset recipe through the native public adapter. The new note and separate
-raw reports preserve the actual clean tested merge, package hashes, measurements
-and limits. They do not replace the initial evidence below.
-
-## Recorded public-artifact qualification
-
-[Browser workflow 43940378818](https://github.com/werg/chronolog-db/actions/runs/43940378818)
-passed the initial complete gate. The [unaltered thin-membership report](evidence/2026-11-16-thin-membership.json)
-records seven runtime assertions plus the independent package/bundle build check,
-Chromium `158.0.8127.18`, no page errors and `passed: true`. The separate
-[two-layout application report](evidence/2026-11-16-application-pilot.json) in the
-same run passed eight checks, with one resident effect dispatch and zero host
-application writes.
-
-| Provenance | Exact identity |
-| --- | --- |
-| Chronolog authored PR head | `5cfa04440029c24d4313e7b8e88e593952180adb` |
-| Clean tested PR merge | `43efd510001c2608bc1e28ee4c7d100cb34c773b` |
-| Tendriller public SDK, runtime and engine source | `43cac4e75b0bbe1e422f4879b7249d6db5988440` |
-| Embedded portable membership source | `46b72ebc1c69f71b4cabab744ef19c6a4e50dfec` |
-| Contrib pages and runner wrapper | `a3797d528d3bbbc649cda637e1e465105ea86c1c` |
-| SDK tarball SHA-256 | `24f3da2394a151e97e368e1129b8e4ab725cdff0bfca62d858d4ca8e1e3a9042` |
-| Engine tarball SHA-256 | `6e8915ca86b788105c0e40c92d0cd610559c596fe76957f6c1f26fcd3e516832` |
-| CI archive | Artifact `14262634338`, SHA-256 `910ac51584c70818dcbf93c945a0766abc01ecaa16c168f80b7cf6810e2b877d` |
-
-The report also retains the exact browser bundle, SQL WASM, manifest and portable
-membership module/declaration hashes. Its membership import inventory excludes
-the application materializer, native SQLite/SSB runtime and full node executor.
-The engine's public provenance export is checked before the scenario starts.
-The native SQL view independently verifies one native schema administrator and
-zero application group memberships for the Cloudflare root.
-
-Reproduce with the [public qualification command](../checks/README.md#qualify-thin-cloudflare-membership-separately).
-The recorded command runs `tools/thin-membership-pilot.ts` against the built
-Tendriller `dist` tarballs and the independently built SQL WASM assets. The
-contrib wrapper invokes that core command; it supplies no replacement provider.
-
-### Encoded byte measurements
-
-These totals are actual canonical descriptor and signed encrypted envelope
-lengths for the named candidates. The requested payload sizes are SQL string
-values; envelope totals also include the rest of each signed program.
-
-| Workload | Candidates | SQL payload per candidate | Descriptor bytes | Detached envelope bytes |
-| --- | ---: | ---: | ---: | ---: |
-| Small | 4 | 16 bytes | 568 | 2,668 |
-| Large | 4 | 196,608 bytes | 576 | 789,092 |
-| More small | 8 | 16 bytes | 1,136 | 5,320 |
-
-Increasing body size at the same candidate count changed descriptor traffic by
-only eight bytes, from the encoded length fields. Doubling the small candidate
-count doubled descriptor bytes. The complete scenario made 21 signed membership
-requests: 13,115 request bytes and 26,251 response bytes. It transferred 2,706
-candidate-descriptor bytes and 9,552 inline-control-descriptor bytes; the latter
-already includes 7,504 inline signed envelope bytes and must not be double-counted.
-The remaining response bytes contain framing, ordering evidence and certificates.
-Repeated range transfer is included in these session totals.
-
-The administrator received **zero application envelope bytes**, with **zero
-unexpected administrator endpoint requests**. The authenticated full-peer path
-separately transferred 57,444 inbound and 1,657,484 outbound framed bytes. Those
-counts include synchronization overhead and repeated ranges; they are not unique
-payload sizes or provider billing. Retained storage size, production relay cost,
-Internet latency and NAT behavior were not measured by this fixture.
-
-### Acceptance map and remaining boundaries
-
-| ID | Scenario | Observed evidence and limit |
-| --- | --- | --- |
-| ADMIN-01 | Default public Cloudflare composition with a separate native full peer. | Passed actual workerd provider, real Durable Object restart and durable root/roster recovery; bundle audit excludes the application engine. This is not a deployed Cloudflare service. |
-| ADMIN-02 | Device-created identity after genesis and live approval. | Passed account-bound signed request, approval, independently verified active grants and HPKE keys, then authenticated detached-body catch-up and application readiness. No raw epoch key or pregrant is injected. |
-| ADMIN-03 | Equal candidate counts with very different body sizes; double count with fixed size. | Passed both measurements above, zero administrator application envelopes and no body endpoint requests. Public-network cost and retained-storage measurements remain issue #15. |
-| ADMIN-04 | Lose the committed approval response and restart the host. | Passed original signed approval and capability IDs after actual Durable Object eviction; a changed decision under the same operation ID is refused. The native integration also drops the native append response. |
-| ADMIN-05 | Revoke writer while host login remains valid; submit directly to native. | Passed final `WRITER_UNAUTHORIZED` rejection and unchanged proposal identity for an earlier accepted exact retry. |
-| ADMIN-06 | Revoke reader and rotate future access. | Passed active-reader removal, refusal of its host history route, known future epoch with no device key, and native publication using its retained authorized future key. Previously held keys/plaintext are not erased. |
-| ADMIN-07 | Withheld, corrupt, duplicated or reordered bodies. | Actual host/browser gate proves missing-body blocking and later authenticated recovery. Separate codec/core tests reject length, digest, type, group and epoch substitution. This run is not a deployed-route corruption/reordering fault campaign; issue #14 retains that work. |
-| ADMIN-08 | Roster changes after large or unavailable application bodies. | Passed activation and authorized key receipt while the browser application frontier is explicitly blocked on detached payloads; thin administration progresses using descriptors/inline controls. |
-| ADMIN-09 | Restart durable host and browser state. | Passed host restart after lost approval response and abrupt browser Worker replacement after accepted/rejected operations, retaining identity, grants and exact receipts. Production storage loss and every enrollment crash boundary remain separate recovery qualifications. |
-| ADMIN-10 | Existing two task-board layouts after the detached-format change. | The initial eight application checks passed against the pins above. The [new pairing](qualification-review-43957113710.md) passes nine checks, adding native scope/reset qualification. The layouts' two identities are explicitly pregranted; fresh-device Cloudflare enrollment remains the separate thin fixture. |
-
-Record encoded transport bytes, not JSON character counts or estimates. The
-report should identify candidate count and envelope size distribution, descriptor
-bytes, capability/epoch bytes, administrator application-payload bytes and fetch
-attempts, full-peer payload bytes by route, retained storage bytes and restart
-results. Include the administrator bundle's module inventory or import audit.
-An empty counter is useful only when the actual fetch/transport boundary is
-instrumented; a fake roster or an unconnected stub cannot prove exclusion.
-
-Use two independent measurements: hold the number of candidates constant while
-increasing body sizes, and hold body sizes constant while increasing the number
-of candidates. The first exposes accidental payload transfer; the second now
-requires zero administrator application-descriptor transfer and unchanged
-retained control state. Participant changes still grow control history and key
-wraps. The historical descriptor-scan measurements above must not be relabeled
-as results for the compact-proof implementation.
-
-## Keep evidence and deployment claims separate
-
-The earlier application pilot used a native root administrator and pregranted
-browser identities. The public bridge pilot exercised live enrollment, but its
-administrator was also a full SQL reader. Neither earlier result proves the new
-membership placement. Preserve those reports as application and bridge
-regressions rather than relabeling their scope.
-
-A test against the built Worker in a local workerd harness establishes that host
-composition. A real deployed Cloudflare run separately establishes the chosen
-service configuration, login, networking and persistence behavior. Record the
-deployed version and operational limits before claiming production qualification.
-
-The existing deployment issues remain the tracking surface:
-
-- [#14](https://github.com/werg/tendriller-contrib/issues/14): measure descriptor,
-  inline-control and detached-payload routes separately, including cold join,
-  interruption and direct/fallback behavior on real networks.
-- [#15](https://github.com/werg/tendriller-contrib/issues/15): compare Cloudflare
-  membership metadata cost with full-peer payload transfer, replay and storage;
-  publish usage and current pricing separately.
-- [#16](https://github.com/werg/tendriller-contrib/issues/16): rehearse durable
-  administrator identity/roster recovery separately from native finality and
-  payload storage recovery. No implicit role or lineage takeover.
-- [#17](https://github.com/werg/tendriller-contrib/issues/17): qualify live deployed
-  enrollment, host-session independence, writer and reader revocation, epoch
-  delivery, OPFS reopen and private-data exclusion.
-
-No deployment issue is closed by the local workerd/native/Chromium qualification.
+The [deployment handoff](deployment-qualification-handoff.md) keeps real login,
+networking, hosted persistence, device recovery and measured cost work explicit.
+A local workerd/native check does not establish the deployed operating envelope.

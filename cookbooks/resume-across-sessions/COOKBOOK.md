@@ -60,12 +60,12 @@ Use an event's validated generation context for protected results, not an applic
 
 ## Manage overlap and uncertain effects
 
-For a [resident peer application](../run-a-peer-application/COOKBOOK.md), keep the
-deterministic service running independently of the model conversation. Reopening
-the UI restores the core's original proposal identities and queries their current
+For a [peer application](../run-a-peer-application/COOKBOOK.md), keep the
+owned device session independent of the model conversation. Reopening
+the UI restores the session's original operation identities and queries their current
 outcomes. The page may keep a reference to an operation beside its local draft;
 that reference is not another delivery queue. A new LLM conversation consumes
-the service's recorded final work rather than becoming its database process.
+the session's recorded work with its applied, shared or abandoned status.
 
 The durable event continuation belongs to a group/history and filter version.
 Changing a topic filter requires an explicit cursor decision. Empty matching
@@ -73,10 +73,13 @@ batches can advance scanned progress, while unresolved execution cannot. Commit
 the derived state and its processed cursor together, and bind cache checkpoints
 to the reducer version. Rebuilding a view never dispatches an external effect.
 
-An unavailable authority can leave local reads and verified peer catch-up useful
-while new coordinated finality waits. Restoring a stale authority backup is not
-ordinary reconnect: the history must have proven continuity or a new explicit
-lineage. Show backup/replication lag separately from the final result a user saw.
+An unavailable control host leaves established peer commands, signals and
+replication useful. Losing the coordinating peer requires an eligible survivor
+to select a complete retained prefix at an explicit recovery boundary. Publish
+the resulting recovery notice, preserve abandoned attempts for inspection, and
+review current preconditions before deliberate reapplication. Restoring a stale
+control store must not silently undo a newer selection. Show retained coverage
+and recovery uncertainty separately from the applied result a user saw.
 
 Two devices may remain active during handoff. Define whether one is authoritative for a particular activity or whether both may edit under conflict detection. A “Continue here” control should explain what changes on the old device; presentation focus does not automatically stop its sensor or revoke its access. Show active-device context when it prevents confusion without exposing private identities unnecessarily.
 

@@ -51,8 +51,8 @@ For a shared application, start with the
 [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md).
 The peer-generation composition uses replaceable coordinating peers, coherent
 views and explicit recovery. Its separate evidence gate defines the required
-runtime observations; the existing resident checks retain the historical
-chronological implementation's scope. Each
+runtime observations. The archived resident reports retain the historical
+chronological implementation's scope; their executable fixtures have been retired. Each
 qualification report names its exact source, public artifacts and measured
 boundary; historical results do not qualify the new profile.
 

@@ -140,9 +140,11 @@ and install that archive into the consuming application. Construct
 can create a fresh standalone identity. Keeping an identity across restarts is
 an explicit application choice.
 
-The governed peer service owns routes for browser and resident replicas.
-Applications using that service call `peer.connectPeer(...)` or
-`context.connectPeer(...)` instead of adding another frame-forwarding loop.
+The application session owns routes for browser and native participants.
+Applications attach a transport with `session.connectPeer(...)`; the same owned
+session carries commands, replication, content and live signals according to the
+participant's verified permissions. A control host has a separate transport
+policy and does not receive live typing or progress frames.
 Expired frames and valid signed frames denied by current writer/topic policy
 are dropped without closing a still-authorized reader's durable peer connection.
 Reader admission is checked separately; invalid signatures, malformed frames
