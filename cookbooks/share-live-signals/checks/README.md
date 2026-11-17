@@ -28,9 +28,10 @@ when the connection ends. Return `true` for local dispatch and `false` for an
 immediate refusal before accepting bytes. Throw for actual transport failures.
 Network loss after dispatch still returns `true`: local dispatch is not a remote
 delivery receipt. Enable `relay: true` only when original verified frames
-should also be forwarded to other attached routes. Preserve
-the channel's cancellation and size/backpressure bounds. The production route
-must provide the required confidentiality and access control. A signed live
+should also be forwarded to other attached routes. Preserve the channel's
+cancellation and size/backpressure bounds. A refused attempt stays unqueued;
+only a fresh observation may be sent after capacity returns. The production
+route must provide the required confidentiality and access control. A signed live
 frame does not establish encryption, a database grant or a completed action.
 
 This local composition qualifies signal semantics and public API use. It does

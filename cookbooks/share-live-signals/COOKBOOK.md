@@ -69,6 +69,13 @@ Installation is separate from `tendril.application.install()`. If it happens asy
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
 
+The hosted channel is for authenticated owner devices and the configured agent.
+Guests and display sessions do not subscribe or publish. The host supplies the
+scope, authenticated author, session, sequence and freshness timestamps; it
+stores no signal payload or per-message durable metadata and never wakes a
+conversational agent for these messages. The connected agent explicitly listens
+when it needs live interaction.
+
 ```js
 await tendril.signals.send('typing', { typing: true }, { ttlMs: 2500 });
 
@@ -157,6 +164,9 @@ the original frame to other live routes without rewriting the signature,
 identity or expiry. Closing a route cancels its pending sends. Closing the channel ends
 subscriptions; an unattached send fails immediately. The module provides no
 database, proposal, capability-log or finality dependency to configure.
+
+Publish fresh observations when capacity returns; never keep a durable retry
+queue for discarded signals.
 
 An agent can participate in the same way as another live endpoint. A disposable
 preview request, attention cue or immediate local Stop can be governed by its
