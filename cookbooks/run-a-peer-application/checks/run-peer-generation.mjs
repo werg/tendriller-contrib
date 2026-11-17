@@ -119,7 +119,8 @@ try {
   let observed = report;
   try { observed = JSON.parse(await readFile(reportPath, 'utf8')); } catch { /* Bootstrap failed before a report existed. */ }
   observed.passed = false;
-  observed.error = error instanceof Error ? error.stack ?? error.message : String(error);
+  observed.runnerError = error instanceof Error ? error.stack ?? error.message : String(error);
+  observed.error ??= observed.runnerError;
   await writeFile(reportPath, `${JSON.stringify(observed, null, 2)}\n`);
   throw error;
 }

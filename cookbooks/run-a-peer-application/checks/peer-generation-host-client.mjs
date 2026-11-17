@@ -18,6 +18,7 @@ export function createHostedFixture(base) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });
       const configured = await request('/api/peers/application', { method: 'PUT', body: configuration });
       const published = await request('/api/peers/definition');
+      assert.deepEqual(published.descriptor, configured.descriptor);
       assert.deepEqual(published.definition, configuration.definition);
       assert.deepEqual(published.schema, configuration.schema);
       return {

@@ -44,7 +44,8 @@ function paintOperations() {
         try {
           // This retained draft is used only for a deliberate new command. The
           // original signed attempt and its retry state stay in the owned journal.
-          await refresh();
+          const current = await session.query(definition.queries.some(value => value.name === 'board') ? 'board' : 'conversation', {});
+          paint(current);
           if (!window.confirm(`Create a new attempt for “${reference.label}” using the current history?`)) return;
           await submit(reference.command, reference.input, reference.label, reference.operationId);
         } catch (error) { status(`Reapplication needs review: ${error.message}`, true); }
@@ -76,7 +77,7 @@ function paint(result) {
     row.append(text('strong', task.title), text('p', task.claimedBy ? `${task.status} · claimed by ${task.claimedBy.slice(0, 12)}` : 'Open for a claim'));
     const button = text('button', task.claimedBy ? 'Finish task' : 'Claim task'); button.type = 'button';
     button.disabled = task.status !== 'open' || Boolean(task.claimedBy && task.claimedBy !== session.deviceId);
-    button.onclick = () => void submit(task.claimedBy ? 'finishTask' : 'claimTask', { taskId: task.id }, `${task.claimedBy ? 'Finish' : 'Claim'}: ${task.title}`);
+    button.onclick = () => void submit(task.claimedBy ? 'finishTask' : 'claimTask', { taskId: task.id }, `${task.claimedBy ? 'Finish' : 'Claim'}: ${task.title}`).catch(() => undefined);
     row.append(button); return row;
   }));
 }
@@ -149,7 +150,7 @@ try {
   $('#message').value = draft; $('#message').disabled = false; $('#send').disabled = false;
   $('#tasks-section').hidden = !definition.commands.some(value => value.name === 'claimTask');
   await refresh(); status('Ready. Attempts and recovery remain visible below.');
-  const notices = await session.recovery.inspect();
+  const notices = await session.inspectRecovery();
   if (notices.length) {
     const latest = notices[notices.length - 1];
     $('#recovery').hidden = false;
