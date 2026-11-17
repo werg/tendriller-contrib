@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Choose when to interrupt
 
-Use an interruption when someone has a meaningful next action: review a completed result, respond to a blocked process, or notice a condition before it becomes irrelevant. Continuous telemetry usually belongs in a quiet history. A threshold crossing may merit attention; every sample above the threshold usually does not.
+Use an interruption when someone has a meaningful next action: review a completed result, respond to a blocked process, or notice a condition before it becomes irrelevant. Continuous telemetry can use quiet live signals when only current conditions matter, or retained history when later inspection matters. A threshold crossing may merit attention; every sample above the threshold usually does not.
 
 Start with the decision that the interruption should enable. For an experiment monitor, “Temperature exceeded the chosen band; inspect the setup” is actionable. “New data received” may add noise without helping. If no action is required, a changed status or a later digest can be sufficient.
 
@@ -34,6 +34,7 @@ A compact instrument page may need one visible alert and local mute. A collabora
 
 | Mechanism | Useful purpose | Boundary |
 | --- | --- | --- |
+| Ephemeral signal | Update a live display or deliver a disposable attention cue. | No offline replay, retained task, durable acknowledgement or finality; use expiry and a bounded consumer. |
 | Quiet state or stream record | Preserve an observation for later inspection. | Recording does not establish that anyone noticed it. |
 | Local visual cue | Help someone actively using the page. | It depends on the view being available and must remain understandable without color alone. |
 | Local sound or speech | Attract attention during a deliberate active session. | Playback may be muted or unavailable; local Stop must remain effective. |
@@ -44,6 +45,13 @@ A compact instrument page may need one visible alert and local mute. A collabora
 The [public notification guide](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PUSH_NOTIFICATIONS.md) distinguishes service readiness, local permission, subscription, and server registration. Check service availability before inviting opt-in, request subscription from a deliberate user action, and offer a test. Keep private payload details out of notification titles and bodies, which can appear on a locked or shared screen.
 
 Keep the underlying task durable where it matters. Push is a delivery channel, not the sole record of a required decision. A notification tap should load current authorized state rather than trusting stale payload text as the action to execute.
+
+Use the [live-signals guide](../share-live-signals/COOKBOOK.md) for presence,
+progress, typing or a temporary “look here” cue. The durable server timer and Web
+Push paths described below belong to the hosted application backend. A peer
+application records required timer intent in its own history and uses a
+designated final-intent worker; it does not start the hosted application writer
+to deliver an optional live cue.
 
 ## Separate detection, suppression, and resolution
 

@@ -1,13 +1,14 @@
-import { signals } from './deployment/bootstrap.mjs';
+import './deployment/bootstrap.mjs';
 import { claimTask, postMessage, requestSummary } from './actions.mjs';
 import { mergeOperation, operationLabel, readBoard, TOPICS } from './projection.mjs';
 import { canRemoveReference, captureMessageDraft, clearSubmittedText, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './drafts.mjs';
+import { observeTyping } from './typing.mjs';
 
 const $ = selector => document.querySelector(selector);
 const api = window.tendril;
 const lifecycle = new AbortController();
 let backend, drafts = newDrafts(), storageKey, painting = false, dirty = false, currentView, currentRead, submittingMessage = false;
-let lastTyping = 0;
+let lastTyping = 0, typingActive = false;
 const outcomes = new Map();
 const operationWatchers = new Map();
 const submissions = new Set();
@@ -155,7 +156,7 @@ async function refresh() {
 
 async function submit(kind, domainId, submittedText, editorSnapshot = submittedText) {
   if (kind === 'message' && submittingMessage) return;
-  if (kind === 'message') { submittingMessage = true; $('#send').disabled = true; }
+  if (kind === 'message') { submittingMessage = true; $('#send').disabled = true; sendTyping(false); }
   const operationId = crypto.randomUUID();
   const messageId = kind === 'message' ? crypto.randomUUID() : domainId;
   const jobId = kind === 'job' ? crypto.randomUUID() : undefined;
@@ -170,7 +171,10 @@ async function submit(kind, domainId, submittedText, editorSnapshot = submittedT
       : kind === 'claim' ? await claimTask(backend, domainId, operationId)
         : await requestSummary(backend, domainId, jobId, operationId);
     outcomes.set(operationId, mergeOperation(outcomes.get(operationId), result));
-    if (kind === 'message') { saveDrafts(clearSubmittedText(drafts, editorSnapshot)); $('#message').value = drafts.message; }
+    if (kind === 'message') {
+      saveDrafts(clearSubmittedText(drafts, editorSnapshot)); $('#message').value = drafts.message;
+      if (!drafts.message) sendTyping(false);
+    }
     paintOperations();
     const observed = outcomes.get(operationId);
     status(operationLabel(observed), observed.status === 'rejected');
@@ -220,19 +224,21 @@ async function watchOperation(operationId) {
 }
 
 async function watchTyping() {
-  if (!signals) { $('#typing').textContent = 'Typing indicators are unavailable on this connection.'; return; }
-  let expiry;
+  if (!api?.signals?.available) { $('#typing').textContent = 'Typing indicators are unavailable on this connection.'; return; }
   try {
-    for await (const event of signals.subscribe({ topics: ['typing'], signal: lifecycle.signal })) {
-      if (event.payload?.typing !== true) continue;
-      const remaining = Math.min(2500, event.expiresAtMs - Date.now());
-      if (!Number.isFinite(remaining) || remaining <= 0) continue;
-      $('#typing').textContent = 'Someone is typing…';
-      clearTimeout(expiry);
-      expiry = setTimeout(() => { $('#typing').textContent = ''; }, remaining);
-    }
+    await observeTyping(api.signals, { signal: lifecycle.signal,
+      onChange: ({ count }) => { $('#typing').textContent = count ? 'Someone is typing…' : ''; } });
   } catch (error) { if (!lifecycle.signal.aborted) $('#typing').textContent = `Typing unavailable: ${error.message}`; }
-  finally { clearTimeout(expiry); }
+}
+
+function sendTyping(active) {
+  if (!api?.signals?.available || (!active && !typingActive)) return;
+  const now = Date.now();
+  if (active && typingActive && now - lastTyping < 1000) return;
+  typingActive = active;
+  lastTyping = now;
+  // This optional live indication never changes a durable submission's outcome.
+  void api.signals.send('typing', { typing: active }, { ttlMs: 2500 }).catch(() => { typingActive = false; });
 }
 
 $('#message-form').addEventListener('submit', event => {
@@ -246,14 +252,11 @@ $('#message-form').addEventListener('submit', event => {
 $('#message').addEventListener('input', () => {
   try { saveDrafts({ ...drafts, message: $('#message').value }); }
   catch (error) { status(`Draft storage unavailable: ${error.message}. Copy your text before leaving.`, true); }
-  if (signals && Date.now() - lastTyping > 1000) {
-    lastTyping = Date.now();
-    void signals.publish('typing', { typing: true }, { ttlMs: 2500 }).catch(() => { $('#typing').textContent = 'Typing indicator could not be sent.'; });
-  }
+  sendTyping($('#message').value.length > 0);
 });
 $('#refresh').addEventListener('click', () => void refresh());
 $('#include-pending').addEventListener('change', () => { currentRead?.abort(); void refresh(); });
-addEventListener('pagehide', () => { lifecycle.abort(); currentRead?.abort(); });
+addEventListener('pagehide', () => { sendTyping(false); lifecycle.abort(); currentRead?.abort(); });
 
 try {
   if (!api?.application) throw new Error('This page requires a peer-selected Tendriller application');

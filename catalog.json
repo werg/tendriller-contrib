@@ -1315,9 +1315,9 @@
         "recovery"
       ],
       "choices": [
-        "Native authority or the hosted backend",
+        "Peer or hosted durable history",
         "Atomic SQL and events or an event-only history",
-        "Final worker intent versus provisional views and transient signals"
+        "Separate membership, finality, execution and live signals"
       ],
       "capabilities": [],
       "evidence": "exercised",
@@ -1514,6 +1514,37 @@
       ],
       "path": "cookbooks/separate-evidence-interpretation/COOKBOOK.md",
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/separate-evidence-interpretation/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Preserve original observations while allowing conclusions, labels, and explanations to evolve. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "share-live-signals",
+      "title": "Share live signals without recording history",
+      "summary": "Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.",
+      "group": "Guide and coordinate work",
+      "tags": [
+        "signals",
+        "presence",
+        "ephemeral",
+        "progress"
+      ],
+      "choices": [
+        "Live signal or durable event",
+        "Every transient message or latest value",
+        "Standalone authorization or database membership"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "coordinate-devices",
+        "observe-long-running-process",
+        "present-live-measurements",
+        "run-a-peer-application"
+      ],
+      "sources": [
+        "https://github.com/werg/chronolog-db/blob/84e229991657a577257dcee91906227b87f98bdd/packages/agent-service/src/signals.ts"
+      ],
+      "path": "cookbooks/share-live-signals/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/share-live-signals/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "test-adaptive-page",

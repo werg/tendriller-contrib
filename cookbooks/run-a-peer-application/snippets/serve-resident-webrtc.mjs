@@ -5,8 +5,8 @@ import { createWebRtcHttpsListener } from '@chronolog/transport-webrtc/resident'
  * allowed page origins and introduction admission; the application context
  * authenticates current Chronolog reader grants on the resulting data channel.
  */
-export function createResidentWebRtcTask({ context, signals, ...deployment }) {
+export function createResidentWebRtcTask({ context, ...deployment }) {
   const listener = createWebRtcHttpsListener({ ...deployment,
-    accept: connection => context.connectPeer({ connection, ...(signals === undefined ? {} : { signals }) }) });
+    accept: connection => context.connectPeer({ connection }) });
   return { id: 'resident-webrtc', run: signal => listener.run(signal), get stats() { return listener.stats; } };
 }

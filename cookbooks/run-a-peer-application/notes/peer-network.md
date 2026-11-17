@@ -160,13 +160,16 @@ first. Its acknowledgement promise may settle later, after Worker authentication
 admission does not authorize a group read or change the durable signing identity.
 
 In the receiving Worker, use public `frameRtcDataChannel(channel)` from
-`@chronolog/transport-webrtc`, and await its bounded `ready` handshake. Feed that framed connection to
-`openAuthenticatedPeerLink` from `@chronolog/agent-service/peer-link`, then attach
-the authenticated link to the replica's portable transport. Use the persisted
-signing identity and active reader grant, and verify the remote identity against
-the current membership snapshot. Neither the recipe nor the rendezvous grants
-access. Install `createChronologApplicationBackend` through the same selected
-`tendril.application` interface after the actual replica is ready.
+`@chronolog/transport-webrtc`, and await its bounded `ready` handshake. Call the
+opened browser peer's `connectPeer({ connection })`. That public composition
+uses its persisted signing identity, verifies current reader capabilities,
+attaches durable replication and attaches its signal channel to the same live
+connection. An optional `peerIdentity` pins the expected remote endpoint as well
+as checking membership. Application bootstrap need not recreate the handshake,
+signal routing or cleanup. Neither the recipe nor the rendezvous grants access.
+Install `createChronologApplicationBackend` through the selected
+`tendril.application` interface after the actual replica is ready, and install
+`client.signals` independently through `tendril.signals.install()`.
 
 The [native resident task](../snippets/serve-resident-webrtc.mjs) supplies a real
 HTTPS listener through `AgentApplication.tasks`. Its `createResidentWebRtcTask`
@@ -178,7 +181,10 @@ The thin task delegates its HTTPS listener and shutdown ownership to
 to `context.connectPeer`. Chronolog owns request cancellation, listener limits,
 TLS adaptation and native connection cleanup in one reusable implementation. The daemon's existing
 context performs the current group/read-grant handshake and owns replication.
-Keep the native module out of browser bundles.
+Its `context.signals` supplies the application-facing live send/subscribe API;
+`connectPeer` manages routing and verified relay automatically. The resident task
+does not require `context.finality` to be present. Keep the native module out of
+browser bundles.
 
 Compose the task when loading a trusted native application module:
 
@@ -226,7 +232,8 @@ page load or a new introduction still needs their declared services.
 
 A disconnected finality provider has a different effect: peers can exchange
 existing signed history and keep local proposals, but coordinated finality
-waits. Host independence cannot make an unavailable finality authority available.
+waits. Established live signals do not wait for that finality progress. Host
+independence cannot make an unavailable finality service available.
 Do not silently substitute the hosted backend or issue a new operation identity.
 
 If the RTC connection fails, preserve pending proposals and report the connection

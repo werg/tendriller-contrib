@@ -15,6 +15,14 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this when a person needs to understand an evolving process. First decide whether they need the latest reading, a trend, a comparison between runs, or evidence for a decision. A numeric readout may answer the question better than a chart. A chart is a presentation choice, never the storage model.
 
+For a latest-reading display, [ephemeral signals](../share-live-signals/COOKBOOK.md)
+with `mode: 'latest'` avoid storing every sample or waiting for finality. Show its
+age and remove or mark the value stale at expiry. Use retained streams or durable
+events when earlier observations must be replayed, compared or exported as
+evidence. The checkpoint and complete-record requirements below apply to that
+retained-history mode; a live-only display should never advertise a complete
+run history.
+
 ## Help the person arrive, inspect, and decide
 
 For a room-condition monitor, the first decision might be whether a recent temperature rise is real, recent, and large enough to act on. Begin with the selected source/run, an exact latest reading and unit, the observation's age, and the interval available for inspection. An empty chart should distinguish waiting for the first sample, no source selected, permission unavailable, and no records in this interval. These states lead to different actions.
@@ -46,7 +54,7 @@ Choose the visible raw-data budget, server retention, and local checkpoint budge
 
 | Decision | A useful starting choice | Choose differently when |
 | --- | --- | --- |
-| Current value or history | Use a stream for ordered observations and state for selected range or summary. | Only the newest value matters, or authorized private records own the evidence. |
+| Current value or history | Use signals for a live newest value; use a retained stream or durable events for historical observations. | Authorized private records own the evidence, or a transaction must couple an observation to a shared decision. |
 | Smoothing | Keep raw values visible; offer sample-weighted EMA for regularly spaced noisy observations. | Spikes are the task, or irregular timing calls for time-aware decay. |
 | Scale | Start with a linear scale and explicit missing segments. | Ratios over orders of magnitude answer the question; label a log scale and retain nonpositive raw values for inspection. |
 | Inspection | Compare exact observations at the same x and show absence. | A justified interpolation model is part of the task; label it and explain uncertainty. |

@@ -15,6 +15,11 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this before adding application data. Different information has different owners and lifetimes; one shared object rarely serves every draft, measurement, command, and private answer. Begin with the person's task and the question each record must answer. A one-person checklist may need only a local draft and an agreed progress value. Add history, private records, and immutable evidence when their distinct guarantees matter.
 
+The [primitive and role guide](../../guides/application-primitives.md) is the
+short architecture entry. Treat a live signal, a durable event, a transaction
+and an external effect as separate choices. Their names should communicate their
+actual guarantees to both application authors and implementing agents.
+
 ## Work backward from a real journey
 
 Consider a field inspection: a person drafts a note, attaches a photograph, submits an observation, receives an interpretation, and later corrects the conclusion. On reopening the page they should understand what was saved, what remains private to this device, and what another person can see. That experience needs several records, even if its interface is one form.
@@ -36,8 +41,9 @@ These are example choices, not a common inspection schema. If a task needs no or
 | Mechanism | Good fit | What it does not establish |
 | --- | --- | --- |
 | Shared state | Current agreed values and atomic, conditional batches over them. | Complete history, privacy between readers, or automatic conflict resolution. |
-| Events | Something happened and a consumer needs to react. | That the consumer handled it, or that repeated delivery is new intent. |
-| Streams | Ordered observations with retention and cursors. | Infinite history, exact external execution, or acknowledgement from a callback. |
+| Ephemeral signals | Live information whose loss is acceptable: cursors, typing, presence, progress or transient messages. | Offline delivery, retained history, a transaction or finality. |
+| Durable events | A recorded fact or intent that consumers must be able to recover and replay. | That the consumer handled it, or that repeated delivery is new intent. |
+| Retained streams | Ordered observations with retention and cursors. | Infinite history, exact external execution, or acknowledgement from a callback. |
 | Local draft | Unsent typing, sketch, or temporary view choice. | Cross-device durability or current authorization for cached private data. |
 | Immutable bytes | A specific image, document, or asset with verified length and digest. | A current named file, accepted application input, or permanent retention. |
 | Shared-file reference | Current file at a canonical path, updated against its previous revision. | Immutable meaning for that path, coherent multi-file publication, or privacy. |
@@ -45,6 +51,11 @@ These are example choices, not a common inspection schema. If a task needs no or
 | Private records | Authorized answers, assignments, or protected policy records. | Privacy after copying them into shared state, logs, or public summaries. |
 
 For each kind of information, record its writer, readers, authoritative owner, ordering, lifetime, and failure behavior. A compact design worksheet should also name the unit, schema version when needed, maximum size, and deletion policy. Use stable IDs independent of position and editable labels. Keep application state vocabulary local to the page; familiar names such as `session` do not activate server behavior.
+
+Use [signal FIFO delivery](../share-live-signals/COOKBOOK.md) for distinct live
+messages, or opt into `latest` for replaceable values. A durable event-only
+Chronolog group avoids SQL but still supplies retained history and finality;
+it is a different mechanism from an ephemeral channel.
 
 ## Make saving legible
 
@@ -74,11 +85,16 @@ questions.
 
 Display persistence at the level the person cares about: “Draft on this device,” “Submission queued,” “Accepted,” and “Awaiting review” have different meanings. Do not show a global green “Saved” indicator while a selected photo is only in memory or its semantic submission was rejected. Associate failures with their object, preserve the draft, and offer a useful next action.
 
-A submitted snapshot must remain separate from later typing. When acknowledgement arrives, clear only the accepted snapshot. An interpretation can change without rewriting its original evidence; link it to the exact evidence revision and show superseded conclusions. For two or more shared-state changes that must commit together, use core's `state.apply(ops, options)` batch. If the effects span another authority, use its actual transaction or model an explicit intermediate state.
+A submitted snapshot must remain separate from later typing. When acknowledgement arrives, clear only the accepted snapshot. An interpretation can change without rewriting its original evidence; link it to the exact evidence revision and show superseded conclusions. For two or more hosted JSON-state changes that must commit together, use `state.apply(ops, options)`. For a peer application's SQL and events, submit one program through its selected backend. If the effects span another authority, use its actual transaction or model an explicit intermediate state.
 
 Choose display state separately from domain state. Changing a chart filter or opening a section should not overwrite an agreed decision. For collaboration, distinguish a personal filter from a deliberately shared selection. Announce save and conflict transitions accessibly without repeatedly stealing focus; retain labels and error text when a form rerenders.
 
-## Use core's concurrency primitives directly
+## Use the selected backend's concurrency primitives
+
+The JSON-state calls below apply to the hosted backend. A peer-selected page uses
+its Chronolog program assertions and captured read views, as shown in the
+[peer application guide](../run-a-peer-application/COOKBOOK.md). It does not open a
+second hosted writer to obtain these JSON-state operations.
 
 The [browser state API](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md) separates a useful local view from an authoritative review snapshot. `state.get()` includes pending ordinary writes; `state.revision` alone does not make that view a coherent server snapshot. Use `await state.snapshot()` to obtain matching `{state, rev, scopes}` while connected. Keep that observation with the draft being reviewed; a later save must not silently substitute newer values or scope generations.
 

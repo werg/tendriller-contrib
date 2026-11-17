@@ -4,7 +4,7 @@ title: "Run a shared application with a resident agent"
 summary: "Use one verified SQL and event history for shared tasks, conversation, and agent work while keeping drafts, transient signals, and external effects distinct."
 group: "Keep work dependable"
 tags: ["peers", "events", "sql", "agent", "recovery"]
-choices: ["Native authority or the hosted backend", "Atomic SQL and events or an event-only history", "Final worker intent versus provisional views and transient signals"]
+choices: ["Peer or hosted durable history", "Atomic SQL and events or an event-only history", "Separate membership, finality, execution and live signals"]
 capabilities: []
 evidence: "exercised"
 related: ["choose-data-model", "reconcile-concurrent-edits", "recover-outdated-work", "resume-across-sessions", "observe-long-running-process", "manage-sensitive-data", "publish-coherent-updates"]
@@ -13,13 +13,19 @@ sources: ["https://github.com/werg/tendriller/blob/0200f3b7942d8aea7144c1764677a
 
 # Run a shared application with a resident agent
 
-Use this approach when an application already has a native agent peer running
-whenever new shared work needs to become final. A browser keeps a local replica,
-queries its own SQL, derives views from accepted events, and authors changes. The
-resident agent retains the same history, certifies included proposals and a closed
-author-time frontier under the selected finality policy, and runs service loops
-while an LLM is idle, thinking, or restarting. Every replica computes the same
-application order from signed author time and deterministic tie-breakers.
+Use this approach when an application has a native agent peer that must keep
+working while an LLM is idle, thinking, or restarting. A browser keeps a local
+replica, queries its own SQL, derives views from accepted events, and authors
+changes. A separately selected finality service certifies included proposals and
+a closed author-time frontier. It may run in the resident process or elsewhere;
+running an agent does not itself grant finality or membership rights. Every
+replica computes the same application order from signed author time and
+deterministic tie-breakers.
+
+Start with the [primitive and role decision guide](../../guides/application-primitives.md).
+Durable events and transactions use this history. Live typing, presence, cursor
+motion and progress use the independent [signal channel](../share-live-signals/COOKBOOK.md)
+and need neither SQL nor a finality service.
 
 A hosted application backend remains a useful choice when no resident machine is
 available. Select one backend for an application's writes. The page should not
@@ -102,7 +108,7 @@ event payloads, reader batches, and storage quota. A full disk needs a visible
 refusal and recovery action. Evicting old messages from a small display is a local
 view decision and never permission to prune the canonical history.
 
-## Make the authority boundary explicit
+## Assign membership, execution and finality separately
 
 The finality provider decides which proposals are included and which author-time
 frontier is closed. In the native profile one fixed authority key certifies those
@@ -110,7 +116,7 @@ decisions. Every replica sorts included proposals by their immutable signed
 author time and deterministic tie-breakers; neither receipt position nor arrival
 order chooses the winner of a SQL conflict.
 
-The authority retains exact envelope hashes, lengths and routing metadata,
+The finality service retains exact envelope hashes, lengths and routing metadata,
 deduplication identities, and an authenticated receipt prefix. Signed closure
 markers bind a closed timestamp to the preceding included prefix. A newly
 included proposal at or below an already closed timestamp is rejected as late;
@@ -137,8 +143,9 @@ Keep these facts distinct in both the interface and operations:
 | Replicated or backed up | An additional stated location has acknowledged the bytes. |
 | Worker completed | A separately recorded effect/result reached its declared completion condition. |
 
-A disconnected authority pauses new coordinated finality. Existing reads, proof
-exchange, and durable pending proposals remain useful. Do not silently switch to
+A disconnected finality service pauses new coordinated finality. Existing reads,
+proof exchange, durable pending proposals and established live signal paths
+remain useful under their own availability contracts. Do not silently switch to
 another agent, the hosted backend, or a different finality policy during an
 outage. A restored old disk cannot prove continuity by consulting only its own
 restored state. Recovery needs established continuity or an explicit new lineage.
@@ -147,14 +154,20 @@ Use a persistent volume and one fenced writer. An asynchronous backup can lag
 behind finality; losing the only disk may lose recently acknowledged history.
 If the product requires survival of that immediate loss, its acknowledgment
 contract must require another durable copy. A running disposable container is
-not a durable authority.
+not a durable finality service.
+
+The agent's `context.finality` identifies its configured local
+`NativeFinalityService`, or `null` when the resident does not perform that role.
+Ordinary effect workers and replicas do not need to own it. The service is opened
+from the verified enrollment descriptor; its timing and trusted key come from
+signed genesis, rather than repeated process-local policy settings.
 
 ## Author one operation and retain its meaning
 
 Allocate the operation and domain IDs before submission. The core outbox retains
 the exact signed proposal before sending; retry that operation instead of
 constructing another command. Reusing an operation ID for different contents is
-a conflict. An accepted or rejected original outcome remains the answer after a
+a conflict. A final accepted or rejected original outcome remains the answer after a
 lost response, reload, or membership change.
 
 For a claim, assert availability and update the row in the same program as its
@@ -169,7 +182,9 @@ edit executes after the reset; receipt order alone cannot cause that rejection.
 A page can show a provisional claim while finality is pending, but it should label
 that state. If another claim wins, replace the whole affected view from a coherent
 revision and preserve the losing operation's rejection. Do not reverse DOM edits
-or replay arbitrary UI callbacks to restore shared truth.
+or replay arbitrary UI callbacks to restore shared truth. This internal
+rollback/re-execution is different from a user's Undo: reversing final work
+requires a new guarded change or explicit compensation.
 
 Business assertions belong in deterministic SQL/platform work. UI reducers are
 pure caches outside consensus. Time, randomness, and external responses that
@@ -247,8 +262,11 @@ platform operations in a mixed program.
 
 The existing count-only agent wake socket is not a generic tunnel. Keep durable
 replication and ephemeral signals in separate protocol domains. Apply bounded
-frames, queues, expiry, and receiver-known membership to transient signals. A
-disconnected receiver cannot promise immediate knowledge of revocations elsewhere.
+frames, queues, expiry and explicit authorization to transient signals. The
+Chronolog integration uses receiver-known membership; standalone channels may
+use a different policy without loading history. A disconnected receiver cannot
+promise immediate knowledge of revocations elsewhere. Signal subscriptions use
+FIFO delivery by default; select `latest` for replaceable values such as typing.
 
 Keep the page host out of the warm data path: peer pages have no implicit hosted
 application socket, event stream or health poll. The browser owns its RTC

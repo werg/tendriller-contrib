@@ -2,6 +2,8 @@
 
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
+For application architecture, start with [primitives and roles](guides/application-primitives.md): local state, ephemeral signals, durable events, transactions and final effects have different guarantees. Choose signals for live information that can be lost, and keep membership, schema, finality and effect permissions distinct.
+
 Start from an [application journey](guides/use-cases.md) when the user names an outcome rather than a technical decision. Follow the person through first use, correction, completion, and return; preserve the evidence boundary of every claimed check.
 
 ### Choose inputs and algorithms
@@ -55,6 +57,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
+- [Share live signals without recording history](cookbooks/share-live-signals/COOKBOOK.md) — Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.
 - [Track routines without misleading progress](cookbooks/track-habits-and-routines/COOKBOOK.md) — Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 

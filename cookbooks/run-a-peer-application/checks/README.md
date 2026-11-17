@@ -58,8 +58,13 @@ an application that chooses the recipe consume the same built program module.
    native [resident task](../snippets/serve-resident-webrtc.mjs) starts its HTTPS
    listener independently of page visits. Coordinated Tendriller rendezvous is
    a separate optional path requiring both peers to join the attempt.
-5. Export `signals`, either an authorized public `EphemeralChannel` instance or
-   `null`. Grant/session/sequence/expiry validation belongs to that channel.
+5. Install the public signal client with
+   `tendril.signals.install(client.signals)` independently of the durable backend.
+   The page consumes `tendril.signals.send()` and `subscribe()`; it does not import
+   a deployment-specific signal object or implement another Worker RPC bridge.
+   The namespace's `available` flag reports whether a channel is installed.
+   Grant/session/sequence/expiry validation belongs to the channel. Signals can
+   also be installed on a page with no durable application backend.
 
 The [peer network contract](../notes/peer-network.md) specifies ownership,
 connection lifetime and the warm host-independence assertions. The WSS/relay
@@ -128,6 +133,15 @@ Only editor drafts and operation references persist locally. Its event
 subscription is a wake-up path for replacement views, not a worker's handled
 cursor. A larger application should consume the public atomic projection
 checkpoint helper instead of inventing a second receipt protocol.
+
+Typing uses `signals.subscribe({ topics: ['typing'], mode: 'latest' })`; distinct
+transient messages use the channel's default FIFO policy. The page-owned
+`shared/typing.mjs` tracks each author/session separately, removes only the sender
+that clears or expires, bounds the visible set, and clears its timer/view when
+the subscription ends. It does not reconstruct expired typing on reconnect.
+The send path emits a best-effort clear on submit or an emptied editor; failure
+does not change the durable message's outcome. The deterministic typing checks
+exercise those display lifetimes independently of transport authorization.
 
 ## Run focused checks
 
