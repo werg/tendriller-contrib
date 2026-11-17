@@ -204,3 +204,23 @@ test('public projection qualification requires durable reuse and explicit recove
     value => { value.projection.definitionReset.snapshot.reset.reason = 'recovery'; },
   ]) rejects(mutate);
 });
+
+test('ancestor recovery requires a complete selected prefix, exact transition retry and floor enforcement', () => {
+  for (const mutate of [
+    value => { delete value.inheritedRecovery; },
+    value => { value.inheritedRecovery.ancestor.sequence = 0; },
+    value => { value.inheritedRecovery.previousNumber = 1; },
+    value => { value.inheritedRecovery.expectedGeneration = 'old-generation'; },
+    value => { value.inheritedRecovery.adopted.sequence++; },
+    value => { value.inheritedRecovery.retriedRequest = '0'.repeat(64); },
+    value => { value.inheritedRecovery.retriedSelection = 'additional-successor'; },
+    value => { value.inheritedRecovery.restoredDigest = '0'.repeat(64); },
+    value => { value.inheritedRecovery.freshPeerDigest = '0'.repeat(64); },
+    value => { value.inheritedRecovery.inheritedOperationAfter.operationId = 'new-identity'; },
+    ...['sourceRemoved', 'incompleteViewRejected', 'proposalDidNotPublishView', 'emptyPeerRejected',
+      'plannedHandoverRejected', 'journalSavedBeforeRetry', 'excludedSuffixAbsent', 'unknownLoss', 'commandResumed']
+      .map(field => value => { value.inheritedRecovery[field] = false; }),
+    ...['localRejected', 'hostRejected', 'journalUnchanged', 'incompleteViewRejected']
+      .map(field => value => { value.inheritedRecovery.floor[field] = false; }),
+  ]) rejects(mutate);
+});

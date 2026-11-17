@@ -43,6 +43,17 @@ the maintained recovery journal retries the identical signed request and
 receives the original selection and recovery notice. The fixture does not
 implement another transition queue or recovery policy.
 
+The same independent scenario keeps a fourth peer offline with a complete G1
+prefix while G3 adopts a later G2 body. Learning newer authority cannot expose a
+partial application view. The session identifies the retained G1 ancestor and
+recovers through its normal transition journal, preserving the exact expected
+generation and ancestor proof after a lost control reply. An empty peer cannot
+propose a reset, and a planned handover cannot use this incomplete-view fallback.
+A fresh peer replays the recovered prefix; explicit control then protects a new
+command with a recovery floor. Both the owned recovery API and the host reject
+an otherwise valid prefix below that floor. The fixture supplies transport
+faults and signed control changes; it supplies no alternate recovery policy.
+
 The explicit lost-reply and ancestry faults use public connection primitives.
 The ordinary lifecycle then runs through `session.participate`: it discovers and
 authenticates peers, continues commands with the host blocked, waits reconnect

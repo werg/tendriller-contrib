@@ -222,6 +222,42 @@ export function validatePeerGenerationReport(report) {
   same(reopening.operationBefore, reopening.operationAfter, 'Reopening lost original operation state');
   assert.ok(reopening.operationBefore != null, 'No operation was inspected after reopening');
 
+  const inherited = report.inheritedRecovery;
+  same(inherited?.owner, 'application-session', 'The session must recover its complete inherited ancestor');
+  nonempty(inherited.previousGeneration, 'Missing newer selected generation');
+  same(inherited.expectedGeneration, inherited.previousGeneration, 'Ancestor recovery must compare against the latest selection');
+  same(inherited.ancestor?.generation, recovery.previousGeneration, 'The survivor must retain the original selected ancestor');
+  count(inherited.ancestor.sequence, 'Missing complete ancestor cutoff');
+  assert.ok(inherited.ancestor.sequence > 0, 'An empty peer cannot manufacture recovery evidence');
+  hex(inherited.ancestor.root, 64, 'Missing complete ancestor root');
+  count(inherited.previousNumber, 'Missing newer selection number'); count(inherited.ancestorNumber, 'Missing ancestor number');
+  assert.ok(inherited.previousNumber >= inherited.ancestorNumber + 2, 'The fixture must miss a later inherited segment');
+  same(inherited.selectedNumber, inherited.previousNumber + 1, 'Recovery must select one successor');
+  nonempty(inherited.selectedGeneration, 'Missing ancestor recovery successor');
+  assert.notEqual(inherited.selectedGeneration, inherited.previousGeneration, 'No ancestor recovery happened');
+  same(inherited.adopted, inherited.ancestor, 'The selected successor did not adopt the complete retained ancestor');
+  for (const field of ['sourceRemoved', 'incompleteViewRejected', 'proposalDidNotPublishView', 'emptyPeerRejected',
+    'plannedHandoverRejected', 'journalSavedBeforeRetry', 'excludedSuffixAbsent', 'unknownLoss', 'commandResumed']) {
+    same(inherited[field], true, `Missing ancestor recovery observation: ${field}`);
+  }
+  hex(inherited.originalRequest, 64, 'Missing durable ancestor transition request');
+  same(inherited.retriedRequest, inherited.originalRequest, 'Lost-reply retry changed the ancestor proposal');
+  same(inherited.originalSelection, inherited.selectedGeneration, 'The first selection did not adopt the ancestor');
+  same(inherited.retriedSelection, inherited.originalSelection, 'Retry selected an additional generation');
+  hex(inherited.retainedDigest, 64, 'Missing original complete ancestor view');
+  same(inherited.restoredDigest, inherited.retainedDigest, 'Ancestor recovery restored a partial or excluded view');
+  same(inherited.freshPeerDigest, inherited.restoredDigest, 'Fresh replay differs from the recovered ancestor');
+  same(inherited.inheritedOperationBefore?.status, 'applied', 'Missing original applied ancestor operation');
+  same(inherited.inheritedOperationAfter, inherited.inheritedOperationBefore, 'Ancestor recovery changed inherited operation identity');
+  same(inherited.floor?.point?.generation, inherited.selectedGeneration, 'The floor must protect newly resumed work');
+  assert.ok(inherited.floor.point.sequence > 0, 'The floor must advance beyond the inherited prefix');
+  hex(inherited.floor.point.root, 64, 'Missing protected recovery root');
+  nonempty(inherited.floor.selectedGeneration, 'Missing floor selection');
+  assert.notEqual(inherited.floor.selectedGeneration, inherited.selectedGeneration, 'The control floor was not selected');
+  for (const field of ['localRejected', 'hostRejected', 'journalUnchanged', 'incompleteViewRejected']) {
+    same(inherited.floor[field], true, `Missing below-floor rejection observation: ${field}`);
+  }
+
   const participation = report.participation;
   same(participation?.owner, 'application-session', 'Discovery and recovery policy must belong to the session');
   same(participation.entry, 'session.participate', 'The maintained participation entry must own the lifecycle');
@@ -235,6 +271,7 @@ export function validatePeerGenerationReport(report) {
       `No owned ${phase} connection was observed`);
   }
   const outage = participation.hostOutage, automatic = participation.automaticRecovery, broader = participation.broaderRecovery;
+  same(automatic.previousGeneration, inherited.floor.selectedGeneration, 'Owned participation did not resume after protected ancestor recovery');
   same(outage?.blocked, true, 'The controller workload requires a real host outage');
   same(outage.blockedProbeRejected, true, 'The controller outage must reject an actual probe');
   assert.ok(outage.commandsApplied > 0, 'The controller applied no host-independent command');
@@ -309,6 +346,7 @@ export function validatePeerGenerationReport(report) {
     controlParticipant: report.controlParticipant,
     participation: report.participation,
     projection: report.projection,
+    inheritedRecovery: report.inheritedRecovery,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
     ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,

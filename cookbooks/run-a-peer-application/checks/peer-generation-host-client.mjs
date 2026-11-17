@@ -88,7 +88,8 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
         descriptor: configured.descriptor, boundary: 'tendriller-workerd-http',
         exchange: participant.exchange,
         read: () => participant.request('control', 'read', {}),
-        select: transition => participant.request('control', 'select', { request: transition }),
+        select: (transition, control) => participant.request('control', 'select', { request: transition,
+          ...(control === undefined ? {} : { control }) }),
         block: blocked => request('/testing/block', { method: 'POST', body: { blocked } }),
         traffic: () => request('/testing/traffic'),
         async qualifyParticipant() {

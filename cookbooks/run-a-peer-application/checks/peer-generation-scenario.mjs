@@ -8,7 +8,7 @@ import {
   AbandonedOperationError, applicationDescriptionDigest, bytesDigest,
   createGenerationRegistry, createParticipantResponse, createParticipantTransport,
   describeApplication, eventExecutionManifest, validateParticipantRequest,
-  executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest,
+  executionManifestArtifacts, participantGrant, peerDigest, signApplicationDescriptor, signControlRevision, signTransitionRequest,
 } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
 import { conversation, conversationCounts } from './peer-generation-definition.mjs';
@@ -57,7 +57,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
 
   try {
     const hostDevice = await openDevice('control', true);
-    const [deviceA, deviceB, deviceC] = await Promise.all(['a', 'b', 'c'].map(name => openDevice(name, true)));
+    const [deviceA, deviceB, deviceC, deviceD, deviceE] = await Promise.all(['a', 'b', 'c', 'd', 'e'].map(name => openDevice(name, true)));
     await assert.rejects(openNativeDevice({ path: database('a') }), /BYTES_STORE_IN_USE/);
     await assert.rejects(openNativeDevice({ path: database('missing') }), /APPLICATION_DEVICE_NOT_FOUND/);
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
@@ -71,7 +71,9 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
         definition,
         schemaAdministrator: hostDevice.identity.publicKey, schema: null,
         epoch: 0, keyDigest: await bytesDigest(epochKey),
-        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC, publisher: device === deviceA }) })),
+        members: [deviceA, deviceB, deviceC, deviceD, deviceE].map(device => ({ grant: participantGrant(device.identity.publicKey, {
+          dataRole: 'member', administrator: [deviceA, deviceB, deviceD].includes(device), publisher: device === deviceA,
+        }) })),
       },
     });
     const descriptor = host.descriptor;
@@ -193,8 +195,16 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
       ...(transportBefore === undefined ? {} : { transport: { before: transportBefore, after: await ab.inspect() } }) };
 
     await checkpoint('continued with control host blocked');
+    await host.block(false);
     const retainedOperation = await b.operations.get('reply-lost');
     const adopted = await b.recoveryPoint();
+    // D retains this complete ancestor, but receives no later application bytes.
+    // Signed newer authority alone must not make an incomplete view readable.
+    const d = await open(deviceD), ad = await connect(a, d);
+    await ad.synchronize(); await ad.close();
+    const ancestor = await d.recoveryPoint(), ancestorView = await query(d);
+    assert.deepEqual(ancestor, adopted);
+    const ancestorOperation = await d.operations.get('reply-lost', { author: b.deviceId });
     await ab.close();
     await post(a, 'abandoned-a', 'Recent message that B has not retained');
     const excludedView = (await query(a)).revision;
@@ -208,7 +218,6 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     await a.close(); sessions.delete(a);
     await rename(join(storeRoot, 'a'), join(storeRoot, 'a-offline'));
 
-    await host.block(false);
     // Discard the persisted selection at the transport boundary. The session
     // journal must retain the exact signed request and retry its original base.
     loseControlReply = true;
@@ -338,9 +347,94 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     assert.equal(projected.calls, revisedProjection.state.messages);
     report.projection.definitionReset = { snapshot: revisedProjection, reducerCalls: projected.calls };
     await Promise.all([...links].map(link => link.close()));
+
+    // The selected G3 includes G2's body, which D never received. The session
+    // must propose its complete G1 ancestor, without exposing a partial G3 view
+    // or allowing a planned handover to use that fallback.
+    await c.close(); sessions.delete(c);
+    let loseAncestorReply = true;
+    const ancestorExchanges = [];
+    const dControl = d.connectControlParticipant({ exchange: async (request, options) => {
+      const response = await host.exchange(request, options);
+      if (request.facet === 'control' && request.action === 'select') {
+        ancestorExchanges.push({ request: structuredClone(request.payload.request), selected: response.payload.id });
+        if (loseAncestorReply) { loseAncestorReply = false; throw Error('ANCESTOR_REPLY_LOST_AFTER_SELECTION'); }
+      }
+      return response;
+    } });
+    authority = await dControl.application();
+    const observed = authority.generations.at(-1), e = await open(deviceE);
+    const eControl = e.connectControlParticipant({ exchange: host.exchange });
+    assert.equal(observed.id, third.id);
+    await assert.rejects(query(d), /PEER_RECOVERING/);
+    await assert.rejects(e.recoveryPoint(), /PEER_RECOVERY_PREFIX_INCOMPLETE/);
+    await assert.rejects(d.recovery.handover(dControl, { coordinator: b.deviceId, transitionId: 'incomplete-handover' }), /PEER_RECOVERY_PREFIX_INCOMPLETE/);
+    const ancestorProposal = await d.recoveryPoint();
+    assert.deepEqual(ancestorProposal, ancestor);
+    await assert.rejects(query(d), /PEER_RECOVERING/, 'Inspecting a recovery point cannot publish a partial view');
+    const expected = { generation: observed.id, controlRevision: observed.payload.controlRevision, point: ancestor.point };
+    await assert.rejects(d.recovery.takeover(dControl, { transitionId: 'ancestor-takeover', expected }), /ANCESTOR_REPLY_LOST_AFTER_SELECTION/);
+    const savedAncestor = (await d.recovery.inspect()).find(value => value.request.payload.transitionId === 'ancestor-takeover');
+    assert.equal(savedAncestor.selected, null);
+    assert.deepEqual(savedAncestor.request.payload.base, ancestor);
+    assert.equal(savedAncestor.request.payload.expectedGeneration, observed.id);
+    const ancestorNotice = await d.recovery.takeover(dControl, { transitionId: 'ancestor-takeover', expected });
+    authority = await dControl.application();
+    const ancestorSelected = authority.generations.at(-1);
+    const retriedAncestor = (await d.recovery.inspect()).find(value => value.request.payload.transitionId === 'ancestor-takeover');
+    assert.deepEqual(retriedAncestor.request, savedAncestor.request);
+    assert.equal(ancestorExchanges.length, 2); assert.deepEqual(ancestorExchanges[1], ancestorExchanges[0]);
+    assert.deepEqual(ancestorSelected.payload.adopted, ancestor.point);
+    assert.equal(ancestorNotice.unknownLoss, true);
+    const restoredAncestor = await query(d);
+    assert.deepEqual(restoredAncestor.value, ancestorView.value);
+    assert.deepEqual(await d.operations.get('reply-lost', { author: b.deviceId }), ancestorOperation);
+    assert.equal((await query(d)).value.messages.some(value => ['reapplied-a', 'abandoned-a', 'isolated-a'].includes(value.operationId)), false);
+
+    // E now has the recovered ancestor but misses one new body. Protect that
+    // body with an explicit control floor, then check both the owned recovery
+    // path and the hosted verifier refuse an otherwise valid older proof.
+    const de = await connect(d, e); await de.synchronize(); await de.close();
+    const freshAncestor = await query(e);
+    assert.deepEqual(freshAncestor.value, restoredAncestor.value);
+    await post(d, 'ancestor-resumed', 'Work resumes from the complete inherited ancestor');
+    const protectedBase = await d.recoveryPoint(), previousControl = authority.controls.at(-1);
+    const floorUpdate = { epoch: previousControl.payload.epoch, keyDigest: previousControl.payload.keyDigest,
+      grants: previousControl.payload.grants, recoveryFloor: protectedBase.point };
+    const floorRequest = await signTransitionRequest({ applicationId, profile: descriptor.payload.profile,
+      policy: descriptor.payload.policy, transitionId: 'protect-recovered-prefix', expectedGeneration: ancestorSelected.id,
+      coordinator: deviceD.identity.publicKey, requester: deviceD.identity.publicKey,
+      controlRevision: previousControl.payload.revision + 1, reason: 'control-change', base: protectedBase,
+    }, deviceD.identity);
+    const floorSelected = await host.select(floorRequest, floorUpdate);
+    authority = await dControl.application(); await eControl.application();
+    assert.deepEqual(authority.controls.at(-1).payload.recoveryFloor, protectedBase.point);
+    await assert.rejects(query(e), /PEER_RECOVERING/);
+    await assert.rejects(e.recoveryPoint(), /PEER_RECOVERY_FLOOR_UNAVAILABLE/);
+    await assert.rejects(e.recovery.takeover(eControl, { transitionId: 'below-floor-owned' }), /PEER_RECOVERY_FLOOR_UNAVAILABLE/);
+    assert.deepEqual(await e.recovery.inspect(), []);
+    await assert.rejects(host.select(await signTransitionRequest({ applicationId, profile: descriptor.payload.profile,
+      policy: descriptor.payload.policy, transitionId: 'below-floor-hosted', expectedGeneration: floorSelected.id,
+      coordinator: deviceE.identity.publicKey, requester: deviceE.identity.publicKey,
+      controlRevision: floorSelected.payload.controlRevision, reason: 'takeover', base: ancestor,
+    }, deviceE.identity)), /PEER_RECOVERY_FLOOR_UNAVAILABLE/);
+    assert.equal((await host.read()).generations.at(-1).id, floorSelected.id);
+    report.inheritedRecovery = { owner: 'application-session', previousGeneration: observed.id,
+      previousNumber: observed.payload.number, ancestorNumber: g1.payload.number, ancestor: ancestor.point,
+      selectedGeneration: ancestorSelected.id, selectedNumber: ancestorSelected.payload.number, adopted: ancestorSelected.payload.adopted,
+      sourceRemoved: true, incompleteViewRejected: true, proposalDidNotPublishView: true, emptyPeerRejected: true,
+      plannedHandoverRejected: true, originalRequest: hash(savedAncestor.request), retriedRequest: hash(retriedAncestor.request),
+      expectedGeneration: savedAncestor.request.payload.expectedGeneration, journalSavedBeforeRetry: savedAncestor.selected === null,
+      originalSelection: ancestorExchanges[0].selected, retriedSelection: ancestorExchanges[1].selected,
+      retainedDigest: hash(ancestorView.value), restoredDigest: hash(restoredAncestor.value), freshPeerDigest: hash(freshAncestor.value),
+      inheritedOperationBefore: ancestorOperation, inheritedOperationAfter: await d.operations.get('reply-lost', { author: b.deviceId }),
+      excludedSuffixAbsent: true, unknownLoss: ancestorNotice.unknownLoss, commandResumed: true,
+      floor: { point: protectedBase.point, selectedGeneration: floorSelected.id, localRejected: true,
+        hostRejected: true, journalUnchanged: true, incompleteViewRejected: true } };
+    await checkpoint('recovered complete ancestor and enforced its protected floor');
     const observerControl = reopened.connectControlParticipant({ exchange: host.exchange });
-    report.participation = await qualifyParticipation({ coordinator: c, follower: b, observer: reopened,
-      coordinatorControl: cControl, followerControl: bControl, observerControl, host });
+    report.participation = await qualifyParticipation({ coordinator: d, follower: b, observer: reopened,
+      coordinatorControl: dControl, followerControl: bControl, observerControl, host });
     report.stage = 'passed';
     report.passed = true;
     console.log('Independent packed peer sessions preserved identity, exact retry and selected-prefix recovery.');
@@ -376,7 +470,15 @@ async function createPortableControl({ applicationId, hostDevice, configuration 
     if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE');
     let payload;
     if (request.facet === 'control' && request.action === 'read') payload = await registry.read();
-    else if (request.facet === 'control' && request.action === 'select') payload = await registry.select(request.payload.request);
+    else if (request.facet === 'control' && request.action === 'select') {
+      let control;
+      if (request.payload.control !== undefined) {
+        const previous = (await registry.read()).controls.at(-1);
+        control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
+          revision: previous.payload.revision + 1, previous: await peerDigest(previous), ...request.payload.control }, hostDevice.identity);
+      }
+      payload = await registry.select(request.payload.request, control === undefined ? {} : { control });
+    }
     else if (request.facet === 'publication' && request.action === 'definition') payload = { descriptor, definition, schema };
     else throw Error('UNEXPECTED_CONTROL_REQUEST');
     return createParticipantResponse(request, payload);
@@ -387,6 +489,6 @@ async function createPortableControl({ applicationId, hostDevice, configuration 
     block(value) { blocked = value; },
     traffic() { return { requests, applicationBodyBytes: 0 }; },
     read: () => transport.request('control', 'read', {}),
-    select: request => transport.request('control', 'select', { request }),
+    select: (request, control) => transport.request('control', 'select', { request, ...(control === undefined ? {} : { control }) }),
   };
 }

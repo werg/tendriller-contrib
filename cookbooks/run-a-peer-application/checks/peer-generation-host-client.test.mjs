@@ -71,6 +71,9 @@ test('bootstrap, publication and control reads use one participant transport and
     { facet: 'publication', action: 'definition', payload: {} },
     { facet: 'control', action: 'read', payload: {} },
   ]);
+  const transition = { signed: 'transition' }, update = { recoveryFloor: { generation: 'current', sequence: 1, root: 'retained' } };
+  await host.select(transition, update);
+  assert.deepEqual(calls.at(-1).payload, { request: transition, control: update });
   const cancellation = new AbortController(); cancellation.abort(new Error('qualification stopped'));
   t.mock.method(globalThis, 'fetch', async (_input, options) => options.signal.throwIfAborted());
   await assert.rejects(host.exchange(calls[2], { signal: cancellation.signal }), /qualification stopped/u);
