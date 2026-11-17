@@ -52,16 +52,20 @@ await write('package.json', { private: true, type: 'module', dependencies: {
 await copyFile(join(here, 'peer-generation-host.scenarios.mjs'), join(hostDirectory, 'host.test.mjs'));
 await write('entry.mjs', "export { default, Tendril, Admission } from '@tendriller/engine';\n");
 await mkdir(join(hostDirectory, 'assets')); await write('assets/index.txt', 'Independent peer qualification assets');
+execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: hostDirectory, stdio: 'inherit',
+  env: { ...process.env, npm_config_cache: join(output, 'host-npm-cache') } });
+const installedEngine = join(hostDirectory, 'node_modules/@tendriller/engine');
+const { ratelimits } = JSON.parse(await readFile(join(installedEngine, 'testing-ratelimits.json')));
+assert.ok(Array.isArray(ratelimits) && ['PAGE_RATE', 'ACCOUNT_RATE'].every(name => ratelimits.some(binding => binding.name === name)),
+  'Public engine must declare its host traffic bindings');
 await write('wrangler.jsonc', { name: 'independent-peer-host', main: 'entry.mjs', compatibility_date: '2026-11-01', compatibility_flags: ['nodejs_compat'],
   assets: { directory: './assets', binding: 'ASSETS', run_worker_first: true },
   durable_objects: { bindings: [{ name: 'TENDRIL', class_name: 'Tendril' }, { name: 'ADMISSION', class_name: 'Admission' }] },
   migrations: [{ tag: 'baseline', new_sqlite_classes: ['Tendril', 'Admission'] }],
   d1_databases: [{ binding: 'ACCOUNTS', database_name: 'test', database_id: '00000000-0000-4000-8000-000000000001' }],
-  r2_buckets: [{ binding: 'FILES', bucket_name: 'test' }], vars: { PUBLIC_BASE: 'https://tendriller.dev', PAGE_BASE_DOMAIN: 'tendriller.site' },
+  r2_buckets: [{ binding: 'FILES', bucket_name: 'test' }], ratelimits,
+  vars: { PUBLIC_BASE: 'https://tendriller.dev', PAGE_BASE_DOMAIN: 'tendriller.site' },
 });
-execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: hostDirectory, stdio: 'inherit',
-  env: { ...process.env, npm_config_cache: join(output, 'host-npm-cache') } });
-const installedEngine = join(hostDirectory, 'node_modules/@tendriller/engine');
 const engineProofBytes = await readFile(join(installedEngine, 'provenance.json'));
 const engineProof = JSON.parse(engineProofBytes);
 for (const key of ['repository', 'source', 'sourceTree', 'dirty']) assert.equal(engineProof[key], manifest[key], `Host provenance mismatch: ${key}`);
