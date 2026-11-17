@@ -44,6 +44,7 @@ export function validatePeerGenerationReport(report) {
   same(report.publicBoundary?.residentRequired, false, 'A permanent resident is not this profile');
 
   const host = report.hostOutage;
+  same(host?.boundary, 'portable-control-port', 'Host traffic scope must be explicit');
   same(host?.blocked, true, 'Host endpoints were not blocked');
   same(host.blockedProbeRejected, true, 'Blocking must be observed by an actual refused request');
   count(host.commandsApplied, 'Missing completed command count');
@@ -69,7 +70,7 @@ export function validatePeerGenerationReport(report) {
   count(recovery.adoptedPosition, 'Missing adopted prefix');
   assert.ok(recovery.adoptedPosition < recovery.previousHead, 'Recovery did not abandon a recent suffix');
   same(recovery.sourceRemoved, true, 'The original coordinator remained a recovery source');
-  same(recovery.coherentReset, true, 'SQL/events/outcomes were not replaced coherently');
+  same(recovery.coherentReset, true, 'Application view/outcomes were not replaced coherently');
   same(recovery.recoveredDigest, recovery.freshPeerDigest, 'A fresh peer did not replay the recovered history');
   hex(recovery.recoveredDigest, 64, 'Missing complete replay digest');
   assert.ok(Array.isArray(recovery.inheritedOperationIds) && recovery.inheritedOperationIds.length > 0, 'No adopted operation was checked');
@@ -124,6 +125,7 @@ export function validatePeerGenerationReport(report) {
     reapplication: reapply,
     limitations: [
       'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
+      'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
       'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
     ],
   };

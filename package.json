@@ -16,6 +16,7 @@
     "test:pilots": "node test/pilot-browser.mjs",
     "test:peer-application": "node cookbooks/run-a-peer-application/checks/run.mjs",
     "test:peer-membership": "node cookbooks/run-a-peer-application/checks/run-membership.mjs",
-    "test:peer-webrtc": "node cookbooks/run-a-peer-application/checks/run-webrtc.mjs"
+    "test:peer-webrtc": "node cookbooks/run-a-peer-application/checks/run-webrtc.mjs",
+    "test:peer-generation": "node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs"
   }
 }
