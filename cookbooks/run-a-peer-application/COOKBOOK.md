@@ -22,11 +22,23 @@ running an agent does not itself grant finality or membership rights. Every
 replica computes the same application order from signed author time and
 deterministic tie-breakers.
 
-This is Tendriller's default **live collaboration** profile. Signed operations,
+This recipe uses Chronolog's **live collaboration** profile, the default for
+Tendriller's implemented peer adapter. Signed operations,
 timestamp ordering and deterministic replay are common foundations; finality is
 the live policy's additional contract. An asynchronous branch/merge policy would
 select and merge operations without finality APIs or final/provisional states.
 This recipe does not implement that alternative or require it to use finality.
+The common host contract also describes applied and abandoned generation results.
+Chronolog's separate `@chronolog/peer-generation` and `@chronolog/peer-session`
+packages implement selected-history recovery with no finality. Tendriller provides
+optional hosted generation controls, but no application binding for that session
+yet, and this recipe does not install it. In that
+profile, receipt sequence selects ancestry and the shared signed author-time
+comparator selects execution order. An applied result can change as earlier
+signed work arrives, even before a generation changes. Native and in-process
+package tests are distinct from this recipe's browser/native network
+qualification. Its types do not change the live adapter's finality, worker or
+retry contract.
 
 Start with the [primitive and role decision guide](../../guides/application-primitives.md).
 Durable events and transactions use this history. Live typing, presence, cursor
@@ -119,8 +131,8 @@ view decision and never permission to prune the canonical history.
 The finality provider decides which proposals are included and which author-time
 frontier is closed. In the native profile one fixed authority key certifies those
 decisions. Every replica sorts included proposals by their immutable signed
-author time and deterministic tie-breakers; neither receipt position nor arrival
-order chooses the winner of a SQL conflict.
+author time, author identity and proposal identity; neither a transport feed
+sequence, receipt position nor arrival order chooses the winner of a SQL conflict.
 
 The finality service retains exact envelope hashes, lengths and routing metadata,
 deduplication identities, and an authenticated receipt prefix. Signed closure
@@ -154,6 +166,10 @@ Reader revocation and the corresponding encryption-epoch change form one signed
 membership revision. Key delivery makes that authorized epoch usable; it does
 not define a second activation timeline. A missing key is a readiness blocker.
 It cannot make a revoked reader current or alter the signed ordering timestamp.
+Live participant changes are limited to reader/writer grants, their revocation
+and the authorized encryption epoch. The validator set, validation policy and
+clock limits stay fixed by signed genesis; membership administration cannot
+silently switch the history's finality policy.
 
 Keep these facts distinct in both the interface and operations:
 

@@ -22,7 +22,7 @@ observation disappears.
 The public signal channel is independent of durable application storage. It
 works with an explicit transport and authorization policy. Peer applications can
 use the same interface with Chronolog membership, and Tendriller exposes it through
-`tendril.signals`. Hosted pages receive a channel automatically through their
+`tendril.signals`. Hosted owner pages receive a channel automatically through their
 existing authenticated page socket. Peer deployments install their selected
 channel independently of durable application readiness. `available` reports
 installation, not connectivity or delivery; an unconfigured send fails immediately.
@@ -58,7 +58,7 @@ use `latest` if it stays within the frame budget.
 The application sends JSON payloads. Authorization and envelope verification
 belong to the channel; the application still validates its payload schema.
 
-A hosted page can use `tendril.signals` directly. A peer bootstrap installs
+A hosted owner page can use `tendril.signals` directly. A peer bootstrap installs
 `tendril.signals.install(client.signals)`; it does not also send through the hosted
 channel. A standalone bootstrap can install its own `SignalChannel` instead.
 An application can also explicitly select the hosted live channel with
@@ -69,10 +69,12 @@ Installation is separate from `tendril.application.install()`. If it happens asy
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
 
-The hosted channel is for authenticated owner devices and the configured agent.
+The hosted channel is for current owner sessions and authorized agent tokens.
 Guests and display sessions do not subscribe or publish. The host supplies the
-scope, authenticated author, session, sequence and freshness timestamps; it
-stores no signal payload or per-message durable metadata and never wakes a
+scope, authenticated author, session and sequence. The sender chooses the bounded
+freshness window; the host checks it again after asynchronous authorization and
+never refreshes an expired message. The host keeps bounded per-connection
+metadata, stores no signal payload or per-message history, and never wakes a
 conversational agent for these messages. The connected agent explicitly listens
 when it needs live interaction.
 

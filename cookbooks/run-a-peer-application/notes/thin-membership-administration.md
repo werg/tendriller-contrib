@@ -9,6 +9,10 @@ administrator. The actual Worker runs in a local workerd harness with synthetic
 authenticated accounts. Deployed Cloudflare authentication, public-network routes,
 provider cost and operational recovery remain separate qualification work.
 
+This note concerns the default live collaboration profile. Optional hosted
+generation controls select recovery ancestry without finality; they use a
+separate protocol and do not inherit this note's closure or final-worker claims.
+
 The historical measurements below describe earlier receipt and descriptor-scan
 implementations. The current protocol is `signed-inclusion-v2`: each native
 closure commits the complete finalized control projection, and the administrator
@@ -24,7 +28,7 @@ these new formats.
 
 The portable administrator owns the root membership identity, durable enrollment
 decisions and roster changes. Its default host is Cloudflare. A native resident
-peer owns the selected coordinated application authority, retains application
+peer owns the selected signed-inclusion authority, retains application
 payloads and runs the application materializer and effect workers. Browsers are
 full application replicas with their own device identities, authorized keys and
 local storage. These are separate responsibilities even when a deployment places
@@ -65,6 +69,13 @@ The projection binds each control's original receipt and first activation cutoff
 an unsigned server-side filter cannot establish completeness. Full replicas fetch detached application envelopes from
 their authorized peer path and verify them against the committed descriptor
 before using them.
+
+The membership revision wire is version 2. A revision binds reader/writer grants
+and revocations together with its authorized encryption epoch. It has no live
+validator or validation-policy mutation fields; those choices remain fixed by
+signed genesis. Key-delivery records make the authorized epoch usable without
+introducing another authority timeline. This revision format is separate from
+the signed-inclusion evidence that proves its activation.
 
 This is a clean prerelease format change. Do not add old/new envelope conversion,
 parallel histories or a second page-owned proposal queue. Existing public

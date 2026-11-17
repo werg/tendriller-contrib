@@ -29,8 +29,8 @@ submit the same intent to both.
 
 ## Use the live collaboration profile by default
 
-Chronolog's peer backend uses live collaboration: peers share one timestamp-ordered
-application history, may show a provisional local view, and observe final
+The Chronolog live adapter used by these recipes shares one timestamp-ordered
+application history. Peers may show a provisional local view and observe final
 accepted or rejected outcomes when the selected provider closes a verified
 prefix. Keep that progression visible. Inclusion, deterministic execution and
 finality answer different questions; a receipt is not proof that SQL succeeded.
@@ -42,17 +42,23 @@ selection, its durable application API uses hosted Cloudflare storage. Choosing
 the peer history does not automatically connect hosted signals; live transport
 composition remains an independent choice.
 
+The common host interface also declares a generation profile with applied and
+abandoned results and no finality fields. Chronolog implements that separate
+runtime in `@chronolog/peer-generation` and `@chronolog/peer-session`. Tendriller
+provides explicit hosted generation controls, but no application binding for that
+session yet. These recipes use the live adapter and its
+local/final guarantees. The standalone session's applied result is an observation
+at a revision: later included work or recovery can change it. A generation's
+receipt sequence selects ancestry, while execution uses the same signed
+author-time comparator. It does not turn an applied result into a final operation.
+
 Signed operations, immutable operation identity, timestamp ordering and
 deterministic replay are reusable foundations. In the shipped live profile, the
 selected finality provider closes a prefix, and effect workers consume accepted
 intent from that prefix. A future asynchronous branch/merge interpretation can
-select and merge operations without any finality concept, API or operation
-states. Its execution and effect policy would be separate; a branch tip is not
+select and merge operations without any finality concept, API or final operation
+states. Its inclusion and effect policy would be separate; a branch tip is not
 a final frontier. That interpretation is not implemented by these live recipes.
-
-The page's immutable backend selection is explicit: omitting it selects
-Tendriller's hosted Cloudflare backend, not a peer replica. Neither selection
-changes the independent live-signal contract.
 
 For the current live profile, an offline proposal can become too old to enter an
 already closed prefix. Preserve that original proposal and its rejection. Retry
@@ -126,6 +132,12 @@ readiness requires both captured history keys and the current active epoch's
 key. Future keys that happen to arrive early do not enlarge the captured target
 or activate a new epoch.
 
+The signed genesis fixes the validator set, validation policy and clock limits.
+Live participant administration changes reader/writer grants and revocations,
+and the authorized encryption epoch. It cannot replace validators or choose a
+new finality policy under the existing history. A new trust configuration needs
+an explicitly created group and history, with its own signed genesis.
+
 Durable event provenance is supplied by the backend in `event.origin`. For a
 Chronolog event it identifies the verified group, author, original operation,
 membership revision, writer capability and signed author time. For a hosted
@@ -157,6 +169,8 @@ identity and stable proposal identity. The finality provider certifies inclusion
 and closes an author-time range. It does not choose SQL winners by network
 arrival order. A replica still needs complete bodies and the pinned execution
 profile to determine the accepted or rejected application outcome.
+Feed sequences and receipt positions identify transport or proof progress;
+neither participates in this application ordering tuple.
 
 For application code, progress and outcome answer separate questions:
 
@@ -178,6 +192,13 @@ A provisional success never releases dependent work or an irreversible effect.
 The public operation type reflects this directly: queued has no outcome, while
 provisional and final require one. An exact retry can immediately return its
 original final receipt; it does not restart the lifecycle.
+
+Missing bodies, keys or governance keep work pending; they do not establish a
+rejection. If verified authority or closure evidence excludes an operation that
+was shown locally, the replica first removes that preview through replay before
+exposing its final rejection. A failed replay leaves the previous coherent view
+and provisional result visible until recovery succeeds. Application code uses
+the same operation status and outcome, independent of the proof mechanism.
 
 An inclusion receipt alone cannot establish either final application outcome.
 A final accepted operation also does not establish that another peer has a
