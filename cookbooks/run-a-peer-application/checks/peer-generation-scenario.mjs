@@ -209,8 +209,11 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     // D retains this complete ancestor, but receives no later application bytes.
     // Signed newer authority alone must not make an incomplete view readable.
     const d = await open(deviceD), ad = await connect(a, d);
+    // A connected protocol participant stays cold until actual data use. Read
+    // the conversation while A is reachable so D deliberately retains this view.
+    const ancestorView = await query(d);
     await ad.synchronize(); await ad.close();
-    const ancestor = await d.recoveryPoint(), ancestorView = await query(d);
+    const ancestor = await d.recoveryPoint();
     assert.deepEqual(ancestor, adopted);
     const ancestorOperation = await d.operations.get('reply-lost', { author: b.deviceId });
     await ab.close();
