@@ -5,10 +5,11 @@ import { randomUUID } from 'node:crypto';
 
 export function createHostedFixture(base, { createParticipantTransport, createParticipantRequest, PEER_PARTICIPANT_POLICY,
   bytesDigest, signPublicationManifest, verifyPublicationManifest, verifyAuthorityBundle }) {
-  const request = async (path, { method = 'GET', body, signal } = {}) => {
+  const closing = new Set();
+  const request = async (path, { method = 'GET', body, signal, timeoutMs = 30_000 } = {}) => {
     const response = await fetch(new URL(path, base), { method,
       ...(body === undefined ? {} : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
-      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(30_000)]) : AbortSignal.timeout(30_000),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs),
     });
     const value = await response.json();
     if (!response.ok) throw Object.assign(new Error(typeof value?.error?.message === 'string'
@@ -17,7 +18,55 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
     });
     return value;
   };
+  const socket = (kind, fields, signal) => {
+    signal?.throwIfAborted();
+    // This is transport to an actual Worker-owned test socket. Opening is
+    // bounded independently so a cancelled owner can still close a late socket.
+    const created = request(`/introductions/${kind}/open`, { method: 'POST', body: fields });
+    let closed = false, closeTask;
+    const call = async (action, body = {}, options = {}) => {
+      const { id } = await created;
+      return request(`/introductions/${kind}/${action}`, { method: 'POST', body: { id, ...body }, ...options });
+    };
+    const close = () => {
+      if (closeTask) return closeTask;
+      closed = true; signal?.removeEventListener('abort', abort);
+      closeTask = call('close'); closing.add(closeTask);
+      void closeTask.finally(() => closing.delete(closeTask)).catch(() => {});
+      return closeTask;
+    };
+    const abort = () => { void close().catch(() => {}); };
+    signal?.addEventListener('abort', abort, { once: true });
+    const ready = call('ready', {}, { signal });
+    void ready.catch(() => {});
+    const messages = { async *[Symbol.asyncIterator]() {
+      try {
+        await ready;
+        while (!closed) {
+          const next = await call('next', {}, { signal, timeoutMs: 120_000 });
+          if (next === null) return;
+          yield next;
+        }
+      } finally { await close(); }
+    } };
+    return { ready, messages, invitations: messages,
+      send: description => call('send', { description }, { signal }), close };
+  };
   return {
+    async drainIntroductions() { await Promise.all([...closing]); },
+    createParticipationPorts(session, openConnection, createPeerIntroductions) {
+      const participant = createParticipantTransport({ applicationId: session.applicationId,
+        exchange: (body, { signal } = {}) => request('/api/peers/participant', { method: 'POST', body, signal }) });
+      const peers = {
+        discover: options => participant.request('discovery', 'read', {}, options),
+        advertise: (advertisement, { ttlMs, signal }) => participant.request('discovery', 'advertise', { advertisement, ttlMs }, { signal }),
+        withdraw: (peerId, options) => participant.request('discovery', 'withdraw', { peerId }, options),
+        invite: (peerId, invitation, options) => participant.request('ephemeral', 'invite', { peerId, ...invitation }, options),
+        rendezvous: (channel, peerId, { signal }) => socket('rendezvous', { channel, peerId }, signal),
+        listenInvitations: (peerId, { signal }) => socket('invitations', { peerId }, signal),
+      };
+      return createPeerIntroductions({ peers, identity: session.deviceId, openConnection });
+    },
     async createControl({ applicationId, configuration }) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });
       let losePublicationReply = false;

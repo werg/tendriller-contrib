@@ -1,0 +1,222 @@
+// Fixture delivery only. The public session owns discovery scheduling, retries,
+// identity verification, replication, candidate choice and recovery policy.
+import assert from 'node:assert/strict';
+
+const timeout = () => AbortSignal.timeout(30_000);
+const point = revision => `${revision.generation}/${revision.point.generation}/${revision.point.sequence}/${revision.point.root}`;
+
+export function waitParticipation(participation, predicate, signal = timeout()) {
+  signal.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    let done = false, unsubscribe = () => {};
+    const finish = (error, value) => {
+      if (done) return; done = true; unsubscribe(); signal.removeEventListener('abort', abort);
+      error ? reject(error) : resolve(value);
+    };
+    const abort = () => finish(signal.reason);
+    signal.addEventListener('abort', abort, { once: true });
+    unsubscribe = participation.onStatus(status => { if (predicate(status)) finish(null, status); });
+    if (done) unsubscribe();
+  });
+}
+export async function waitRevision(session, revision) {
+  const iterator = session.changes({ signal: timeout() })[Symbol.asyncIterator]();
+  try {
+    for (;;) {
+      const next = await iterator.next();
+      assert.equal(next.done, false, 'The expected coherent revision was not observed');
+      if (point(next.value.revision) === point(revision)) return next.value.revision;
+    }
+  } finally { await iterator.return?.(); }
+}
+
+/** Bounded in-process discovery/SDP delivery for portable and loopback RTC gates. */
+export function createParticipationFixture({ openConnection } = {}) {
+  const directory = new Map(), inboxes = new Map(), opened = [];
+  const ports = session => {
+    const inbox = mailbox(); inboxes.set(session.deviceId, inbox);
+    return {
+      discovery: {
+        async read({ signal }) { signal.throwIfAborted(); return [...directory.keys()].filter(id => id !== session.deviceId)
+          .map(identity => ({ identity, route: identity })); },
+        async advertise(value, { signal }) {
+          signal.throwIfAborted(); assert.equal(value.identity, session.deviceId);
+          directory.set(value.identity, { storageId: value.storageId });
+        },
+        async withdraw() { directory.delete(session.deviceId); },
+        invitations({ signal }) { return inbox.messages(signal); },
+      },
+      transport: {
+        async open({ peer, invitation }, { signal }) {
+          signal.throwIfAborted();
+          let connection;
+          if (invitation !== undefined) {
+            connection = openConnection ? await openConnection({ role: 'answerer', signaling: invitation.signaling, signal }) : invitation.connection;
+          } else {
+            assert.equal(directory.has(peer.identity), true, 'The fixture route is unavailable');
+            const target = inboxes.get(peer.identity);
+            assert.ok(target, 'A fixture invitation receiver is required');
+            if (openConnection) {
+              const signaling = signalingPair();
+              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: { signaling: signaling.b } });
+              connection = await openConnection({ role: 'offerer', signaling: signaling.a, signal });
+            } else {
+              const [local, remote] = framedPair();
+              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: { connection: remote } });
+              connection = local;
+            }
+          }
+          opened.push({ owner: session.deviceId, peer: peer.identity, connection });
+          return connection;
+        },
+      },
+    };
+  };
+  return { ports, async inspect() {
+    return { boundary: openConnection ? 'loopback-rtc-fixture-discovery' : 'in-process-fixture-discovery',
+      connections: await Promise.all(opened.map(async item => ({ owner: item.owner, peer: item.peer,
+        closed: item.connection.signal.aborted,
+        ...(item.connection.session?.getRoute ? { route: await item.connection.session.getRoute() } : {}) }))) };
+  } };
+}
+
+// A byte-only implementation of the public FramedPeerConnection interface.
+// The fixture does not inspect envelopes, authenticate peers or retain history.
+function framedPair() {
+  const lifetime = new AbortController(), inboxes = [mailbox(64), mailbox(64)];
+  const close = async () => { lifetime.abort(); for (const inbox of inboxes) inbox.close(); };
+  return inboxes.map((inbox, index) => ({
+    signal: lifetime.signal,
+    async send(frame, { signal } = {}) {
+      signal?.throwIfAborted(); lifetime.signal.throwIfAborted();
+      assert.ok(frame instanceof Uint8Array); inboxes[1 - index].send(frame.slice());
+    },
+    frames(signal) { return inbox.messages(signal); },
+    close,
+  }));
+}
+
+/** The only two SDP values belong to test delivery, never to application history. */
+export function signalingPair() {
+  const types = [], lanes = [mailbox(1), mailbox(1)];
+  let sentMessages = 0, sentBytes = 0;
+  const endpoint = index => ({
+    messages: lanes[index].messages(),
+    async send(description) {
+      assert.equal(lanes[index].closed, false, 'A retired introduction cannot carry traffic');
+      types.push(description.type); sentMessages++; sentBytes += new TextEncoder().encode(description.sdp).length;
+      lanes[1 - index].send(structuredClone(description));
+    },
+    close() { lanes[index].close(); },
+  });
+  return { a: endpoint(0), b: endpoint(1), roles: ['offerer', 'answerer'], types,
+    closed: () => lanes.every(lane => lane.closed),
+    snapshot: () => ({ sentMessages, sentBytes, closed: lanes.every(lane => lane.closed) }) };
+}
+function mailbox(limit = 8) {
+  const queue = []; let waiting, closed = false;
+  const close = () => { if (closed) return; closed = true; queue.length = 0; waiting?.({ done: true }); waiting = undefined; };
+  return {
+    get closed() { return closed; },
+    send(value) {
+      assert.equal(closed, false, 'A closed fixture mailbox cannot receive');
+      if (waiting) { const deliver = waiting; waiting = undefined; deliver({ done: false, value }); }
+      else { assert.ok(queue.length < limit, 'The fixture mailbox is bounded'); queue.push(value); }
+    },
+    close,
+    messages(signal) { return { [Symbol.asyncIterator]() {
+      const abort = () => close(); signal?.addEventListener('abort', abort, { once: true }); if (signal?.aborted) close();
+      return {
+        async next() {
+          if (closed) return { done: true };
+          if (queue.length) return { done: false, value: queue.shift() };
+          assert.equal(waiting, undefined, 'Only one fixture reader owns a mailbox');
+          return new Promise(resolve => { waiting = resolve; });
+        },
+        async return() { signal?.removeEventListener('abort', abort); close(); return { done: true }; },
+      };
+    } }; },
+  };
+}
+
+/** Ordinary operation and recovery run through the maintained controller. */
+export async function qualifyParticipation({ coordinator, follower, observer, coordinatorControl, followerControl,
+  observerControl, host, ports, copyPrefix, inspectTransport = async () => ({}) }) {
+  const controllers = [], graceMs = 150, statuses = [];
+  let stage = 'establishing-owned-connections';
+  const start = (session, control) => {
+    const participation = session.participate({ control, ...ports(session), recovery: { graceMs, freshnessMs: 300_000 },
+      connections: { retryInitialMs: 100, retryMaxMs: 500, advertiseMs: 300_000, timeoutMs: 15_000 } });
+    controllers.push(participation);
+    participation.onStatus(status => statuses.push({ device: session.deviceId, ...status }));
+    return participation;
+  };
+  const post = async (session, operationId) => {
+    const operation = await session.command('postMessage', { messageId: operationId, text: operationId }, { operationId });
+    assert.equal((await operation.applied({ signal: timeout() })).outcome, 'accepted'); return operation;
+  };
+  try {
+    const primary = start(coordinator, coordinatorControl), secondary = start(follower, followerControl);
+    await Promise.all([
+      waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId)),
+      waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId)),
+    ]);
+    stage = 'commands-during-host-outage';
+    await post(follower, 'controller-established');
+    await waitRevision(coordinator, follower.revision);
+    await host.block(true); await assert.rejects(followerControl.application(), /CONTROL_HOST_UNAVAILABLE/);
+    const before = await host.traffic();
+    await post(follower, 'controller-host-blocked');
+    await waitRevision(coordinator, follower.revision);
+    const after = await host.traffic();
+    assert.deepEqual(after, before, 'Ordinary controller-owned work must not contact the host');
+    await host.block(false);
+    const previousGeneration = follower.revision.generation, retained = follower.revision.point;
+    stage = 'automatic-recovery-after-grace';
+    const disconnectedAt = Date.now();
+    await coordinator.close();
+    const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration);
+    const recoveredAt = Date.now();
+    const automaticAuthority = await followerControl.application();
+    assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);
+    assert.equal(automatic.recovery, null);
+    assert.ok(recoveredAt - disconnectedAt >= graceMs, 'Takeover must honor reconnect grace');
+
+    // Deliberate cold-observer fault setup: supply verified bytes through a
+    // public connection before attaching a controller, so no coordinator-age
+    // observation exists in this device's owned participation journal.
+    const copied = await copyPrefix(observer, follower);
+    await copied.synchronize(); await copied.close();
+    const observedGeneration = observer.revision.generation;
+    await secondary.close(); await follower.close();
+    stage = 'approval-for-unknown-freshness';
+    const cold = start(observer, observerControl);
+    const approval = await waitParticipation(cold, value => value.phase === 'approval-required');
+    assert.equal(approval.recovery.reason, 'freshness-unknown');
+    assert.equal(approval.recovery.ageMs, null);
+    assert.equal((await observerControl.application()).generations.at(-1).id, observedGeneration,
+      'Unknown freshness must not authorize an automatic transition');
+    await assert.rejects(cold.approveRecovery('unreviewed-proposal'), /APPLICATION_RECOVERY_APPROVAL_STALE/);
+    await cold.approveRecovery(approval.recovery.id);
+    stage = 'explicitly-approved-recovery';
+    await waitParticipation(cold, value => value.phase === 'coordinating' && observer.revision.generation !== observedGeneration);
+    await post(observer, 'controller-approved-recovery');
+    const finalAuthority = await observerControl.application();
+    assert.deepEqual(finalAuthority.generations.at(-1).payload.adopted, approval.recovery.point);
+    await Promise.all(controllers.map(value => value.close()));
+    return { owner: 'application-session', entry: 'session.participate', automaticConnections: true,
+      observedPeerIdentities: [coordinator.deviceId, follower.deviceId],
+      hostOutage: { blocked: true, commandsApplied: 1, before, after },
+      automaticRecovery: { previousGeneration, selectedGeneration: automaticAuthority.generations.at(-1).id,
+        adopted: retained, graceMs, elapsedMs: recoveredAt - disconnectedAt, freshnessBudgetMs: 300_000 },
+      broaderRecovery: { reason: approval.recovery.reason, ageMs: approval.recovery.ageMs, approvalRequired: true,
+        staleApprovalRejected: true, proposalId: approval.recovery.id, adopted: approval.recovery.point,
+        selectedGeneration: finalAuthority.generations.at(-1).id, commandApplied: true },
+      statuses, transport: await inspectTransport() };
+  } catch (error) {
+    throw new Error(`PARTICIPATION_QUALIFICATION_FAILED at ${stage}: ${JSON.stringify(statuses.slice(-6))}`, { cause: error });
+  } finally {
+    await host.block(false);
+    await Promise.allSettled(controllers.map(value => value.close()));
+  }
+}

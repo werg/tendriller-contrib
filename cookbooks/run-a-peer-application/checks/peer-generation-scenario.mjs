@@ -14,7 +14,7 @@ import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session
 import { conversation } from './peer-generation-definition.mjs';
 import { isNextPublishedCommand } from './peer-generation-fault.mjs';
 
-export async function runPeerGenerationScenario({ path, connectSessions, createControl = createPortableControl }) {
+export async function runPeerGenerationScenario({ path, connectSessions, qualifyParticipation, createControl = createPortableControl }) {
   const reportPath = resolve(path);
   const report = JSON.parse(await readFile(reportPath, 'utf8'));
   const storeRoot = join(dirname(reportPath), 'stores');
@@ -295,6 +295,10 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     const afterReopen = await reopened.operations.get('reapplied-a');
     assert.deepEqual(afterReopen, beforeReopen);
     report.reopen = { identityBefore, identityAfter: reopened.deviceId, operationBefore: beforeReopen, operationAfter: afterReopen };
+    await Promise.all([...links].map(link => link.close()));
+    const observerControl = reopened.connectControlParticipant({ exchange: host.exchange });
+    report.participation = await qualifyParticipation({ coordinator: c, follower: b, observer: reopened,
+      coordinatorControl: cControl, followerControl: bControl, observerControl, host });
     report.stage = 'passed';
     report.passed = true;
     console.log('Independent packed peer sessions preserved identity, exact retry and selected-prefix recovery.');

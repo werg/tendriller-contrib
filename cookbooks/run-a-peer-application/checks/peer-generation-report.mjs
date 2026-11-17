@@ -41,7 +41,8 @@ export function validatePeerGenerationReport(report) {
     same(typeof artifact.sourceDirty, 'boolean', 'Artifact cleanliness must be observed');
   }
   same(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native',
-    ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : [])], 'Use only the documented public session entry');
+    ...(rtc ? ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'] : []),
+    ...(report.hostOutage?.boundary === 'tendriller-workerd-http' ? ['@tendriller/core/peers'] : [])], 'Use only the documented public session entry');
   same(report.publicBoundary?.siblingSourceImports, 0, 'A sibling source checkout is not an independent consumer');
   same(report.publicBoundary?.applicationRetryQueues, 0, 'The consumer must use the session journal');
   same(report.publicBoundary?.residentRequired, false, 'The common session must not depend on a permanent resident');

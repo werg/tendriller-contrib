@@ -79,7 +79,7 @@ try {
   await Promise.race([bridge.ready, worker.done.then(() => { throw Error('Workerd exited before becoming ready'); })]);
   const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
     '--transport', 'native-rtc', '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
-  { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath });
+  { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath, PEER_GENERATION_HOST_SDK: sdk });
   await peer.done;
   await bridge.stop();
   await worker.done;
@@ -108,7 +108,7 @@ async function createBridge() {
   const enqueue = job => new Promise((resolve, reject) => {
     assert.ok(pending.size < 32, 'The test bridge is bounded');
     const jobId = `${++nextId}`;
-    const timer = setTimeout(() => { pending.delete(jobId); reject(Error('TEST_BRIDGE_TIMEOUT')); }, 45_000);
+    const timer = setTimeout(() => { pending.delete(jobId); reject(Error('TEST_BRIDGE_TIMEOUT')); }, job.kind.endsWith('.next') ? 120_000 : 45_000);
     pending.set(jobId, { resolve, reject, timer });
     const value = { ...job, jobId };
     if (reader) { const response = reader; reader = undefined; json(response, 200, value); }
@@ -142,6 +142,8 @@ async function createBridge() {
         return json(res, response.status, response.value);
       }
       if (url.pathname === '/rendezvous/open') return json(res, 200, await enqueue({ kind: 'rendezvous.open', ...body }));
+      const introduced = /^\/introductions\/(rendezvous|invitations)\/(open|ready|next|send|close)$/u.exec(url.pathname);
+      if (introduced) return json(res, 200, await enqueue({ kind: `introductions.${introduced[1]}.${introduced[2]}`, ...body }));
       const action = /^\/rendezvous\/(\d+)\/(0|1)\/(next|send|close)$/u.exec(url.pathname);
       assert.ok(action, 'Unknown bridge endpoint');
       return json(res, 200, await enqueue({ kind: `rendezvous.${action[3]}`, id: action[1], index: Number(action[2]), body }));

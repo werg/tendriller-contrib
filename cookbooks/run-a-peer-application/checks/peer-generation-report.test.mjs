@@ -119,7 +119,7 @@ test('deliberate reapplication needs new identity, linked abandoned intent and c
 function syntheticRtcReport() {
   const report = syntheticReport();
   report.topology = 'independent-native-rtc';
-  report.publicBoundary.imports.push('@chronolog/peer-session/webrtc-native');
+  report.publicBoundary.imports.push('@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native');
   report.runtime.dependencies = { lockSha256: 'c'.repeat(64), packages: [{ path: 'node_modules/werift', version: '0.27.0', integrity: 'sha512-synthetic' }] };
   const signaling = { sentMessages: 2, sentBytes: 2048, closed: true };
   report.rtc = { implementation: 'werift', version: '0.27.0', signalingBoundary: 'one-off-in-process-sdp-mailbox',
@@ -160,6 +160,7 @@ test('host-independent RTC commands require authenticated traffic after signalin
 function syntheticHostedReport() {
   const report = syntheticRtcReport();
   report.hostOutage.boundary = 'tendriller-workerd-http';
+  report.publicBoundary.imports.push('@tendriller/core/peers');
   report.rtc.signalingBoundary = 'tendriller-workerd-rendezvous';
   report.host = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
     participant: { protocol: 'chronolog-participant-v1', route: 'peers/participant', transport: 'public-chronolog-participant',

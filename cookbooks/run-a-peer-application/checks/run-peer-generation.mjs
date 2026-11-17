@@ -16,12 +16,13 @@ const { values } = parseArgs({ options: {
   domain: { type: 'string', default: 'conversation' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
-if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc] [--domain conversation|tasks]');
+if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc] [--domain conversation|tasks|agent]');
 assert.ok(['direct', 'native-rtc'].includes(values.transport), 'Unknown transport');
-assert.ok(['conversation', 'tasks'].includes(values.domain), 'Unknown domain');
-const tasks = values.domain === 'tasks';
+assert.ok(['conversation', 'tasks', 'agent'].includes(values.domain), 'Unknown domain');
+const agent = values.domain === 'agent', tasks = values.domain === 'tasks' || agent;
 if (tasks) assert.equal(values.transport, 'direct', 'The native guarded-task gate uses direct authenticated peers');
 const rtc = values.transport === 'native-rtc';
+const hostSdk = process.env.PEER_GENERATION_HOST_SDK;
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
 const artifact = resolve(values.artifact), output = resolve(values.output);
@@ -33,20 +34,22 @@ await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
 const report = {
   format: 'peer-generation-consumer/v1', profile: 'peer-generation-v1', mode: 'runtime',
-  topology: tasks ? 'independent-packed-tasks' : rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
+  topology: agent ? 'independent-agent-tools' : tasks ? 'independent-packed-tasks' : rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'),
     tree: git('rev-parse', 'HEAD^{tree}'), dirty: git('status', '--porcelain', '--untracked-files=all').length > 0 },
   artifacts: [], fixtures: [], error: null,
 };
 try {
-  const entry = tasks ? 'peer-generation-task-consumer.mjs' : rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
+  const entry = agent ? 'peer-generation-agent-harness.mjs' : tasks ? 'peer-generation-task-consumer.mjs' : rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
   // Freeze the exact consumer bytes before installation; a later working-tree
   // edit must not masquerade as the source commit captured above.
   const fixtures = await Promise.all([
     [entry, join(here, entry)],
     ...(rtc ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
-    ...(!tasks ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
+    ...(hostSdk ? [['peer-generation-host-introductions.mjs', join(here, 'peer-generation-host-introductions.mjs')]] : []),
+    ...(!tasks ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs', 'peer-generation-participation.mjs'].map(name => [name, join(here, name)]) : []),
+    ...(agent ? [['peer-generation-participation.mjs', join(here, 'peer-generation-participation.mjs')]] : []),
     ...(tasks ? [['peer-generation-task-definition.mjs', join(here, '../snippets/peer-task-board.mjs')],
       ['peer-conversation.mjs', join(here, '../snippets/peer-conversation.mjs')]] : [['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')]]),
   ].map(async ([name, path]) => {
@@ -60,7 +63,7 @@ try {
   }
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-peer-generation-consumer', private: true, type: 'module' }));
   execFileSync('npm', ['install', ...(rtc ? [] : ['--offline', '--package-lock=false']), '--ignore-scripts', '--no-audit', '--no-fund',
-    artifact, ...(rtc ? ['werift@0.27.0'] : [])], {
+    artifact, ...(rtc ? ['werift@0.27.0'] : []), ...(hostSdk ? [resolve(hostSdk)] : [])], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
@@ -72,13 +75,18 @@ try {
   }
   assert.deepEqual(metadata.peerDependencies ?? {}, rtc ? { werift: '0.27.0' } : {}, 'The optional native RTC adapter pins its external dependency');
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(tree.dependencies).sort(), rtc ? ['@chronolog/peer-session', 'werift'] : ['@chronolog/peer-session']);
+  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(hostSdk ? ['@tendriller/core'] : []), ...(rtc ? ['werift'] : [])]);
+  if (hostSdk) {
+    const sdk = report.host.artifacts.find(value => value.name === '@tendriller/core');
+    assert.equal(hash(await readFile(resolve(hostSdk))), sdk.sha256, 'The controller must use the exact qualified host SDK');
+    assert.equal(tree.dependencies['@tendriller/core'].version, sdk.version);
+  }
   if (rtc) {
     assert.equal(tree.dependencies.werift.version, '0.27.0');
     const lockBytes = await readFile(join(consumer, 'package-lock.json'));
     const lock = JSON.parse(lockBytes);
     report.runtime.dependencies = { lockSha256: hash(lockBytes),
-      packages: Object.entries(lock.packages).filter(([path]) => path.startsWith('node_modules/') && path !== 'node_modules/@chronolog/peer-session')
+      packages: Object.entries(lock.packages).filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@chronolog/peer-session', 'node_modules/@tendriller/core'].includes(path))
         .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
     assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
   } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
@@ -102,18 +110,24 @@ try {
   const imports = new Set();
   for (const { name, sourcePath, bytes } of fixtures) {
     report.fixtures.push({ path: sourcePath, sha256: hash(bytes) });
-    for (const match of bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*)['"]([^'"]+)['"]/gu)) {
+    for (const match of bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)['"]([^'"]+)['"]/gu)) {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
-        ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
+        ...(rtc ? ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'] : []),
+        ...(hostSdk ? ['@tendriller/core/peers'] : []),
         ...(tasks ? ['@chronolog/peer-session/sql', '@chronolog/peer-session/sql-native'] : []),
-        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs', './peer-generation-fault.mjs', './peer-generation-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-participation.mjs', './peer-generation-host-introductions.mjs', './peer-generation-host-client.mjs', './peer-generation-fault.mjs', './peer-generation-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
     await writeFile(join(consumer, name), bytes, { flag: 'wx' });
   }
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0, residentRequired: false };
+  if (agent) report.stage = 'prepared-agent-tools';
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  if (agent) {
+    console.log(JSON.stringify({ prepared: true, cwd: consumer, command: ['node', entry, reportPath], report: reportPath }));
+    process.exit(0);
+  }
   const result = spawnSync(process.execPath, [join(consumer, entry), reportPath], {
     cwd: consumer, stdio: 'inherit', timeout: rtc ? 300_000 : 180_000,
   });
