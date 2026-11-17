@@ -1,129 +1,131 @@
 # Finish deployment qualification
 
-The implementation and reproducible local/CI gates live in
-[Chronolog #1](https://github.com/werg/chronolog-db/pull/1),
-[Tendriller #35](https://github.com/werg/tendriller/pull/35) and
-[contrib #13](https://github.com/werg/tendriller-contrib/pull/13).
-The four deployment issues remain open until their observations come from the
-actual deployment. This handoff names the inputs, commands and evidence needed
-to finish them. Exact passing revisions and unaltered reports belong in the
-qualification notes; a command or test's presence is not a passing result.
+The [current qualification inventory](peer-generation-qualification.md) and
+[machine-readable manifest](peer-generation-release-manifest.json) identify
+passing artifacts for `peer-generation-v1`. Those reports establish their exact
+local and CI settings. Issues [#14](https://github.com/werg/tendriller-contrib/issues/14),
+[#15](https://github.com/werg/tendriller-contrib/issues/15),
+[#16](https://github.com/werg/tendriller-contrib/issues/16) and
+[#17](https://github.com/werg/tendriller-contrib/issues/17) require observations
+from actual deployments. Their older descriptions and reports preserve the
+earlier fixed-authority design; use the current contract below when executing
+their outstanding deployment goals.
 
-## Keep the architecture simple
+The [architecture completion matrix](architecture-completion.md) separately
+tracks implementation work for release publication, projections, effects and
+timers. Completing that code does not supply network, device or provider
+measurements. Missing deployment inputs do not prevent implementing and testing
+the portable mechanisms.
 
-The [peer network contract](peer-network.md) defines the current WebRTC target:
-bounded introduction, explicit participant operations, peer-owned application
-traffic and no implicit hosted socket or health poll in a peer page. Keep cold
-load/participant costs separate from the warm application interval.
+## Qualify the implemented contract
 
-The administrator approves small signed roster and epoch operations. Cloudflare
-hosts it by default; its portable implementation does not need application SQL
-or application payloads. Members create their own signing and reader key pairs.
-The administrator retains the membership state and key material needed to wrap
-authorized epoch keys to approved reader public keys. A member's private key is
-not uploaded as part of enrollment.
+Chronolog owns the authenticated selected application history, command journal,
+coherent SQL/event views, identity, keyring, peer communication and explicit
+recovery. An eligible peer coordinates one generation. `applied()` reports its
+execution result; `shared()` reports independent complete coverage. Recovery may
+adopt an earlier complete prefix and abandon recent applied work. An old branch
+does not merge back when its device returns.
 
-One receipt ledger carries small signed descriptors, inline membership controls
-and signed author-time closure markers. Full peers fetch the hash-committed
-application envelopes and derive execution order from signed author timestamps
-and deterministic tie-breakers. The native finality authority certifies inclusion
-and a closed author-time frontier; receipt positions do not choose application
-conflict winners. The membership administrator decides roster permissions at the
-proved control boundaries. These responsibilities can have different hosts
-without inventing another application command log.
+Tendriller hosts a constrained participant: account integration, compact signed
+control, discovery and publication. It does not need application SQL, ordinary
+command envelopes or private history keys. Enrolled devices create their own
+signing and reader keys. Authorized live peers exchange encrypted key packages;
+account login and a successful host request alone do not establish application
+membership or permission to decrypt history.
 
-Retaining a descriptor proves which bytes were committed, not that a usable copy
-of those bytes still exists. A storage or routing failure must not silently
-create a new signer, overwrite an original operation, grant membership, or
-fabricate a final application rejection.
+Publication authority is independent of application read/write/coordinator
+rights. Public code assets have their own signed release manifest and activation
+history. Hosting an approved public release does not grant access to private
+attachments. A deliberately selected earlier page release does not roll back
+application data, protected controls or external effects.
 
-## Reproduce the available gates first
+Keep role and transport separate in the report. HTTP, WebRTC and a local process
+connection can carry different permitted protocol messages, but the verified
+capability determines what a participant may do. A healthy peer connection must
+continue ordinary commands, queries, signals and content while host endpoints
+are unavailable. If both the coordinator and control selector are unavailable,
+preserve drafts and exact attempts while waiting to select another generation.
 
-Use exact clean source commits and paired public SDK/runtime/engine packages.
-Keep every output directory new. The wrappers preserve source and artifact
-identities; build-only output explicitly leaves runtime scenarios unexecuted.
+## Reuse the current public gates
 
-| Gate | Entry point | Scope and runbook |
+Run only the gate needed to qualify a changed artifact or a new setting. Use an
+exact clean source revision, public archives and a new output directory. Existing
+green reports need no repetition merely because documentation changes.
+
+| Gate | Entry point | What its result establishes |
 | --- | --- | --- |
-| Standing resident HTTPS introduction | In Chronolog: `node --import tsx tools/test-resident-webrtc.ts --contrib ... --output ...` | Exact native resident task recipe, real TLS verification, origin/admission/read-grant refusal, authenticated native/native RTC and listener/task shutdown. [Resident service gate](../checks/README.md#qualify-the-standing-native-https-service). |
-| Browser/native WebRTC after introduction closes | `npm run test:peer-webrtc -- --chronolog ... --output ...` | Actual Chromium/OPFS Worker and native Werift adapter; bidirectional authenticated records, exact history and detached-payload digests after the loopback offer/answer host closes. [RTC gate](../checks/README.md#qualify-the-browsernative-webrtc-transport). The fixture does not qualify the packaged Tendriller host. |
-| Task/chat over WebRTC with packaged host introduction | `npm run test:peer-application -- --chronolog ... --tendriller-runtime ... --tendriller-engine ... --wasm ... --output ...` | Actual native authority, two independent Chromium/OPFS peers and packaged workerd rendezvous with synthetic page sessions. RTC reconnect/catch-up, original state/outcome comparison and warm work after introduction stops. [Route runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/route-qualification.md). |
-| Fresh device and thin administrator | `npm run test:peer-membership -- --chronolog ... --tendriller-artifacts ... --wasm ... --output ...` | Actual packaged workerd provider, native peer and Chromium device; enrollment, certified grants/keys, detached-body readiness, revocation and restart. [Membership gate](../checks/README.md#qualify-thin-cloudflare-membership-separately). |
-| Native traffic and retained storage | In Chronolog: `node --import tsx tools/membership-cost.ts --output ...` | Actual signed requests and durable stores; independent body-size/count workloads and membership lifecycle. [Cost guide](measuring-application-costs.md). |
-| Authority loss and restore | In Chronolog: `node --import tsx tools/authority-recovery.ts --output ...` | Separate real processes, SIGKILL at commit boundaries, same-store fencing, retry, complete backup/restore and stale-lineage refusal. [Recovery runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/authority-recovery.md). |
-| Browser storage and authorization | Chronolog Browser peer qualification workflow; focused commands in the runbook | Real Chromium/OPFS ownership, explicit identity creation, metadata/storage-loss refusal, bounded actual quota fixture and publisher negative cases. [Device runbook](https://github.com/werg/chronolog-db/blob/feat/portable-peer-core/docs/device-boundary-qualification.md). |
+| Independent native events or guarded SQL | `npm run test:peer-generation -- --artifact /exact/session.tgz --domain conversation` (or `tasks`) `--output /new/evidence` | Separate owned stores, real signed attempts, deterministic domain behavior, earlier-prefix recovery, linked reapplication and durable reopen. Tasks require the SQL-native archive. |
+| Actual native WebRTC | The same command with `--transport native-rtc` and the native-RTC archive | Authenticated ICE/DTLS/SCTP and peer-only warm work in the recorded network topology. |
+| Actual packaged Tendriller host | `node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs` with the exact session, SDK and engine artifacts documented in [the runner guide](../checks/README.md) | Public workerd controls/rendezvous and actual native RTC with synthetic fixture accounts; production identity remains separate. |
+| Actual browser events or SQL | `npm run test:peer-browser -- --artifact /exact/session.tgz --domain conversation` (or `tasks`) `--output /new/evidence` | Dedicated Worker/OPFS, maintained public bootstrap and host bridge, actual browser/native RTC, coherent recovery and reopen. Tasks require the combined SQL-native/SQL-browser archive. |
+| Fresh implementation from public APIs | [Independent task consumer](../checks/fresh-peer-task/README.md) | The recorded domain implementation, API interventions and developer experience. Its direct transport does not qualify physical RTC. |
 
-The author-time finality change requires new source-pinned qualification. Earlier
-receipt-order reports remain historical: they do not qualify closure recovery,
-timestamp admission, closure traffic, or the revised reset-versus-stale-edit
-scenario. Record the future-admission window, cutoff lag, closure interval and
-polling cadence in route and cost reports. The native authority backup must
-retain its closure history as well as its certified receipt prefix.
+The public runner reports identify their engine and package hashes, fixture
+source, selected topology and actual scenario results. A build, a simulated
+transport or an unexecuted command cannot replace a runtime report.
 
-The browser workflow runs independent gates even if an earlier gate fails. Its
-overall result still fails. Read each report's status and scenario list; a later
-passing scenario does not turn an earlier failure into a successful workflow.
+## Supply deployment inputs and record observations
 
-## Required external setting and evidence
+| Issue | Required setting | Work and evidence |
+| --- | --- | --- |
+| [#14: production routes](https://github.com/werg/tendriller-contrib/issues/14) | Public host with actual identity provider, reachable native participant, TLS/DNS and home Wi-Fi, mobile hotspot and restrictive corporate networks | Repeat the same guarded task/chat trace over supported direct and relay paths. Record selected ICE candidates, TURN/tunnel/provider hops, actual bytes, establishment/catch-up time, whole-device resources, bounded queues, cold join, suspension, reconnect, native restart and warm operation with host services stopped. Select a supported route and practical fallback from observations. |
+| [#15: comparable cost](https://github.com/werg/tendriller-contrib/issues/15) | Matched hosted and peer deployments, provider analytics/billing access, account allowances and the actual relay/storage/backup providers | Use the same trace, idle time, faults and retention window. Observe actual hosted hibernation. Separate control, signaling, public release assets, private peer content and relay traffic. Include native CPU/disk/network, browser replay/memory, retained bytes, backup lag and guarantee differences. Preserve raw usage, query windows and dated prices; unknown meters stay unknown. |
+| [#16: deployed durability](https://github.com/werg/tendriller-contrib/issues/16) | Disposable infrastructure with the intended persistent volumes, secrets, cross-host fencing and independent retained history/control evidence | Exercise process loss, interrupted writes, volume/power loss, ordinary reopen and loss of the newest copy. Inspect usable complete prefixes and select recovery explicitly. Record abandoned/unknown work, original-attempt continuity and protected control floors. Recover the control/publisher store separately from peer history and private content; never copy one root identity into two active independent stores. |
+| [#17: deployed devices and privacy](https://github.com/werg/tendriller-contrib/issues/17) | Separately enrolled real browser/OS devices, actual owner/participant authentication, authorized private fixtures and storage-pressure controls | Exercise live enrollment/key exchange, role scope, revocation/rotation, late responses, default-bucket quota, clearing/eviction, isolated profiles and recovery UX. Verify loss of keys causes explicit fresh enrollment, not silent identity replacement. Audit private-agent and attachment flows; hosting public assets must not reveal private history keys or bodies. |
 
-| Issue | What must be supplied | Work to perform | Evidence that finishes the boundary |
-| --- | --- | --- | --- |
-| [#14: production routes](https://github.com/werg/tendriller-contrib/issues/14) | Deployed public host, actual identity provider, reachable native agent, TLS/DNS configuration, and home Wi-Fi, mobile hotspot and restrictive corporate networks | Repeat identical task/chat histories over every supported direct/fallback path. Exercise cold join, warm catch-up, real suspension, disconnect, native restart, slow readers and a warm direct session while host services are stopped. | Exact topology including tunnels/relays; supported/unsupported routes; actual wire/provider bytes; establishment and catch-up times; whole-browser/Worker/native memory; queue behavior; identical signed records, permissions and outcomes; zero hosted application-state writes; selected production route and fallback. |
-| [#15: complete cost comparison](https://github.com/werg/tendriller-contrib/issues/15) | Matched hosted/peer deployments, Cloudflare analytics/account access, monthly allowance baseline, native and relay/tunnel/blob/backup providers | Run the same trace, idle intervals, faults and retention window for hosted, peer-direct and peer-relayed cases. Observe the hosted WebSocket hibernation behavior. Include capture/blob reads and restore, not only metadata. | Raw provider usage and queries, dated prices and account allocations, native/browser resources, time-integrated retention, history growth, independent blob copies and backup lag. Feed the supplied calculator; retain unknown totals where any required meter is absent. |
-| [#16: deployed durability](https://github.com/werg/tendriller-contrib/issues/16) | Disposable infrastructure matching the actual persistent volume/daemon/secret store, cross-host fencing controls, independent latest acknowledged prefix, backup/export rights and a secure administrator transfer procedure | Rehearse process and volume/power failures, full-state restore and loss of the newest disk. Verify old-owner fencing. Separately restore or move the Cloudflare administrator with only one active root store. | Actual deployment/storage versions and guarantees, independently verified continuity floor, backup age/lag, complete store/key inventory, exact retry outcomes, live peer reads during outage, descriptor versus payload availability, and an explicit continue-lineage or new-lineage decision. |
-| [#17: deployed device/privacy boundaries](https://github.com/werg/tendriller-contrib/issues/17) | Real separately enrolled browser/OS devices, actual owner/participant authentication, authorized private-data fixtures, storage-pressure controls and key-management access | Repeat the membership/revocation/negative cases through production authentication; exercise real suspension, default-storage exhaustion, selective loss, clearing, isolated profiles, recovery UX and retained/future epoch policy. Audit actual private-agent data flows. | Deployed version and account/device identity fingerprints, logs with private values excluded, original-operation continuity, explicit fresh enrollment after key loss, private-data exclusion, revoked future access and observed browser-specific recovery limits. |
+The five-minute recovery-age objective requires a suitable independent peer and
+an observed interval long enough to measure it. Record the retained prefix age,
+peer availability, disconnect duration and selected recovery base. A short test,
+two tabs sharing one owner or a heartbeat does not establish that objective.
 
-### Limits that need explicit observations
+## Preserve the limits of each observation
 
-- Historical local direct WSS proves its recorded route can carry the real
-  protocol. A new browser/native WebRTC run must name its own source, runtime,
-  selected candidate route and results. Neither loopback route establishes
-  public reachability through NAT, a corporate policy or a mobile network.
-- The historical relay fixture used the actual packaged engine, but its local TLS bridge
-  supplies a synthetic page session. Test production cookie/origin/login and
-  participant authorization on the deployed host.
-- Frame counters exclude transport overhead. Count RTC signaling separately
-  from data-channel bytes and distinguish direct candidate pairs from TURN.
-  Sampled queue sizes,
-  page metric snapshots and one process's RSS are not a whole-device peak or a
-  queue-saturation qualification.
-- A deliberately small browser Storage Bucket can produce a bounded real OPFS
-  quota failure. That storage/checkpoint/journal result does not establish quota
-  exhaustion at the public peer's default bucket, outbound-publication behavior
-  under that pressure, disk-full behavior, OS eviction or other browsers. A CDP
-  reported quota alone must not be accepted as evidence that writes failed.
-- SQLite's same-file writer fence does not fence copied volumes on independent
-  hosts. A retained local certificate helps detect partial loss; it cannot
-  detect a rollback that removes every newer copy of evidence. Keep independently
-  verified acknowledged inclusion and closure evidence outside the restored
-  disk, and validate the complete retained closure history during recovery.
-- No second-durable-copy-before-acknowledgment contract, automatic failover,
-  generic Cloudflare-to-native administrator export/import command, or erasure
-  of plaintext already read by a revoked device is claimed. If such a promise
-  becomes a product requirement, define and qualify that contract separately.
+Logical frame counters exclude WebRTC, SCTP, DTLS and IP overhead. Separate
+signaling from data-channel traffic, cold startup from the warm interval, and
+direct candidates from TURN. Whole-browser/Worker/native peaks need measurements
+at their actual boundaries; a page metric snapshot is not a whole-device peak.
 
-## Order the deployment session
+A small test Storage Bucket can demonstrate an actual bounded OPFS quota failure.
+It does not qualify the default bucket, OS eviction or another browser. Abruptly
+terminating a Worker after a durable result is observed does not exercise a
+mid-write crash. Record where each failure was injected and what survived.
 
-1. Record the exact authored and tested commits, package hashes, deployed
-   versions, browser/OS/native versions, accounts, network paths and role owners.
-   Use public fingerprints in shared evidence; keep credentials, databases and
-   private keys in protected operator storage.
-2. Confirm a usable independent backup and continuity floor before the loss
-   rehearsal. Use disposable deployment data and the real storage configuration.
-3. Establish real enrollment and authorized key delivery, then qualify network
-   routes and application equivalence. Carry the same trace into cost runs.
-4. Execute the storage/restart/loss drills and real browser pressure/eviction
-   cases. Record observed absence and refusal explicitly; do not repair away a
-   failed case before preserving its evidence.
-5. Export usage after the provider's analytics delay, preserving units, windows,
-   query filters, shared allocations and missing-data flags. Calculate only from
-   those measurements and the matching pricebook.
-6. Attach immutable sanitized reports, trace hashes, commands, pass/fail results
-   and limits to the relevant issue. Close a checklist item only for the setting
-   actually exercised; leave unsupported or unmeasured cases explicit.
+Independent coverage is a statement about a complete retained prefix at the
+time of the observation. It is not universal second-copy durability or a promise
+that every applied edit survives later recovery. A release manifest, history
+descriptor or content reference likewise does not prove its bytes remain
+available. Record public asset retention and private content availability
+separately.
 
-The current workspace and CI can run the implementation gates and publish their
-evidence. They do not provide production Cloudflare credentials, real identity
-provider accounts, physical home/mobile/corporate networks, deployed volume
-attachment/power-loss controls, private production agent data, or billing and
-backup exports. Those inputs are the concrete handoff for the remaining issues.
+Application recovery cannot undo an external effect. A worker must retain its
+dispatch journal across selected-history resets, reconcile uncertain provider
+results and preserve completed intent identities. A code rollback cannot erase
+that journal. If an action requires its prerequisite history to survive, enforce
+the protected recovery floor and report unavailable if that prerequisite is
+missing.
+
+## Execute the deployment session
+
+1. Record exact source commits, public archive and engine hashes, deployed
+   versions, browser/OS/runtime, accounts, roles, network paths and provider
+   settings. Shared evidence uses public fingerprints; credentials, private keys
+   and databases stay in protected operator storage.
+2. Establish independently verified backups and retained control/history
+   evidence before destructive drills. Use disposable deployment data and the
+   actual storage configuration.
+3. Verify enrollment, current roles and authorized peer key exchange. Run the
+   same trace for route, recovery and cost observations, including publication
+   and ordinary collaboration during host outages.
+4. Preserve failed cases before repairing them. Record exact attempts,
+   selected/abandoned ancestry, protected controls, incomplete content and
+   explicit refusal states.
+5. Export usage after provider analytics have caught up. Keep units, windows,
+   filters, shared allocations, prices and missing meters explicit.
+6. Attach immutable sanitized reports, commands and pass/fail boundaries to the
+   relevant issue. Close only the settings actually exercised.
+
+The workspace and CI can build the implementations and run reproducible public
+artifact gates. They do not supply production account credentials, physical
+home/mobile/corporate networks, deployed volume or power controls, private
+production fixtures, or provider billing/backup exports. Those are the concrete
+remaining inputs for deployed qualification.

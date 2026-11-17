@@ -19,6 +19,11 @@ operating limits. It treats each runtime gate separately. Its current
 browser SQL recovery now has its own passing exact-source report; local runtime
 results do not qualify deployed networks, provider cost or a recovery-age bound.
 
+The [architecture completion matrix](architecture-completion.md) separates the
+new release, projection, effect and timer work from those deployed measurements.
+The [deployment handoff](deployment-qualification-handoff.md) applies the current
+selected-history and peer-keyring contract to the still-open issues #14–#17.
+
 The current source, Chronolog `7b9bd41d`, passed the complete native/host,
 browser events/SQL and quality workflows. The raw reports are preserved under
 their exact artifact identities. Older passing and failed evidence remains
