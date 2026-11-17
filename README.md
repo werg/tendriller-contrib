@@ -26,16 +26,15 @@ references live beside the cookbook that explains their policy.
 For new application architecture, start with
 [application primitives and roles](guides/application-primitives.md):
 `peer-generation-v1` is the adopted target, with implementation and qualification
-in progress. Use one selected-history contract: `local()` means applied here;
-`final()` means committed and applied under the selected history. Explicit
-recovery may abandon a recent suffix, including work previously reported final.
-Ordinary effects use reset-aware journaling and reconciliation; protect a
-prerequisite only when the application requires it to survive recovery. The
+in progress. `applied()` reports execution in the selected generation; `shared()`
+separately observes retained coverage on another peer. Explicit recovery may
+abandon a recent suffix, including previously applied work. This profile has no
+`final()` wait. Irreversible external work requires an explicitly configured
+protected checkpoint or durable external-action service. The
 [peer application preview](cookbooks/run-a-peer-application/COOKBOOK.md) develops
 the target APIs with an independent consumer; executable examples require an
 explicitly supplied matching `@chronolog/peer-session` archive.
-The preview currently calls its execution wait `applied()`; examples keep the
-actual archive API without adding aliases. The [historical implementation guide](guides/finalized-peer-applications.md)
+Examples use that public API directly. The [historical implementation guide](guides/finalized-peer-applications.md)
 records the older packages' immutable-prefix guarantee and original test scope.
 Method names alone do not imply that guarantee, and those checks do not establish
 generation API availability or qualification.
@@ -46,7 +45,7 @@ The [standalone composition check](cookbooks/share-live-signals/checks/README.md
 uses an actual public signal module for live readings and token previews. For
 peer applications, completion is scoped to the selected history. Authenticated
 provenance, application authorization and recovery-aware journals govern agent
-work; explicitly protected decisions are used only where required.
+work; irreversible actions have a separate declared guarantee.
 
 For a shared application, start with the
 [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md).

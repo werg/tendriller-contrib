@@ -3,18 +3,15 @@
 **Implementation status:** `peer-generation-v1` is the adopted target for new
 peer applications. The encrypted replica, public session/native/browser entries,
 framed network transport and maintained RTC composition are implemented as a
-preview; qualification is in progress. The unified target contract uses `local()` for a result applied here and `final()` for a
-result committed and applied under the selected history. Explicit recovery may
-abandon a recent suffix, including work previously reported final. Design around
-that recovery exception and the effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
-develops the target APIs alongside an independent consumer; using those APIs
+preview; qualification is in progress. `operation.applied()` returns an accepted
+or rejected result at a specific generation and sequence. Explicit recovery may
+abandon a recent suffix, including previously applied work. This profile has no
+`final()` wait or irreversible-finality capability. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
+uses the public APIs alongside an independent consumer; using those APIs
 requires an explicitly supplied matching `@chronolog/peer-session` archive.
-The preview currently spells its execution wait `applied()`; use the actual API
-of the supplied archive, without inventing aliases or additional protocol stages.
 The [historical implementation guide](finalized-peer-applications.md) records the
-older packages' immutable-prefix guarantee. That guarantee comes from their
-implementation, not from the name `final()`, and their checks do not qualify
-generation recovery.
+older packages' immutable-prefix guarantee and its original evidence. Their
+checks do not qualify generation recovery or add finality to the new profile.
 
 The preserved package report uses separate native/events stores over an in-process
 link with dirty-source provenance. Maintained RTC code and its independent
@@ -36,7 +33,7 @@ External work needs a journal and an explicit policy for recovery and uncertain 
 | Shared conversation or recorded observations | Peer application events | Exact signed attempts and deterministic replay; a selected recovery may abandon a recent suffix. |
 | A conditional shared state transition | One SQL/event program | Assertions, mutations and effective events succeed or fail together in the selected order. |
 | Administration that must not be rolled back | Signed control transition or protected administrative action | Monotonic permissions and recovery floors survive application-tail loss. |
-| External work | An authorized effect worker with a reset-aware journal | Stable effect identity and reconciliation; protect a prerequisite only when the application requires it to survive recovery. |
+| Irreversible external work | An explicitly configured protected action or durable external-action service | Preserve the action's prerequisites, stable identity, authorization, provider idempotency and reconciliation independently of a lossy application tail. |
 
 Use the [signal guide](../cookbooks/share-live-signals/COOKBOOK.md) for typing,
 presence, cursors, readings, previews and disposable progress. An events-only
@@ -71,9 +68,9 @@ the recipe and reports identify which exact public packages and runtime scenario
 actually pass.
 The [historical implementation guide](finalized-peer-applications.md) preserves
 the earlier chronological implementation and its source-specific evidence. It is
-not a second architecture to select for ordinary applications. The adopted model
-has one selected history and an explicit recovery exception; completion names do
-not add protocol stages or promise survival beyond that contract.
+not a prerequisite for ordinary applications. The adopted model has one selected
+history and explicit recovery; stronger settlement is a separately declared
+capability.
 
 An application uses one backend and authenticated selected history. A lost peer
 never triggers an automatic hosted fallback. Existing certificates and author
@@ -105,21 +102,22 @@ A stable application/team identity must outlive the creating device.
 
 ## Distinguish completion from recovery
 
-These are observations, not a required ladder of protocol stages. The target
-method names describe scope: `local()` is applied here; `final()` is committed
-and applied in the selected history. The current preview's `applied()` spelling
-remains an implementation detail of that archive.
+These are distinct observations, not a required ladder of protocol stages.
+`operation.applied()` waits for execution in the selected history;
+`operation.shared()` separately observes retained coverage on another peer.
+Neither promises that an operation survives a later permitted recovery.
 
 | Observation | What it establishes |
 | --- | --- |
 | Saved | The exact attempt is durably recorded locally with its original generation and guards. |
 | Waiting | The original attempt is retained; no current execution outcome is known. |
-| Local | The program has an execution result on this replica. |
 | Applied accepted | The selected sequence executed the complete program successfully at a stated position. |
 | Applied rejected | That execution rejected the complete program; no partial mutation or effective event escaped. |
 | Shared | A named independent peer retained a complete usable prefix; reachability may change. |
 | Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
-| Final | The accepted or rejected result is committed and applied under the selected history; explicit recovery may later abandon it. |
+
+Reserve `final` for a profile that actually provides irrevocable settlement.
+Do not alias a final wait to `applied()` or leave it pending in this profile.
 
 Applied outcomes are stable while their position remains in the selected
 ancestry. Inherited attempts keep their original identity and outcome. An
@@ -176,23 +174,21 @@ its producer's claim; it does not by itself prove correct SQL execution.
 
 ## Keep external effects explicit
 
-Ordinary effects can follow committed selected-history events through a worker
-that handles resets. Keep stable intent identities and a dispatch journal whose
-completed effects are not forgotten with an abandoned application suffix.
-Reconcile uncertain calls and use provider idempotency where available. A reset
-must not automatically repeat a completed effect. An abandoned edit cannot undo
-an email, payment or external deletion; the application's recovery policy must
-account for that possibility.
+An applied event cannot by itself authorize an irreversible email, payment or
+external deletion. Recovery can abandon its business preconditions. A dispatch
+journal and provider idempotency prevent some duplicate calls but cannot make
+those abandoned preconditions true.
 
-Only when an application requires a prerequisite to survive recovery, protect
-the complete accepted program and its dependencies with a recovery floor or an
-explicitly protected action boundary. If that required prefix is unavailable,
-report the protected action unavailable without stopping unrelated collaboration.
-This is a requirement of that action, not a second default architecture.
+Select a stronger boundary explicitly: a durable external-action service, or a
+protected checkpoint covering the complete prerequisite program and dependencies.
+Keep stable effect identities, authorization and reconciliation for uncertain
+calls. Do not automatically redispatch after a generation change. If a required
+protected prefix is unavailable, report that action unavailable while ordinary
+collaboration continues.
 
-The existing `FinalEventSource` adapter assumes an immutable accepted-event
-history. It needs an explicit reset-aware contract before consuming generation
-events; renaming an execution wait does not provide that behavior.
+The existing `FinalEventSource` adapter requires immutable accepted-event history
+and must not consume generation-applied events. Reversible computation and
+replaceable caches may instead use an explicit recovery-aware rerun policy.
 
 ## Give an implementing agent a short contract
 
@@ -201,7 +197,7 @@ events; renaming an execution wait does not provide that behavior.
 3. Establish device identity and explicit author, coordinator and recovery rights.
 4. Use the public session for query, command, operation inspection and recovery.
 5. Preserve exact attempts across lost replies; deliberately review reapplication.
-6. Journal and reconcile ordinary effects across resets; protect whole-program prerequisites only where required.
+6. Use an explicit stronger boundary for irreversible work; keep reversible computation recovery-aware.
 7. Qualify the packed composition against host outage, coordinator loss, returning
    old branches and close/reopen without replacing device identity.
 

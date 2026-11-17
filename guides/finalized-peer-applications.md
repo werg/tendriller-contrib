@@ -3,11 +3,11 @@
 This guide preserves the earlier chronological implementation, its packaged
 APIs and the original scope of its checks. It is historical implementation
 guidance, not a second architecture to choose for new applications. Follow the
-[unified peer-generation target](application-primitives.md): `local()` means
-applied here, and `final()` means committed and applied under the selected
-history, with an explicit recovery exception. The older implementation below
-promises an immutable final prefix; that guarantee comes from its implementation,
-not from those method names. Its reports do not qualify generation recovery.
+[peer-generation contract](application-primitives.md): `applied()` reports
+execution in the selected generation and `shared()` observes retained coverage.
+Recovery may abandon either; this profile exposes no `final()` wait. The older
+implementation below promises an immutable final prefix. Its reports retain that
+original scope and do not qualify generation recovery.
 
 Start with what must survive. A live cursor can disappear. A submitted message
 must be recoverable. A resource reservation must satisfy its condition. Sending

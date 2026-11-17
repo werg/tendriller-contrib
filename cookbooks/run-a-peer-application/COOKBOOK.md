@@ -20,10 +20,10 @@ preserves independent native/events and clean native RTC reports with their exac
 source and archive hashes. Those runs do not establish browser, Internet or deployed readiness;
 existing finalized packages retain their [historical implementation evidence](notes/finalized-resident-recipe.md).
 
-The unified target uses `local()` for applied-here results and `final()` for
-committed/applied results under the selected history, with an explicit recovery
-exception. This preview currently calls its execution wait `applied()`; the code
-below uses that actual API spelling and adds no aliases or protocol stages.
+`operation.applied()` returns execution in the selected generation.
+`operation.shared()` separately observes retained coverage on another peer.
+Either observation can later become abandoned during permitted recovery.
+This profile exposes no `final()` wait or automatic irreversible-effect dispatch.
 
 Use this approach for shared applications that can lose a recent unreplicated
 tail when peers disappear. A temporary coordinating peer orders commands; other
@@ -217,14 +217,14 @@ outbox. A lost live message does not become a queued application command. Large
 content lives outside command envelopes and needs authorized peer/provider reads;
 a content reference does not guarantee every peer still retains the bytes.
 
-Ordinary effects need authorization, stable intent identity, a reset-aware
-dispatch journal and reconciliation of uncertain outcomes. Recovery must not
-repeat completed work merely because its intent left the selected history.
-Provider idempotency prevents some duplicates but cannot preserve a precondition
-that recovery abandons. Protect the complete prerequisite program only when the
-application requires it to survive recovery; this does not require a second
-default architecture. Reversible computations and replaceable caches can follow
-an explicit rerun policy.
+Irreversible work needs an explicitly configured durable external-action service
+or protected checkpoint covering its complete prerequisite program. An ordinary
+applied event cannot supply that guarantee. Retain authorization, stable effect
+identity, provider idempotency and reconciliation of uncertain outcomes;
+generation changes must not repeat completed work. Provider idempotency prevents
+some duplicates but cannot preserve a precondition that recovery abandons.
+Reversible computations and replaceable caches can follow an explicit rerun
+policy without adding a stronger boundary to ordinary collaboration.
 
 ## Exercise the public composition
 
