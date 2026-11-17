@@ -140,6 +140,11 @@ Use it when reading the preconditions for a command. Include business guards in
 the program: a revision token identifies what was observed but cannot prove the
 business condition still holds.
 
+Recovery changes the current view. Resuming it with an old-generation event
+cursor throws `RecoveredViewError`; capture the new view and start a new cursor.
+A view held before recovery remains a coherent snapshot of its recorded revision
+until `release()`. It must not be presented as the current selected view.
+
 A generation change between reading and preparation either preserves the
 captured position as inherited ancestry or produces an explicit reread/reapply
 result. The session owns that decision. Do not refresh stale guards inside an
