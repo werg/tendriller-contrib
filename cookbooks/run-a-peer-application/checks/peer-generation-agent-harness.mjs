@@ -66,6 +66,9 @@ try {
   resources.push(await connectApplications(coordinator, member));
   const primary = participate(coordinator), secondary = participate(member);
   memberControl = secondary.port; memberParticipation = secondary.participation;
+  // Opening the enrolled board is actual data demand. Protocol attachment alone
+  // intentionally leaves both data components idle and reports only connected.
+  await member.query('board', {});
   await Promise.all([
     waitParticipation(primary.participation, value => value.phase === 'coordinating' && value.connectedPeers.includes(member.deviceId)),
     waitParticipation(memberParticipation, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId)),
