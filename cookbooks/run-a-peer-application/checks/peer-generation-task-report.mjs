@@ -10,7 +10,7 @@ export function validatePeerTaskReport(report) {
   assert.equal(report.artifacts?.length, 1);
   const artifact = report.artifacts[0]; assert.equal(artifact.name, '@chronolog/peer-session');
   hex(artifact.sha256, 64); hex(artifact.sourceCommit, 40); hex(artifact.sourceTree, 40); assert.equal(typeof artifact.sourceDirty, 'boolean');
-  assert.deepEqual(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql-native']);
+  assert.deepEqual(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql', '@chronolog/peer-session/sql-native']);
   assert.equal(report.publicBoundary.siblingSourceImports, 0); assert.equal(report.publicBoundary.applicationRetryQueues, 0);
   assert.equal(report.publicBoundary.residentRequired, false);
   assert.equal(report.sqlEngine?.implementation, '@dolthub/doltlite@0.11.29');

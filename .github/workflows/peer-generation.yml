@@ -22,7 +22,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: 'cfd40e407a87048fbb7d9ffa09eb255571629ca3'
+        default: '095a04cf027a7c753c028306d1d8311d70e415fe'
+      tendriller_ref:
+        description: Exact Tendriller source commit for the hosted participant gate
+        required: false
+        type: string
+        default: 'd252a1e10e6632fba35c07a9e45f22fce38b9d81'
 permissions:
   contents: read
 concurrency:
@@ -35,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        transport: [direct, native-rtc, browser-native, native-sql]
+        transport: [direct, native-rtc, browser-native, native-sql, hosted]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,14 +52,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || 'cfd40e407a87048fbb7d9ffa09eb255571629ca3' }}
+          ref: ${{ inputs.chronolog_ref || '095a04cf027a7c753c028306d1d8311d70e415fe' }}
           path: .chronolog-build
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
         run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && '--ignore-scripts' || '' }}
       - name: Build clean public session archive
         working-directory: .chronolog-build
-        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native' || matrix.transport == 'hosted') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
+      - uses: actions/checkout@v4
+        if: ${{ matrix.transport == 'hosted' }}
+        with:
+          repository: werg/tendriller
+          ref: ${{ inputs.tendriller_ref || 'd252a1e10e6632fba35c07a9e45f22fce38b9d81' }}
+          path: .tendriller-build
+      - name: Build the actual public hosted participant
+        if: ${{ matrix.transport == 'hosted' }}
+        working-directory: .tendriller-build
+        run: npm ci && npm run build
       - name: Install pinned Chromium and browser system dependencies
         if: ${{ matrix.transport == 'browser-native' }}
         run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
@@ -65,6 +80,8 @@ jobs:
           test "${#archives[@]}" -eq 1
           if [ "${{ matrix.transport }}" = browser-native ]; then
             node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs --artifact "${archives[0]}" --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = hosted ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --output test-results/peer-generation
           elif [ "${{ matrix.transport }}" = native-sql ]; then
             node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --domain tasks --output test-results/peer-generation
           else
@@ -78,5 +95,11 @@ jobs:
             test-results/peer-generation/report.json
             test-results/peer-generation/summary.json
             test-results/peer-generation/consumer/package-lock.json
+            test-results/peer-generation/peers/report.json
+            test-results/peer-generation/peers/summary.json
+            test-results/peer-generation/peers/consumer/package-lock.json
+            test-results/peer-generation/host-artifacts.json
+            test-results/peer-generation/host/package-lock.json
+            .tendriller-build/dist/provenance.json
             .chronolog-build/artifacts/peer-session/*.tgz
             .chronolog-build/artifacts/peer-session/package/provenance.json

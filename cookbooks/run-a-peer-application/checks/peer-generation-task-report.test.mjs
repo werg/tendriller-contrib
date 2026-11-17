@@ -9,7 +9,7 @@ function synthetic() {
   return { format: 'peer-generation-consumer/v1', mode: 'runtime', profile: 'peer-generation-v1', passed: true,
     topology: 'independent-packed-tasks', source: { commit: '1'.repeat(40), tree: '2'.repeat(40), dirty: true },
     artifacts: [{ name: '@chronolog/peer-session', sha256: h('1'), sourceCommit: '1'.repeat(40), sourceTree: '2'.repeat(40), sourceDirty: true }],
-    publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql-native'],
+    publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql', '@chronolog/peer-session/sql-native'],
       siblingSourceImports: 0, applicationRetryQueues: 0, residentRequired: false },
     runtime: { platform: 'synthetic', architecture: 'synthetic' }, executionManifestDigest: h('2'),
     sqlEngine: { implementation: '@dolthub/doltlite@0.11.29', platform: 'synthetic', architecture: 'synthetic', patchSha256: h('1') },

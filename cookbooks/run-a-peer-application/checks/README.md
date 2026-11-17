@@ -61,6 +61,8 @@ npm run test:peer-generation -- \
   --domain tasks --output /new/sql-evidence
 ```
 
+The public `/sql` entry prepares and opens the same application with an explicit engine capability. `/sql-native` supplies `createNativeSqlEngine`; `/sql-browser` supplies a browser engine for that same composition. Neither introduces another command API.
+
 This archive includes the exact patched native engine and records its manifest
 and patch digest. Two members race to claim a task; exactly one complete program
 succeeds. Another signer cannot complete the winner's task. SQL, messages and

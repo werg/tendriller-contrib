@@ -7,7 +7,8 @@ import { bytesDigest, connectApplications, controlParticipantGrant, createGenera
   createParticipantResponse, createParticipantTransport, participantGrant, signApplicationDescriptor,
   signControlRevision, signTransitionRequest, validateParticipantRequest } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
-import { openNativeSqlApplication, prepareNativeSqlApplication } from '@chronolog/peer-session/sql-native';
+import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-session/sql';
+import { createNativeSqlEngine } from '@chronolog/peer-session/sql-native';
 import { taskBoard } from './peer-generation-task-definition.mjs';
 
 const path = resolve(process.argv[2]), report = JSON.parse(await readFile(path, 'utf8'));
@@ -21,7 +22,8 @@ try {
   const devices = await Promise.all(['creator', 'member'].map(name => openNativeDevice({ path: join(directory, `${name}.sqlite`), create: true })));
   resources.push(host, ...devices);
   const applicationId = randomBytes(32).toString('hex'), epochKey = new Uint8Array(randomBytes(32));
-  const prepared = await prepareNativeSqlApplication({ applicationId, definition: taskBoard, schemaAdministrator: devices[0].identity });
+  const engine = createNativeSqlEngine();
+  const prepared = await prepareSqlApplication({ engine, applicationId, definition: taskBoard, schemaAdministrator: devices[0].identity });
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'independent-guarded-tasks',
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: host.identity.publicKey, ...prepared.binding }, host.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
@@ -32,7 +34,7 @@ try {
     policy: descriptor.payload.policy, expectedGeneration: null, requester: devices[0].identity.publicKey,
     coordinator: devices[0].identity.publicKey, controlRevision: 0, base: null, reason: 'create', transitionId: 'task-initial' }, devices[0].identity));
   const open = async (device, name, initialize) => {
-    const session = await openNativeSqlApplication({ device, databasePath: join(directory, `${name}-materialized.sqlite`),
+    const session = await openSqlApplication({ engine, device, databasePath: join(directory, `${name}-materialized.sqlite`),
       definition: taskBoard, schema: prepared.schema, authority: await registry.read(),
       ...(initialize ? { epochKeys: new Map([[0, epochKey]]) } : {}) });
     resources.push(session); return session;

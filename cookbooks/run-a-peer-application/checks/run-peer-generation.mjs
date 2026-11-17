@@ -84,7 +84,7 @@ try {
   } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
   const provenance = JSON.parse(await readFile(join(installed, 'provenance.json'), 'utf8'));
   if (tasks) {
-    assert.ok(metadata.exports['./sql-native'], 'The guarded-task gate requires the public SQL-enabled archive');
+    assert.ok(metadata.exports['./sql'] && metadata.exports['./sql-native'], 'The guarded-task gate requires the common SQL composition and native engine capability');
     report.sqlEngine = provenance.nativeEngine;
   }
   assert.match(provenance.source, /^[a-f0-9]{40}$/u);
@@ -106,7 +106,7 @@ try {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
-        ...(tasks ? ['@chronolog/peer-session/sql-native'] : []),
+        ...(tasks ? ['@chronolog/peer-session/sql', '@chronolog/peer-session/sql-native'] : []),
         './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs', './peer-generation-fault.mjs', './peer-generation-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
