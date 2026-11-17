@@ -23,7 +23,36 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Complete ancestor-recovery composition: `f5e01684`
+## Latest complete composition: `5581a475`
+
+All five independent public-package gates and strict composition assembly passed
+again after the recovery-authority admission change, in
+[contrib CI run 44126931363](https://github.com/werg/tendriller-contrib/actions/runs/44126931363).
+The exact [latest manifest](evidence/2026-11-17-ci-composition-5581a475/composition.json)
+has SHA-256
+`717f92a2b064332eae85f43819c456bb9dd7f0d40eda5afb584c43ae55822879`.
+Its [origin record](evidence/2026-11-17-ci-composition-5581a475/origin.json)
+identifies the successful composition job, all six artifact IDs and GitHub's
+archive digests. The downloaded manifest ZIP matched its recorded digest;
+the five original raw-report bundles remain in the linked CI artifacts.
+
+| Component | Exact clean source | Source tree |
+| --- | --- | --- |
+| Chronolog runtime | `5581a475946c363c47211194016c72f21ecb45c4` | `63897c75083dabf152f2e88401a55919918bbb19` |
+| Tendriller host | `ed2509358c01a2a1a7c9db7691f4775347bb27c0` | `ee38b3c2bea94d9b88032003219ecd773d69dfb1` |
+| CI consumer checkout | `2e3b4f49925fa4c733fbd8a7ad445cc22c400a36` | `9c222fe3993f2a080627a1fecd97a6da2f448b96` |
+
+The consumer merge checkout has the same tree as branch pin
+`1d46947b2f86a5cbbb2c95b3e358b343768d5aa8`. That workflow explicitly pins the
+runtime and host sources above. Direct events, native RTC, browser Worker,
+native SQL and the actual hosted participant all passed, as did strict assembly
+job `134195404613`. The manifest retains each checked summary and exact raw
+report hash without duplicating another complete raw-report set in this
+repository. No independent local reassembly is claimed for this latest run.
+The separately retained `f5e01684` reports and fresh-agent study below remain
+scoped to their recorded source and artifact identities.
+
+## Earlier complete ancestor-recovery composition: `f5e01684`
 
 All five independent gates and the strict composition job passed in
 [contrib CI run 44126101769](https://github.com/werg/tendriller-contrib/actions/runs/44126101769).
