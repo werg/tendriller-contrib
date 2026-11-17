@@ -197,11 +197,11 @@ function syntheticHostedReport() {
     participant: { protocol: 'chronolog-participant-v1', route: 'peers/participant', transport: 'public-chronolog-participant',
       clientFiltered: ['database.submit', 'content.chunk', 'ephemeral.signal'],
       hostRejected: ['database.submit', 'content.chunk', 'ephemeral.signal'], clientFilteredHttpRequests: 0 },
-    publication: { author: '1'.repeat(64), nonAdministrator: '2'.repeat(64),
+    publication: { author: '1'.repeat(64), nonPublisher: '2'.repeat(64), administratorWithoutPublisher: true,
       first: { id: '3'.repeat(64), version: 1, expectedCodeDigest: '4'.repeat(64), servedCodeDigest: '4'.repeat(64) },
       second: { id: '5'.repeat(64), version: 2, previous: '3'.repeat(64), expectedCodeDigest: '6'.repeat(64), servedCodeDigest: '6'.repeat(64) },
       sessionOwned: true, lostReplyAfterPersistence: true, savedIdentityRecovered: true,
-      exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
+      exactRetry: true, alteredBytesRejected: true, nonPublisherRejected: true, staleHeadRejected: true,
       authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true },
     publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
     dependencies: { lockSha256: '6'.repeat(64) }, artifacts: ['@tendriller/core', '@tendriller/engine'].map(name => ({
@@ -228,9 +228,10 @@ test('hosted publication evidence requires actual signed code, permissions, retr
     value => { value.host.publication.second.previous = '0'.repeat(64); },
     value => { value.host.publication.second.expectedCodeDigest = value.host.publication.first.expectedCodeDigest;
       value.host.publication.second.servedCodeDigest = value.host.publication.first.servedCodeDigest; },
-    value => { value.host.publication.nonAdministrator = value.host.publication.author; },
+    value => { value.host.publication.nonPublisher = value.host.publication.author; },
+    value => { value.host.publication.administratorWithoutPublisher = false; },
     ...['sessionOwned', 'lostReplyAfterPersistence', 'savedIdentityRecovered',
-      'exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+      'exactRetry', 'alteredBytesRejected', 'nonPublisherRejected', 'staleHeadRejected',
       'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']
       .map(field => value => { value.host.publication[field] = false; }),
   ]) {

@@ -81,8 +81,9 @@ export function validatePeerGenerationReport(report) {
     same(report.host.participant.clientFilteredHttpRequests, 0, 'Filtered updates must not reach the hosted transport');
     const publication = report.host.publication;
     hex(publication?.author, 64, 'Missing verified publication author');
-    hex(publication.nonAdministrator, 64, 'Missing non-administrator rejection identity');
-    assert.notEqual(publication.author, publication.nonAdministrator, 'Publication authority must be tested separately from ordinary membership');
+    hex(publication.nonPublisher, 64, 'Missing non-publisher rejection identity');
+    same(publication.administratorWithoutPublisher, true, 'An administrator without publisher authority must be rejected');
+    assert.notEqual(publication.author, publication.nonPublisher, 'Publication authority must be tested separately from ordinary membership');
     for (const value of [publication.first, publication.second]) {
       hex(value?.id, 64, 'Missing signed publication identity');
       count(value.version, 'Missing served publication version');
@@ -94,7 +95,7 @@ export function validatePeerGenerationReport(report) {
     assert.ok(publication.second.version > publication.first.version, 'Code update did not advance the served version');
     same(publication.second.previous, publication.first.id, 'Code publication lost its signed chain');
     for (const field of ['sessionOwned', 'lostReplyAfterPersistence', 'savedIdentityRecovered',
-      'exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+      'exactRetry', 'alteredBytesRejected', 'nonPublisherRejected', 'staleHeadRejected',
       'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']) {
       same(publication[field], true, `Missing publication observation: ${field}`);
     }

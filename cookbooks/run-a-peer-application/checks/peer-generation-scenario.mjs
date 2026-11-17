@@ -65,7 +65,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
         definition,
         schemaAdministrator: hostDevice.identity.publicKey, schema: null,
         epoch: 0, keyDigest: await bytesDigest(epochKey),
-        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC }) })),
+        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC, publisher: device === deviceA }) })),
       },
     });
     const descriptor = host.descriptor;
@@ -98,7 +98,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     report.controlParticipant = { owner: 'application-session', role: aControl.role,
       attachRequests: afterAttach.requests - beforeAttach.requests, definitionVerified: true };
     if (host.qualifyPublication) report.host.publication = await host.qualifyPublication({
-      control: aControl, signer: deviceA.identity, reader: deviceC.identity,
+      control: aControl, signer: deviceA.identity, reader: deviceB.identity,
     });
     assert.equal(a.status.role, 'coordinator');
     assert.equal(b.status.role, 'follower');

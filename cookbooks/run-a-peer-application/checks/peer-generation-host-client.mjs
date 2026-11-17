@@ -111,6 +111,10 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
           const authority = await control.application();
           const verified = await verifyAuthorityBundle(authority, configured.descriptor);
           assert.equal(await control.publication(), null);
+          const grant = identity => verified.control.payload.grants.find(value => value.publicKey === identity);
+          assert.equal(grant(signer.publicKey).publisher, true);
+          assert.equal(grant(reader.publicKey).administrator, true);
+          assert.equal(grant(reader.publicKey).publisher, false, 'Administration does not grant code publication');
           const prepare = async (revision, previous, author = signer) => {
             const marker = `participant-publication-${revision}`;
             const content = [ ['index.html', 'text/html', `<!doctype html><html><head><meta charset="utf-8"></head><body><p>${marker}</p><script type="module" src="./page.mjs"></script></body></html>`],
@@ -172,13 +176,13 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
           const restarted = await asset('page.mjs');
           assert.equal(restarted.status, 200); assert.equal(restarted.text, second.code);
           assert.deepEqual(await control.application(), authority, 'Page publication cannot rewrite application controls or history');
-          return { author: signer.publicKey, nonAdministrator: reader.publicKey,
+          return { author: signer.publicKey, nonPublisher: reader.publicKey, administratorWithoutPublisher: true,
             first: { id: selected.publication.id, version: selected.version,
               expectedCodeDigest: first.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(firstCode.text)) },
             second: { id: updated.publication.id, version: updated.version, previous: updated.publication.payload.previous,
               expectedCodeDigest: second.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(restarted.text)) },
             sessionOwned: true, lostReplyAfterPersistence: true, savedIdentityRecovered: true,
-            exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
+            exactRetry: true, alteredBytesRejected: true, nonPublisherRejected: true, staleHeadRejected: true,
             authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true };
         },
       };

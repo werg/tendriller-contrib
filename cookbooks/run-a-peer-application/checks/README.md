@@ -136,7 +136,7 @@ The publication facet publishes a signed HTML/module graph and verifies actual
 served code. The owned session saves the exact signed publication before a
 deliberately lost persisted response; retry preserves that identity and selected
 version. Tampered bytes, a
-member without publication authority and a stale predecessor fail. A second
+administrator without publisher authority and a stale predecessor fail. A second
 signed revision updates HTML and code while retaining the original immutable
 version. Restarting the Durable Object preserves the publication and served
 bytes without changing application authority.
