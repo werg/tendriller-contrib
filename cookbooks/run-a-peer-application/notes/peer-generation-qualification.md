@@ -23,7 +23,87 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Complete CI composition checkpoint: `ae9d95de`
+## Completed CI composition checkpoint: `10f53f11`
+
+All five independent public-package gates, the strict composition assembler,
+and artifact upload passed in
+[core CI run 44123123517](https://github.com/werg/chronolog-db/actions/runs/44123123517).
+The exact emitted [composition](evidence/2026-11-17-ci-composition-10f53f11/composition.json)
+and [origin record](evidence/2026-11-17-ci-composition-10f53f11/origin.json)
+are retained with the raw reports and package provenance:
+
+| Gate | Exact passing raw report |
+| --- | --- |
+| Native events | [Direct](evidence/2026-11-17-ci-composition-10f53f11/direct/report.json) |
+| Native RTC | [Native RTC](evidence/2026-11-17-ci-composition-10f53f11/native-rtc/report.json) |
+| Browser Worker | [Chromium/OPFS](evidence/2026-11-17-ci-composition-10f53f11/browser/report.json) |
+| Native SQL | [Guarded tasks](evidence/2026-11-17-ci-composition-10f53f11/native-sql/report.json), [public archive boundary](evidence/2026-11-17-ci-composition-10f53f11/native-sql/public-boundary-report.json) |
+| Hosted participant | [Actual workerd/native RTC](evidence/2026-11-17-ci-composition-10f53f11/hosted/report.json) |
+
+The workflow head is Chronolog
+`c4e4b72e59f62395473991de1788d1eee1aea50f`. Its actual clean pull-request
+checkout and packed source is `10f53f11fdd78452bed473f2921499a2dde706cf`.
+Both commits have exactly the same tree,
+`388b8e09a9de77f74cd098eb64057e91bc0fd42d`; the merge identity is retained
+instead of relabeling its artifacts. Every report uses clean contrib
+`564f257aafeaaf4a86e457408000f4241f9e5dbb`, tree
+`223308b7dd70ac3e305ab0e6a9665cafef8b4164`, and the hosted lane uses clean
+Tendriller `56f758ce9a0b5556e61462b4444995147d1b4533`, tree
+`38b20056517d12eb2a12fd84e4971d77ba2ad0b3`.
+
+The downloaded CI artifact is `application-44123123517-1`, ID `14345493696`.
+Its 417,599 bytes match GitHub's advertised ZIP SHA-256,
+`9108064d2d4a3f64e41842774c48ae952bef685a43047cd5bc2ff46ad97e0f42`.
+The unchanged `564f257a` validators reproduce all five checked summaries and
+the emitted composition exactly. The composition SHA-256 is
+`02b2e0e316635bda9f1c2b5e7a50ca3b0e5295ec3e9b29b66628a7cb4ebbcbe6`.
+No synthetic result or modified assertion is substituted for a missing lane.
+
+The [RTC provenance](evidence/2026-11-17-ci-composition-10f53f11/provenance/session-rtc.json)
+and [SQL provenance](evidence/2026-11-17-ci-composition-10f53f11/provenance/session-sql.json)
+match the installed-package digests recorded by the consumers. The downloaded
+RTC archive and all 99 named packed-file digests were independently verified.
+The ZIP retains SQL provenance and passing reports, but does not contain the
+SQL archive; its archive/content verification was performed in CI. The
+[host provenance](evidence/2026-11-17-ci-composition-10f53f11/provenance/host.json)
+and [installed host evidence](evidence/2026-11-17-ci-composition-10f53f11/hosted/artifacts.json)
+bind the actual public packages, schema revision and embedded verifier.
+
+The events lanes each retain the declared 32-command, 1,024-byte burst through
+ordinary applied completion and one subsequent coverage observation. Their
+complete host counters remain unchanged during the outage workload, and all
+original-author outcomes survive the selected takeover:
+
+| Exact CI workload | Prefix age at disconnect | Takeover readiness | Known lost commands |
+| --- | --- | --- | --- |
+| Direct events | 82.32 ms | 295.97 ms | 0 |
+| Native RTC | 107.37 ms | 296.35 ms | 0 |
+| Actual hosted participant | 120.44 ms | 366.71 ms | 0 |
+
+These are separate bounded local runs, not a controlled transport-performance
+comparison or a universal loss guarantee. Unknown freshness still requires
+explicit approval. Chromium 158.0.8127.18 executes the actual dedicated Worker,
+OPFS and exclusive Web Lock composition, including fresh replay and
+graceful/abrupt reopen. SQL runs against the actual patched native engine;
+code publication uses the filtered host participant and explicit publisher
+permission.
+
+The same workflow head also passed the
+[quality verification job](https://github.com/werg/chronolog-db/actions/runs/44123123740/job/134179586200):
+524 tests passed, 6 WASM tests were skipped in that ordinary suite, and 62 files
+passed with 1 skipped. Coverage was 91.60% statements and 85.64% branches.
+The separate [native/WASM run](https://github.com/werg/chronolog-db/actions/runs/44123123484)
+passed all 6 actual comparisons; ordinary-suite skips do not supply equivalence
+evidence.
+
+Later contrib commit `adc477e7` adds explicit inherited-ancestor recovery and
+protected-prefix-floor scenarios. Those assertions are not part of the
+`564f257a` fixture tested here and are qualified separately; this completed
+checkpoint does not establish every later plan acceptance condition. The
+unassisted fresh-agent setup and deployed network/cost boundaries below also
+remain explicit.
+
+## Earlier complete CI composition checkpoint: `ae9d95de`
 
 All five independent public-package gates passed in
 [GitHub Actions run 44121043353](https://github.com/werg/tendriller-contrib/actions/runs/44121043353).
