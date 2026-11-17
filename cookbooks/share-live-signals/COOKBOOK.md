@@ -21,9 +21,11 @@ observation disappears.
 
 The public signal channel is independent of durable application storage. It
 works with an explicit transport and authorization policy. Peer applications can
-use the same channel with Chronolog membership, and Tendriller exposes it through
-`tendril.signals`. Bootstrap explicitly installs a channel; `available` reports
-whether installation has happened, and an unconfigured send fails immediately.
+use the same interface with Chronolog membership, and Tendriller exposes it through
+`tendril.signals`. Hosted pages receive a channel automatically through their
+existing authenticated page socket. Peer deployments install their selected
+channel independently of durable application readiness. `available` reports
+installation, not connectivity or delivery; an unconfigured send fails immediately.
 Signal-only applications do not need to open a SQL database or select a durable
 application backend.
 
@@ -56,9 +58,10 @@ use `latest` if it stays within the frame budget.
 The application sends JSON payloads. Authorization and envelope verification
 belong to the channel; the application still validates its payload schema.
 
-A peer bootstrap installs `tendril.signals.install(client.signals)`. A standalone
-bootstrap can install its own `SignalChannel` instead. Installation is separate
-from `tendril.application.install()`. If installation happens asynchronously,
+A hosted page can use `tendril.signals` directly. A peer bootstrap installs
+`tendril.signals.install(client.signals)`; it does not also send through the hosted
+channel. A standalone bootstrap can install its own `SignalChannel` instead.
+Installation is separate from `tendril.application.install()`. If it happens asynchronously,
 bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
 queues work while waiting for a channel.
 
@@ -88,6 +91,19 @@ arrives, and clear it immediately when the subscription ends.
 dispatch. It is not a remote delivery receipt, durable acceptance or completed
 action. Keep a transient send failure separate from a durable submission result.
 Never queue yesterday's typing or preview to be resent after reconnect.
+
+A hosted agent or other native SDK client explicitly opens its live connection:
+
+```js
+const signals = await host.connectSignals({ signal: lifetime.signal });
+try { await signals.send('progress', { completed: 3, total: 5 }); }
+finally { signals.close(); }
+```
+
+The returned port also supports `subscribe()`. It has no reconnect or replay
+outbox: when the connection ends, the application decides whether to open a new
+one and publish fresh observations. Its scope and author come from the
+authenticated hosted session, not fields supplied in the payload.
 
 For native or standalone use, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
@@ -187,8 +203,9 @@ page-owned behavior, not network delivery or deployed authorization.
 ## Keep access and lifetime explicit
 
 The scope separates applications; topics describe payloads. Neither is a secret
-nor a permission. The channel checks a sender's signature and the configured
-policy for the topic, with session/sequence replay protection and bounded expiry.
+nor a permission. The adapter establishes the sender through its authenticated
+hosted session or a verified standalone/Chronolog signature, and enforces its
+topic policy, session/sequence bounds and expiry. A payload cannot replace that identity.
 The transport must provide the required confidentiality and connection access.
 Do not assume a signed signal is encrypted or a successful introduction grants
 permission to read a database.
