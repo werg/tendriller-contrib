@@ -1,6 +1,7 @@
 // Only domain calls and UI drafts live here; the public Worker session owns work.
 import { applicationReady } from './deployment/bootstrap.mjs';
 import { observeTyping } from './typing.mjs';
+import { bindRecoveryChoice } from './recovery-choice.mjs';
 
 const $ = selector => document.querySelector(selector);
 const lifetime = new AbortController();
@@ -142,6 +143,9 @@ window.addEventListener('pagehide', () => { lifetime.abort(); void session?.clos
 try {
   session = await applicationReady;
   definition = await session.describe();
+  bindRecoveryChoice(session.participation, { panel: $('#recovery-choice'), message: $('#recovery-choice-message'),
+    details: $('#recovery-choice-details'), button: $('#approve-recovery'), signal: lifetime.signal,
+    onError: () => status('Recovery was not approved. Review the current choice before trying again.', true) });
   storageKey = `peer-page/${session.applicationId}/${session.deviceId}`;
   const stored = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
   if (stored && typeof stored.draft === 'string' && stored.draft.length <= 4096 && Array.isArray(stored.references) && stored.references.length <= 100 &&

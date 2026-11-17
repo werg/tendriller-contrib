@@ -59,7 +59,7 @@ try {
     target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
   for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'deployment/bootstrap.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
   for (const file of ['board.html', 'compact.html', 'style.css']) await writeFile(join(assets, file), await readFile(join(process.cwd(), file)));
   report.browserAssets = await Promise.all((await readdir(assets)).map(async file => ({ file, sha256: hash(await readFile(join(assets, file))) })));
   report.browserBundleInputs = Object.keys(bundle.metafile.inputs).sort();

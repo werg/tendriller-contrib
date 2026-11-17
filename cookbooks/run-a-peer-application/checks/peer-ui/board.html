@@ -5,6 +5,7 @@
   <header><p class="eyebrow">Shared workspace</p><h1>Tasks and conversation</h1>
     <p id="status" role="status">Opening this device…</p><p id="revision" class="quiet"></p>
     <aside id="recovery" hidden><h2>History recovered</h2><p id="recovery-message"></p><p>Review excluded work below before creating a new attempt. Your unsent draft stays here.</p></aside>
+    <aside id="recovery-choice" hidden aria-labelledby="recovery-choice-title"><h2 id="recovery-choice-title">Recovery needs your choice</h2><p id="recovery-choice-message"></p><details><summary>Review available history</summary><pre id="recovery-choice-details"></pre></details><button id="approve-recovery" type="button" disabled>Recover from this history</button></aside>
   </header>
   <main>
     <section id="tasks-section" hidden><h2>Tasks</h2><form id="task-form"><label for="task-title">New task</label><input id="task-title" maxlength="512" required><button>Add task</button></form><ul id="tasks"></ul></section>

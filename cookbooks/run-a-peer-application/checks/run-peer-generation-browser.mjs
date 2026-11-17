@@ -23,7 +23,7 @@ const fixtures = await Promise.all([
   ['peer-generation-browser-page.mjs', join(here, 'peer-generation-browser-page.mjs')],
   ['peer-generation-browser-worker.mjs', join(here, 'peer-generation-browser-worker.mjs')],
   ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
-  ...['board.html', 'compact.html', 'style.css', 'app.mjs'].map(name => [name, join(here, 'peer-ui', name)]),
+  ...['board.html', 'compact.html', 'style.css', 'app.mjs', 'recovery-choice.mjs'].map(name => [name, join(here, 'peer-ui', name)]),
   ['typing.mjs', join(here, 'shared/typing.mjs')],
 ].map(async ([name, path]) => {
   const bytes = await readFile(path), relativePath = relative(root, path).split(sep).join('/');
@@ -72,7 +72,7 @@ try {
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         '@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
         './peer-generation-definition.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
-        './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './typing.mjs', './recovery-choice.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
       if (['playwright', 'esbuild'].includes(specifier)) tools.add(specifier);
     }
