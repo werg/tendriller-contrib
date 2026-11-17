@@ -42,6 +42,52 @@ new exact-source relay reports must be retained before claiming a seven-gate
 composition. Deployed authentication, real WSS networks and provider/device
 cost remain separate observations.
 
+## Local WebSocket relay checkpoint: `3d31e101`
+
+The native relay runner and its actual Workerd test passed using clean
+Chronolog `3d31e101627ec58b9bf98552c05bdedbd45abbd1`, Tendriller
+`50810422bfa1003ae5690eda32c8e71ecaf31e72`, and consumer
+`a3368d4c79b2dba2fd529156480ee60c0fa7f119`. The
+[raw report](evidence/2026-11-17-websocket-local-3d31e101/relay/report.json),
+[validated summary](evidence/2026-11-17-websocket-local-3d31e101/relay/summary.json)
+and [origin/provenance index](evidence/2026-11-17-websocket-local-3d31e101/origin.json)
+preserve the actual byte and source boundaries.
+
+Seven explicitly connected peer pairs and the owned participation controller
+attempted direct delivery 18 times before selecting the WebSocket relay. The
+host observed 36 relay socket upgrades, 1,778,808 sent payload bytes and
+1,756,018 received payload bytes across the complete scenario. Those totals
+include relay protocol and encrypted application frames; they are not provider
+billing meters or per-command wire costs. Reliable lanes observed 1,016 sends
+and 1,011 receives; the disposable signal observed one send and one receive on
+separate endpoints. No declared private command/live/content marker appeared in
+raw relay frames.
+
+The same public scenario applied commands, delivered live typing, retained
+22,528 content bytes, reused durable projections, recovered a complete ancestor,
+rejected protected-floor violations and preserved exact signed retries. During
+the two-command control outage, control requests remained 47→47; during the
+owned 32-command, 1,024-byte burst they remained 134→134. Relay transit continued
+and is explicitly included in the delivery boundary. Cutting relay links led
+the existing participation owner to reopen its connection in the same generation,
+without a replacement identity or another command queue. Subsequent coordinator
+loss adopted the complete observed burst with zero known lost commands,
+2.249 seconds of observed adopted-prefix age and 3.758 seconds to recovery.
+
+The earlier [failed raw report](evidence/2026-11-17-websocket-local-3d31e101/failed-relay/report.json)
+remains unchanged. Its application scenario completed, but its validator
+incorrectly required one live socket to both send and receive. One-way delivery
+has separate sender and receiver sockets. The corrected validator still requires
+observed ingress and egress for each lane, and the clean rerun above passed.
+
+A separate [direct feature smoke](evidence/2026-11-17-websocket-local-3d31e101/direct/report.json)
+passed on consumer `3853ac9756001020a4cf1889a3a440002810e4b4` with the same
+Chronolog feature archive. These different consumer checkpoints are preserved
+individually; they are not combined into a seven-gate composition. The new
+browser relay fixtures also bundle against the public archives, but a bundle is
+not Chromium runtime evidence. Deployed WSS, authentication, real network
+conditions and provider/device costs remain unqualified here.
+
 ## Qualified direct composition: `e82163de`
 
 All five public-package consumers, the strict composition assembler and artifact
