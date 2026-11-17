@@ -83,6 +83,8 @@ try {
   for (const [name, path] of [
     [entry, join(here, entry)],
     ...(browser ? ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs'].map(name => [name, join(here, name)]) : []),
+    ...(browser ? ['board.html', 'compact.html', 'style.css', 'app.mjs'].map(name => [name, join(here, 'peer-ui', name)]) : []),
+    ...(browser ? [['typing.mjs', join(here, 'shared/typing.mjs')]] : []),
     ...(rtc && !browser ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
     ...(!browser ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
     ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
@@ -95,7 +97,7 @@ try {
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
         ...(browser ? ['@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', 'playwright'] : []),
         './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs',
-        './peer-generation-fault.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-fault.mjs', './deployment/bootstrap.mjs', './typing.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
     await copyFile(path, join(consumer, name));

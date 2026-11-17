@@ -23,6 +23,13 @@ export function validatePeerBrowserReport(report) {
   assert.equal(report.browser?.owner, 'DedicatedWorker'); assert.equal(report.browser.storage, 'OPFS');
   assert.ok(report.browser.version); assert.equal(report.browser.tabs, 2);
   assert.deepEqual(report.browser.runtimeErrors, []);
+  const ui = report.ui;
+  assert.deepEqual(ui?.pages, ['board.html', 'compact.html']);
+  assert.equal(ui.domain, 'events'); assert.equal(ui.sessionFacade, 'connectApplicationWorker');
+  assert.equal(ui.sentThroughForms, 3); assert.equal(ui.reapplicationConfirmed, true);
+  assert.equal(ui.recoveryNoticeVisible, true); assert.equal(ui.originalReviewPreserved, true);
+  assert.ok(typeof ui.draftBeforeRestart === 'string' && ui.draftBeforeRestart.length > 0);
+  assert.equal(ui.draftAfterRestart, ui.draftBeforeRestart); assert.equal(ui.draftAfterRecovery, ui.draftBeforeRestart);
   for (const field of ['secondTabRefused', 'unsupportedStorageRefused', 'pageOwnershipRefused']) assert.equal(report.ownership?.[field], true, field);
   assert.equal(report.ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the test');
   const host = report.hostOutage;
@@ -78,7 +85,7 @@ export function validatePeerBrowserReport(report) {
   assert.ok(report.runtime.dependencies.packages?.length > 0);
   assert.ok(report.runtime.dependencies.packages.every(value => value.path && value.version && value.integrity));
   return { format: 'peer-generation-browser-summary/v1', source: report.source, artifacts: report.artifacts,
-    executionManifestDigest: report.executionManifestDigest, browser: report.browser, ownership: report.ownership,
+    executionManifestDigest: report.executionManifestDigest, browser: report.browser, ui: report.ui, ownership: report.ownership,
     hostOutage: report.hostOutage, reopen: report.reopen, recovery: report.recovery, content: report.content, rtc: report.rtc,
     limitations: ['Local Chromium OPFS and native RTC; mobile browsers, suspension, quota exhaustion and deployed networks were not exercised.',
       'The page/SDP host is a loopback test server, not Tendriller HTTP or deployed enrollment.',

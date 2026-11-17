@@ -13,6 +13,9 @@ function synthetic() {
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native',
       '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'], siblingSourceImports: 0, applicationRetryQueues: 0 },
     browser: { version: 'synthetic', owner: 'DedicatedWorker', storage: 'OPFS', tabs: 2, runtimeErrors: [] },
+    ui: { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',
+      sentThroughForms: 3, reapplicationConfirmed: true, recoveryNoticeVisible: true, originalReviewPreserved: true,
+      draftBeforeRestart: 'Synthetic draft', draftAfterRestart: 'Synthetic draft', draftAfterRecovery: 'Synthetic draft' },
     ownership: { secondTabRefused: true, unsupportedStorageRefused: true, pageOwnershipRefused: true,
       unsupportedFault: 'Worker navigator.storage.getDirectory removed by the test' },
     hostOutage: { boundary: 'loopback-static-page-and-sdp', blockedProbeStatus: 503, requests: { before: 4, after: 4 },
@@ -45,6 +48,8 @@ test('browser qualification rejects missing execution, broken recovery, false re
   for (const mutate of [
     report => { report.passed = false; }, report => { report.mode = 'build-only'; },
     report => { report.browser.owner = 'page'; }, report => { report.ownership.secondTabRefused = false; },
+    report => { report.ui.draftAfterRecovery = ''; }, report => { report.ui.originalReviewPreserved = false; },
+    report => { report.ui.reapplicationConfirmed = false; }, report => { report.ui.sessionFacade = 'fixture-rpc'; },
     report => { report.hostOutage.requests.after++; }, report => { report.hostOutage.applicationBodyBytes = 1; },
     report => { report.hostOutage.reliableBytes.after = report.hostOutage.reliableBytes.before; },
     report => { report.reopen.identityAfter = h('2'); }, report => { report.recovery.nativeDigest = h('9'); },

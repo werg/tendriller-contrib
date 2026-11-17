@@ -44,10 +44,20 @@ selected-prefix recovery and deliberate reapplication. A bounded encrypted file
 is read partially, survives Worker restart, and completes after reconnect before
 the browser may claim complete retention. The one-off HTTP SDP mailbox is test
 infrastructure; this gate does not qualify Tendriller enrollment or Internet
-reachability. The Worker driver only invokes public application operations;
-authentication, channel handoff, replication and retry belong to the package.
+reachability. The board and compact pages submit through the maintained
+`connectApplicationWorker` facade. The gate types into the actual forms, checks
+their durable attempt rows, preserves an unsent draft through page replacement
+and recovery, and confirms an explicit linked reapplication in the review UI.
+Only device bootstrap and deliberate storage faults use fixture messages;
+commands, queries, content, signals, operation lookup and recovery use the
+public Worker facade. Authentication, channel handoff, replication and retry
+belong to the package.
 The [browser evidence validator](peer-generation-browser-report.mjs) validates
 those observations separately from the native-only report.
+
+The [preserved local launch failure](../notes/peer-browser-runtime-status.md)
+does not qualify those scenarios. Each public package change needs fresh runtime
+evidence; the CI job installs the pinned browser and retains failed reports too.
 
 For actual Tendriller controls and short-lived SDP rendezvous, run:
 

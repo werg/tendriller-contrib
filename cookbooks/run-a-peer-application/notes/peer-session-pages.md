@@ -19,7 +19,7 @@ The complete deployment supplies `deployment/bootstrap.mjs`. Its
 `connectApplicationWorker(worker)` from `@chronolog/peer-session/browser`.
 The Worker first opens the device and application using its authorized
 enrollment and pinned execution runtime, then calls
-`installApplicationWorkerSession(session, self)` from that same public entry.
+`serveApplicationWorker(session, self)` from that same public entry.
 Use `installApplicationWorkerTransport` and `connectWorkerApplicationWebRtc`
 from the public `webrtc` entry for RTC handoff and authentication.
 

@@ -1,8 +1,9 @@
 // Browser negotiation uses the public synchronous Worker handoff, not custom framing.
 import { connectWorkerApplicationWebRtc } from '@chronolog/peer-session/webrtc';
-import { openBrowserDevice } from '@chronolog/peer-session/browser';
+import { openBrowserDevice, connectApplicationWorker } from '@chronolog/peer-session/browser';
 
-let worker, connection;
+let worker, connection, application, resolveApplication;
+export const applicationReady = new Promise(resolve => { resolveApplication = resolve; });
 const timeoutMs = 30_000;
 const rpc = (target, action, args = {}) => new Promise((resolve, reject) => {
   const channel = new MessageChannel();
@@ -16,7 +17,36 @@ const rpc = (target, action, args = {}) => new Promise((resolve, reject) => {
 const spawn = () => new Worker('./peer-generation-browser-worker.mjs', { type: 'module' });
 window.peerFixture = {
   async openDevice(args) { worker = spawn(); return rpc(worker, 'openDevice', args); },
-  call: (action, args) => rpc(worker, action, args),
+  async call(action, args = {}) {
+    if (action === 'open') {
+      const result = await rpc(worker, action, args);
+      application = await connectApplicationWorker(worker, { timeoutMs });
+      resolveApplication(application);
+      return result;
+    }
+    switch (action) {
+      case 'query': return application.query('conversation', {});
+      case 'operation': return application.operations.get(args.id);
+      case 'inspectOperation': return application.operations.inspect(args.id);
+      case 'retry': await application.retry(args.id); return application.operations.get(args.id);
+      case 'point': return application.recoveryPoint();
+      case 'adopt': return application.adopt(args);
+      case 'signal': return application.signals.send('typing', { typing: true }, { ttlMs: 2500 });
+      case 'readContent': {
+        let bytes = 0;
+        for await (const chunk of application.content.read(args.reference, { offset: args.offset ?? 0, length: args.length ?? args.reference.bytes - (args.offset ?? 0) })) {
+          for (let index = 0; index < chunk.length; index++) {
+            if (chunk[index] !== ((args.offset ?? 0) + bytes + index) % 251) throw Error('CONTENT_BYTES_CHANGED');
+          }
+          bytes += chunk.length;
+        }
+        return { bytes };
+      }
+      case 'retained': return application.content.retained(args.reference);
+      case 'retain': return application.content.retain(args.reference);
+      default: throw Error(`Unknown browser fixture action ${action}`);
+    }
+  },
   async secondOwner(args) {
     const other = spawn();
     try { await rpc(other, 'openDevice', args); throw Error('SECOND_OWNER_WAS_ALLOWED'); }
@@ -49,5 +79,6 @@ window.peerFixture = {
   },
   async synchronize() { await connection.synchronize(); return { stats: connection.stats, route: await connection.rtc.getRoute() }; },
   async disconnect() { await connection?.close(); connection = undefined; return { closed: true }; },
-  async close() { await connection?.close(); connection = undefined; if (worker) { await rpc(worker, 'close'); worker.terminate(); worker = undefined; } },
+  async close() { await connection?.close(); connection = undefined; await application?.close();
+    if (worker) { await rpc(worker, 'close'); worker.terminate(); worker = undefined; } },
 };

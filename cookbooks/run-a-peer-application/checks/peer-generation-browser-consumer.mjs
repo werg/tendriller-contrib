@@ -4,6 +4,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, join, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { applicationDefinitionDigest, bytesDigest, CONTENT_CHUNK_BYTES, createGenerationRegistry,
   eventExecutionManifest, executionManifestArtifacts, participantGrant,
@@ -13,7 +14,7 @@ import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-n
 import { conversation } from './peer-generation-definition.mjs';
 
 const reportPath = resolve(process.argv[2]), report = JSON.parse(await readFile(reportPath, 'utf8'));
-const root = dirname(new URL(import.meta.url).pathname);
+const root = dirname(fileURLToPath(import.meta.url));
 const resources = [], links = [], introductions = [];
 let browser, host, page, native, authority, browserIdentity;
 const stage = async name => { report.stage = name; await writeReport(); console.log(`Peer browser consumer: ${name}`); };
@@ -72,7 +73,7 @@ try {
   await stage('opened real exclusive OPFS Worker');
 
   let link = await connect();
-  const firstOperation = await call('post', { id: 'browser-retained', text: 'Retained from a real browser Worker' });
+  const firstOperation = await submitMessage('Retained from a real browser Worker');
   assert.equal(firstOperation.outcome, 'accepted');
   await synchronize(link);
   const retained = await native.recoveryPoint();
@@ -83,7 +84,7 @@ try {
   const requestsBefore = host.requests, bytesBefore = link.native.stats.sentBytes + link.native.stats.receivedBytes;
   const fromNative = await native.command('postMessage', { messageId: 'native-blocked', text: 'Native with page host unavailable' }, { operationId: 'native-blocked' });
   assert.equal((await fromNative.applied({ signal: timeout() })).outcome, 'accepted');
-  assert.equal((await call('post', { id: 'browser-blocked', text: 'Browser with page host unavailable' })).outcome, 'accepted');
+  assert.equal((await submitMessage('Browser with page host unavailable')).outcome, 'accepted');
   const liveAbort = new AbortController();
   const live = native.signals.subscribe({ topics: ['typing'], signal: AbortSignal.any([liveAbort.signal, timeout()]) })[Symbol.asyncIterator]();
   const liveResult = live.next(), beforeLive = await native.recoveryPoint();
@@ -113,22 +114,28 @@ try {
   await assert.rejects(call('retained', { reference }), /CONTENT_NOT_RETAINED/);
   await closeLink(link);
   // A second observed update occurs only in the disconnected original Worker.
-  const abandoned = await call('post', { id: 'browser-abandoned', text: 'A signed old-branch operation' });
+  const abandoned = await submitMessage('A signed old-branch operation');
   assert.equal(abandoned.outcome, 'accepted');
   const oldHead = await call('point');
   const beforeRecovery = await query();
-  const beforeRestart = await call('operation', { id: 'browser-retained' });
+  const beforeRestart = await call('operation', { id: firstOperation.operationId });
+  const draft = 'An unsent draft must survive page replacement and recovery.';
+  await page.locator('#message').fill(draft);
+  assert.equal(await page.locator('#message').inputValue(), draft);
   await page.evaluate(() => window.peerFixture.close());
-  await page.reload(); await page.waitForFunction(() => window.peerFixture);
+  await page.goto(`${host.url}/compact.html`); await page.waitForFunction(() => window.peerFixture);
   const reopenedDevice = await page.evaluate(name => window.peerFixture.openDevice({ name }), storageName);
   assert.deepEqual(reopenedDevice, workerDevice);
   await call('open', { authority, epochKey: [...epochKey] });
-  assert.deepEqual(await call('operation', { id: 'browser-retained' }), beforeRestart);
+  await page.waitForFunction(() => !document.querySelector('#message').disabled);
+  const draftAfterRestart = await page.locator('#message').inputValue();
+  assert.equal(draftAfterRestart, draft);
+  assert.deepEqual(await call('operation', { id: firstOperation.operationId }), beforeRestart);
   assert.equal((await call('readContent', { reference, length: CONTENT_CHUNK_BYTES })).bytes, CONTENT_CHUNK_BYTES);
   await assert.rejects(call('readContent', { reference, offset: CONTENT_CHUNK_BYTES }), /CONTENT_UNAVAILABLE/);
   report.reopen = { identityBefore: workerDevice.deviceId, identityAfter: reopenedDevice.deviceId,
     storageBefore: workerDevice.storageId, storageAfter: reopenedDevice.storageId,
-    operationBefore: beforeRestart, operationAfter: await call('operation', { id: 'browser-retained' }) };
+    operationBefore: beforeRestart, operationAfter: await call('operation', { id: firstOperation.operationId }) };
   report.content = { bytes: reference.bytes, interruptedAfter: CONTENT_CHUNK_BYTES,
     partialRetentionRefused: true, partialSurvivedRestart: true, unavailableRemainderRefused: true };
   await stage('reopened identity, operations, and partial content from OPFS');
@@ -139,19 +146,29 @@ try {
   const nativeNotice = await native.adopt(authority);
   assert.equal(nativeNotice.generation, selected.id);
   const notice = await call('adopt', authority);
-  assert.ok(notice.abandoned.some(value => value.operationId === 'browser-abandoned'));
+  assert.ok(notice.abandoned.some(value => value.operationId === abandoned.operationId));
   const recovered = await query();
   const nativeRecovered = await native.query('conversation', {});
   assert.notEqual(beforeRecovery.revision.generation, recovered.revision.generation);
   assert.deepEqual(recovered.value, nativeRecovered.value);
-  assert.deepEqual(await call('operation', { id: 'browser-retained' }), beforeRestart);
-  assert.equal((await call('operation', { id: 'browser-abandoned' })).status, 'abandoned');
-  await assert.rejects(call('retry', { id: 'browser-abandoned' }), /abandoned|Abandoned|ABANDONED/u);
+  assert.deepEqual(await call('operation', { id: firstOperation.operationId }), beforeRestart);
+  assert.equal((await call('operation', { id: abandoned.operationId })).status, 'abandoned');
+  await assert.rejects(call('retry', { id: abandoned.operationId }), /abandoned|Abandoned|ABANDONED/u);
+  await page.locator('#recovery').waitFor({ state: 'visible' });
+  await page.waitForFunction(id => document.querySelector(`[data-operation="${id}"][data-status="abandoned"]`), abandoned.operationId);
+  assert.equal(await page.locator('#message').inputValue(), draft);
+  await page.waitForFunction(() => document.querySelectorAll('#conversation li').length === 1);
+  assert.doesNotMatch(await page.locator('#conversation').textContent(), /A signed old-branch operation/u);
   link = await connect(); await synchronize(link);
   assert.deepEqual((await query()).value, recovered.value, 'Returning Worker must not import its excluded tail');
-  const reapplied = await call('reapply', { originalId: 'browser-abandoned', id: 'browser-reapplied', text: 'Explicitly reviewed after recovery' });
+  const reviewedIds = await page.locator('#operations li').evaluateAll(rows => rows.map(row => row.dataset.operation));
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator(`#operations [data-operation="${abandoned.operationId}"] [data-action="reapply"]`).click();
+  await page.waitForFunction(ids => [...document.querySelectorAll('#operations li')].some(row => !ids.includes(row.dataset.operation) && row.dataset.status === 'applied'), reviewedIds);
+  const reappliedId = await page.locator('#operations li').evaluateAll((rows, ids) => rows.find(row => !ids.includes(row.dataset.operation)).dataset.operation, reviewedIds);
+  const reapplied = await call('operation', { id: reappliedId });
   assert.equal(reapplied.outcome, 'accepted'); assert.notEqual(reapplied.attemptId, abandoned.attemptId);
-  const reapplication = await call('inspectOperation', { id: 'browser-reapplied' });
+  const reapplication = await call('inspectOperation', { id: reapplied.operationId });
   assert.equal(reapplication.attempt.payload.header.reapplyOf, abandoned.attemptId);
   const retention = await call('retain', { reference });
   assert.equal(retention.payload.peer, workerDevice.deviceId);
@@ -164,6 +181,10 @@ try {
     abandonedAttemptId: abandoned.attemptId, returningTailExcluded: true, retryRefused: true,
     reappliedOperationId: reapplied.operationId, reappliedAttemptId: reapplied.attemptId,
     reapplyOf: reapplication.attempt.payload.header.reapplyOf };
+  report.ui = { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',
+    sentThroughForms: 3, reapplicationConfirmed: true, recoveryNoticeVisible: await page.locator('#recovery').isVisible(),
+    draftBeforeRestart: draft, draftAfterRestart, draftAfterRecovery: await page.locator('#message').inputValue(),
+    originalReviewPreserved: await page.locator(`#operations [data-operation="${abandoned.operationId}"][data-status="abandoned"]`).count() === 1 };
   await synchronize(link);
   assert.deepEqual((await query()).value, (await native.query('conversation', {})).value);
   assert.equal(report.browser.runtimeErrors.length, 0);
@@ -207,6 +228,14 @@ async function connect() {
   links.push(value); return value;
 }
 async function synchronize(link) { await Promise.all([link.native.synchronize(), page.evaluate(() => window.peerFixture.synchronize())]); }
+async function submitMessage(text) {
+  await page.waitForFunction(() => !document.querySelector('#send').disabled);
+  await page.locator('#message').fill(text);
+  await page.locator('#send').click();
+  await page.waitForFunction(label => [...document.querySelectorAll('#operations li')].some(row => row.querySelector('strong')?.textContent === label && row.dataset.status === 'applied'), text);
+  const operationId = await page.locator('#operations li').evaluateAll((rows, label) => rows.find(row => row.querySelector('strong')?.textContent === label).dataset.operation, text);
+  return call('operation', { id: operationId });
+}
 async function closeLink(link) {
   if (link.closed) return;
   await Promise.allSettled([link.native.close(), page?.evaluate(() => window.peerFixture.disconnect())]);
@@ -219,7 +248,6 @@ async function serve() {
   const sessions = new Map();
   const replacements = new Map([['@chronolog/peer-session/browser', '/package/browser.mjs'],
     ['@chronolog/peer-session/webrtc', '/package/webrtc.mjs'], ['@chronolog/peer-session', '/package/index.mjs']]);
-  const html = '<!doctype html><meta charset="utf-8"><title>Independent peer Worker qualification</title><script type="module" src="/peer-generation-browser-page.mjs"></script>';
   const server = createServer(async (request, response) => {
     requests++;
     try {
@@ -237,14 +265,18 @@ async function serve() {
         else { item.close(1); value = { closed: true }; }
         response.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(value)); return;
       }
-      if (path === '/') { response.writeHead(200, { 'Content-Type': 'text/html' }).end(html); return; }
+      if (path === '/favicon.ico') { response.writeHead(204).end(); return; }
+      if (path === '/deployment/bootstrap.mjs') {
+        response.writeHead(200, { 'Content-Type': 'application/javascript' }).end("export { applicationReady } from '/peer-generation-browser-page.mjs';\n"); return;
+      }
       const base = path.startsWith('/package/') ? join(root, 'node_modules/@chronolog/peer-session') : root;
-      const relative = path.startsWith('/package/') ? path.slice(9) : path.slice(1);
-      assert.ok(relative.endsWith('.mjs') && !relative.split('/').includes('..'));
+      const relative = path === '/' ? 'board.html' : path.startsWith('/package/') ? path.slice(9) : path.slice(1);
+      const type = relative.endsWith('.mjs') ? 'application/javascript' : relative.endsWith('.html') ? 'text/html' : relative.endsWith('.css') ? 'text/css' : null;
+      assert.ok(type && !relative.split('/').includes('..'));
       const file = resolve(base, relative); assert.ok(file.startsWith(`${base}${sep}`));
       let code = await readFile(file, 'utf8');
       for (const [name, value] of replacements) code = code.replaceAll(`'${name}'`, `'${value}'`);
-      response.writeHead(200, { 'Content-Type': 'application/javascript' }).end(code);
+      response.writeHead(200, { 'Content-Type': type }).end(code);
     } catch (error) { response.writeHead(500).end(String(error)); }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
