@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { validatePeerGenerationReport } from './peer-generation-report.mjs';
 import { validatePeerTaskReport } from './peer-generation-task-report.mjs';
+import { validatePeerWorkersReport } from './peer-generation-workers-report.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, output: { type: 'string' },
@@ -16,11 +17,11 @@ const { values } = parseArgs({ options: {
   domain: { type: 'string', default: 'conversation' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
-if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc] [--domain conversation|tasks]');
+if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc] [--domain conversation|tasks|workers]');
 assert.ok(['direct', 'native-rtc'].includes(values.transport), 'Unknown transport');
-assert.ok(['conversation', 'tasks'].includes(values.domain), 'Unknown domain');
-const tasks = values.domain === 'tasks';
-if (tasks) assert.equal(values.transport, 'direct', 'The native guarded-task gate uses direct authenticated peers');
+assert.ok(['conversation', 'tasks', 'workers'].includes(values.domain), 'Unknown domain');
+const tasks = values.domain === 'tasks', workers = values.domain === 'workers', sql = tasks || workers;
+if (sql) assert.equal(values.transport, 'direct', 'The native SQL domain gates use direct authenticated peers');
 const rtc = values.transport === 'native-rtc';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
@@ -33,22 +34,24 @@ await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
 const report = {
   format: 'peer-generation-consumer/v1', profile: 'peer-generation-v1', mode: 'runtime',
-  topology: tasks ? 'independent-packed-tasks' : rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
+  topology: workers ? 'independent-packed-workers' : tasks ? 'independent-packed-tasks' : rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'),
     tree: git('rev-parse', 'HEAD^{tree}'), dirty: git('status', '--porcelain', '--untracked-files=all').length > 0 },
   artifacts: [], fixtures: [], error: null,
 };
 try {
-  const entry = tasks ? 'peer-generation-task-consumer.mjs' : rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
+  const entry = workers ? 'peer-generation-workers-consumer.mjs' : tasks ? 'peer-generation-task-consumer.mjs' : rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
   // Freeze the exact consumer bytes before installation; a later working-tree
   // edit must not masquerade as the source commit captured above.
   const fixtures = await Promise.all([
     [entry, join(here, entry)],
     ...(rtc ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
-    ...(!tasks ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
+    ...(!sql ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
+    ...(workers ? ['peer-generation-workers-owner.mjs', 'peer-generation-workers-timers.mjs', 'peer-generation-effect-provider.mjs'].map(name => [name, join(here, name)]) : []),
     ...(tasks ? [['peer-generation-task-definition.mjs', join(here, '../snippets/peer-task-board.mjs')],
-      ['peer-conversation.mjs', join(here, '../snippets/peer-conversation.mjs')]] : [['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')]]),
+      ['peer-conversation.mjs', join(here, '../snippets/peer-conversation.mjs')]] : workers ? [['peer-generation-workers-definition.mjs', join(here, '../snippets/peer-notifications.mjs')]]
+      : [['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')]]),
   ].map(async ([name, path]) => {
     const bytes = await readFile(path), sourcePath = relative(root, path).split(sep).join('/');
     if (!report.source.dirty) assert.equal(hash(bytes), hash(execFileSync('git', ['show', `${report.source.commit}:${sourcePath}`], { cwd: root })), 'Fixture changed after source capture');
@@ -83,8 +86,8 @@ try {
     assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
   } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
   const provenance = JSON.parse(await readFile(join(installed, 'provenance.json'), 'utf8'));
-  if (tasks) {
-    assert.ok(metadata.exports['./sql-native'], 'The guarded-task gate requires the public SQL-enabled archive');
+  if (sql) {
+    assert.ok(metadata.exports['./sql-native'], 'The native domain gates require the public SQL-enabled archive');
     report.sqlEngine = provenance.nativeEngine;
   }
   assert.match(provenance.source, /^[a-f0-9]{40}$/u);
@@ -106,7 +109,8 @@ try {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
-        ...(tasks ? ['@chronolog/peer-session/sql-native'] : []),
+        ...(sql ? ['@chronolog/peer-session/sql-native'] : []),
+        ...(workers ? ['@chronolog/peer-session/browser', './peer-generation-workers-definition.mjs', './peer-generation-effect-provider.mjs', './peer-generation-workers-timers.mjs'] : []),
         './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs', './peer-generation-fault.mjs', './peer-generation-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
@@ -121,7 +125,7 @@ try {
   if (result.signal) throw Error(`Consumer terminated with ${result.signal}`);
   if (result.status !== 0) throw Error(`Consumer failed with exit code ${result.status}`);
   const raw = await readFile(reportPath);
-  const summary = (tasks ? validatePeerTaskReport : validatePeerGenerationReport)(JSON.parse(raw));
+  const summary = (workers ? validatePeerWorkersReport : tasks ? validatePeerTaskReport : validatePeerGenerationReport)(JSON.parse(raw));
   summary.reportSha256 = hash(raw);
   await writeFile(join(output, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`, { flag: 'wx' });
   console.log(`Independent peer-generation consumer passed. Evidence: ${reportPath}`);
