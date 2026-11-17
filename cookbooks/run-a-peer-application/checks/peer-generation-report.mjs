@@ -205,6 +205,56 @@ export function validatePeerGenerationReport(report) {
   same(reopening.operationBefore, reopening.operationAfter, 'Reopening lost original operation state');
   assert.ok(reopening.operationBefore != null, 'No operation was inspected after reopening');
 
+  const participation = report.participation;
+  same(participation?.owner, 'application-session', 'Discovery and recovery policy must belong to the session');
+  same(participation.entry, 'session.participate', 'The maintained participation entry must own the lifecycle');
+  same(participation.automaticConnections, true, 'Manually connected peers do not qualify owned introductions');
+  assert.ok(participation.observedPeerIdentities?.length === 2, 'Missing both authenticated participant identities');
+  for (const identity of participation.observedPeerIdentities) hex(identity, 64, 'Missing participant identity');
+  assert.notEqual(...participation.observedPeerIdentities, 'Two distinct participants are required');
+  for (const [phase, identity, peer] of [['coordinating', ...participation.observedPeerIdentities],
+    ['following', ...[...participation.observedPeerIdentities].reverse()]]) {
+    assert.ok(participation.statuses?.some(value => value.device === identity && value.phase === phase && value.connectedPeers.includes(peer)),
+      `No owned ${phase} connection was observed`);
+  }
+  const outage = participation.hostOutage, automatic = participation.automaticRecovery, broader = participation.broaderRecovery;
+  same(outage?.blocked, true, 'The controller workload requires a real host outage');
+  same(outage.blockedProbeRejected, true, 'The controller outage must reject an actual probe');
+  assert.ok(outage.commandsApplied > 0, 'The controller applied no host-independent command');
+  count(outage.before?.requests, 'Missing controller host request observations');
+  same(outage.before?.applicationBodyBytes, 0, 'Application bodies reached the host');
+  same(outage.after, outage.before, 'The controller contacted the host during ordinary peer work');
+  const historyPoint = value => {
+    hex(value?.generation, 64, 'Missing verified recovery-point generation');
+    count(value?.sequence, 'Missing verified recovery-point sequence');
+    hex(value?.root, 64, 'Missing verified recovery-point root');
+  };
+  for (const value of [automatic, broader]) {
+    hex(value?.selectedGeneration, 64, 'Missing controller-selected generation'); historyPoint(value?.adopted);
+    assert.notEqual(value.selectedGeneration, value.adopted.generation, 'The controller selected no successor');
+  }
+  same(automatic.adopted.generation, automatic.previousGeneration, 'Automatic recovery changed the observed prefix scope');
+  assert.ok(Number.isSafeInteger(automatic.graceMs) && automatic.graceMs > 0, 'Missing reconnect grace');
+  assert.ok(Number.isFinite(automatic.elapsedMs) && automatic.elapsedMs >= automatic.graceMs, 'Automatic recovery skipped reconnect grace');
+  assert.ok(Number.isSafeInteger(automatic.freshnessBudgetMs) && automatic.freshnessBudgetMs > 0, 'Missing freshness budget');
+  same(broader.adopted.generation, automatic.selectedGeneration, 'Broader recovery did not follow the automatic transition');
+  same(broader.reason, 'freshness-unknown', 'Unknown freshness must remain explicit');
+  same(broader.ageMs, null, 'Unknown freshness cannot become a fabricated age');
+  same(broader.approvalRequired, true, 'Broader recovery requires review');
+  same(broader.staleApprovalRejected, true, 'Approval must identify the displayed proposal');
+  hex(broader.proposalId, 64, 'Missing exact approved proposal');
+  same(broader.commandApplied, true, 'The reviewed successor must resume application work');
+  const delivery = participation.transport;
+  same(delivery?.boundary, hosted ? 'tendriller-sdk-introductions' : rtc ? 'loopback-rtc-fixture-discovery' : 'in-process-fixture-discovery', 'Record the actual owned introduction boundary');
+  if (hosted) {
+    const traffic = delivery.traffic?.worker;
+    assert.ok(traffic?.invitations?.length >= 2 && traffic.invitations.every(value => value.closed), 'Owned invitation listeners must be observed and released');
+    assert.ok(traffic.rendezvous?.length > report.rtc.connections.length * 2 && traffic.rendezvous.every(value => value.closed), 'The factory must introduce and retire actual additional rendezvous sockets');
+  } else {
+    same(delivery.pendingIntroductions, 0, 'Unclaimed fixture invitations retained a transport');
+    assert.ok(delivery.connections?.length >= 2 && delivery.connections.every(value => value.closed), 'Owned transports must be released');
+  }
+
   return {
     format: 'peer-generation-consumer-summary/v1',
     profile: report.profile,
@@ -213,6 +263,7 @@ export function validatePeerGenerationReport(report) {
     source: report.source,
     artifacts: report.artifacts,
     controlParticipant: report.controlParticipant,
+    participation: report.participation,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
     ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,

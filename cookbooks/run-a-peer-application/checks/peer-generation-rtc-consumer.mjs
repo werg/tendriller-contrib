@@ -58,7 +58,8 @@ try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions,
     qualifyParticipation: options => qualifyParticipation({ ...options,
       ports: host ? session => host.createParticipationPorts(session, openConnection, introductions.createPeerIntroductions) : network.ports,
-      copyPrefix: connectSessions, inspectTransport: host ? async () => { await host.drainIntroductions(); return { boundary: 'tendriller-sdk-introductions' }; } : network.inspect }),
+      copyPrefix: connectSessions, inspectTransport: host ? async () => { await host.drainIntroductions();
+        return { boundary: 'tendriller-sdk-introductions', traffic: await options.host.traffic() }; } : network.inspect }),
     ...(host ? { createControl: host.createControl } : {}) });
 } finally {
   const report = JSON.parse(await readFile(process.argv[2], 'utf8'));

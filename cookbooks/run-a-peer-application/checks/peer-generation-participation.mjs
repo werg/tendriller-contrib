@@ -32,7 +32,21 @@ export async function waitRevision(session, revision) {
 
 /** Bounded in-process discovery/SDP delivery for portable and loopback RTC gates. */
 export function createParticipationFixture({ openConnection } = {}) {
-  const directory = new Map(), inboxes = new Map(), opened = [];
+  const directory = new Map(), inboxes = new Map(), pending = new Map(), opened = [];
+  const offer = (value, signal) => {
+    assert.ok(pending.size < 16, 'Fixture introduction tokens are bounded');
+    const token = crypto.randomUUID();
+    const abort = () => {
+      if (pending.delete(token)) void Promise.resolve((value.connection ?? value.signaling).close()).catch(() => {});
+    };
+    pending.set(token, { value, signal, abort }); signal.addEventListener('abort', abort, { once: true });
+    return token;
+  };
+  const accept = token => {
+    assert.equal(typeof token, 'string', 'Invitations carry only an opaque serializable token');
+    const entry = pending.get(token); assert.ok(entry, 'The fixture introduction expired');
+    pending.delete(token); entry.signal.removeEventListener('abort', entry.abort); return entry.value;
+  };
   const ports = session => {
     const inbox = mailbox(); inboxes.set(session.deviceId, inbox);
     return {
@@ -51,18 +65,19 @@ export function createParticipationFixture({ openConnection } = {}) {
           signal.throwIfAborted();
           let connection;
           if (invitation !== undefined) {
-            connection = openConnection ? await openConnection({ role: 'answerer', signaling: invitation.signaling, signal }) : invitation.connection;
+            const offered = accept(invitation);
+            connection = openConnection ? await openConnection({ role: 'answerer', signaling: offered.signaling, signal }) : offered.connection;
           } else {
             assert.equal(directory.has(peer.identity), true, 'The fixture route is unavailable');
             const target = inboxes.get(peer.identity);
             assert.ok(target, 'A fixture invitation receiver is required');
             if (openConnection) {
               const signaling = signalingPair();
-              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: { signaling: signaling.b } });
+              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: offer({ signaling: signaling.b }, signal) });
               connection = await openConnection({ role: 'offerer', signaling: signaling.a, signal });
             } else {
               const [local, remote] = framedPair();
-              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: { connection: remote } });
+              target.send({ peer: { identity: session.deviceId, route: session.deviceId }, token: offer({ connection: remote }, signal) });
               connection = local;
             }
           }
@@ -74,6 +89,7 @@ export function createParticipationFixture({ openConnection } = {}) {
   };
   return { ports, async inspect() {
     return { boundary: openConnection ? 'loopback-rtc-fixture-discovery' : 'in-process-fixture-discovery',
+      pendingIntroductions: pending.size,
       connections: await Promise.all(opened.map(async item => ({ owner: item.owner, peer: item.peer,
         closed: item.connection.signal.aborted,
         ...(item.connection.session?.getRoute ? { route: await item.connection.session.getRoute() } : {}) }))) };
@@ -206,7 +222,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     await Promise.all(controllers.map(value => value.close()));
     return { owner: 'application-session', entry: 'session.participate', automaticConnections: true,
       observedPeerIdentities: [coordinator.deviceId, follower.deviceId],
-      hostOutage: { blocked: true, commandsApplied: 1, before, after },
+      hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1, before, after },
       automaticRecovery: { previousGeneration, selectedGeneration: automaticAuthority.generations.at(-1).id,
         adopted: retained, graceMs, elapsedMs: recoveredAt - disconnectedAt, freshnessBudgetMs: 300_000 },
       broaderRecovery: { reason: approval.recovery.reason, ageMs: approval.recovery.ageMs, approvalRequired: true,

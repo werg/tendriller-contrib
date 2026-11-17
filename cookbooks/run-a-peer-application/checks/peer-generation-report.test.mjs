@@ -30,6 +30,17 @@ function syntheticReport() {
       outcome: 'accepted', currentGuardsChecked: true },
     reopen: { identityBefore: 'device-a', identityAfter: 'device-a', operationBefore: { id: 'op-reapplied', status: 'applied' },
       operationAfter: { id: 'op-reapplied', status: 'applied' } },
+    participation: { owner: 'application-session', entry: 'session.participate', automaticConnections: true,
+      observedPeerIdentities: ['1'.repeat(64), '2'.repeat(64)],
+      statuses: [{ device: '1'.repeat(64), phase: 'coordinating', connectedPeers: ['2'.repeat(64)] },
+        { device: '2'.repeat(64), phase: 'following', connectedPeers: ['1'.repeat(64)] }],
+      hostOutage: { blocked: true, blockedProbeRejected: true, commandsApplied: 1,
+        before: { requests: 9, applicationBodyBytes: 0 }, after: { requests: 9, applicationBodyBytes: 0 } },
+      automaticRecovery: { previousGeneration: '3'.repeat(64), selectedGeneration: '4'.repeat(64),
+        adopted: { generation: '3'.repeat(64), sequence: 2, root: '6'.repeat(64) }, graceMs: 150, elapsedMs: 200, freshnessBudgetMs: 300_000 },
+      broaderRecovery: { selectedGeneration: '5'.repeat(64), adopted: { generation: '4'.repeat(64), sequence: 0, root: '7'.repeat(64) },
+        reason: 'freshness-unknown', ageMs: null, approvalRequired: true, staleApprovalRejected: true, proposalId: '8'.repeat(64), commandApplied: true },
+      transport: { boundary: 'in-process-fixture-discovery', pendingIntroductions: 0, connections: [{ closed: true }, { closed: true }] } },
   };
 }
 
@@ -116,9 +127,27 @@ test('deliberate reapplication needs new identity, linked abandoned intent and c
   rejects(value => { value.reopen.operationAfter.status = 'waiting'; });
 });
 
+test('owned participation requires actual connections, reconnect grace, explicit broader approval and closed delivery', () => {
+  for (const mutate of [
+    value => { delete value.participation; },
+    value => { value.participation.owner = 'fixture-policy-loop'; },
+    value => { value.participation.automaticConnections = false; },
+    value => { value.participation.statuses = []; },
+    value => { value.participation.hostOutage.blockedProbeRejected = false; },
+    value => { value.participation.hostOutage.after.requests++; },
+    value => { value.participation.automaticRecovery.elapsedMs = 149; },
+    value => { value.participation.broaderRecovery.ageMs = 0; },
+    value => { value.participation.broaderRecovery.approvalRequired = false; },
+    value => { value.participation.broaderRecovery.staleApprovalRejected = false; },
+    value => { value.participation.transport.pendingIntroductions++; },
+    value => { value.participation.transport.connections[0].closed = false; },
+  ]) rejects(mutate);
+});
+
 function syntheticRtcReport() {
   const report = syntheticReport();
   report.topology = 'independent-native-rtc';
+  report.participation.transport.boundary = 'loopback-rtc-fixture-discovery';
   report.publicBoundary.imports.push('@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native');
   report.runtime.dependencies = { lockSha256: 'c'.repeat(64), packages: [{ path: 'node_modules/werift', version: '0.27.0', integrity: 'sha512-synthetic' }] };
   const signaling = { sentMessages: 2, sentBytes: 2048, closed: true };
@@ -160,6 +189,8 @@ test('host-independent RTC commands require authenticated traffic after signalin
 function syntheticHostedReport() {
   const report = syntheticRtcReport();
   report.hostOutage.boundary = 'tendriller-workerd-http';
+  report.participation.transport = { boundary: 'tendriller-sdk-introductions', traffic: { worker: {
+    invitations: [{ closed: true }, { closed: true }], rendezvous: Array.from({ length: 10 }, () => ({ closed: true })) } } };
   report.publicBoundary.imports.push('@tendriller/core/peers');
   report.rtc.signalingBoundary = 'tendriller-workerd-rendezvous';
   report.host = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
@@ -220,6 +251,8 @@ test('actual host qualification refuses missing HTTP counters, hidden signaling 
     value => { value.host.participant.route = 'peers/generations'; },
     value => { value.host.participant.hostRejected = []; },
     value => { value.host.participant.clientFilteredHttpRequests = 1; },
+    value => { value.participation.transport.traffic.worker.invitations[0].closed = false; },
+    value => { value.participation.transport.traffic.worker.rendezvous = []; },
   ]) {
     const report = syntheticHostedReport(); mutate(report);
     assert.throws(() => validatePeerGenerationReport(report));
