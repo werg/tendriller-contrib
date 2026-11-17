@@ -4,10 +4,11 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { validateBrowserPeerReport } from './peer-generation-browser-report.mjs';
+import { verifyPeerSessionArtifact } from './peer-session-artifact.mjs';
 
 const { values } = parseArgs({ options: { artifact: { type: 'string' }, output: { type: 'string' },
   chromium: { type: 'string' }, transport: { type: 'string', default: 'native-rtc' }, 'allow-dirty': { type: 'boolean', default: false } } });
@@ -48,24 +49,12 @@ try {
     ...(relay ? [resolve(hostSdk)] : ['werift@0.27.0']), 'playwright@1.65.0', 'esbuild@0.28.2'], { cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') } });
   const installed = join(consumer, 'node_modules/@chronolog/peer-session');
-  const metadata = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
-  assert.equal(metadata.name, '@chronolog/peer-session');
+  const { metadata, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
+    installed, archive: artifact, allowDirty: values['allow-dirty'],
+  });
   for (const field of ['dependencies', 'optionalDependencies']) assert.deepEqual(metadata[field] ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, relay ? {} : { werift: '0.27.0' });
-  const provenanceBytes = await readFile(join(installed, 'provenance.json'));
-  const provenance = JSON.parse(provenanceBytes);
-  assert.match(provenance.source, /^[a-f0-9]{40}$/u); assert.match(provenance.sourceTree, /^[a-f0-9]{40}$/u);
-  if (!values['allow-dirty']) assert.equal(provenance.dirty, false, 'Qualification requires a clean-source artifact');
-  assert.ok(Object.keys(provenance.sha256 ?? {}).length > 0);
-  for (const [name, digest] of Object.entries(provenance.sha256)) {
-    const scoped = relative(installed, resolve(installed, name));
-    assert.ok(scoped && !isAbsolute(scoped) && scoped !== '..' && !scoped.startsWith(`..${sep}`));
-    assert.equal(hash(await readFile(join(installed, name))), digest, `Artifact content mismatch: ${name}`);
-  }
-  report.artifacts.push({ name: metadata.name, version: metadata.version, sha256: hash(await readFile(artifact)),
-    sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty,
-    provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, optionalNativeRtc: provenance.optionalNativeRtc,
-      sqlEngines: provenance.sqlEngines, runtimeModules: provenance.runtimeModules, files: provenance.sha256 } });
+  report.artifacts.push(verifiedArtifact);
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
   assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(relay ? ['@tendriller/core'] : []), 'esbuild', 'playwright', ...(relay ? [] : ['werift'])]);
   for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) assert.equal(tree.dependencies[name].version, version);

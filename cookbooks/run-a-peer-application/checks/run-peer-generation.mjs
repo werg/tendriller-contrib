@@ -4,11 +4,12 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { validatePeerGenerationReport } from './peer-generation-report.mjs';
 import { validatePeerTaskReport } from './peer-generation-task-report.mjs';
+import { verifyPeerSessionArtifact } from './peer-session-artifact.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, output: { type: 'string' },
@@ -69,8 +70,9 @@ try {
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
   const installed = join(consumer, 'node_modules/@chronolog/peer-session');
-  const metadata = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
-  assert.equal(metadata.name, '@chronolog/peer-session');
+  const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
+    installed, archive: artifact, allowDirty: values['allow-dirty'],
+  });
   for (const field of ['dependencies', 'optionalDependencies']) {
     assert.deepEqual(metadata[field] ?? {}, {}, 'The standalone archive must not fetch runtime dependencies');
   }
@@ -91,26 +93,11 @@ try {
         .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
     assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
   } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
-  const provenanceBytes = await readFile(join(installed, 'provenance.json'));
-  const provenance = JSON.parse(provenanceBytes);
   if (tasks) {
     assert.ok(metadata.exports['./sql'] && metadata.exports['./sql-native'], 'The guarded-task gate requires the common SQL composition and native engine capability');
     report.sqlEngine = provenance.nativeEngine;
   }
-  assert.match(provenance.source, /^[a-f0-9]{40}$/u);
-  assert.match(provenance.sourceTree, /^[a-f0-9]{40}$/u);
-  assert.equal(typeof provenance.dirty, 'boolean');
-  if (!values['allow-dirty']) assert.equal(provenance.dirty, false, 'Release qualification requires a clean-source artifact; --allow-dirty is explicit local debugging');
-  assert.ok(provenance.sha256 && Object.keys(provenance.sha256).length > 0, 'Package must record content digests');
-  for (const [name, digest] of Object.entries(provenance.sha256)) {
-    const path = resolve(installed, name), scoped = relative(installed, path);
-    assert.ok(scoped && !isAbsolute(scoped) && scoped !== '..' && !scoped.startsWith(`..${sep}`), 'Package hash path escapes its archive');
-    assert.equal(hash(await readFile(path)), digest, `Package content digest mismatch: ${name}`);
-  }
-  report.artifacts.push({ name: metadata.name, version: metadata.version, sha256: hash(await readFile(artifact)),
-    sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty,
-    provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, optionalNativeRtc: provenance.optionalNativeRtc,
-      sqlEngines: provenance.sqlEngines, files: provenance.sha256 } });
+  report.artifacts.push(verifiedArtifact);
   const imports = new Set();
   for (const { name, sourcePath, bytes } of fixtures) {
     report.fixtures.push({ path: sourcePath, sha256: hash(bytes) });

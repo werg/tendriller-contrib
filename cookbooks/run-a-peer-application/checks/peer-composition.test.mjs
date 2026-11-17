@@ -15,7 +15,8 @@ function fixtures() {
     report.artifacts = [{ name: '@chronolog/peer-session', version: `0.0.0-test-${sql ? 'sql' : rtc ? 'rtc' : 'events'}`,
       sha256: digit.repeat(64), sourceCommit: 'd'.repeat(40), sourceTree: 'e'.repeat(40), sourceDirty: false,
       provenance: { sha256: '4'.repeat(64), profile: report.profile, optionalNativeRtc: rtc,
-        sqlEngines: sql ? ['native'] : [], files: { 'index.mjs': '5'.repeat(64), ...(sql ? { 'engine/build/Release/doltlite.node': '6'.repeat(64) } : {}) } } }];
+        sqlEngines: sql ? ['native'] : [], runtimeModules: { 'index.mjs': { inputs: ['packages/peer-session/src/session.ts'], imports: [] } },
+        files: { 'index.mjs': '5'.repeat(64), ...(sql ? { 'engine/build/Release/doltlite.node': '6'.repeat(64) } : {}) } } }];
     if (report.host) {
       report.host.artifacts = report.host.artifacts.map((artifact, index) => ({ name: artifact.name, version: '0.1.0-test',
         sha256: String(index + 7).repeat(64), sourceCommit: '9'.repeat(40), sourceTree: '8'.repeat(40), sourceDirty: false }));
@@ -62,6 +63,8 @@ test('composition rejects source, byte, execution and embedded-control mismatche
     reports => { reports[1].source.commit = '1'.repeat(40); },
     reports => { reports[1].artifacts[0].sourceTree = '1'.repeat(40); },
     reports => { reports[1].artifacts[0].sha256 = 'f'.repeat(64); },
+    reports => { delete reports[1].artifacts[0].provenance.runtimeModules; },
+    reports => { reports[2].artifacts[0].provenance.runtimeModules['index.mjs'].inputs.push('packages/peer-generation/src/replica.ts'); },
     reports => { reports[2].executionManifestDigest = 'c'.repeat(64); },
     reports => { delete reports[3].artifacts[0].provenance.files['engine/build/Release/doltlite.node']; },
     reports => { delete reports[4].host.provenance.storageSchemaRevision; },
