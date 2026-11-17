@@ -31,7 +31,7 @@ on:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '7a6187213ebdaeaf676a3d1e2804b0281f76588c'
+        default: '5e8339c44bda1671bc9db1594347549b69ddbbb6'
 permissions:
   contents: read
 concurrency:
@@ -68,7 +68,7 @@ jobs:
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         with:
           repository: werg/tendriller
-          ref: ${{ inputs.tendriller_ref || '7a6187213ebdaeaf676a3d1e2804b0281f76588c' }}
+          ref: ${{ inputs.tendriller_ref || '5e8339c44bda1671bc9db1594347549b69ddbbb6' }}
           path: .tendriller-build
       - name: Build the actual public hosted participant
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
