@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/7d1baf3461a4d84a24a45867d448acb84e3515b7/packages/signals/src/index.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
@@ -127,7 +127,7 @@ of implementing capability checks in application code.
 
 The standalone package is supplied as a dependency-free archive built from an
 exact Chronolog checkout; it is not yet published to npm. Follow the
-[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/7d1baf3461a4d84a24a45867d448acb84e3515b7/packages/signals/README.md#build-and-consume-the-standalone-package)
+[package build and isolated-consumer instructions](https://github.com/werg/chronolog-db/blob/1b356067e531f1d76f162c8339356ade61e571f6/packages/signals/README.md#build-and-consume-the-standalone-package)
 and install that archive into the consuming application. Construct
 `new SignalChannel({ scope, identity, authorize })`; `generateSignalIdentity()`
 can create a fresh standalone identity. Keeping an identity across restarts is
