@@ -1,0 +1,450 @@
+{
+  "exercise": "fresh independent public business-tool workflow with supplied enrollment",
+  "scope": "The fixture supplied package installation, enrollment, the application definition, native SQL runtime and transport delivery. This review qualifies public business-tool use, not independent deployment or bootstrap.",
+  "taskSupplied": {
+    "businessGoal": "Discover and query the shared application; recover the uncertain agent-note-1 result by inspection; observe recovery reset and actual notices; explicitly reapply as agent-note-2 with Ready for review; verify another author's locked task cannot be completed; claim and complete review with fresh query guards; inspect, wait and retry the exact finish identity after device reopen.",
+    "operationIds": [
+      "agent-note-1",
+      "agent-note-2",
+      "agent-wrong-author-1",
+      "agent-claim-1",
+      "agent-finish-1"
+    ],
+    "workDirectory": "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/consumer",
+    "launchCommand": "node peer-generation-agent-harness.mjs /workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/report.json",
+    "processSessionId": 69563
+  },
+  "timing": {
+    "startUtc": "2026-11-17T16:30:13Z",
+    "initialCommandSubmittedUtc": "2026-11-17T16:30:37Z",
+    "firstAppliedCommand": {
+      "operationId": "agent-note-2",
+      "command": "postMessage",
+      "input": {
+        "messageId": "review-readiness",
+        "text": "Ready for review"
+      },
+      "submittedUtc": "2026-11-17T16:30:57Z",
+      "observedAppliedUtc": "2026-11-17T16:31:02Z",
+      "elapsedSecondsFromStartToObservedApplied": 49,
+      "result": {
+        "status": "applied",
+        "attemptId": "968859787154bbbbe03215d87cf7cf2ab9c21c42a76772fdba4765f7293f5e13",
+        "operationId": "agent-note-2",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 1,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "timingQualification": "This is the first accepted applied result actually observed by this agent. agent-note-1 returned an uncertain transport result and inspection found needsReapply with previous:null; its application time was not observed."
+    },
+    "endUtc": "2026-11-17T16:31:55Z",
+    "elapsedSeconds": 102,
+    "reviewRecordedAtUtc": "2026-11-17 16:32:25 UTC"
+  },
+  "sourcesUsed": [
+    "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/consumer/node_modules/@chronolog/peer-session/README.md",
+    "Independent agent business workflow section of /workspace/scratch/fee958cb2f5e/qualification/contrib-80997ea/cookbooks/run-a-peer-application/checks/README.md",
+    "Schemas and results returned by the interactive public tool process"
+  ],
+  "independence": {
+    "priorExerciseContext": "None supplied beyond this task's public workflow and launch instructions.",
+    "helpOrCoaching": [
+      "Parent supplied the launch command, public documentation paths, business goals, reserved operation IDs and evidence output paths.",
+      "Public README explained operation inspection, exact retry, recovery resets and deliberate reapplication.",
+      "No implementation help, source inspection or additional coaching was used during execution."
+    ],
+    "forbiddenSourceInspected": false,
+    "productOrFixtureCodeChanged": false,
+    "rawReportEdited": false
+  },
+  "infrastructureAndCodeWritten": {
+    "infrastructureCreated": "None",
+    "productCodeWritten": "None",
+    "fixtureCodeWritten": "None",
+    "exerciseOrchestration": "Short tool-call JavaScript snippets sent one public JSON request per line through the provided tty process and retained selected returned JSON values in transient memory. No application retry queue, enrollment code, transport implementation or deployment setup was written.",
+    "filesWrittenByAgent": [
+      "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/fresh-agent-review.json"
+    ],
+    "filesWrittenByHarness": [
+      "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/report.json"
+    ]
+  },
+  "observations": {
+    "discoveryRequestIds": [
+      1,
+      2,
+      3
+    ],
+    "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+    "authenticatedAuthor": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+    "uncertainOriginal": {
+      "requestId": 4,
+      "operationId": "agent-note-1",
+      "input": {
+        "messageId": "review-readiness",
+        "text": "Review in progress."
+      },
+      "error": "EXERCISE_TRANSPORT_REPLY_LOST",
+      "inspectionRequestId": 5,
+      "state": {
+        "status": "needsReapply",
+        "attemptId": "cf9386d7e35c8f16b179213966d2cb62dc94e21bd6b46f7f7255b703552c08f8",
+        "operationId": "agent-note-1",
+        "generation": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+        "selectedGeneration": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "previous": null
+      },
+      "originalAttemptId": "cf9386d7e35c8f16b179213966d2cb62dc94e21bd6b46f7f7255b703552c08f8",
+      "originalSigner": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18"
+    },
+    "recoveryReset": {
+      "requestId": 6,
+      "resetRequired": true,
+      "change": {
+        "kind": "recovery",
+        "revision": {
+          "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+          "historyId": "independent-agent-exercise",
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "point": {
+            "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+            "sequence": 0,
+            "root": "05fb72260589c5504b1e89f4fd5f4ef837c5cb52dd307b4b40c592e43810e139"
+          },
+          "controlRevision": 0,
+          "materializationRevision": "4"
+        },
+        "recovery": {
+          "previousGeneration": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "adopted": {
+            "generation": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+            "root": "19df6ca59d048d311c4f8fc6400e88fe8f5070737d4c7a8b1382463c67a42d43",
+            "sequence": 3
+          },
+          "revision": {
+            "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+            "historyId": "independent-agent-exercise",
+            "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+            "point": {
+              "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+              "sequence": 0,
+              "root": "05fb72260589c5504b1e89f4fd5f4ef837c5cb52dd307b4b40c592e43810e139"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "4"
+          },
+          "abandoned": [
+            {
+              "status": "needsReapply",
+              "attemptId": "cf9386d7e35c8f16b179213966d2cb62dc94e21bd6b46f7f7255b703552c08f8",
+              "operationId": "agent-note-1",
+              "generation": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+              "selectedGeneration": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+              "previous": null
+            }
+          ],
+          "unknownLoss": true
+        }
+      },
+      "recoveryNoticeRequestId": 7,
+      "notices": [
+        {
+          "previousGeneration": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "adopted": {
+            "generation": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+            "root": "19df6ca59d048d311c4f8fc6400e88fe8f5070737d4c7a8b1382463c67a42d43",
+            "sequence": 3
+          },
+          "revision": {
+            "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+            "historyId": "independent-agent-exercise",
+            "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+            "point": {
+              "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+              "sequence": 0,
+              "root": "05fb72260589c5504b1e89f4fd5f4ef837c5cb52dd307b4b40c592e43810e139"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "4"
+          },
+          "abandoned": [
+            {
+              "status": "needsReapply",
+              "attemptId": "cf9386d7e35c8f16b179213966d2cb62dc94e21bd6b46f7f7255b703552c08f8",
+              "operationId": "agent-note-1",
+              "generation": "beaae426ac5b8fcf598307b57569b2df960e448622d8561a5bbb7c283753b1d2",
+              "selectedGeneration": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+              "previous": null
+            }
+          ],
+          "unknownLoss": true
+        }
+      ],
+      "coherentRereadRequestId": 8,
+      "messagesAfterRecovery": []
+    },
+    "deliberateReapplication": {
+      "requestId": 9,
+      "waitRequestId": 10,
+      "originalOperationId": "agent-note-1",
+      "newOperationId": "agent-note-2",
+      "basedOn": {
+        "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+        "historyId": "independent-agent-exercise",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "point": {
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "sequence": 0,
+          "root": "05fb72260589c5504b1e89f4fd5f4ef837c5cb52dd307b4b40c592e43810e139"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "4"
+      },
+      "result": {
+        "status": "applied",
+        "attemptId": "968859787154bbbbe03215d87cf7cf2ab9c21c42a76772fdba4765f7293f5e13",
+        "operationId": "agent-note-2",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 1,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "verifiedMessage": {
+        "messageId": "review-readiness",
+        "text": "Ready for review",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "operationId": "agent-note-2",
+        "attemptId": "968859787154bbbbe03215d87cf7cf2ab9c21c42a76772fdba4765f7293f5e13"
+      }
+    },
+    "wrongAuthorRefusal": {
+      "guardQueryRequestId": 11,
+      "commandRequestId": 12,
+      "waitRequestId": 13,
+      "taskId": "locked",
+      "taskOwner": "69a64f56c50eed06ff862528d7ef760a847d3192809bc27751625e37c8d73581",
+      "result": {
+        "status": "applied",
+        "attemptId": "c097cbd9ab3e9831cc04631b26600540fa35a08dbb610ba3a31044f3d0b7566e",
+        "operationId": "agent-wrong-author-1",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 2,
+        "outcome": "rejected",
+        "rejectionCode": "assert:claim_required"
+      }
+    },
+    "claim": {
+      "guardQueryRequestId": 14,
+      "commandRequestId": 15,
+      "waitRequestId": 16,
+      "basedOn": {
+        "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+        "historyId": "independent-agent-exercise",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "point": {
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "sequence": 2,
+          "root": "cd3795f111829089ed93ad664e67076da4cf74ae5c11b5e5e3c94336d79276bf"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "6"
+      },
+      "result": {
+        "status": "applied",
+        "attemptId": "dc33ccaaf21c87c54f7cbd14b4c51cf4a124ebede9ae9197a294e26037827b2c",
+        "operationId": "agent-claim-1",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 3,
+        "outcome": "accepted",
+        "rejectionCode": null
+      }
+    },
+    "finish": {
+      "guardQueryRequestId": 17,
+      "commandRequestId": 18,
+      "basedOn": {
+        "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+        "historyId": "independent-agent-exercise",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "point": {
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "sequence": 3,
+          "root": "63de42ed3e0e099b364d0b41f80f60b92bdc6a6d6e6d73f0857e30ed09b70dd9"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "7"
+      },
+      "submittedAttemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947"
+    },
+    "reopen": {
+      "notification": {
+        "fixture": "reopened",
+        "deviceId": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "storageId": "a8146aa4-48fb-495c-8160-e7109bdc7782"
+      },
+      "initialWaitRequestId": 19,
+      "inspectRequestId": 20,
+      "waitRequestId": 21,
+      "retryRequestId": 22,
+      "inspectionResult": {
+        "status": "applied",
+        "attemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947",
+        "operationId": "agent-finish-1",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "waitResult": {
+        "status": "applied",
+        "attemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947",
+        "operationId": "agent-finish-1",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "retryResult": {
+        "status": "applied",
+        "attemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947",
+        "operationId": "agent-finish-1",
+        "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 4,
+        "outcome": "accepted",
+        "rejectionCode": null
+      },
+      "preservedAttemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947",
+      "sameAttemptAndResultAfterReopen": true
+    },
+    "finalQueryRequestId": 23,
+    "finalBoard": {
+      "revision": {
+        "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+        "historyId": "independent-agent-exercise",
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "point": {
+          "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+          "sequence": 4,
+          "root": "23b946bfa104a0e0b18bc702b092559b2dd9a435b8db3007d7294752a4fe2d31"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "8"
+      },
+      "value": {
+        "tasks": [
+          {
+            "id": "locked",
+            "title": "A task claimed by another authenticated author",
+            "claimedBy": "69a64f56c50eed06ff862528d7ef760a847d3192809bc27751625e37c8d73581",
+            "status": "open"
+          },
+          {
+            "id": "review",
+            "title": "Review the public session experience",
+            "claimedBy": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+            "status": "done"
+          }
+        ],
+        "messages": [
+          {
+            "messageId": "review-readiness",
+            "text": "Ready for review",
+            "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+            "operationId": "agent-note-2",
+            "attemptId": "968859787154bbbbe03215d87cf7cf2ab9c21c42a76772fdba4765f7293f5e13"
+          }
+        ]
+      }
+    },
+    "processCompletion": {
+      "fixture": "complete",
+      "requests": 23,
+      "processExitCode": 0
+    }
+  },
+  "errorsAndRecoveryMistakes": {
+    "observedErrors": [
+      {
+        "requestId": 4,
+        "code": "EXERCISE_TRANSPORT_REPLY_LOST",
+        "category": "Supplied uncertainty scenario",
+        "recovery": "Inspected original operation identity; observed needsReapply; obtained reset and actual notices; reread current board; explicitly reapplied with a new linked operation."
+      },
+      {
+        "requestId": 13,
+        "code": "assert:claim_required",
+        "category": "Expected business guard rejection",
+        "recovery": "Confirmed locked task remained open under the other author; proceeded with the independent review task."
+      }
+    ],
+    "agentMistakes": [],
+    "notes": [
+      "No duplicate command was issued after uncertainty.",
+      "The original needsReapply attempt was not retried or silently reconstructed.",
+      "Claim and finish each used a fresh coherent query revision.",
+      "The finished operation was retried by its existing operation ID after reopening; no new finish identity was created.",
+      "The exact retry required an additional stdout poll to observe its response; it returned the same accepted generation and sequence.",
+      "Recovery notices reported unknownLoss:true; no complete-loss or irreversible-finality claim is made."
+    ]
+  },
+  "finalVerifiedIdentityAndResult": {
+    "status": "applied",
+    "attemptId": "c97c4df9137bf45a1bc9e350fd52c1ee8de7486b28906678e3b7b15651de1947",
+    "operationId": "agent-finish-1",
+    "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+    "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+    "sequence": 4,
+    "outcome": "accepted",
+    "rejectionCode": null
+  },
+  "finalBusinessState": {
+    "reviewTask": {
+      "id": "review",
+      "title": "Review the public session experience",
+      "claimedBy": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+      "status": "done"
+    },
+    "lockedTask": {
+      "id": "locked",
+      "title": "A task claimed by another authenticated author",
+      "claimedBy": "69a64f56c50eed06ff862528d7ef760a847d3192809bc27751625e37c8d73581",
+      "status": "open"
+    },
+    "messageCount": 1,
+    "selectedMessage": {
+      "messageId": "review-readiness",
+      "text": "Ready for review",
+      "author": "2ea0ccd1b4e36f8ab50429bd12681852801762ba1058a5f7de88700452dd1d18",
+      "operationId": "agent-note-2",
+      "attemptId": "968859787154bbbbe03215d87cf7cf2ab9c21c42a76772fdba4765f7293f5e13"
+    },
+    "selectedRevision": {
+      "applicationId": "f2ff6cb9a9ae2b982a4d2647f424697d3056d9d3223c036db634945de02fe6fa",
+      "historyId": "independent-agent-exercise",
+      "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+      "point": {
+        "generation": "17a994b4b979ba1eaf0ae18f5a140749a55d838489497996f505b995336f6885",
+        "sequence": 4,
+        "root": "23b946bfa104a0e0b18bc702b092559b2dd9a435b8db3007d7294752a4fe2d31"
+      },
+      "controlRevision": 0,
+      "materializationRevision": "8"
+    },
+    "duplicateFinishIntentCreated": false
+  },
+  "resultSummary": "Completed the supplied business workflow. The reopened device retained the exact accepted agent-finish-1 attempt at sequence 4, review is done, locked remains open under its other author, and exactly one Ready for review message is selected.",
+  "evidencePaths": {
+    "rawReport": "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/report.json",
+    "independentReview": "/workspace/scratch/fee958cb2f5e/qualification/final-agent-f5e01684/fresh-agent-review.json"
+  }
+}

@@ -23,7 +23,131 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Completed CI composition checkpoint: `10f53f11`
+## Complete ancestor-recovery composition: `f5e01684`
+
+All five independent gates and the strict composition job passed in
+[contrib CI run 44126101769](https://github.com/werg/tendriller-contrib/actions/runs/44126101769).
+The exact [composition manifest](evidence/2026-11-17-ci-composition-f5e01684/composition.json)
+and [origin record](evidence/2026-11-17-ci-composition-f5e01684/origin.json) retain
+the complete source, package, content, browser, report and GitHub artifact
+identities. All six downloaded artifact ZIPs matched GitHub's recorded size and
+SHA-256. Reassembling the five raw reports with the unchanged strict validator
+reproduced the successful remote manifest exactly, including SHA-256
+`5d7790f14b20336f6dfe80eb96acbfdf8f030640d2b0178bffbb22b0603db8d7`.
+
+| Component | Exact clean source | Source tree |
+| --- | --- | --- |
+| Chronolog runtime | `f5e016843ce062e27aa56445ca74f15f046ecb2a` | `86ada86a6fed8080c8f2d78f01e010ae7f929eec` |
+| Tendriller host | `ed2509358c01a2a1a7c9db7691f4775347bb27c0` | `ee38b3c2bea94d9b88032003219ecd773d69dfb1` |
+| CI consumer checkout | `91b341716c22a04d279fbc5a86fd5e2e9db9dd1e` | `96bc5cccd795fa216c465abb417c7d2f7c5f7dfc` |
+
+The consumer checkout is GitHub's pull-request merge for branch commit
+`80997ea96d00a59d3c376c9157cba78cefdb1cfc`; both have the same complete tree.
+Later source changes require separate qualification and do not inherit this
+checkpoint. The source revision of a later documentation or workflow-only
+commit is not substituted into these observed runtime reports.
+
+| Gate | Exact passing raw evidence |
+| --- | --- |
+| Native events | [Direct](evidence/2026-11-17-ci-composition-f5e01684/direct/report.json) |
+| Native RTC | [Authenticated native RTC](evidence/2026-11-17-ci-composition-f5e01684/native-rtc/report.json) |
+| Browser Worker | [Chromium/OPFS](evidence/2026-11-17-ci-composition-f5e01684/browser/report.json) |
+| Native SQL | [Guarded SQL tasks](evidence/2026-11-17-ci-composition-f5e01684/native-sql/report.json) |
+| Hosted participant | [Actual workerd/native RTC](evidence/2026-11-17-ci-composition-f5e01684/hosted/report.json) |
+
+The direct, RTC and hosted scenarios now retain a complete four-command G1
+ancestor on an isolated survivor while G3 selects a G2 body that survivor lacks.
+Reading the incomplete current view is refused. Inspecting a recovery point
+returns the complete G1 ancestor without publishing a partial view; an empty
+peer and planned handover remain ineligible. The session saves a takeover
+against the actual G3 selection, loses its first persisted response, and retries
+the identical signed request to recover one G4 selection. Its restored view and
+original operation identity match the retained ancestor, and a fresh peer
+replays the same state. Previously excluded suffixes remain absent.
+
+The recovered coordinator then applies a new command and explicitly advances
+the control recovery floor to that command. A peer missing the protected body
+cannot recover below the floor: both its owned recovery API and a raw signed
+request to the control participant are refused. The rejected local request
+does not enter its transition journal. The ordinary participation controller
+then resumes, performs the host-blocked workload and completes its automatic
+and explicitly approved recoveries above that floor.
+
+| Observed workload | Burst apply time | Complete-prefix age at coordinator loss | Time to usable takeover | Known lost workload commands |
+| --- | --- | --- | --- | --- |
+| CI direct events | 858.41 ms | 96.15 ms | 296.75 ms | 0 |
+| CI native RTC | 1,044.55 ms | 183.00 ms | 387.87 ms | 0 |
+| CI hosted controls/native RTC | 981.05 ms | 146.45 ms | 285.58 ms | 0 |
+| Separate local direct run | 8,231.19 ms | 737.08 ms | 1,572.40 ms | 0 |
+
+Each workload contains 32 commands with 1,024-byte text, waits for ordinary
+`applied()` completion, and observes independent retention once after the burst.
+Host traffic remains unchanged during the measured outage windows. These are
+observations of distinct local runs, not a controlled performance comparison or
+a universal loss guarantee. The five-minute target remains limited to the
+declared workload and measured retained prefix.
+
+The [separate local direct report](evidence/2026-11-17-final-direct-f5e01684-report.json)
+and [checked summary](evidence/2026-11-17-final-direct-f5e01684-summary.json) use
+the same clean runtime source and branch consumer `80997ea`. Its SQL-capable
+archive SHA-256 is
+`bf35d116b5b7f6e0efbbe73c1d80e20fc5800bf5b81c799b96486f3c4b40ac5c`;
+the CI SQL archive is
+`2d8355323713f88614b85ff1a9080e664ae31f4709e7e38cca467cb3abb00e86`.
+Comparing the verified content manifests finds exactly one differing file:
+`engine/build/Release/doltlite.node`, with local digest
+`291e75ef09c0e07482f2a2f6030eaf588127c62db1d4444cd914f60ea43e27e2`
+and CI digest
+`cca093a1ca607b5d8478515f04ae27c03893af0a91ce91a9c566c6aa4fe961d4`.
+All other packaged content hashes match. These are recorded as separate exact
+native artifacts; no local report is substituted into the CI composition.
+
+The same gates retain public projection recovery from six messages to four,
+checkpoint reopen without reducer replay, deliberate definition reset, guarded
+SQL recovery, and explicit publisher permission independent of administration.
+The real browser is Chromium 158.0.8127.18 with a dedicated Worker, OPFS and
+exclusive Web Locks. Hosted signed HTML/JavaScript publication, retry identity
+and restart survive, while ordinary database bodies, private content and live
+signals are filtered at both client and server ingress.
+
+Deployed authentication, Internet/home/mobile/restrictive network and TURN
+conditions, sustained suspension/quota pressure, browser SQL/WASM equivalence,
+provider/device costs and a production recovery envelope remain unqualified.
+### Fresh independent agent exercise
+
+A new agent with no prior exercise context completed the supplied-enrollment
+business workflow in 23 public requests. Its recorded interval was
+16:30:13–16:31:55 UTC, 102 seconds; it first observed an accepted applied result
+49 seconds after starting. The [raw transcript](evidence/2026-11-17-fresh-agent-f5e01684-report.json),
+[independent review](evidence/2026-11-17-fresh-agent-f5e01684-review.json) and
+[transcript cross-check](evidence/2026-11-17-fresh-agent-f5e01684-validation.json)
+are retained separately from the scripted five-gate composition.
+
+The agent used only the installed public README, the documented business task,
+and returned tool schemas/results. It wrote no product or fixture code, created
+no extra infrastructure, reported no recovery mistakes, and needed no follow-up
+coaching. It inspected the uncertain original as `needsReapply` with
+`previous: null`, observed the real reset and `unknownLoss: true` notice, and
+deliberately reapplied the message under a new linked identity. It confirmed
+the other author's task remained locked, claimed/completed its own review using
+fresh captured query guards, and inspected, waited for and exactly retried the
+same accepted finish identity after device reopen. The original uncertain
+message is not counted as an observed accepted result.
+
+The maintained harness's completion assertions passed; an independent check of
+the raw transcript also verified all five query guards, linked reapplication,
+the rejected wrong-author command, retained device/store identities, exact
+finish retry and final business state. There is no separate maintained agent
+report-validator executable, so the cross-check does not claim to be one.
+
+This study uses clean runtime `f5e01684`, clean consumer `80997ea`, and the local
+SQL archive `bf35d116...` described above. Installation, enrollment, the task
+definition, native SQL engine and transport delivery were supplied. The result
+qualifies independent public business-tool use within that scope; it does not
+establish independently configured deployment, qualify later runtime changes,
+or replace the distinct CI SQL binary in the composition manifest.
+
+## Earlier completed CI composition checkpoint: `10f53f11`
 
 All five independent public-package gates, the strict composition assembler,
 and artifact upload passed in
