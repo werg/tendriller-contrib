@@ -1,93 +1,108 @@
-// Validates measured browser/native observations. It never supplies evidence.
 import assert from 'node:assert/strict';
 
-export function validatePeerBrowserReport(report) {
-  const hex = (value, length) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${length}}$`, 'u'));
-  assert.equal(report?.format, 'peer-generation-consumer/v1');
-  assert.equal(report.profile, 'peer-generation-v1');
-  assert.equal(report.mode, 'runtime');
-  assert.equal(report.topology, 'independent-browser-native-rtc');
-  assert.equal(report.passed, true);
-  hex(report.executionManifestDigest, 64);
-  hex(report.source?.commit, 40); hex(report.source?.tree, 40);
+/** Validate the observations this gate actually runs; never infer deployment. */
+export function validateBrowserPeerReport(report) {
+  assert.equal(report.format, 'peer-generation-browser/v1');
+  assert.equal(report.profile, 'peer-generation-v1'); assert.equal(report.mode, 'runtime');
+  assert.equal(report.topology, 'browser-worker-opfs-native-rtc'); assert.equal(report.passed, true);
+  assert.match(report.executionManifestDigest, /^[a-f0-9]{64}$/u);
+  assert.match(report.source.commit, /^[a-f0-9]{40}$/u); assert.match(report.source.tree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof report.source.dirty, 'boolean');
-  assert.equal(report.artifacts?.length, 1);
+  assert.equal(report.artifacts.length, 1);
   const artifact = report.artifacts[0];
-  assert.equal(artifact.name, '@chronolog/peer-session');
-  hex(artifact.sha256, 64); hex(artifact.sourceCommit, 40); hex(artifact.sourceTree, 40);
+  assert.equal(artifact.name, '@chronolog/peer-session'); assert.match(artifact.sha256, /^[a-f0-9]{64}$/u);
+  assert.match(artifact.sourceCommit, /^[a-f0-9]{40}$/u); assert.match(artifact.sourceTree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof artifact.sourceDirty, 'boolean');
-  assert.deepEqual(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/browser',
+  assert.deepEqual(report.publicBoundary.imports, ['@chronolog/peer-session', '@chronolog/peer-session/browser',
     '@chronolog/peer-session/native', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native']);
-  assert.equal(report.publicBoundary.siblingSourceImports, 0);
-  assert.equal(report.publicBoundary.applicationRetryQueues, 0);
-  assert.equal(report.browser?.owner, 'DedicatedWorker'); assert.equal(report.browser.storage, 'OPFS');
-  assert.ok(report.browser.version); assert.equal(report.browser.tabs, 2);
-  assert.deepEqual(report.browser.runtimeErrors, []);
+  assert.deepEqual(report.publicBoundary.testTools, ['esbuild', 'playwright']);
+  for (const field of ['siblingSourceImports', 'applicationRpcMaps', 'applicationRetryQueues']) assert.equal(report.publicBoundary[field], 0);
+  assert.equal(report.publicBoundary.residentRequired, false);
+  assert.ok(report.fixtures.length >= 4);
+  for (const fixture of report.fixtures) assert.match(fixture.sha256, /^[a-f0-9]{64}$/u);
+  assert.ok(report.browserAssets.length >= 2);
+  for (const asset of report.browserAssets) assert.match(asset.sha256, /^[a-f0-9]{64}$/u);
+  assert.ok(report.browserBundleInputs.length > 3);
+  for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') ||
+    ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
+      'app.mjs', 'typing.mjs', 'deployment/bootstrap.mjs'].includes(input));
+  assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
+  for (const [name, version] of Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })) {
+    assert.ok(report.runtime.dependencies.packages.some(item => item.path === `node_modules/${name}` && item.version === version && item.integrity));
+  }
+  const browser = report.browser;
+  assert.equal(browser.implementation, 'chromium'); assert.equal(typeof browser.version, 'string');
+  assert.equal(browser.transportOwner, 'dedicated-worker'); assert.equal(browser.storage, 'opfs-with-exclusive-web-lock');
+  assert.equal(browser.signalingBoundary, 'loopback-fixture-http');
+  assert.equal(browser.controlBoundary, 'portable-registry-over-loopback-http');
+  assert.equal(browser.nativeCandidateSource, 'explicit-loopback-only');
+  assert.equal(browser.interfaceEnumeration, 'disabled-by-native-options');
+  assert.deepEqual(browser.pageErrors, []);
+  for (const field of ['secureContext', 'storage', 'locks']) assert.equal(browser.observations[field], true);
   const ui = report.ui;
-  assert.deepEqual(ui?.pages, ['board.html', 'compact.html']);
-  assert.equal(ui.domain, 'events'); assert.equal(ui.sessionFacade, 'connectApplicationWorker');
-  assert.equal(ui.sentThroughForms, 3); assert.equal(ui.reapplicationConfirmed, true);
-  assert.equal(ui.recoveryNoticeVisible, true); assert.equal(ui.originalReviewPreserved, true);
+  assert.deepEqual(ui.pages, ['board.html', 'compact.html']); assert.equal(ui.domain, 'events');
+  assert.equal(ui.sessionFacade, 'connectApplicationWorker'); assert.equal(ui.sentThroughForms, 3);
+  for (const field of ['reapplicationConfirmed', 'recoveryNoticeVisible', 'originalReviewPreserved']) assert.equal(ui[field], true);
   assert.ok(typeof ui.draftBeforeRestart === 'string' && ui.draftBeforeRestart.length > 0);
   assert.equal(ui.draftAfterRestart, ui.draftBeforeRestart); assert.equal(ui.draftAfterRecovery, ui.draftBeforeRestart);
-  for (const field of ['secondTabRefused', 'unsupportedStorageRefused', 'pageOwnershipRefused']) assert.equal(report.ownership?.[field], true, field);
-  assert.equal(report.ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the test');
-  const host = report.hostOutage;
-  assert.equal(host?.boundary, 'loopback-static-page-and-sdp');
-  assert.equal(host.blockedProbeStatus, 503);
-  assert.ok(Number.isSafeInteger(host.requests?.before) && host.requests.before > 0);
-  assert.equal(host.requests.after, host.requests.before);
-  assert.equal(host.applicationBodyBytes, 0); assert.equal(host.commandsApplied, 2);
-  assert.equal(host.liveSignalsObserved, 1); assert.equal(host.signalingClosed, true);
-  assert.ok(Number.isSafeInteger(host.reliableBytes?.before) && host.reliableBytes.before > 0);
-  assert.ok(host.reliableBytes.after > host.reliableBytes.before);
-  const reopen = report.reopen;
-  hex(reopen?.identityBefore, 64); assert.equal(reopen.identityAfter, reopen.identityBefore);
-  assert.ok(reopen.storageBefore); assert.equal(reopen.storageAfter, reopen.storageBefore);
-  assert.equal(reopen.operationBefore?.status, 'applied');
-  assert.deepEqual(reopen.operationAfter, reopen.operationBefore);
-  const recovery = report.recovery;
-  hex(recovery?.previousGeneration, 64); hex(recovery.selectedGeneration, 64);
-  assert.notEqual(recovery.selectedGeneration, recovery.previousGeneration);
-  assert.ok(Number.isSafeInteger(recovery.adoptedPosition) && recovery.adoptedPosition > 0 && recovery.previousHead > recovery.adoptedPosition);
-  hex(recovery.recoveredDigest, 64); assert.equal(recovery.nativeDigest, recovery.recoveredDigest);
-  for (const field of ['coherentReset', 'inheritedIdentityPreserved', 'returningTailExcluded', 'retryRefused']) assert.equal(recovery[field], true, field);
-  assert.ok(recovery.abandonedOperationId); assert.ok(recovery.reappliedOperationId);
-  assert.notEqual(recovery.reappliedOperationId, recovery.abandonedOperationId);
-  hex(recovery.abandonedAttemptId, 64); hex(recovery.reappliedAttemptId, 64);
-  assert.notEqual(recovery.reappliedAttemptId, recovery.abandonedAttemptId);
-  assert.equal(recovery.reapplyOf, recovery.abandonedAttemptId);
-  const content = report.content;
-  assert.ok(Number.isSafeInteger(content?.bytes) && content.bytes > 65_536);
-  assert.equal(content.interruptedAfter, 65_536);
-  for (const field of ['partialRetentionRefused', 'partialSurvivedRestart', 'unavailableRemainderRefused', 'completeAfterReconnect']) assert.equal(content[field], true, field);
-  assert.equal(content.retainedBy, reopen.identityAfter); hex(content.retentionSignature, 128);
-  assert.equal(report.rtc?.implementation, 'Chromium and werift'); assert.equal(report.rtc.nativeVersion, '0.27.0');
-  assert.equal(report.rtc.signalingBoundary, 'one-off-loopback-http-test-mailbox');
-  assert.equal(report.rtc.byteBoundary, 'authenticated-reliable-application-frames');
-  assert.equal(report.rtc.candidateSource, 'native-explicit-loopback/browser-discovered');
-  assert.equal(report.rtc.connections?.length, 2);
-  for (const connection of report.rtc.connections) {
-    assert.equal(connection.authenticated, true); assert.equal(connection.closed, true);
-    hex(connection.nativePeer, 64); hex(connection.browserPeer, 64);
-    assert.notEqual(connection.nativePeer, connection.browserPeer);
-    assert.equal(connection.signaling?.closed, true); assert.equal(connection.signaling.sentMessages, 2);
-    assert.ok(connection.signaling.sentBytes > 0);
-    assert.ok(connection.native?.sentBytes > 0 && connection.native.receivedBytes > 0);
-    assert.equal(connection.routes?.length, 2);
-    for (const route of connection.routes) {
-      assert.ok(['direct', 'relay', 'unknown'].includes(route.route));
-      if (route.route === 'direct') assert.ok(['host', 'srflx', 'prflx'].includes(route.localCandidateType) && ['host', 'srflx', 'prflx'].includes(route.remoteCandidateType));
-      if (route.route === 'relay') assert.ok(route.localCandidateType === 'relay' || route.remoteCandidateType === 'relay');
-    }
+  const ownership = report.ownership;
+  for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceAwaitedKeys']) assert.equal(ownership[field], true);
+  assert.equal(ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the fixture');
+  assert.equal(ownership.pagePrivateKeys, 0);
+  assert.match(ownership.initialDeviceId, /^[a-f0-9]{64}$/u); assert.match(ownership.initialStorageId, /^[a-f0-9-]{36}$/u);
+  for (const field of ['sameDeviceId', 'sameStorageId', 'sameView', 'storedKeysReused']) assert.equal(ownership.gracefulReopen[field], true);
+  for (const field of ['sameDeviceId', 'sameStorageId', 'sameView', 'durableOperation']) assert.equal(ownership.abruptWorkerReopen[field], true);
+  for (const field of ['cancelledWaitPreservedAttempt', 'resumedExactAttempt', 'enrolledFromPeer']) assert.equal(report.operations[field], true);
+  assert.notEqual(report.operations.receiptPeer, ownership.initialDeviceId);
+  const outage = report.hostOutage;
+  assert.equal(outage.blocked, true); assert.equal(outage.blockedProbeRejected, true); assert.ok(outage.commandsApplied >= 2);
+  for (const field of ['controlRequests', 'controlBodyBytes', 'signalingRequests', 'signalingBodyBytes']) {
+    assert.ok(Number.isSafeInteger(outage.before[field]) && outage.before[field] >= 0);
+    assert.equal(outage.after[field], outage.before[field]);
   }
-  hex(report.runtime?.dependencies?.lockSha256, 64);
-  assert.ok(report.runtime.dependencies.packages?.length > 0);
-  assert.ok(report.runtime.dependencies.packages.every(value => value.path && value.version && value.integrity));
-  return { format: 'peer-generation-browser-summary/v1', source: report.source, artifacts: report.artifacts,
-    executionManifestDigest: report.executionManifestDigest, browser: report.browser, ui: report.ui, ownership: report.ownership,
-    hostOutage: report.hostOutage, reopen: report.reopen, recovery: report.recovery, content: report.content, rtc: report.rtc,
-    limitations: ['Local Chromium OPFS and native RTC; mobile browsers, suspension, quota exhaustion and deployed networks were not exercised.',
-      'The page/SDP host is a loopback test server, not Tendriller HTTP or deployed enrollment.',
-      'Encrypted content interrupted at a verified chunk boundary; no provider cost or recovery-age bound is inferred.'] };
+  assert.ok(outage.transport.after.reliable.sentBytes > outage.transport.before.reliable.sentBytes);
+  assert.ok(outage.transport.after.reliable.receivedBytes > outage.transport.before.reliable.receivedBytes);
+  assert.deepEqual(outage.transport.after.signaling, outage.transport.before.signaling);
+  assert.ok(outage.liveSignalsObserved >= 1); assert.equal(outage.disposablePathsDidNotAppend, true); assert.equal(outage.coherentReadView, true);
+  assert.ok(outage.content.bytes >= 32_768); assert.match(outage.content.sha256, /^[a-f0-9]{64}$/u); assert.equal(outage.content.retainedByBrowser, true);
+  const content = report.contentRecovery;
+  assert.ok(content.bytes > content.interruptedAfter && content.interruptedAfter >= 65_536);
+  for (const field of ['partialRetentionRefused', 'partialSurvivedRestart', 'unavailableRemainderRefused', 'completeAfterReconnect']) assert.equal(content[field], true);
+  assert.equal(content.retainedBy, ownership.initialDeviceId); assert.match(content.retentionSignature, /^[a-f0-9]{128}$/u);
+  const recovery = report.recovery;
+  assert.equal(recovery.originatorClosed, true); assert.equal(recovery.originatorStoreUnavailable, true);
+  assert.ok(Number.isSafeInteger(recovery.adoptedPrefix.sequence) && recovery.adoptedPrefix.sequence < recovery.priorHead.sequence);
+  assert.ok(['abandoned', 'needsReapply'].includes(recovery.originalAttempt.status));
+  assert.equal(recovery.reapplied.outcome, 'accepted');
+  assert.notEqual(recovery.reapplied.attemptId, recovery.originalAttempt.attemptId);
+  assert.notEqual(recovery.reapplied.operationId, recovery.originalAttempt.operationId);
+  assert.equal(recovery.reapplyOf, recovery.originalAttempt.attemptId); assert.equal(recovery.currentGuardsChecked, true);
+  assert.equal(recovery.staleViewError, 'RecoveredViewError');
+  assert.ok(recovery.noticesPersisted > 0); assert.equal(recovery.transitionJournalEntries, 1);
+  assert.equal(report.freshPeer.joinedAfterOriginatorLoss, true); assert.equal(report.freshPeer.enrolledFromBrowser, true);
+  assert.equal(report.freshPeer.generation, recovery.selectedGeneration);
+  assert.match(report.freshPeer.browserViewSha256, /^[a-f0-9]{64}$/u);
+  assert.equal(report.freshPeer.nativeViewSha256, report.freshPeer.browserViewSha256);
+  assert.ok(report.connections.length >= 4);
+  for (const connection of report.connections) {
+    assert.equal(connection.authenticated, true); assert.equal(connection.nativeClosed, true);
+    assert.equal(connection.peers.length, 2); assert.notEqual(connection.peers[0], connection.peers[1]);
+    assert.equal(connection.signaling.descriptions, 2); assert.equal(connection.signaling.closed, true);
+    assert.equal(connection.routes.length, 2);
+    for (const route of connection.routes) assert.ok(route.route === 'direct' && route.localCandidateType && route.remoteCandidateType);
+  }
+  return { format: 'peer-generation-browser-summary/v1', passed: true,
+    qualification: !report.source.dirty && !artifact.sourceDirty ? 'clean-source-pair' : 'development-preview',
+    source: report.source, artifacts: report.artifacts, ui, browser: { version: browser.version, transportOwner: browser.transportOwner, storage: browser.storage },
+    hostRequestsDuringCommands: outage.after.controlRequests - outage.before.controlRequests,
+    signalingRequestsDuringCommands: outage.after.signalingRequests - outage.before.signalingRequests,
+    recovery: { previousHead: recovery.priorHead.sequence, adoptedPrefix: recovery.adoptedPrefix.sequence,
+      abandonedOperationId: recovery.originalAttempt.operationId, reappliedOperationId: recovery.reapplied.operationId },
+    identityReopened: { graceful: true, abruptWorker: true },
+    limitations: [
+      'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.',
+      'Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.',
+      'Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.',
+      'The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate.',
+    ] };
 }

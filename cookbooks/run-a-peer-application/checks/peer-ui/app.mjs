@@ -9,6 +9,7 @@ let lastSignal = 0;
 const outcomes = new Map();
 const text = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
 const status = (message, failure = false) => { $('#status').textContent = message; $('#status').dataset.failure = String(failure); };
+const canAuthor = () => session && !['awaiting-keys', 'recovering', 'closed'].includes(session.status.phase);
 const save = () => localStorage.setItem(storageKey, JSON.stringify({ draft, references }));
 const describeOutcome = value => value === null ? 'No saved attempt was found; the draft is still available.'
   : value === undefined ? 'Checking the original attempt…'
@@ -122,7 +123,7 @@ $('#message-form').onsubmit = async event => {
     await submit('postMessage', { messageId: crypto.randomUUID(), text: snapshot.trim() }, snapshot.trim());
     if (draft === snapshot) { draft = ''; $('#message').value = ''; save(); }
   } catch { /* Keep the user's current draft and original review reference. */ }
-  finally { submitting = false; $('#send').disabled = false; }
+  finally { submitting = false; $('#send').disabled = !canAuthor(); }
 };
 $('#task-form').onsubmit = async event => {
   event.preventDefault(); const title = $('#task-title').value.trim(); if (!title) return;
@@ -141,15 +142,21 @@ window.addEventListener('pagehide', () => { lifetime.abort(); void session?.clos
 try {
   session = await applicationReady;
   definition = await session.describe();
-  storageKey = `peer-page/${session.revision.applicationId}/${session.deviceId}`;
+  storageKey = `peer-page/${session.applicationId}/${session.deviceId}`;
   const stored = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
   if (stored && typeof stored.draft === 'string' && stored.draft.length <= 4096 && Array.isArray(stored.references) && stored.references.length <= 100 &&
       stored.references.every(value => value && typeof value.operationId === 'string' && typeof value.command === 'string' && typeof value.label === 'string' && value.input && typeof value.input === 'object')) {
     draft = stored.draft; references = stored.references;
   }
-  $('#message').value = draft; $('#message').disabled = false; $('#send').disabled = false;
+  $('#message').value = draft;
+  session.onStatus(value => {
+    $('#message').disabled = !canAuthor(); $('#send').disabled = !canAuthor() || submitting;
+    if (value.phase === 'awaiting-keys') status('Waiting for an authorized peer to share this history’s keys. Your draft is retained.');
+    else if (value.phase === 'recovering') status('Restoring the selected history. Your draft is retained.');
+    else if (value.phase === 'closed') status('This device session is closed. Your draft is retained.');
+  });
   $('#tasks-section').hidden = !definition.commands.some(value => value.name === 'claimTask');
-  await refresh(); status('Ready. Attempts and recovery remain visible below.');
+  await refresh(); if (canAuthor()) status('Ready. Attempts and recovery remain visible below.');
   const notices = await session.inspectRecovery();
   if (notices.length) {
     const latest = notices[notices.length - 1];

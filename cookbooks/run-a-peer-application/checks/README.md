@@ -28,37 +28,6 @@ The one-off in-process SDP mailbox is test infrastructure, not a claim to have
 exercised Tendriller rendezvous or deployed discovery. A new runner or a passing
 evidence-validator test does not mean the RTC runtime gate has run.
 
-The independent browser/native gate uses the same public archive, Chromium and
-the maintained Worker transport handoff:
-
-```sh
-npm run test:peer-browser -- --artifact /exact/peer-session-with-native-rtc.tgz \
-  --browser /exact/chromium --output /new/browser-peer-evidence
-```
-
-It opens real exclusive OPFS storage in a DedicatedWorker and attempts a second
-tab owner. It checks explicit refusal when durable storage is unavailable,
-identity and operation restart, authenticated browser/native RTC, ordinary
-commands and live signals with the static page/SDP host returning 503, coherent
-selected-prefix recovery and deliberate reapplication. A bounded encrypted file
-is read partially, survives Worker restart, and completes after reconnect before
-the browser may claim complete retention. The one-off HTTP SDP mailbox is test
-infrastructure; this gate does not qualify Tendriller enrollment or Internet
-reachability. The board and compact pages submit through the maintained
-`connectApplicationWorker` facade. The gate types into the actual forms, checks
-their durable attempt rows, preserves an unsent draft through page replacement
-and recovery, and confirms an explicit linked reapplication in the review UI.
-Only device bootstrap and deliberate storage faults use fixture messages;
-commands, queries, content, signals, operation lookup and recovery use the
-public Worker facade. Authentication, channel handoff, replication and retry
-belong to the package.
-The [browser evidence validator](peer-generation-browser-report.mjs) validates
-those observations separately from the native-only report.
-
-The [preserved local launch failure](../notes/peer-browser-runtime-status.md)
-does not qualify those scenarios. Each public package change needs fresh runtime
-evidence; the CI job installs the pinned browser and retains failed reports too.
-
 For actual Tendriller controls and short-lived SDP rendezvous, run:
 
 ```sh
@@ -82,6 +51,41 @@ blocked. Those values must remain unchanged while authenticated RTC application
 bytes increase. Test accounts are synthetic; no result is a deployed-login or
 Internet-route qualification. The runner has no private host imports or second
 application command queue.
+
+For browser ownership and the maintained page/Worker application facade, run:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs \
+  --artifact /exact/peer-session-with-native-rtc.tgz \
+  --chromium /path/to/chromium --output /new/browser-peer-evidence
+```
+
+This isolated consumer installs declared Playwright/esbuild tools and bundles
+only the public browser entries. The Worker owns OPFS, its signing identity,
+operation journal, application reads, and both transferred RTC channels. The
+fixture uses `connectApplicationWorker` for commands and recovery;
+`connectWorkerApplicationWebRtc` owns the RTC handoff. No application RPC map or
+second retry queue is copied into the page.
+
+Both actual board and compact forms submit through that facade. The check keeps
+an unsent draft through page replacement and recovery, retains the original
+attempt row, and confirms deliberate linked reapplication through the review UI.
+
+The scenario requires a keyless granted browser to enroll through a real native
+peer, resume the exact saved attempt, and continue commands, signals, and encrypted
+content while measured control HTTP is blocked. It then removes the original
+coordinator's usable store, takes over the browser's retained prefix, exposes
+abandoned intent, deliberately reapplies it, and joins a fresh native peer.
+Exclusive ownership across tabs, explicit missing-storage refusal, coherent
+captured reads, and both graceful and abrupt Worker reopening preserve the
+browser device and operation state. A larger encrypted file is partially read,
+survives Worker restart, and completes after reconnect before the browser can
+claim full retention. The portable registry
+HTTP fixture is separately named from the actual Tendriller workerd gate above.
+The new browser runner is not qualified until its report is preserved; synthetic
+validator tests alone do not count as a browser execution.
+The [preserved earlier local launch failure](../notes/peer-browser-runtime-status.md)
+remains attached to its original source and does not qualify these scenarios.
 
 
 These are two page-owned adaptations of the same application decisions:

@@ -20,8 +20,9 @@ The complete deployment supplies `deployment/bootstrap.mjs`. Its
 The Worker first opens the device and application using its authorized
 enrollment and pinned execution runtime, then calls
 `serveApplicationWorker(session, self)` from that same public entry.
-Use `installApplicationWorkerTransport` and `connectWorkerApplicationWebRtc`
-from the public `webrtc` entry for RTC handoff and authentication.
+That owner also installs and closes the maintained Worker RTC transport. Use
+`connectWorkerApplicationWebRtc` from the public `webrtc` entry on the page for
+negotiation and authenticated handoff.
 
 The device owner retains private keys, original signed attempts, authenticated
 authority, materialization and detached content. RPC requests carry application

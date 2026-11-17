@@ -61,7 +61,11 @@ jobs:
         run: |
           archives=(.chronolog-build/artifacts/peer-session/chronolog-peer-session-*.tgz)
           test "${#archives[@]}" -eq 1
-          node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --transport "${{ matrix.transport }}" --output test-results/peer-generation
+          if [ "${{ matrix.transport }}" = browser-native ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs --artifact "${archives[0]}" --output test-results/peer-generation
+          else
+            node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --transport "${{ matrix.transport }}" --output test-results/peer-generation
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

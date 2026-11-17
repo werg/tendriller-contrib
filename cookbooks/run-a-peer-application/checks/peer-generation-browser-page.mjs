@@ -1,84 +1,85 @@
-// Browser negotiation uses the public synchronous Worker handoff, not custom framing.
+// Playwright calls these fixture lifecycle methods, then the actual public
+// application facade directly. There is no application-owned RPC or retry map.
+import { connectApplicationWorker, openBrowserDevice } from '@chronolog/peer-session/browser';
 import { connectWorkerApplicationWebRtc } from '@chronolog/peer-session/webrtc';
-import { openBrowserDevice, connectApplicationWorker } from '@chronolog/peer-session/browser';
 
-let worker, connection, application, resolveApplication;
+let worker, application, name;
+let resolveApplication;
 export const applicationReady = new Promise(resolve => { resolveApplication = resolve; });
-const timeoutMs = 30_000;
-const rpc = (target, action, args = {}) => new Promise((resolve, reject) => {
-  const channel = new MessageChannel();
-  const timer = setTimeout(() => { channel.port1.close(); reject(Error('BROWSER_FIXTURE_TIMEOUT')); }, timeoutMs);
-  channel.port1.onmessage = event => {
-    clearTimeout(timer); channel.port1.close();
-    event.data.error ? reject(Error(event.data.error)) : resolve(event.data.value);
+const links = new Map();
+const notices = [], statuses = [];
+const ready = candidate => new Promise((resolve, reject) => {
+  const timer = setTimeout(() => finish(Error('FIXTURE_WORKER_START_TIMEOUT')), 30_000);
+  const receive = event => {
+    if (event.data?.type === 'fixture-ready') finish();
+    if (event.data?.type === 'fixture-error') finish(Error(event.data.error));
   };
-  target.postMessage({ type: 'peer-browser-scenario', action, args, port: channel.port2 }, [channel.port2]);
+  const error = event => finish(Error(event.message || 'FIXTURE_WORKER_START_FAILED'));
+  function finish(failure) {
+    clearTimeout(timer); candidate.removeEventListener('message', receive); candidate.removeEventListener('error', error);
+    if (failure) reject(failure); else resolve();
+  }
+  candidate.addEventListener('message', receive); candidate.addEventListener('error', error);
 });
-const spawn = () => new Worker('./peer-generation-browser-worker.mjs', { type: 'module' });
-window.peerFixture = {
-  async openDevice(args) { worker = spawn(); return rpc(worker, 'openDevice', args); },
-  async call(action, args = {}) {
-    if (action === 'open') {
-      const result = await rpc(worker, action, args);
-      application = await connectApplicationWorker(worker, { timeoutMs });
-      resolveApplication(application);
-      return result;
-    }
-    switch (action) {
-      case 'query': return application.query('conversation', {});
-      case 'operation': return application.operations.get(args.id);
-      case 'inspectOperation': return application.operations.inspect(args.id);
-      case 'retry': await application.retry(args.id); return application.operations.get(args.id);
-      case 'point': return application.recoveryPoint();
-      case 'adopt': return application.adopt(args);
-      case 'signal': return application.signals.send('typing', { typing: true }, { ttlMs: 2500 });
-      case 'readContent': {
-        let bytes = 0;
-        for await (const chunk of application.content.read(args.reference, { offset: args.offset ?? 0, length: args.length ?? args.reference.bytes - (args.offset ?? 0) })) {
-          for (let index = 0; index < chunk.length; index++) {
-            if (chunk[index] !== ((args.offset ?? 0) + bytes + index) % 251) throw Error('CONTENT_BYTES_CHANGED');
-          }
-          bytes += chunk.length;
-        }
-        return { bytes };
-      }
-      case 'retained': return application.content.retained(args.reference);
-      case 'retain': return application.content.retain(args.reference);
-      default: throw Error(`Unknown browser fixture action ${action}`);
-    }
+const create = (deviceName, provision) => new Worker(`/worker.mjs?${new URLSearchParams({ name: deviceName, create: String(provision) })}`, { type: 'module' });
+
+globalThis.fixture = {
+  async open({ deviceName, provision = false }) {
+    name = deviceName; worker = create(name, provision);
+    try { await ready(worker); application = await connectApplicationWorker(worker); }
+    catch (error) { worker.terminate(); throw error; }
+    globalThis.application = application;
+    resolveApplication(application);
+    application.onRecovery(notice => notices.push(notice));
+    application.onStatus(status => statuses.push(status));
+    return { deviceId: application.deviceId, storageId: application.storageId, status: application.status,
+      capabilities: application.capabilities, description: application.describe() };
   },
-  async secondOwner(args) {
-    const other = spawn();
-    try { await rpc(other, 'openDevice', args); throw Error('SECOND_OWNER_WAS_ALLOWED'); }
-    catch (error) { return String(error); }
-    finally { other.terminate(); }
+  async secondOwner() {
+    const contender = create(name, false);
+    try { await ready(contender); throw Error('FIXTURE_SECOND_OWNER_WAS_ALLOWED'); }
+    catch (error) { return error.message; }
+    finally { contender.terminate(); }
   },
-  async unsupported() {
-    const other = spawn();
-    try { await rpc(other, 'unsupported'); throw Error('UNSUPPORTED_STORAGE_WAS_ALLOWED'); }
-    catch (error) { return String(error); }
-    finally { other.terminate(); }
+  async windowStorage() {
+    try { await openBrowserDevice({ name, create: true }); return 'unexpected-success'; }
+    catch (error) { return error.message; }
   },
-  async pageOwner() {
-    try { await openBrowserDevice({ name: 'page-owner', create: true }); throw Error('PAGE_OWNER_WAS_ALLOWED'); }
-    catch (error) { return String(error); }
+  async unsupportedStorage() {
+    const contender = new Worker(`/worker.mjs?${new URLSearchParams({ name: `${name}-unsupported`, create: 'true', unsupported: 'true' })}`, { type: 'module' });
+    try { await ready(contender); return 'unexpected-success'; }
+    catch (error) { return error.message; }
+    finally { contender.terminate(); }
   },
-  async connect({ id, peerId }) {
-    let retired = false;
-    const request = async (action, body) => {
-      const result = await fetch(`/signaling/${id}/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
-      if (!result.ok) throw Error(`TEST_SIGNALING_${result.status}`);
-      return result.json();
+  async connect({ id, peerId, role }) {
+    const base = `/signaling/${id}`;
+    const signaling = {
+      messages: { async *[Symbol.asyncIterator]() { const description = await request(`${base}/next`); if (description) yield description; } },
+      send: description => request(`${base}/send`, description),
+      close: () => request(`${base}/close`, {}),
     };
-    const signaling = { async send(description) { await request('send', description); },
-      messages: (async function* () { const result = await request('next'); if (result !== null) yield result; })(),
-      async close() { if (retired) return; retired = true; await request('close'); } };
-    connection = await connectWorkerApplicationWebRtc(worker, { role: 'answerer', expectedPeerId: peerId, signaling, timeoutMs });
-    return { peerId: connection.peerId, stats: connection.stats, route: await connection.rtc.getRoute(), signalingClosed: retired };
+    const link = await connectWorkerApplicationWebRtc(worker, { role, signaling, expectedPeerId: peerId, timeoutMs: 30_000 });
+    links.set(id, link);
+    return { peerId: link.peerId, stats: link.stats, route: await link.rtc.getRoute(), signaling: link.rtc.signaling };
   },
-  async synchronize() { await connection.synchronize(); return { stats: connection.stats, route: await connection.rtc.getRoute() }; },
-  async disconnect() { await connection?.close(); connection = undefined; return { closed: true }; },
-  async close() { await connection?.close(); connection = undefined; await application?.close();
-    if (worker) { await rpc(worker, 'close'); worker.terminate(); worker = undefined; } },
+  async inspect(id) {
+    const link = links.get(id);
+    await link.synchronize();
+    return { peerId: link.peerId, stats: link.stats, route: await link.rtc.getRoute(), closed: link.signal.aborted };
+  },
+  async disconnect(id) { const link = links.get(id); if (link) { await link.close(); links.delete(id); } },
+  async close() {
+    await Promise.all([...links.values()].map(link => link.close())); links.clear();
+    await application.close(); worker.terminate();
+  },
+  crash() { worker.terminate(); },
+  observations: () => ({ notices, statuses, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
+    locks: !!navigator.locks, userAgent: navigator.userAgent }),
 };
+
+async function request(path, body) {
+  const response = await fetch(path, body === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const result = await response.json();
+  if (!response.ok) throw Error(result.error ?? `HTTP_${response.status}`);
+  return result;
+}

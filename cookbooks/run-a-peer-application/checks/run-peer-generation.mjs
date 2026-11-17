@@ -3,22 +3,20 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { validatePeerGenerationReport } from './peer-generation-report.mjs';
-import { validatePeerBrowserReport } from './peer-generation-browser-report.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, output: { type: 'string' },
   transport: { type: 'string', default: 'direct' },
-  browser: { type: 'string' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
-if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc|browser-native] [--browser /exact/chromium]');
-assert.ok(['direct', 'native-rtc', 'browser-native'].includes(values.transport), 'Unknown transport');
-const browser = values.transport === 'browser-native', rtc = values.transport !== 'direct';
+if (!values.artifact || !values.output) throw Error('Usage: --artifact /exact/chronolog-peer-session.tgz --output /new/evidence-directory [--transport direct|native-rtc]');
+assert.ok(['direct', 'native-rtc'].includes(values.transport), 'Unknown transport');
+const rtc = values.transport === 'native-rtc';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
 const artifact = resolve(values.artifact), output = resolve(values.output);
@@ -30,20 +28,33 @@ await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
 const report = {
   format: 'peer-generation-consumer/v1', profile: 'peer-generation-v1', mode: 'runtime',
-  topology: browser ? 'independent-browser-native-rtc' : rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
+  topology: rtc ? 'independent-native-rtc' : 'independent-packed-peers', passed: false,
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'),
     tree: git('rev-parse', 'HEAD^{tree}'), dirty: git('status', '--porcelain', '--untracked-files=all').length > 0 },
   artifacts: [], fixtures: [], error: null,
 };
 try {
+  const entry = rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
+  // Freeze the exact consumer bytes before installation; a later working-tree
+  // edit must not masquerade as the source commit captured above.
+  const fixtures = await Promise.all([
+    [entry, join(here, entry)],
+    ...(rtc ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
+    ...['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]),
+    ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
+  ].map(async ([name, path]) => {
+    const bytes = await readFile(path), sourcePath = relative(root, path).split(sep).join('/');
+    if (!report.source.dirty) assert.equal(hash(bytes), hash(execFileSync('git', ['show', `${report.source.commit}:${sourcePath}`], { cwd: root })), 'Fixture changed after source capture');
+    return { name, sourcePath, bytes };
+  }));
   if (process.env.PEER_GENERATION_HOST_EVIDENCE) {
     report.host = JSON.parse(await readFile(process.env.PEER_GENERATION_HOST_EVIDENCE, 'utf8'));
     assert.equal(rtc, true, 'The hosted qualification requires actual peer RTC');
   }
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-peer-generation-consumer', private: true, type: 'module' }));
   execFileSync('npm', ['install', ...(rtc ? [] : ['--offline', '--package-lock=false']), '--ignore-scripts', '--no-audit', '--no-fund',
-    artifact, ...(rtc ? ['werift@0.27.0'] : []), ...(browser ? ['playwright@1.65.0'] : [])], {
+    artifact, ...(rtc ? ['werift@0.27.0'] : [])], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
@@ -55,7 +66,7 @@ try {
   }
   assert.deepEqual(metadata.peerDependencies ?? {}, rtc ? { werift: '0.27.0' } : {}, 'The optional native RTC adapter pins its external dependency');
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(tree.dependencies).sort(), rtc ? ['@chronolog/peer-session', ...(browser ? ['playwright'] : []), 'werift'] : ['@chronolog/peer-session']);
+  assert.deepEqual(Object.keys(tree.dependencies).sort(), rtc ? ['@chronolog/peer-session', 'werift'] : ['@chronolog/peer-session']);
   if (rtc) {
     assert.equal(tree.dependencies.werift.version, '0.27.0');
     const lockBytes = await readFile(join(consumer, 'package-lock.json'));
@@ -79,40 +90,27 @@ try {
   report.artifacts.push({ name: metadata.name, version: metadata.version, sha256: hash(await readFile(artifact)),
     sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty });
   const imports = new Set();
-  const entry = browser ? 'peer-generation-browser-consumer.mjs' : rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
-  for (const [name, path] of [
-    [entry, join(here, entry)],
-    ...(browser ? ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs'].map(name => [name, join(here, name)]) : []),
-    ...(browser ? ['board.html', 'compact.html', 'style.css', 'app.mjs'].map(name => [name, join(here, 'peer-ui', name)]) : []),
-    ...(browser ? [['typing.mjs', join(here, 'shared/typing.mjs')]] : []),
-    ...(rtc && !browser ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
-    ...(!browser ? ['peer-generation-scenario.mjs', 'peer-generation-fault.mjs'].map(name => [name, join(here, name)]) : []),
-    ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
-  ]) {
-    const bytes = await readFile(path);
-    report.fixtures.push({ path: relative(root, path).split(sep).join('/'), sha256: hash(bytes) });
+  for (const { name, sourcePath, bytes } of fixtures) {
+    report.fixtures.push({ path: sourcePath, sha256: hash(bytes) });
     for (const match of bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*)['"]([^'"]+)['"]/gu)) {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
-        ...(browser ? ['@chronolog/peer-session/browser', '@chronolog/peer-session/webrtc', 'playwright'] : []),
-        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs',
-        './peer-generation-fault.mjs', './deployment/bootstrap.mjs', './typing.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs', './peer-generation-fault.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
-    await copyFile(path, join(consumer, name));
+    await writeFile(join(consumer, name), bytes, { flag: 'wx' });
   }
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0, residentRequired: false };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   const result = spawnSync(process.execPath, [join(consumer, entry), reportPath], {
     cwd: consumer, stdio: 'inherit', timeout: rtc ? 300_000 : 180_000,
-    env: { ...process.env, ...(values.browser ? { PEER_BROWSER_EXECUTABLE: resolve(values.browser) } : {}) },
   });
   if (result.error) throw result.error;
   if (result.signal) throw Error(`Consumer terminated with ${result.signal}`);
   if (result.status !== 0) throw Error(`Consumer failed with exit code ${result.status}`);
   const raw = await readFile(reportPath);
-  const summary = (browser ? validatePeerBrowserReport : validatePeerGenerationReport)(JSON.parse(raw));
+  const summary = validatePeerGenerationReport(JSON.parse(raw));
   summary.reportSha256 = hash(raw);
   await writeFile(join(output, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`, { flag: 'wx' });
   console.log(`Independent peer-generation consumer passed. Evidence: ${reportPath}`);

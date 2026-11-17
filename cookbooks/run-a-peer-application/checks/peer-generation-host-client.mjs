@@ -36,10 +36,10 @@ export function createHostedFixture(base) {
       const types = [], closed = [false, false];
       let sentMessages = 0, sentBytes = 0;
       const endpoint = index => ({
-        async *messages() {
+        messages: { async *[Symbol.asyncIterator]() {
           const value = await request(`/rendezvous/${opened.id}/${index}/next`);
           if (value !== null) yield value;
-        },
+        } },
         async send(description) {
           assert.equal(closed[index], false);
           types.push(description.type); sentMessages++;
