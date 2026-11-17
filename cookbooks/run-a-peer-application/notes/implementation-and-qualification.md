@@ -60,11 +60,7 @@ order, missing bodies, restrictive controls, protected floors and three-generati
 ancestry. An excluded suffix cannot become eligible merely because its signatures
 remain valid. Browser, native and hosted consumers use the shared verifier.
 
-**G1 — Host independence.** Establish connections, then block every Tendriller
-endpoint during ordinary commands, coherent reads, live signals and replication.
-Require zero command-correlated hosted requests and application-body bytes,
-usable local status, no certificate/append dependency and no backend fallback.
-Measure TURN separately when configured.
+**G1 — Thin hosted participation.** Establish direct connections, then block every Tendriller endpoint during ordinary commands, coherent reads, live signals and replication. Require zero command-correlated hosted requests and application-body bytes, usable local status and no hosted append dependency. Repeat the workload through the WebSocket relay while blocking only control HTTP; measure positive relay ingress/egress and test relay loss separately. Both transports use the same encrypted peer channel and application journal. Relayed availability includes the relay service.
 
 **G2 — Accepted-loss recovery.** Remove coordinator A and its newest store; let
 B select an older complete prefix; reconstruct fresh C; return A and quarantine
@@ -82,7 +78,7 @@ capabilities. Record extra protocol code, coaching, time to useful work and
 recovery mistakes; repeated application-owned infrastructure belongs in core.
 
 **G4 — Deployed operation and cost.** Actual authentication, deployed controls,
-home/mobile/restrictive networks, TURN, suspension, restart, quota pressure,
+home/mobile/restrictive networks, deployed WSS fallback, suspension, restart, quota pressure,
 large content, recovery freshness and provider/device cost require actual
 observations. The [deployment handoff](deployment-qualification-handoff.md)
 names those settings. Local workerd, loopback RTC and build-only evidence cannot

@@ -65,7 +65,7 @@ The direct run uses an in-process implementation of the public framed transport
 interface. The RTC run uses the public raw native connection composition and
 real ICE/DTLS/SCTP. Its explicit
 loopback candidate and one-off in-process SDP mailbox do not qualify network
-interface discovery, Internet reachability, TURN or deployed discovery. Both
+interface discovery, Internet reachability, deployed WSS fallback or deployed discovery. Both
 record their exact measurement boundary rather than calling a loopback result a
 deployment test.
 

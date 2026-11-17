@@ -4,7 +4,7 @@ import { inject, test } from 'vitest';
 import { createPeerRendezvous, createPeerInvitationListener } from '@tendriller/core/peers';
 import { createTestPage, initializeTestService } from '@tendriller/engine/testing';
 
-test('public host controls and rendezvous serve independent native application peers', async () => {
+test('public host participant and peer transports serve independent application peers', async () => {
   await initializeTestService(inject('d1Migrations'));
   const bridge = inject('bridge');
   const sessions = new Map(), introduced = new Map(), relays = new Map(), running = new Set();

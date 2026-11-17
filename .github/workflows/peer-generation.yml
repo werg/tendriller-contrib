@@ -24,12 +24,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '5581a475946c363c47211194016c72f21ecb45c4'
+        default: '3d31e101627ec58b9bf98552c05bdedbd45abbd1'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: 'ed2509358c01a2a1a7c9db7691f4775347bb27c0'
+        default: '50810422bfa1003ae5690eda32c8e71ecaf31e72'
 permissions:
   contents: read
 concurrency:
@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        transport: [direct, native-rtc, browser-native, native-sql, hosted]
+        transport: [direct, native-rtc, browser-native, native-sql, hosted, relay, browser-relay]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || '5581a475946c363c47211194016c72f21ecb45c4' }}
+          ref: ${{ inputs.chronolog_ref || '3d31e101627ec58b9bf98552c05bdedbd45abbd1' }}
           path: .chronolog-build
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
@@ -63,17 +63,17 @@ jobs:
         working-directory: .chronolog-build
         run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native' || matrix.transport == 'hosted') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
       - uses: actions/checkout@v4
-        if: ${{ matrix.transport == 'hosted' }}
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         with:
           repository: werg/tendriller
-          ref: ${{ inputs.tendriller_ref || 'ed2509358c01a2a1a7c9db7691f4775347bb27c0' }}
+          ref: ${{ inputs.tendriller_ref || '50810422bfa1003ae5690eda32c8e71ecaf31e72' }}
           path: .tendriller-build
       - name: Build the actual public hosted participant
-        if: ${{ matrix.transport == 'hosted' }}
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         working-directory: .tendriller-build
         run: npm ci && npm run build
       - name: Install pinned Chromium and browser system dependencies
-        if: ${{ matrix.transport == 'browser-native' }}
+        if: ${{ matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
         run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
       - name: Exercise independent application through the packed public API
         shell: bash
@@ -84,6 +84,10 @@ jobs:
             node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs --artifact "${archives[0]}" --output test-results/peer-generation
           elif [ "${{ matrix.transport }}" = hosted ]; then
             node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --transport websocket --output test-results/peer-generation
+          elif [ "${{ matrix.transport }}" = browser-relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs --artifact "${archives[0]}" --artifacts .tendriller-build/dist --transport websocket --browser --output test-results/peer-generation
           elif [ "${{ matrix.transport }}" = native-sql ]; then
             node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs --artifact "${archives[0]}" --domain tasks --output test-results/peer-generation
           else
@@ -100,9 +104,12 @@ jobs:
             test-results/peer-generation/peers/report.json
             test-results/peer-generation/peers/summary.json
             test-results/peer-generation/peers/consumer/package-lock.json
+            test-results/peer-generation/peers/*.png
+            test-results/peer-generation/peers/assets/*
             test-results/peer-generation/host-artifacts.json
             test-results/peer-generation/host/package-lock.json
             .tendriller-build/dist/provenance.json
+            .tendriller-build/dist/*.tgz
             .chronolog-build/artifacts/peer-session/*.tgz
             .chronolog-build/artifacts/peer-session/package/provenance.json
 

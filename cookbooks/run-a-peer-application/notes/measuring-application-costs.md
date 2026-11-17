@@ -109,7 +109,7 @@ request elapsed time or sampled process CPU is not a billed duration export.
 ### Keep providers and physical copies visible
 
 Account for every hop from browser to native agent, including a public tunnel,
-Cloudflare relay, TURN server or hosting proxy. Record encoded payload bytes and
+WebSocket relay or hosting proxy. Record encoded payload bytes and
 provider-metered egress separately. A direct application session through a
 provider tunnel still uses that provider. Take direct/relayed topology and
 unsupported-network evidence from
@@ -119,8 +119,7 @@ Measure native CPU, disk, network and browser memory/replay over the same window
 Record the sampling method and distinguish a process peak from a per-role peak.
 The current native RTC gates report logical authenticated peer frame
 payload bytes, excluding RTC packet headers and credit messages as well as
-IP/UDP/DTLS/SCTP overhead. The packaged-host application gate counts SDP JSON
-envelopes separately. Preserve those exact boundaries when comparing results;
+IP/UDP/DTLS/SCTP overhead. The packaged direct-host gate counts SDP JSON envelopes separately. The WebSocket gates also count actual Worker relay ingress/egress payload bytes, including relay control messages and encrypted peer frames. These exclude WebSocket framing and IP/TCP/TLS overhead; the test bridge itself is a declared harness hop. Relay-host bytes must never be reported as the direct path's zero required host bytes. Preserve those exact boundaries when comparing results;
 they are not total network bytes or a provider egress meter.
 Record stored data at several timestamps so retained-byte usage has a time
 integral; keep the original samples and the integration rule. Record history
