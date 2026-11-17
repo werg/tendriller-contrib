@@ -23,7 +23,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: cookbook-pilots-${{ github.head_ref || github.ref_name }}-${{ inputs.core_ref || 'pinned' }}
+  group: cookbook-pilots-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.core_ref || 'pinned' }}
   cancel-in-progress: true
 jobs:
   pilots:
