@@ -17,8 +17,8 @@ const connectSessions = async (a, b) => {
     iceUseIpv4: false, iceUseIpv6: false, iceUseTcp: false };
   const started = performance.now();
   const endpoints = await Promise.allSettled([
-    connectNativeApplicationWebRtc(a, { role: 'offerer', signaling: introduction.a, peerIdentity: b.deviceId, native }),
-    connectNativeApplicationWebRtc(b, { role: 'answerer', signaling: introduction.b, peerIdentity: a.deviceId, native }),
+    connectNativeApplicationWebRtc(a, { role: introduction.roles[0], signaling: introduction.a, peerIdentity: b.deviceId, native }),
+    connectNativeApplicationWebRtc(b, { role: introduction.roles[1], signaling: introduction.b, peerIdentity: a.deviceId, native }),
   ]);
   if (endpoints.some(value => value.status === 'rejected')) {
     await Promise.allSettled(endpoints.filter(value => value.status === 'fulfilled').map(value => value.value.close()));
@@ -75,7 +75,7 @@ function signalingPair() {
     },
     close() { lanes[index].close(); },
   });
-  return { a: endpoint(0), b: endpoint(1), types,
+  return { a: endpoint(0), b: endpoint(1), roles: ['offerer', 'answerer'], types,
     closed: () => lanes.every(lane => lane.closed),
     snapshot: () => ({ sentMessages, sentBytes, closed: lanes.every(lane => lane.closed) }) };
 }

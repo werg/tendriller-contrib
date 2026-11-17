@@ -75,3 +75,29 @@ test('bootstrap, publication and control reads use one participant transport and
   t.mock.method(globalThis, 'fetch', async (_input, options) => options.signal.throwIfAborted());
   await assert.rejects(host.exchange(calls[2], { signal: cancellation.signal }), /qualification stopped/u);
 });
+
+test('rendezvous preserves host-assigned roles and endpoint identities when the second peer offers', async t => {
+  const sent = [], closed = [];
+  t.mock.method(globalThis, 'fetch', async (input, options) => {
+    const path = new URL(input).pathname;
+    if (path === '/rendezvous/open') {
+      assert.deepEqual(JSON.parse(options.body).peers, ['first-peer', 'second-peer']);
+      return Response.json({ id: '7', roles: ['answerer', 'offerer'] });
+    }
+    const [, endpoint, action] = /^\/rendezvous\/7\/(0|1)\/(send|close)$/u.exec(path);
+    if (action === 'send') sent.push({ endpoint: Number(endpoint), ...JSON.parse(options.body) });
+    else closed.push(Number(endpoint));
+    return Response.json({ ok: true });
+  });
+  const pair = await createHostedFixture('https://test.invalid', participantApi)
+    .signalingPair({ deviceId: 'first-peer' }, { deviceId: 'second-peer' });
+  assert.deepEqual(pair.roles, ['answerer', 'offerer']);
+  await pair.b.send({ type: 'offer', sdp: 'second peer offer' });
+  await pair.a.send({ type: 'answer', sdp: 'first peer answer' });
+  assert.deepEqual(sent, [{ endpoint: 1, type: 'offer', sdp: 'second peer offer' },
+    { endpoint: 0, type: 'answer', sdp: 'first peer answer' }]);
+  await Promise.all([pair.a.close(), pair.b.close()]);
+  assert.deepEqual(closed.sort(), [0, 1]);
+  assert.equal(pair.closed(), true);
+  assert.deepEqual(pair.types, ['offer', 'answer']);
+});
