@@ -15,8 +15,8 @@ const connectSessions = async (a, b) => {
     iceUseIpv4: false, iceUseIpv6: false, iceUseTcp: false };
   const started = performance.now();
   const endpoints = await Promise.allSettled([
-    connectNativeApplicationWebRtc(a, { role: 'offerer', signaling: introduction.a, expectedPeerId: b.deviceId, native }),
-    connectNativeApplicationWebRtc(b, { role: 'answerer', signaling: introduction.b, expectedPeerId: a.deviceId, native }),
+    connectNativeApplicationWebRtc(a, { role: 'offerer', signaling: introduction.a, peerIdentity: b.deviceId, native }),
+    connectNativeApplicationWebRtc(b, { role: 'answerer', signaling: introduction.b, peerIdentity: a.deviceId, native }),
   ]);
   if (endpoints.some(value => value.status === 'rejected')) {
     await Promise.allSettled(endpoints.filter(value => value.status === 'fulfilled').map(value => value.value.close()));

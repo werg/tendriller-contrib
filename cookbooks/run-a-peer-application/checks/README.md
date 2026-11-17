@@ -117,6 +117,11 @@ Both consume the selected public `tendril.application` backend. They do not
 implement a database, sign records, infer permission from a relay, enqueue a
 second command copy, or dispatch tools from a UI reducer.
 
+The [published compact proof and resident recovery qualification at `89aee742`](../notes/compact-membership-resident-qualification-2026-11-17.md)
+preserves native membership-cost and direct browser/native RTC results with exact
+source identities and validator hashes. Those historical reports retain their
+own protocol versions and do not qualify a later packaged-host pairing.
+
 ## Build a complete page graph
 
 Supply the exact browser-safe public application bundle built by the paired

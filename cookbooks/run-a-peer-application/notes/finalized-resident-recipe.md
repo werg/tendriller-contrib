@@ -32,10 +32,10 @@ a choice of owner, availability, and recovery contract; it is not a competition
 between UI frameworks.
 
 The [paired implementation work](implementation-and-qualification.md) maps
-the public boundaries and the remaining deployment qualifications. The linked qualification reports
-identify the portable foundation and artifacts exercised for this guide. A
-proposed scenario is not evidence that it passed; recorded checks name their
-actual artifacts and limits.
+the public boundaries and the remaining deployment qualifications. The linked
+reports identify the exact source and artifacts they exercised. A proposed
+scenario is not evidence that it passed; recorded checks name their actual
+artifacts and limits.
 
 The implementation places **portable membership administration on
 Cloudflare by default**, separately from native inclusion/finality, execution
@@ -222,14 +222,13 @@ identity; an older rejected edit is reviewed instead of silently upgraded.
 
 The operation API separates progress (`queued`, `provisional`, `final`) from
 the executed outcome (`accepted` or `rejected`). A terminal rejection is
-`{ status: 'final', outcome: 'rejected' }`. Native operation handles expose
-`local()` for the executed result at its current position and `final()` for its
-immutable result; both return accepted or rejected outcomes. Inspect
-`result.outcome.type` after awaiting `final()` before dependent work. A final
-rejection returns normally; the application handles it explicitly and preserves
-the reviewed draft. The browser adapter exposes the
-same decision through `operations.subscribe`. Submission resolving is not by
-itself permission to proceed.
+`{ status: 'final', outcome: 'rejected' }`. Chronolog client handles expose
+`local()` for the current executed result, which may change during replay,
+and `final()` for the immutable result. Both return accepted or rejected
+outcomes; inspect `result.outcome.type` after `final()` before dependent work,
+and handle a final rejection explicitly. The browser adapter exposes the same
+decision through `operations.subscribe`. Submission resolving is not by itself
+permission to proceed.
 
 Use authenticated `event.origin` when attributing a record or choosing which
 agent policy may handle it. Chronolog supplies the verified group, author,

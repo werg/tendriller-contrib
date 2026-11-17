@@ -58,7 +58,7 @@ globalThis.fixture = {
       send: description => request(`${base}/send`, description),
       close: () => request(`${base}/close`, {}),
     };
-    const link = await connectWorkerApplicationWebRtc(worker, { role, signaling, expectedPeerId: peerId, timeoutMs: 30_000 });
+    const link = await connectWorkerApplicationWebRtc(worker, { role, signaling, peerIdentity: peerId, timeoutMs: 30_000 });
     links.set(id, link);
     return { peerId: link.peerId, stats: link.stats, route: await link.rtc.getRoute(), signaling: link.rtc.signaling };
   },

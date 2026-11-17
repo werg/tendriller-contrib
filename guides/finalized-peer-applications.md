@@ -177,13 +177,13 @@ For application code, progress and outcome answer separate questions:
 | `final` | `rejected` | The original operation has a stable rejection; recovery is a newly reviewed action. |
 
 Submission returns the operation's current state. Subscribe to
-`application.operations` when the workflow needs its final outcome. Native
-Chronolog handles expose `local()` for the current executed result and `final()`
-for the immutable result. Both return accepted or rejected outcomes. Inspect
-`result.outcome.type` after awaiting `final()` before dependent work. A final
-rejection returns normally; waiting successfully does not mean the operation
-succeeded. Dependent work requires an accepted result from `final()`; handle its
-final rejection explicitly and preserve the reviewed draft.
+`application.operations` when the workflow needs its final outcome. Chronolog
+client handles expose `local()` for the current executed result, which may
+change during replay, and `final()` for the immutable result. Both return
+accepted or rejected outcomes; inspect `result.outcome.type` before dependent
+work. Awaiting either method does not imply acceptance.
+Dependent work requires an accepted result from `final()`; handle its final
+rejection explicitly and preserve the reviewed draft.
 A provisional success never releases dependent work or an irreversible effect.
 The public operation type reflects this directly: queued has no outcome, while
 provisional and final require one. An exact retry can immediately return its

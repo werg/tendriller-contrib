@@ -391,7 +391,7 @@ async function connect(session, browserRole) {
   const start = performance.now();
   const outcomes = await Promise.allSettled([
     connectNativeApplicationWebRtc(session, { native, role: browserRole === 'offerer' ? 'answerer' : 'offerer',
-      expectedPeerId: browserIdentity.deviceId, signaling: mailbox.native, timeoutMs: 30_000 }),
+      peerIdentity: browserIdentity.deviceId, signaling: mailbox.native, timeoutMs: 30_000 }),
     page.evaluate(options => fixture.connect(options), { id, role: browserRole, peerId: session.deviceId }),
   ]);
   if (outcomes.some(value => value.status === 'rejected')) {

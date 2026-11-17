@@ -10,7 +10,10 @@ export function createHostedFixture(base) {
       signal: AbortSignal.timeout(30_000),
     });
     const value = await response.json();
-    if (!response.ok) throw new Error(typeof value.error === 'string' ? value.error : JSON.stringify(value));
+    if (!response.ok) throw Object.assign(new Error(typeof value?.error?.message === 'string'
+      ? value.error.message : `Control host returned HTTP ${response.status} without a typed error`), {
+      code: typeof value?.error?.code === 'string' ? value.error.code : 'invalid_host_error', status: response.status,
+    });
     return value;
   };
   return {

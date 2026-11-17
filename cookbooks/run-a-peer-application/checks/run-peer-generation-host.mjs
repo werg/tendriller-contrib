@@ -132,7 +132,7 @@ async function createBridge() {
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
-      if (blocked) return json(res, 503, { error: 'CONTROL_HOST_UNAVAILABLE' });
+      if (blocked) return json(res, 503, { error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } });
       if (url.pathname.startsWith('/api/')) {
         const path = url.pathname.slice(5);
         assert.ok(['peers/application', 'peers/generations', 'peers/definition'].includes(path), 'Only public compact control routes belong to this fixture');
@@ -143,7 +143,7 @@ async function createBridge() {
       const action = /^\/rendezvous\/(\d+)\/(0|1)\/(next|send|close)$/u.exec(url.pathname);
       assert.ok(action, 'Unknown bridge endpoint');
       return json(res, 200, await enqueue({ kind: `rendezvous.${action[3]}`, id: action[1], index: Number(action[2]), body }));
-    } catch (error) { json(res, 500, { error: error instanceof Error ? error.message : String(error) }); }
+    } catch (error) { json(res, 500, { error: { code: 'test_bridge_failed', message: error instanceof Error ? error.message : String(error) } }); }
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   return { url: `http://127.0.0.1:${server.address().port}`, ready,
