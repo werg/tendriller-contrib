@@ -22,7 +22,7 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '2e81d56f685881f0cb0d7ce118a2797dc4e2c70b'
+        default: 'fcbc04dbb206fc2262674a10de2cbfd670987e46'
 permissions:
   contents: read
 concurrency:
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || '2e81d56f685881f0cb0d7ce118a2797dc4e2c70b' }}
+          ref: ${{ inputs.chronolog_ref || 'fcbc04dbb206fc2262674a10de2cbfd670987e46' }}
           path: .chronolog-build
       - name: Install pinned build dependencies and the patched engine when SQL is selected
         working-directory: .chronolog-build
@@ -74,9 +74,69 @@ jobs:
         if: always()
         with:
           name: independent-peer-generation-${{ matrix.transport }}-evidence
+          include-hidden-files: true
           path: |
             test-results/peer-generation/report.json
             test-results/peer-generation/summary.json
             test-results/peer-generation/consumer/package-lock.json
             .chronolog-build/artifacts/peer-session/*.tgz
             .chronolog-build/artifacts/peer-session/package/provenance.json
+  hosted-native-rtc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.12.4'
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/chronolog-db
+          ref: ${{ inputs.chronolog_ref || 'fcbc04dbb206fc2262674a10de2cbfd670987e46' }}
+          path: .chronolog-build
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/tendriller
+          ref: 8adaf7bd0a4d63c0ca7490ad169a3c0ffb83c1d2
+          path: .core-build
+          persist-credentials: false
+      - name: Install the pinned public session build dependencies
+        working-directory: .chronolog-build
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build the clean native RTC session archive
+        working-directory: .chronolog-build
+        run: node tools/package-peer-session.mjs --native-rtc --output artifacts/peer-session
+      - name: Build the clean public host SDK and engine archives
+        working-directory: .core-build
+        run: npm ci && npm run build
+      - name: Qualify hosted participants and signed page publications with native RTC peers
+        shell: bash
+        run: |
+          archives=(.chronolog-build/artifacts/peer-session/chronolog-peer-session-*.tgz)
+          test "${#archives[@]}" -eq 1
+          node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs \
+            --artifact "${archives[0]}" --artifacts .core-build/dist \
+            --output test-results/peer-generation-host
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-peer-generation-hosted-native-rtc-evidence
+          if-no-files-found: warn
+          include-hidden-files: true
+          path: |
+            test-results/peer-generation-host/peers/report.json
+            test-results/peer-generation-host/peers/summary.json
+            test-results/peer-generation-host/host-artifacts.json
+            test-results/peer-generation-host/host/package-lock.json
+            test-results/peer-generation-host/peers/consumer/package-lock.json
+            .chronolog-build/artifacts/peer-session/*.tgz
+            .chronolog-build/artifacts/peer-session/package/provenance.json
+            .chronolog-build/pnpm-lock.yaml
+            .core-build/dist/tendriller-sdk-*.tgz
+            .core-build/dist/tendriller-engine-*.tgz
+            .core-build/dist/provenance.json
+            .core-build/package-lock.json

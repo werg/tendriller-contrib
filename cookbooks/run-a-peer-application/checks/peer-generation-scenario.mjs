@@ -55,7 +55,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     await assert.rejects(openNativeDevice({ path: database('missing') }), /APPLICATION_DEVICE_NOT_FOUND/);
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
     const applicationId = randomBytes(32).toString('hex');
-    const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+    const execution = await executionManifestArtifacts(await eventExecutionManifest());
     const definition = describeApplication(conversation);
     host = await createControl({ applicationId, hostDevice,
       configuration: {

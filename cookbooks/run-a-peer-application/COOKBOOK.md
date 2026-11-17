@@ -55,8 +55,10 @@ older immutable-prefix evidence and the original scope of its reports.
 An agent can use any path. Its presence does not require a durable transaction
 for every preview or a fixed native authority for ordinary collaboration.
 Use the same application session and backend for every participant. Unavailable peers
-never select a second command API or journal. Stronger guarantees are explicit
-capabilities on the same session contract.
+never select a second command API or journal. The generation session exposes
+applied outcomes and retained coverage. Chronolog core's separate
+`chronolog-finality-v1` profile provides irreversible outcomes under its own
+explicit contract; it is not a fallback or an extra wait on this session.
 
 The [owned Worker page recipe](notes/peer-session-pages.md) provides two layouts
 using domain commands, coherent queries and explicit recovery notices. Its build

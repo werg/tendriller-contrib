@@ -133,9 +133,10 @@ observations above. Their synthetic tests prove only that missing or
 contradictory evidence is rejected, not that the runtime scenarios passed.
 
 Current consumers use `applied()` for execution and `shared()` for retained
-coverage. Neither is irreversible finality. A protected action is an explicit
-capability of the same session contract and must qualify its stronger boundary.
-It is not an invitation to start a second resident application stack.
+coverage. Neither is irreversible finality. A stronger guarantee requires an
+explicitly supported profile or capability and evidence for that boundary.
+Chronolog core's separate `chronolog-finality-v1` profile is outside these
+generation-session runners; ordinary commands never switch to it automatically.
 
 Real deployment qualification still needs actual enrollment and controls,
 home/mobile/restrictive networks, TURN, suspension, quota pressure, large content,

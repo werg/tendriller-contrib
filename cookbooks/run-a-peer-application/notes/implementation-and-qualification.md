@@ -1,11 +1,12 @@
 # Common-session implementation and qualification
 
-This checklist follows the peer-first implementation plan across Chronolog,
-Tendriller and contrib. There is one application/session API, attempt journal,
-verified execution order and replication model. Native, browser and hosted
-participants supply different storage, transport and capability policies.
-Stronger guarantees are explicit capabilities of that composition, not separate
-application stacks or implicit fallbacks.
+This checklist follows the peer-generation implementation plan across Chronolog,
+Tendriller and contrib. Its consumers share one application/session API, attempt
+journal, verified execution order and replication model. Native, browser and
+hosted participants supply different storage, transport and capability policies.
+The separate `chronolog-finality-v1` profile remains supported in Chronolog core,
+outside these cookbook runners. It is not an implicit fallback or a completion
+mode of the generation session.
 
 All software is prerelease. Replace abstractions directly and update every
 consumer. No compatibility alias, old/new mirror, migration layer or permanent

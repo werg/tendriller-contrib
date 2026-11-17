@@ -332,7 +332,7 @@ async function bootstrap(identity) {
   if (browserIdentity) { assert.deepEqual(identity, browserIdentity); return { authority: await registry.read() }; }
   assert.match(identity.deviceId, /^[a-f0-9]{64}$/u); assert.match(identity.storageId, /^[a-f0-9-]{36}$/u);
   browserIdentity = identity;
-  const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+  const execution = await executionManifestArtifacts(await eventExecutionManifest());
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'browser-peer-conversation',
     executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
     definitionDigest: await applicationDefinitionDigest(conversation), schemaAdministrator: controlDevice.identity.publicKey, schemaDigest: null,

@@ -145,10 +145,12 @@ Applications attach a transport with `session.connectPeer(...)`; the same owned
 session carries commands, replication, content and live signals according to the
 participant's verified permissions. A control host has a separate transport
 policy and does not receive live typing or progress frames.
-Expired frames and valid signed frames denied by current writer/topic policy
-are dropped without closing a still-authorized reader's durable peer connection.
-Reader admission is checked separately; invalid signatures, malformed frames
-and physical failures still end the owning session.
+Generation-session signals require a current reader grant; command authorship
+separately requires writer permission. Standalone channels can enforce additional
+topic restrictions through their authorization callback. Expired frames and
+valid signed frames denied by signal authorization are dropped. Reader admission
+is checked separately; invalid signatures, malformed frames and physical failures
+still end the owning session.
 
 The [executable standalone composition](checks/README.md) creates two public
 channels from an explicitly supplied `@chronolog/signals` build. It combines

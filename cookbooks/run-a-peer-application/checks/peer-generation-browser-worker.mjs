@@ -1,6 +1,7 @@
 // Only fixture provisioning crosses HTTP. The maintained session owns every
 // application command, signer, operation journal, read view, and RTC channel.
 import { openBrowserApplication, openBrowserDevice, serveApplicationWorker } from '@chronolog/peer-session/browser';
+import { installApplicationWorkerTransport } from '@chronolog/peer-session/webrtc';
 import { conversation } from './peer-generation-definition.mjs';
 
 const parameters = new URL(self.location.href).searchParams;
@@ -12,6 +13,7 @@ try {
   // A fresh granted browser receives no plaintext epoch key from the page or
   // fixture host. Its maintained peer connection enrolls wrapped keys from A.
   const session = await openBrowserApplication({ device, authority: bootstrap.authority, definition: conversation });
+  installApplicationWorkerTransport(session, self);
   serveApplicationWorker(session, self, { host: {
     application: () => request('/control/application'),
     selectGeneration: requestValue => request('/control/generations', requestValue),
