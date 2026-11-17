@@ -52,9 +52,20 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
     return { ready, messages, invitations: messages,
       send: description => call('send', { description }, { signal }), close };
   };
+  const relay = (channel, peerId, remotePeerId, createPeerRelay, signal) => {
+    const endpoint = lane => {
+      const url = new URL('/relay', base); url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+      url.search = new URLSearchParams({ channel, peerId, remotePeerId, lane });
+      return new WebSocket(url, 'tendriller.relay.v1');
+    };
+    return createPeerRelay({ reliable: endpoint('reliable'), live: endpoint('live') }, { peerId, remotePeerId, signal });
+  };
   return {
+    relay,
+    relayTraffic: () => request('/testing/relay-traffic'),
+    cutRelays: () => request('/testing/relay-cut', { method: 'POST', body: {} }),
     async drainIntroductions() { await Promise.all([...closing]); },
-    createParticipationPorts(session, openConnection, createPeerIntroductions) {
+    createParticipationPorts(session, { openConnection, openRelayConnection, createPeerIntroductions, createPeerRelay }) {
       const participant = createParticipantTransport({ applicationId: session.applicationId,
         exchange: (body, { signal } = {}) => request('/api/peers/participant', { method: 'POST', body, signal }) });
       const peers = {
@@ -64,8 +75,9 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
         invite: (peerId, invitation, options) => participant.request('ephemeral', 'invite', { peerId, ...invitation }, options),
         rendezvous: (channel, peerId, { signal }) => socket('rendezvous', { channel, peerId }, signal),
         listenInvitations: (peerId, { signal }) => socket('invitations', { peerId }, signal),
+        ...(createPeerRelay ? { relay: (channel, peerId, { remotePeerId, signal }) => relay(channel, peerId, remotePeerId, createPeerRelay, signal) } : {}),
       };
-      return createPeerIntroductions({ peers, identity: session.deviceId, openConnection });
+      return createPeerIntroductions({ peers, identity: session.deviceId, openConnection, ...(openRelayConnection ? { openRelayConnection } : {}) });
     },
     async createControl({ applicationId, configuration }) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });

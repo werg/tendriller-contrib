@@ -10,7 +10,7 @@ import { validatePeerGenerationReport } from './peer-generation-report.mjs';
 import { validateBrowserPeerReport } from './peer-generation-browser-report.mjs';
 import { validatePeerTaskReport } from './peer-generation-task-report.mjs';
 
-const required = ['native-events', 'native-rtc', 'browser-worker', 'native-sql', 'hosted-participant'];
+const required = ['native-events', 'native-rtc', 'browser-worker', 'native-sql', 'hosted-participant', 'hosted-websocket-relay'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 const hex = (value, length, name) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${length}}$`, 'u'), name);
 
@@ -60,7 +60,8 @@ export function assemblePeerComposition(inputs) {
       sqlManifest = report.executionManifestDigest; sqlEngine = report.sqlEngine;
     } else {
       summary = validatePeerGenerationReport(report);
-      gate = report.hostOutage.boundary === 'tendriller-workerd-http' ? 'hosted-participant'
+      gate = topology === 'independent-native-websocket' ? 'hosted-websocket-relay'
+        : report.hostOutage.boundary === 'tendriller-workerd-http' ? 'hosted-participant'
         : topology === 'independent-native-rtc' ? 'native-rtc' : 'native-events';
     }
     assert.equal(gates.has(gate), false, `Duplicate composition gate: ${gate}`);
@@ -75,10 +76,11 @@ export function assemblePeerComposition(inputs) {
     } else {
       if (eventManifest !== undefined) assert.equal(report.executionManifestDigest, eventManifest, 'Event execution manifests differ across consumers');
       eventManifest = report.executionManifestDigest;
-      if (gate !== 'native-events') assert.equal(session.provenance.optionalNativeRtc, true, 'RTC gate requires the emitted native transport');
+      if (!['native-events', 'hosted-websocket-relay'].includes(gate)) assert.equal(session.provenance.optionalNativeRtc, true, 'RTC gate requires the emitted native transport');
     }
-    if (gate === 'hosted-participant') {
+    if (['hosted-participant', 'hosted-websocket-relay'].includes(gate)) {
       for (const artifact of report.host.artifacts) addPackage(artifact, 'werg/tendriller', false);
+      if (hostedProvenance !== undefined) assert.deepEqual(report.host.provenance, hostedProvenance, 'Hosted direct and relay gates use different engine contents');
       hostedProvenance = report.host.provenance;
       hex(hostedProvenance?.sha256, 64, 'Missing installed host provenance digest');
       assert.ok(Number.isSafeInteger(hostedProvenance.storageSchemaRevision) && hostedProvenance.storageSchemaRevision > 0,
@@ -103,7 +105,7 @@ export function assemblePeerComposition(inputs) {
     execution: { events: eventManifest, sql: sqlManifest, nativeEngine: sqlEngine },
     host: hostedProvenance, browser,
     gates: Object.fromEntries(required.map(name => [name, gates.get(name)])),
-    unqualified: ['Deployed authentication and controls, Internet/home/mobile/restrictive networks and TURN.',
+    unqualified: ['Deployed authentication and controls, Internet/home/mobile/restrictive networks and deployed WSS relay fallback.',
       'Sustained suspension, quota pressure, eviction, device/provider cost and a production recovery envelope.',
       'Browser SQL/WASM equivalence and optional archive, protected effects or stronger settlement.',
       'An unassisted fresh-agent usability study for these exact artifacts; scripted consumers do not supply one.'] };
@@ -111,7 +113,7 @@ export function assemblePeerComposition(inputs) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const { values } = parseArgs({ options: { report: { type: 'string', multiple: true }, output: { type: 'string' } } });
-  if (!values.report?.length || !values.output) throw Error('Usage: --report /exact/report.json (repeat for all five gates) --output /new/composition.json');
+  if (!values.report?.length || !values.output) throw Error('Usage: --report /exact/report.json (repeat for all six gates) --output /new/composition.json');
   const inputs = await Promise.all(values.report.map(async path => ({ path, bytes: await readFile(resolve(path)) })));
   const manifest = assemblePeerComposition(inputs);
   await writeFile(resolve(values.output), `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });

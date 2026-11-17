@@ -7,13 +7,35 @@ import { createTestPage, initializeTestService } from '@tendriller/engine/testin
 test('public host controls and rendezvous serve independent native application peers', async () => {
   await initializeTestService(inject('d1Migrations'));
   const bridge = inject('bridge');
-  const sessions = new Map(), introduced = new Map(), running = new Set();
+  const sessions = new Map(), introduced = new Map(), relays = new Map(), running = new Set();
+  const privateMarkers = ['A continues without host access', 'B continues through its coordinating peer', 'private-live-signal-marker', 'private-content-marker'];
   let page, nextSession = 0, stopping = false;
   const send = async (path, value) => {
     const response = await fetch(`${bridge}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value) });
     assert.equal(response.status, 200, 'Test bridge delivery failed');
   };
   const handle = async job => {
+    if (job.kind.startsWith('relay.')) {
+      const action = job.kind.slice(6);
+      if (action === 'open') {
+        assert.ok(page);
+        assert.ok(['reliable', 'live'].includes(job.lane));
+        const socket = page.relaySocket(job.channel, job.peerId, job.remotePeerId, job.lane);
+        const endpoint = relayMailbox(socket, privateMarkers, job.lane);
+        const id = `${++nextSession}`; relays.set(id, endpoint); return { id };
+      }
+      if (action === 'traffic') return { boundary: 'actual-workerd-websocket-relay',
+        sockets: [...relays.values()].map(endpoint => endpoint.inspect()), host: page.hostTraffic };
+      if (action === 'cut') {
+        for (const endpoint of relays.values()) endpoint.close();
+        return { disconnected: true };
+      }
+      const endpoint = relays.get(job.id); assert.ok(endpoint, 'Unknown fixture relay socket');
+      if (action === 'next') return endpoint.next();
+      if (action === 'send') { endpoint.send(job.frame); return { sent: true }; }
+      if (action === 'close') { endpoint.close(); return { closed: true }; }
+      throw Error(`Unknown relay action ${action}`);
+    }
     if (job.kind.startsWith('introductions.')) {
       const [, kind, action] = job.kind.split('.');
       if (action === 'open') {
@@ -51,7 +73,7 @@ test('public host controls and rendezvous serve independent native application p
         assert.ok(page); await page.restart(); return { restarted: true };
       case 'traffic':
         assert.ok(page);
-        return { host: page.hostTraffic, rendezvous: [...sessions.values()].flatMap(pair => pair.map(value => value.session.stats))
+        return { host: Object.fromEntries(Object.entries(page.hostTraffic).filter(([key]) => !key.startsWith('relay'))), rendezvous: [...sessions.values()].flatMap(pair => pair.map(value => value.session.stats))
           .concat([...introduced.values()].filter(value => value.kind === 'rendezvous').map(value => value.session.stats)),
           invitations: [...introduced.values()].filter(value => value.kind === 'invitations').map(value => value.session.stats) };
       case 'rendezvous.open': {
@@ -77,6 +99,7 @@ test('public host controls and rendezvous serve independent native application p
         stopping = true;
         for (const pair of sessions.values()) for (const endpoint of pair) assert.equal(endpoint.session.stats.closed, true);
         for (const endpoint of introduced.values()) assert.equal(endpoint.session.stats.closed, true);
+        for (const endpoint of relays.values()) assert.equal(endpoint.inspect().closed, true);
         return { stopped: true, host: page?.hostTraffic };
       default: throw Error(`Unknown test bridge operation ${job.kind}`);
     }
@@ -106,3 +129,45 @@ test('public host controls and rendezvous serve independent native application p
     await Promise.allSettled(running);
   }
 }, 360_000);
+
+
+// Test delivery only: preserve each actual Worker WebSocket message as bytes.
+// The fixture bounds its own queue and scans declared private markers without
+// decoding the encrypted peer protocol or supplying authentication behavior.
+function relayMailbox(socket, markers, lane) {
+  const queue = []; let reader, queuedBytes = 0, closed = false;
+  const stats = { lane, sentBytes: 0, receivedBytes: 0, sentBinaryFrames: 0, receivedBinaryFrames: 0,
+    maxQueuedBytes: 0, plaintextMatches: [] };
+  const observe = bytes => {
+    for (const marker of markers) if (Buffer.from(bytes).includes(Buffer.from(marker)) && !stats.plaintextMatches.includes(marker)) stats.plaintextMatches.push(marker);
+  };
+  const push = event => {
+    if (closed && event.type !== 'close') return;
+    const size = event.data?.length ?? 0;
+    if (reader) { const deliver = reader; reader = undefined; deliver(event); return; }
+    assert.ok(queue.length < 64 && queuedBytes + size <= 2_200_000, 'The relay test mailbox is bounded');
+    queue.push({ event, size }); queuedBytes += size; stats.maxQueuedBytes = Math.max(stats.maxQueuedBytes, queuedBytes);
+  };
+  socket.addEventListener('message', event => {
+    const binary = typeof event.data !== 'string', bytes = binary ? Buffer.from(event.data) : Buffer.from(event.data, 'utf8');
+    stats.receivedBytes += bytes.length; if (binary) { stats.receivedBinaryFrames++; observe(bytes); }
+    push({ type: 'message', binary, data: binary ? bytes.toString('base64') : event.data });
+  });
+  socket.addEventListener('close', () => { if (closed) return; closed = true; push({ type: 'close' }); });
+  socket.addEventListener('error', () => push({ type: 'error', message: 'WORKER_RELAY_SOCKET_FAILED' }));
+  return {
+    inspect: () => ({ ...stats, plaintextMatches: [...stats.plaintextMatches], closed: closed || socket.readyState === 3 }),
+    next() {
+      if (queue.length) { const { event, size } = queue.shift(); queuedBytes -= size; return Promise.resolve(event); }
+      if (closed) return Promise.resolve({ type: 'close' });
+      assert.equal(reader, undefined, 'One fixture reader owns each raw socket');
+      return new Promise(resolve => { reader = resolve; });
+    },
+    send(frame) {
+      const bytes = frame.binary ? Buffer.from(frame.data, 'base64') : Buffer.from(frame.data, 'utf8');
+      stats.sentBytes += bytes.length; if (frame.binary) { stats.sentBinaryFrames++; observe(bytes); }
+      socket.send(frame.binary ? bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) : frame.data);
+    },
+    close() { socket.close(1000, 'Fixture owner closed'); },
+  };
+}

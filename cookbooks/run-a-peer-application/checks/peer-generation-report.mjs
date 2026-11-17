@@ -22,8 +22,8 @@ export function validatePeerGenerationReport(report) {
   same(report.mode, 'runtime', 'A build cannot qualify runtime behavior');
   same(report.profile, 'peer-generation-v1', 'Report the signed protocol version that was exercised');
   hex(report.executionManifestDigest, 64, 'Missing exact execution manifest');
-  assert.ok(['independent-packed-peers', 'independent-native-rtc'].includes(report.topology), 'Report the actual execution topology');
-  const rtc = report.topology === 'independent-native-rtc';
+  assert.ok(['independent-packed-peers', 'independent-native-rtc', 'independent-native-websocket'].includes(report.topology), 'Report the actual execution topology');
+  const rtc = report.topology === 'independent-native-rtc', relay = report.topology === 'independent-native-websocket';
   same(report.passed, true, 'The consumer did not pass');
   nonempty(report.runtime?.node, 'Missing actual Node version');
   nonempty(report.runtime?.platform, 'Missing actual platform');
@@ -42,6 +42,7 @@ export function validatePeerGenerationReport(report) {
   }
   same(report.publicBoundary?.imports, ['@chronolog/peer-session', '@chronolog/peer-session/native',
     ...(rtc ? ['@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native'] : []),
+    ...(relay ? ['@chronolog/peer-session/websocket'] : []),
     ...(report.hostOutage?.boundary === 'tendriller-workerd-http' ? ['@tendriller/core/peers'] : [])], 'Use only the documented public session entry');
   same(report.publicBoundary?.siblingSourceImports, 0, 'A sibling source checkout is not an independent consumer');
   same(report.publicBoundary?.applicationRetryQueues, 0, 'The consumer must use the session journal');
@@ -70,7 +71,7 @@ export function validatePeerGenerationReport(report) {
   same(host.applicationBodyBytes.before, 0, 'Default commands must not upload application bodies');
   same(host.finalityCapability, false, 'Applied progress must not claim finality');
   if (hosted) {
-    same(rtc, true, 'A real hosted gate also requires real peer transport');
+    assert.ok(rtc || relay, 'A real hosted gate also requires real peer transport');
     same(report.host?.runtime, 'workerd', 'A mocked host cannot qualify HTTP controls');
     same(report.host.identity, 'synthetic authenticated test accounts', 'Identity scope must be explicit');
     same(report.host.participant?.protocol, 'chronolog-participant-v1', 'Host control must use the shared participant protocol');
@@ -152,6 +153,46 @@ export function validatePeerGenerationReport(report) {
       transport?.after.reliable.receivedBytes > transport?.before.reliable.receivedBytes, 'Host outage must carry actual RTC application traffic');
     same(transport.before.signaling, transport.after.signaling, 'Application work changed introduction traffic');
     same(transport.after.signaling.closed, true, 'Host-independent commands require retired signaling');
+  }
+
+  if (relay) {
+    assert.ok(hosted, 'WebSocket fallback must exercise the actual hosted relay');
+    const network = report.relay;
+    same(network?.implementation, 'native-websocket', 'Exercise the real native WebSocket client');
+    same(network.hostRuntime, 'workerd', 'Exercise the actual Worker relay');
+    same(network.networkBoundary, 'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket', 'State the measured physical boundary');
+    same(network.forcedDirectFailure, true, 'Force direct failure to exercise fallback');
+    same(network.independentLanes, ['reliable', 'live'], 'Disposable traffic needs an independent socket');
+    same(network.security, 'shared-authenticated-peer-channel', 'Both transports must use common peer security');
+    same(network.controlOutageScope, 'control-http-only', 'Relay operation cannot claim a complete host outage');
+    assert.ok(network.connections?.length >= 4, 'Exercise original, reopened, fresh and returning connections');
+    for (const link of network.connections) {
+      same(link.route, 'websocket-relay'); same(link.authenticated, true); same(link.closed, true);
+      same(link.directAttempts, 2, 'Each endpoint must attempt direct delivery');
+      assert.ok(link.peers.length === 2 && link.peers[0] !== link.peers[1]);
+      for (const peer of link.peers) hex(peer, 64, 'Missing authenticated relay peer');
+      assert.ok(link.reliable.sentBytes > 0 && link.reliable.receivedBytes > 0, 'The relay carried no application frames');
+    }
+    const reconnect = network.ownedReconnect;
+    same(reconnect?.owner, 'application-session');
+    for (const field of ['physicalLinksCut', 'reconnected', 'sameGeneration']) same(reconnect[field], true, `Missing relay reconnect observation: ${field}`);
+    hex(reconnect.identity, 64, 'Relay reconnection lost its device identity');
+    assert.ok(reconnect.afterConnections > reconnect.beforeConnections);
+    same(network.traffic?.boundary, 'actual-workerd-websocket-relay');
+    const sockets = network.traffic.sockets;
+    assert.ok(sockets?.length >= network.connections.length * 4);
+    for (const socket of sockets) {
+      assert.ok(['reliable', 'live'].includes(socket.lane)); same(socket.closed, true);
+      same(socket.plaintextMatches, [], 'A declared private payload reached the relay in cleartext');
+      for (const field of ['sentBytes', 'receivedBytes', 'sentBinaryFrames', 'receivedBinaryFrames', 'maxQueuedBytes']) count(socket[field], `Missing relay ${field}`);
+      assert.ok(socket.maxQueuedBytes <= 2_200_000);
+    }
+    for (const lane of ['reliable', 'live']) assert.ok(sockets.some(socket => socket.lane === lane && socket.sentBinaryFrames > 0 && socket.receivedBinaryFrames > 0), `No actual ${lane} frames crossed the relay`);
+    assert.ok(network.traffic.host.relayUpgrades >= 16 && network.traffic.host.relaySentBytes > 0 && network.traffic.host.relayReceivedBytes > 0, 'Relay cost must include observed host byte traffic');
+    assert.ok(host.content?.bytes > 0 && host.content.retainedByPeer === true, 'The relay must transfer retained content');
+    hex(host.content.sha256, 64, 'Missing transferred content digest');
+    const transport = host.transport;
+    assert.ok(transport.after.reliable.sentBytes > transport.before.reliable.sentBytes && transport.after.reliable.receivedBytes > transport.before.reliable.receivedBytes);
   }
 
   const retry = report.lostReply;
@@ -330,7 +371,7 @@ export function validatePeerGenerationReport(report) {
   if (hosted) {
     const traffic = delivery.traffic?.worker;
     assert.ok(traffic?.invitations?.length >= 2 && traffic.invitations.every(value => value.closed), 'Owned invitation listeners must be observed and released');
-    assert.ok(traffic.rendezvous?.length > report.rtc.connections.length * 2 && traffic.rendezvous.every(value => value.closed), 'The factory must introduce and retire actual additional rendezvous sockets');
+    assert.ok(traffic.rendezvous?.length > (rtc ? report.rtc : report.relay).connections.length * 2 && traffic.rendezvous.every(value => value.closed), 'The factory must introduce and retire actual additional rendezvous sockets');
   } else {
     same(delivery.pendingIntroductions, 0, 'Unclaimed fixture invitations retained a transport');
     assert.ok(delivery.connections?.length >= 2 && delivery.connections.every(value => value.closed), 'Owned transports must be released');
@@ -348,10 +389,11 @@ export function validatePeerGenerationReport(report) {
     projection: report.projection,
     inheritedRecovery: report.inheritedRecovery,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
+    ...(relay ? { relay: report.relay } : {}),
     ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,
     hostRequestsDuringCommands: host.requests.after - host.requests.before,
-    hostedApplicationBodyBytes: host.applicationBodyBytes.after,
+    hostedControlApplicationBodyBytes: host.applicationBodyBytes.after,
     recovery: {
       previousGeneration: recovery.previousGeneration,
       selectedGeneration: recovery.selectedGeneration,
@@ -362,11 +404,13 @@ export function validatePeerGenerationReport(report) {
     },
     reapplication: reapply,
     limitations: [
-      rtc ? `Actual native loopback RTC with ${hosted ? 'Tendriller workerd rendezvous' : 'in-process SDP introduction'}; this is not a deployed-network or browser qualification.`
+      relay ? 'Actual native WebSocket clients and workerd relay connected by a bounded loopback test bridge; this is not deployed WSS or Internet qualification.'
+        : rtc ? `Actual native loopback RTC with ${hosted ? 'Tendriller workerd rendezvous' : 'in-process SDP introduction'}; this is not a deployed-network or browser qualification.`
         : 'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
-      hosted ? 'Tendriller HTTP controls and rendezvous ran in workerd with synthetic authenticated accounts; deployed login was not exercised.'
+      hosted ? 'Tendriller HTTP controls and peer routing ran in workerd with synthetic authenticated accounts; deployed login was not exercised.'
         : 'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
-      rtc ? 'Explicit loopback candidates do not qualify network-interface discovery, Internet routes, provider cost or a universal loss bound.'
+      relay ? 'Control HTTP is blocked independently of the relay. Ciphertext transit consumes measured host bandwidth and depends on relay availability.'
+        : rtc ? 'Explicit loopback candidates do not qualify network-interface discovery, Internet routes, provider cost or a universal loss bound.'
         : 'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
     ],
   };
@@ -379,5 +423,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const summary = validatePeerGenerationReport(JSON.parse(raw));
   summary.reportSha256 = createHash('sha256').update(raw).digest('hex');
   writeFileSync(values.output, `${JSON.stringify(summary, null, 2)}\n`, { flag: 'wx' });
-  console.log(`Validated ${summary.commandsWithHostBlocked} peer-generation commands with no hosted application traffic.`);
+  console.log(`Validated ${summary.commandsWithHostBlocked} peer-generation commands with no application traffic on the control HTTP transport.`);
 }

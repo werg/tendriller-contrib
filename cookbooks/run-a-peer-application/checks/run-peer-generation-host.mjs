@@ -7,13 +7,16 @@ import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/pro
 import { createServer } from 'node:http';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
+  transport: { type: 'string', default: 'native-rtc' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
 if (!values.artifact || !values.artifacts || !values.output) throw Error('Usage: --artifact /exact/native-rtc-session.tgz --artifacts /exact/tendriller-dist --output /new/evidence');
+assert.ok(['native-rtc', 'websocket'].includes(values.transport), 'Choose native-rtc or websocket');
 const here = dirname(fileURLToPath(import.meta.url)), output = resolve(values.output), artifacts = resolve(values.artifacts);
 try { await stat(output); throw Error('Use a new evidence directory'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const hostDirectory = join(output, 'host');
@@ -43,7 +46,7 @@ for (const [name, path] of [['@tendriller/core', sdk], ['@tendriller/engine', en
 const write = (path, value) => writeFile(join(hostDirectory, path), typeof value === 'string' ? value : `${JSON.stringify(value, null, 2)}\n`);
 await write('package.json', { private: true, type: 'module', dependencies: {
   '@tendriller/core': `file:${sdk}`, '@tendriller/engine': `file:${engine}`,
-  '@cloudflare/vitest-plugin': '1.8.1', vitest: '4.1.12', typescript: '7.0.2',
+  '@cloudflare/vitest-plugin': '1.8.1', vitest: '4.1.12', typescript: '7.0.2', ws: '8.22.0',
 } });
 await copyFile(join(here, 'peer-generation-host.scenarios.mjs'), join(hostDirectory, 'host.test.mjs'));
 await write('entry.mjs', "export { default, Tendril, Admission } from '@tendriller/engine';\n");
@@ -84,7 +87,9 @@ assert.ok(hostEvidence.dependencies.packages.every(value => value.integrity));
 const hostEvidencePath = join(output, 'host-artifacts.json');
 await writeFile(hostEvidencePath, `${JSON.stringify(hostEvidence, null, 2)}\n`);
 
-const bridge = await createBridge();
+const require = createRequire(join(hostDirectory, 'package.json'));
+const { WebSocketServer } = require('ws');
+const bridge = await createBridge(WebSocketServer);
 await write('vitest.config.mjs', `import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin';
 import { defineConfig } from 'vitest/config';
 import { createRequire } from 'node:module';
@@ -97,12 +102,12 @@ const worker = run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '
 try {
   await Promise.race([bridge.ready, worker.done.then(() => { throw Error('Workerd exited before becoming ready'); })]);
   const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
-    '--transport', 'native-rtc', '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
+    '--transport', values.transport, '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
   { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath, PEER_GENERATION_HOST_SDK: sdk });
   await peer.done;
   await bridge.stop();
   await worker.done;
-  console.log(`Independent workerd/native RTC qualification passed: ${join(output, 'peers/report.json')}`);
+  console.log(`Independent workerd/${values.transport} qualification passed: ${join(output, 'peers/report.json')}`);
 } finally {
   await bridge.close();
   worker.child.kill('SIGTERM');
@@ -120,8 +125,8 @@ function run(command, args, cwd, environment = {}) {
   return { child, done };
 }
 
-async function createBridge() {
-  const queue = [], pending = new Map();
+async function createBridge(WebSocketServer) {
+  const queue = [], pending = new Map(), relayTasks = new Set();
   let nextId = 0, blocked = false, requests = 0, requestBodyBytes = 0, reader, markReady;
   const ready = new Promise(resolve => { markReady = resolve; });
   const enqueue = job => new Promise((resolve, reject) => {
@@ -151,6 +156,8 @@ async function createBridge() {
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/asset') return json(res, 200, await enqueue({ kind: 'asset', path: url.searchParams.get('path') ?? '' }));
       if (url.pathname === '/testing/restart') return json(res, 200, await enqueue({ kind: 'restart' }));
+      if (url.pathname === '/testing/relay-traffic') return json(res, 200, await enqueue({ kind: 'relay.traffic' }));
+      if (url.pathname === '/testing/relay-cut') return json(res, 200, await enqueue({ kind: 'relay.cut' }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
       if (blocked) return json(res, 503, { error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } });
@@ -168,12 +175,59 @@ async function createBridge() {
       return json(res, 200, await enqueue({ kind: `rendezvous.${action[3]}`, id: action[1], index: Number(action[2]), body }));
     } catch (error) { json(res, 500, { error: { code: 'test_bridge_failed', message: error instanceof Error ? error.message : String(error) } }); }
   });
+  // Native and browser clients use actual WebSocket machinery on this loopback
+  // hop. The bounded fixture bridge delivers the unchanged protocol frames to
+  // actual authenticated workerd sockets; it does not parse application frames.
+  const sockets = new WebSocketServer({ noServer: true, maxPayload: 1_100_000, perMessageDeflate: false });
+  server.on('upgrade', (request, socket, head) => {
+    const url = new URL(request.url, 'http://localhost');
+    if (url.pathname !== '/relay') { socket.destroy(); return; }
+    sockets.handleUpgrade(request, socket, head, client => {
+      const task = relaySocket(client, url.searchParams).finally(() => relayTasks.delete(task));
+      relayTasks.add(task); void task.catch(() => client.terminate());
+    });
+  });
+  async function relaySocket(client, parameters) {
+    const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
+    const opened = enqueue({ kind: 'relay.open', ...fields });
+    let closed = false, pendingSends = 0, tail = Promise.resolve();
+    const close = async () => {
+      if (closed) return; closed = true;
+      const { id } = await opened;
+      await enqueue({ kind: 'relay.close', id });
+    };
+    client.on('error', () => { void close().catch(() => {}); });
+    client.on('close', () => { void close().catch(() => {}); });
+    client.on('message', (bytes, binary) => {
+      if (closed || ++pendingSends > 16) { client.terminate(); return; }
+      const frame = { binary, data: binary ? bytes.toString('base64') : bytes.toString('utf8') };
+      tail = tail.then(async () => {
+        const { id } = await opened;
+        if (!closed) await enqueue({ kind: 'relay.send', id, frame });
+      }).catch(() => client.terminate()).finally(() => { pendingSends--; });
+    });
+    const { id } = await opened;
+    try {
+      while (!closed) {
+        const event = await enqueue({ kind: 'relay.next', id });
+        if (event.type === 'close') {
+          if (client.readyState === 1) client.close(1000, 'Fixture relay closed');
+          break;
+        }
+        if (event.type === 'error') throw Error(event.message);
+        if (event.type !== 'message') continue;
+        assert.ok(client.bufferedAmount <= 1_100_000, 'Fixture relay egress exceeded its bound');
+        if (client.readyState !== 1) break;
+        client.send(event.binary ? Buffer.from(event.data, 'base64') : event.data, { binary: event.binary });
+      }
+    } finally { await close(); await tail; }
+  }
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   return { url: `http://127.0.0.1:${server.address().port}`, ready,
-    stop: () => enqueue({ kind: 'stop' }),
+    stop: async () => { await Promise.allSettled([...relayTasks]); return enqueue({ kind: 'stop' }); },
     async close() {
       for (const item of pending.values()) { clearTimeout(item.timer); item.reject(Error('TEST_BRIDGE_CLOSED')); }
-      pending.clear(); reader?.end(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
+      pending.clear(); reader?.end(); for (const socket of sockets.clients) socket.terminate(); sockets.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
     },
   };
 }

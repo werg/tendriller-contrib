@@ -1,4 +1,4 @@
-import { syntheticReport, syntheticRtcReport, syntheticHostedReport } from './peer-generation-report-fixtures.mjs';
+import { syntheticReport, syntheticRtcReport, syntheticHostedReport, syntheticRelayReport } from './peer-generation-report-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { validatePeerGenerationReport } from './peer-generation-report.mjs';
@@ -223,4 +223,25 @@ test('ancestor recovery requires a complete selected prefix, exact transition re
     ...['localRejected', 'hostRejected', 'journalUnchanged', 'incompleteViewRejected']
       .map(field => value => { value.inheritedRecovery.floor[field] = false; }),
   ]) rejects(mutate);
+});
+
+
+test('relay evidence preserves control scope, actual ciphertext traffic and owned reconnection', () => {
+  const summary = validatePeerGenerationReport(syntheticRelayReport());
+  assert.ok(summary.relay.traffic.host.relaySentBytes > 0);
+  assert.equal(summary.hostedControlApplicationBodyBytes, 0);
+  assert.ok(summary.limitations.some(value => value.includes('depends on relay availability')));
+  for (const mutate of [
+    value => { value.relay.controlOutageScope = 'entire-host'; },
+    value => { value.relay.traffic.host.relaySentBytes = 0; },
+    value => { value.relay.traffic.sockets[0].plaintextMatches.push('private payload'); },
+    value => { value.relay.ownedReconnect.owner = 'second-retry-loop'; },
+    value => { value.relay.ownedReconnect.sameGeneration = false; },
+    value => { value.relay.connections[0].directAttempts = 0; },
+    value => { value.relay.independentLanes = ['combined']; },
+    value => { value.relay.traffic.sockets.forEach(socket => { if (socket.lane === 'live') socket.sentBinaryFrames = 0; }); },
+    value => { value.hostOutage.content.retainedByPeer = false; },
+  ]) {
+    const report = syntheticRelayReport(); mutate(report); assert.throws(() => validatePeerGenerationReport(report));
+  }
 });

@@ -111,6 +111,27 @@ export function syntheticHostedReport() {
   return report;
 }
 
+export function syntheticRelayReport() {
+  const report = syntheticHostedReport();
+  report.topology = 'independent-native-websocket';
+  report.publicBoundary.imports = ['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/websocket', '@tendriller/core/peers'];
+  report.hostOutage.content = { bytes: 1024, sha256: h('a'), retainedByPeer: true };
+  delete report.rtc; delete report.runtime.dependencies;
+  report.relay = { implementation: 'native-websocket', hostRuntime: 'workerd',
+    networkBoundary: 'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket',
+    forcedDirectFailure: true, directAttempts: 10, independentLanes: ['reliable', 'live'],
+    security: 'shared-authenticated-peer-channel', controlOutageScope: 'control-http-only',
+    connections: Array.from({ length: 4 }, () => ({ peers: [h('1'), h('2')], authenticated: true,
+      route: 'websocket-relay', directAttempts: 2, closed: true, reliable: { sentBytes: 1000, receivedBytes: 1000 } })),
+    ownedReconnect: { owner: 'application-session', physicalLinksCut: true, reconnected: true, sameGeneration: true,
+      identity: h('2'), beforeConnections: 8, afterConnections: 10 },
+    traffic: { boundary: 'actual-workerd-websocket-relay',
+      host: { relayUpgrades: 16, relaySentBytes: 16_000, relayReceivedBytes: 16_000 },
+      sockets: Array.from({ length: 16 }, (_, index) => ({ lane: index % 2 ? 'live' : 'reliable', closed: true,
+        sentBytes: 1000, receivedBytes: 1000, sentBinaryFrames: 2, receivedBinaryFrames: 2, maxQueuedBytes: 1000, plaintextMatches: [] })) } };
+  return report;
+}
+
 export function syntheticBrowserReport() {
   const digest = 'a'.repeat(64), id = 'b'.repeat(64), other = 'c'.repeat(64);
   const traffic = { controlRequests: 2, controlBodyBytes: 42, signalingRequests: 3, signalingBodyBytes: 1000 };

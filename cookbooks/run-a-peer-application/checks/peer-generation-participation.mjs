@@ -157,8 +157,9 @@ function mailbox(limit = 8) {
 
 /** Ordinary operation and recovery run through the maintained controller. */
 export async function qualifyParticipation({ coordinator, follower, observer, coordinatorControl, followerControl,
-  observerControl, host, ports, copyPrefix, inspectTransport = async () => ({}) }) {
-  const controllers = [], graceMs = 150, statuses = [];
+  observerControl, host, ports, copyPrefix, inspectTransport = async () => ({}),
+  graceMs = 150, qualifyTransport = async () => {} }) {
+  const controllers = [], statuses = [];
   let stage = 'establishing-owned-connections';
   const start = (session, control) => {
     const participation = session.participate({ control, ...ports(session), recovery: { graceMs, freshnessMs: 300_000 },
@@ -177,6 +178,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
       waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId)),
       waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId)),
     ]);
+    await qualifyTransport({ coordinator, follower, primary, secondary });
     stage = 'commands-during-host-outage';
     await post(follower, 'controller-established');
     await waitRevision(coordinator, follower.revision);

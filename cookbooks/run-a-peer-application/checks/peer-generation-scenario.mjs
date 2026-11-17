@@ -181,10 +181,17 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
     const live = b.signals.subscribe({ topics: ['typing'], signal: AbortSignal.any([signalAbort.signal, timeout()]) })[Symbol.asyncIterator]();
     const nextLive = live.next();
     const beforeLive = await a.recoveryPoint();
-    await a.signals.send('typing', { typing: true }, { ttlMs: 2500 });
+    await a.signals.send('typing', { typing: true, marker: 'private-live-signal-marker' }, { ttlMs: 2500 });
     assert.equal((await nextLive).value.payload.typing, true);
     signalAbort.abort(); await live.return?.();
-    assert.deepEqual(await a.recoveryPoint(), beforeLive, 'Live signals must not append history');
+    const contentBytes = new TextEncoder().encode('private-content-marker'.repeat(1024));
+    const stagedContent = await a.content.stage({ bytes: contentBytes.length });
+    await stagedContent.write(0, contentBytes); const reference = await stagedContent.commit();
+    const retention = await b.content.retain(reference), retainedBytes = [];
+    for await (const chunk of b.content.read(reference)) retainedBytes.push(...chunk);
+    assert.deepEqual(new Uint8Array(retainedBytes), contentBytes);
+    assert.equal(retention.payload.peer, b.deviceId);
+    assert.deepEqual(await a.recoveryPoint(), beforeLive, 'Live signals and content must not append history');
     assert.deepEqual((await query(a)).value, (await query(b)).value);
     const hostAfter = await host.traffic();
     report.hostOutage = { boundary: host.boundary, blocked: true, blockedProbeRejected: true,
@@ -192,6 +199,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, qualify
       applicationBodyBytes: { before: hostBefore.applicationBodyBytes, after: hostAfter.applicationBodyBytes },
       observations: { before: hostBefore, after: hostAfter }, finalityCapability: a.capabilities.finality,
       liveSignalsObserved: 1, peerReplicationObserved: true,
+      content: { bytes: contentBytes.length, sha256: await bytesDigest(contentBytes), retainedByPeer: true },
       ...(transportBefore === undefined ? {} : { transport: { before: transportBefore, after: await ab.inspect() } }) };
 
     await checkpoint('continued with control host blocked');
