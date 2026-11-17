@@ -1,6 +1,6 @@
 {
   "format": "tendriller-peer-release-qualification/v1",
-  "recordedAt": "2026-11-17T14:08:01.839638+00:00",
+  "recordedAt": "2026-11-17T14:15:16.612956+00:00",
   "overallStatus": "partially-qualified",
   "releaseReady": false,
   "interpretation": "Each gate applies only to its exact inputs and scope. No single green release gate is inferred across different revisions or unexecuted topologies.",
@@ -156,6 +156,24 @@
       "sourceCommit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
       "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
       "sourceDirty": false
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g76129c3c-rtc",
+      "sha256": "66fc7f10973614dbf071e89666fd9e1157353fe0f6c1eaa28c116baefedbc43b",
+      "sourceCommit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
+      "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g76129c3c-rtc-sql-wasm",
+      "sha256": "9fc49ca77f075fb043003479455b37104151459a5c4281fa537c5a9072240842",
+      "sourceCommit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
+      "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db"
     }
   ],
   "engines": {
@@ -272,7 +290,7 @@
     },
     {
       "kind": "Chromium Worker/OPFS to native WebRTC over loopback",
-      "qualification": "Events/content/recovery passed at572; current full SQL recovery pending."
+      "qualification": "Events and complete guarded SQL task recovery passed with clean core76129 and consumer1a63; exact archives and boundaries are recorded per gate."
     },
     {
       "kind": "managed browser/native lifecycle against deployed host; Internet/TURN",
@@ -575,13 +593,99 @@
       ]
     },
     {
-      "id": "G1-current-browser-sql",
-      "status": "not-yet-qualified",
-      "scope": "Canonical Worker host bridge, flat17a public configuration, current operation-state notifications, SQL forms and full recovery.",
-      "requiredConsumerCommit": "aa7a445b968a752df17a7860e98f1008283a6750",
+      "id": "G1-browser-events-76129",
+      "status": "passed",
+      "scope": "Actual Chromium Worker/OPFS, maintained bootstrap and host bridge, authenticated native RTC, host-blocked commands/signals/content, selected-prefix recovery, fresh replay and durable reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "1a63e2a69bdcb80b36a10759f7dac10cdf690a45",
+        "tree": "72ef2d8b83c56e3483c167283fd22f0ff43979d5",
+        "dirty": false
+      },
+      "artifacts": [
+        "66fc7f10973614dbf071e89666fd9e1157353fe0f6c1eaa28c116baefedbc43b"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-events-76129c3c-report.json",
+        "sha256": "32962d97cabcf4350ccb9fa596a6852fd9f343984f29cceeb536aa6d4271bc90"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-events-76129c3c-summary.json",
+        "sha256": "54cec1f1b3e0b74ea118667cd05b98fae7856ee28695f94bdef8cecae9c22852"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44098541762",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44098541762/job/134092028630",
+      "workflowArchiveSha256": "4c8f020c3f9956ffdaa17e351d6c50b44c03d152fb7900462d932e2b959b1512",
       "limitations": [
-        "A passing complete current real-browser SQL report has not yet been preserved in this manifest."
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate."
       ]
+    },
+    {
+      "id": "G1-current-browser-sql",
+      "status": "passed",
+      "scope": "Actual Chromium Worker/OPFS, maintained bootstrap and host bridge, authenticated native RTC, host-blocked commands/signals/content, selected-prefix recovery, fresh replay and durable reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "1a63e2a69bdcb80b36a10759f7dac10cdf690a45",
+        "tree": "72ef2d8b83c56e3483c167283fd22f0ff43979d5",
+        "dirty": false
+      },
+      "artifacts": [
+        "9fc49ca77f075fb043003479455b37104151459a5c4281fa537c5a9072240842"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-task-76129c3c-report.json",
+        "sha256": "387a6642931531da61317cd28c6b65d0654ff97ceb3743635bb6357223ed5c5a"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-browser-task-76129c3c-summary.json",
+        "sha256": "8faab76b6dfeb8d09b22a3d18257ce90cf0222b0eca3fc7b19df0fc9cecc4b62"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44098541762",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44098541762/job/134092028630",
+      "workflowArchiveSha256": "4c8f020c3f9956ffdaa17e351d6c50b44c03d152fb7900462d932e2b959b1512",
+      "limitations": [
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The task domain used both packaged SQL engines; this result applies to the recorded native platform and browser build."
+      ],
+      "verification": {
+        "publishedHashes": 148,
+        "consumerFixtureHashes": 13,
+        "nativeAndWasmManifestEqual": true,
+        "wasmBytes": 2761242,
+        "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+        "nativeBinarySha256": "cca093a1ca607b5d8478515f04ae27c03893af0a91ce91a9c566c6aa4fe961d4"
+      },
+      "observations": {
+        "commandsWithHostBlocked": 5,
+        "hostRequestsDuringCommands": 0,
+        "signalingRequestsDuringCommands": 0,
+        "retainedPrefix": 16,
+        "previousHead": 19,
+        "sameViewClaimRace": true,
+        "sqlAndEventsSelectedTogether": true,
+        "gracefulAndAbruptReopen": true
+      },
+      "currentConsumerComparison": {
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "changes": [
+          "Bounded failure observations only in the browser driver.",
+          "Task owner subquery uses the public OWNER_FOR_KEY_SQL helper; equivalent owner lookup with whitespace differences."
+        ],
+        "unchanged": [
+          "UI forms and application module",
+          "Worker owner and host bridge",
+          "Browser SQL runtime and bootstrap",
+          "Successful browser scenario and assertions"
+        ]
+      }
     },
     {
       "id": "G4-deployed-operation",

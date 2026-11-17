@@ -33,9 +33,9 @@ uses the maintained bootstrap, peer lifecycle, Worker facade and local MCP
 surface through an exact supplied `@chronolog/peer-session` archive.
 
 The [qualification inventory](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
-records separate clean native RTC, actual-host, browser events/OPFS, native SQL
-and independently authored consumer results. Browser SQL recovery, Internet/TURN
-and deployed operation require their own complete evidence. The
+records separate clean native RTC, actual-host, browser events/OPFS, native SQL,
+complete browser SQL recovery and independently authored consumer results.
+Internet/TURN and deployed operation require their own complete evidence. The
 [historical implementation guide](guides/finalized-peer-applications.md) retains
 the older immutable-prefix contract and its original test scope.
 

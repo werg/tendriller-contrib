@@ -1,11 +1,11 @@
 # Browser runtime qualification status
 
-The current [clean browser pairing](peer-generation-qualification.md#clean-browser-worker-and-opfs-pairing)
-passed in GitHub Actions with actual Chromium, Worker-owned OPFS, peer key
-enrollment, real RTC, host-blocked work, partial-content restart and explicit
-recovery. Its report and summary are preserved separately at the exact tested
-Chronolog and consumer revisions. It qualifies the events profile on that local
-browser/native topology; SQL and deployed operating conditions remain separate.
+Both the [events pairing](peer-generation-qualification.md#clean-browser-worker-and-opfs-pairing)
+and the [complete guarded SQL task pairing](peer-task-qualification.md#complete-clean-browser-sql-pairing)
+passed with actual Chromium, Worker-owned OPFS, peer key enrollment, real RTC,
+host-blocked work, partial-content restart and explicit recovery. Each report
+retains its exact tested artifact and consumer revisions. Deployed operating
+conditions remain outside these local browser/native topology results.
 
 ## Earlier workspace launch failure
 
@@ -65,5 +65,13 @@ The diagnostic is not an unmodified artifact qualification. Its artifact fields
 identify the original archive, while its browser asset hashes identify the
 instrumented execution. Neither local report qualifies SQL forms, peer data
 exchange, or recovery. No product timeouts, transport policy, or workspace
-restrictions were changed to obtain these observations. The full SQL scenario
-requires its separate clean CI result.
+restrictions were changed to obtain these observations. The separate clean
+`76129c3c` CI pairing subsequently passed the full SQL scenario.
+
+A further local browser-only OPFS diagnostic sampled an initial SQL commit in
+`csReplayWal`/BLAKE3 before any held read view. It did not measure WAL size or a
+defensible commit duration, and it did not establish the cause of the earlier
+CI receipt timeout. Read-only engine inspection identified whole-WAL replay and
+synchronous SAH I/O as a possible source of read amplification. Automatic
+compaction has not been qualified with live readers, so no product patch was
+made from that diagnostic. The complete cloud scenario above passed.

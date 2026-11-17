@@ -15,9 +15,9 @@ The [release qualification manifest](peer-generation-release-manifest.json)
 records exact Chronolog, Tendriller and consumer commits/trees, clean-source
 flags, archive hashes, native/WASM identities, storage formats and implemented
 operating limits. It treats each runtime gate separately. Its current
-`releaseReady: false` records outstanding browser SQL recovery and deployed
-operating conditions; successful native, browser-events and fresh-consumer
-results do not fill those gaps.
+`releaseReady: false` records unqualified deployed operating conditions. Complete
+browser SQL recovery now has its own passing exact-source report; local runtime
+results do not qualify deployed networks, provider cost or a recovery-age bound.
 
 | Gate | Recorded result | Scope |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ results do not fill those gaps.
 | Workerd/native RTC at `572fded7` + Tendriller `2e8200a3` | Passed | Actual public host control/rendezvous routes and measured host-blocked commands. |
 | Native task domain at `fe752b7f` | Passed | Real SQL/event guards, shared creator departure, recovery, linked reapply and reopen. |
 | Fresh consumer at `fe752b7f` + Tendriller `2e8200a3` | Passed with recorded coaching | Independent domain source, canonical bootstrap and actual Worker controls; native stores use local direct transport. |
-| Current complete browser SQL gate | Not yet qualified | Prior real SQL forms and same-view race passed before a later receipt timeout; that report remains failed. |
+| Complete browser SQL at `76129c3c` + consumer `1a63e2a` | Passed | Actual guarded forms, same-view claim race, host-blocked work, partial-content restart, earlier-prefix recovery, fresh replay and graceful/abrupt Worker reopen. |
 | Deployed networks, TURN, cost and five-minute freshness | Not executed/measured | No release-wide green status is inferred. |
 
 ## Fresh public-API exercise

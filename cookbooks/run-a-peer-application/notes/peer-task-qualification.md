@@ -1,5 +1,10 @@
 # Guarded shared-task qualification
 
+The [complete browser SQL report](evidence/2026-11-17-peer-generation-browser-task-76129c3c-report.json)
+and [validated summary](evidence/2026-11-17-peer-generation-browser-task-76129c3c-summary.json)
+now qualify the real Worker/OPFS, native RTC, task forms and recovery scenario.
+Its exact pairing and scope are recorded below, alongside the native results.
+
 The [native task report](evidence/2026-11-17-peer-generation-task-clean-report.json)
 and [validated summary](evidence/2026-11-17-peer-generation-task-clean-summary.json)
 record a passing independent runtime execution of the actual
@@ -80,8 +85,8 @@ all passed. This is the latest native pairing recorded here.
 This is native SQL with direct authenticated peer transport and a portable local
 generation registry. It does not qualify browser WASM or Tendriller HTTP by
 itself. The [browser task command](../checks/README.md) runs the same definition
-through both packaged SQL engines and actual board/compact forms; it needs a
-separate passing runtime report. The preserved browser events report and hosted
+through both packaged SQL engines and actual board/compact forms; its separate
+passing runtime report is below. The preserved browser events report and hosted
 RTC report retain their own exact source pairs and boundaries.
 
 The [browser task attempt](evidence/2026-11-17-peer-generation-browser-task-blocked-report.json)
@@ -100,7 +105,7 @@ Those attempts preserve the original errors and remain unsuccessful runtime
 evidence; they do not replace the independent native task result or a required
 clean browser task result.
 
-## Browser SQL evidence before the final receipt failure
+## Earlier browser SQL receipt failure
 
 The [clean CI task report](evidence/2026-11-17-peer-generation-browser-task-ci-b05979c6-report.json)
 is from [Chronolog browser run 44095421612](https://github.com/werg/chronolog-db/actions/runs/44095421612),
@@ -125,3 +130,52 @@ an operation that remained saved. Consumer `bf140db` now records bounded DOM,
 original operation and query observations from both peers for that failure.
 The partial observations above are preserved; `passed: false` remains the overall
 result, and SQL browser recovery is not qualified by this run.
+
+## Complete clean browser SQL pairing
+
+[Chronolog browser run 44098541762](https://github.com/werg/chronolog-db/actions/runs/44098541762)
+passed the complete task scenario with clean consumer
+`1a63e2a69bdcb80b36a10759f7dac10cdf690a45` (tree
+`72ef2d8b83c56e3483c167283fd22f0ff43979d5`) and clean Chronolog
+`76129c3cbe3ef6623d54aba155decb68cecf49e1` (tree
+`5beb048fe482d545d8ae6c3822840a4376b9709b`). The CI archive SHA-256 is
+`9fc49ca77f075fb043003479455b37104151459a5c4281fa537c5a9072240842`;
+it is the exact uploaded archive, not the independently built local archive.
+
+The downloaded ZIP matched GitHub's SHA-256
+`4c8f020c3f9956ffdaa17e351d6c50b44c03d152fb7900462d932e2b959b1512`.
+All 148 published content hashes and all 13 consumer fixture hashes were verified
+against their archived bytes and source commit. The native and WASM engine
+manifests agree. The WASM is 2,761,242 bytes with SHA-256
+`0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81`.
+The current report validator reproduces the preserved summary exactly.
+
+Chromium 158.0.8127.18 used `openBrowserSqlSession`, the public Worker host
+bridge and `connectApplicationWorker`. The board created, claimed and finished
+tasks; a simultaneous same-view claim race accepted one author and rejected the
+other without an effective event. Five commands, including three SQL task
+commands, completed with the control host blocked. Host and signaling request
+counters stayed unchanged while reliable frame bytes increased from 42,492 to
+223,092. A live signal and encrypted content crossed the peer connection without
+appending history. A 131,095-byte transfer resumed after a Worker restart from
+its retained 65,536-byte prefix.
+
+After the originator and its store became unavailable, the browser selected
+prefix 16 from prior head 19. SQL rows and events changed together; retained
+task-state hashes matched, and an unshared originator claim stayed excluded.
+The compact page preserved the draft and original attempt reference, displayed
+the recovery notice and obtained confirmation before linked reapplication.
+Another member completed a shared task after its creator closed. A fresh native
+peer reconstructed the same complete view. Graceful and abrupt Worker reopen
+preserved identity, storage, keys, state and durable operation outcomes.
+
+Compared with this tested consumer, `3107cba` changes only failure observations
+in the browser driver and uses the public owner-lookup SQL helper in place of
+the equivalent literal subquery. The UI, Worker, host bridge, SQL bootstrap and
+successful scenario are unchanged. Its native task pairing is independently
+recorded above. The browser report remains explicitly scoped to `1a63e2a`.
+
+This qualifies the recorded browser/native loopback topology and portable HTTP
+control fixture. Actual Tendriller routes have separate hosted evidence. It
+does not measure deployed Internet/TURN behavior, provider billing, storage
+eviction, interrupted-write crashes or a five-minute recovery-age bound.
