@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 15
     env:
       # A one-way test pairing, not a prose/release compatibility requirement.
-      CORE_CHECK_REF: ${{ inputs.core_ref || '534e044c74589a2c19757386813c5627b9383b8d' }}
+      CORE_CHECK_REF: ${{ inputs.core_ref || 'fbb943750bda263df711e3e8be595c1c436eb528' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
