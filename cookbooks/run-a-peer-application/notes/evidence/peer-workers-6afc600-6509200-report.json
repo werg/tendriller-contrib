@@ -1,0 +1,1361 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-packed-workers",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "6509200331289faef45fa5ce7f681a55a1ebd277",
+    "tree": "3224033b4e00f60f510909a6ff72bc72cbff7d3e",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g6afc600b-sql",
+      "sha256": "af031a29d480c9ce41fe923e0884fea7dfb4188ef7c7156af5c4d231fc325c75",
+      "sourceCommit": "6afc600bb2931b67735209dc93c28696d29bde28",
+      "sourceTree": "6449f8d5cb90273479129ae72c61b6cbe107bba3",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-workers-consumer.mjs",
+      "sha256": "042c99f3d0ff9095af4a3f64f8949bbf041a21843c21041516153156825959fc"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-workers-owner.mjs",
+      "sha256": "851595ef81d790fca78fcd7a74ac57dd46b1e466c20f18dc5462b46470a386dd"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-workers-timers.mjs",
+      "sha256": "3b30a6382fda786c1fe2a200ffb8ac532f33c505b7ecf097899cc17e8e88b2a9"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-effect-provider.mjs",
+      "sha256": "77bb0ccc6b7c2ab3ebf753d99f13f83ccb603ed2452b38bb91a61081af637c04"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-notifications.mjs",
+      "sha256": "cf0732a7d91040f22638e7b8c9df3512abd35711869ad0d5ec1e3c53ab6e827c"
+    }
+  ],
+  "error": null,
+  "sqlEngine": {
+    "implementation": "@dolthub/doltlite@0.11.29",
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v24.22.1",
+    "manifest": {
+      "doltliteVersion": "0.11.29",
+      "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+      "sqliteVecVersion": "0.1.9",
+      "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+      "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+      "fts5": true,
+      "json1": true,
+      "rtree": true,
+      "dynamicExtensions": false
+    },
+    "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/browser",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/sql-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+  "stage": "passed",
+  "projection": {
+    "initial": {
+      "revision": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 1,
+          "root": "aa893f2b26687a3535082e2bbf2e95f1cea20788db466690d78e824ce49b466e"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "2"
+      },
+      "cursor": "{\"historyId\":\"independent-application-workers\",\"generation\":\"b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56\",\"index\":1,\"anchor\":\"c902a53b9a572f94e911fb3ed915ea20108babb9fee2fb12b462ae80692859b8\",\"topics\":[\"notes\"]}",
+      "state": {
+        "notes": [
+          {
+            "attemptId": "c902a53b9a572f94e911fb3ed915ea20108babb9fee2fb12b462ae80692859b8",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "noteId": "retained",
+            "operationId": "retained-note",
+            "text": "This note survives the selected prefix."
+          }
+        ]
+      },
+      "reset": false
+    },
+    "beforeRecovery": {
+      "revision": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 3,
+          "root": "b894eaf7666d44ff3aedde58c1f75e57570b91260e9a14a62a8f72bd8dcc2718"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "4"
+      },
+      "cursor": "{\"historyId\":\"independent-application-workers\",\"generation\":\"b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56\",\"index\":3,\"anchor\":\"4fd66e6f7d771e98dd897cc36f4659a69c8c1963596e4c42dc82d4656ee2c383\",\"topics\":[\"notes\"]}",
+      "state": {
+        "notes": [
+          {
+            "attemptId": "c902a53b9a572f94e911fb3ed915ea20108babb9fee2fb12b462ae80692859b8",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "noteId": "retained",
+            "operationId": "retained-note",
+            "text": "This note survives the selected prefix."
+          },
+          {
+            "attemptId": "4fd66e6f7d771e98dd897cc36f4659a69c8c1963596e4c42dc82d4656ee2c383",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "noteId": "excluded",
+            "operationId": "excluded-note",
+            "text": "This note is outside the recovered prefix."
+          }
+        ]
+      },
+      "reset": false
+    },
+    "recovered": {
+      "revision": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+        "point": {
+          "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+          "sequence": 0,
+          "root": "fe1e30cbb2404cd2f4ed3b1d9772d0188c6226c2528010c880381d32f059e877"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "8"
+      },
+      "cursor": "{\"historyId\":\"independent-application-workers\",\"generation\":\"ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6\",\"index\":2,\"anchor\":\"faa5ae05815299e2aeabd0afc143745bd562be52c0b15309ee0c7e4b56b2a3f5\",\"topics\":[\"notes\"]}",
+      "state": {
+        "notes": [
+          {
+            "attemptId": "c902a53b9a572f94e911fb3ed915ea20108babb9fee2fb12b462ae80692859b8",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "noteId": "retained",
+            "operationId": "retained-note",
+            "text": "This note survives the selected prefix."
+          }
+        ]
+      },
+      "reset": true
+    },
+    "sameGenerationIncremental": true,
+    "duplicateOwnerRefused": true,
+    "staleCursorRefused": true,
+    "heldViewPreserved": true
+  },
+  "effects": {
+    "denied": {
+      "effectId": "effect_9cb26d5312cbdfb1b1cdddbce57bc41b876556cac19ce834f52e2585d65f1c4c",
+      "intentKey": "spoofed-author",
+      "event": {
+        "id": "faa5ae05815299e2aeabd0afc143745bd562be52c0b15309ee0c7e4b56b2a3f5:0",
+        "attemptId": "faa5ae05815299e2aeabd0afc143745bd562be52c0b15309ee0c7e4b56b2a3f5",
+        "operationId": "spoofed-author",
+        "author": "bb03089d2f9f92b97ff88dcddc07700ef4b97bca664ea3a237a2892de2e2690e",
+        "authorTimestampMs": "1794929015623",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "spoofed-author",
+          "message": "No provider call is authorized.",
+          "requestedByLabel": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "faa5ae05815299e2aeabd0afc143745bd562be52c0b15309ee0c7e4b56b2a3f5:0",
+          "attemptId": "faa5ae05815299e2aeabd0afc143745bd562be52c0b15309ee0c7e4b56b2a3f5",
+          "operationId": "spoofed-author",
+          "author": "bb03089d2f9f92b97ff88dcddc07700ef4b97bca664ea3a237a2892de2e2690e",
+          "authorTimestampMs": "1794929015623",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "spoofed-author",
+            "message": "No provider call is authorized.",
+            "requestedByLabel": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 2,
+          "root": "c3e6ad6345dac8c383576d3c95dfb04c4268568996bafd199c4f3740e924db3e"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "3"
+      },
+      "stage": "denied",
+      "reason": "unauthorized",
+      "result": null,
+      "publications": []
+    },
+    "completed": {
+      "effectId": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+      "intentKey": "completed-intent",
+      "event": {
+        "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+        "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+        "operationId": "completed-request",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929016779",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "completed-intent",
+          "message": "One synthetic provider effect.",
+          "requestedByLabel": "Application member",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+          "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+          "operationId": "completed-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929016779",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "completed-intent",
+            "message": "One synthetic provider effect.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 4,
+          "root": "c1c80efb238d78dfa2b2247ba211dbf5ba122030cad43e8e8555a981cb8460e0"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "5"
+      },
+      "stage": "completed",
+      "reason": null,
+      "result": {
+        "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+      },
+      "publications": [
+        {
+          "operationId": "effect-result:effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "reapplyOf": null,
+          "status": "applied"
+        }
+      ]
+    },
+    "uncertain": {
+      "effectId": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+      "intentKey": "uncertain-intent",
+      "event": {
+        "id": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19:0",
+        "attemptId": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19",
+        "operationId": "uncertain-request",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929017187",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "uncertain-intent",
+          "message": "Committed but its response is lost.",
+          "requestedByLabel": "Application member",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19:0",
+          "attemptId": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19",
+          "operationId": "uncertain-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929017187",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "uncertain-intent",
+            "message": "Committed but its response is lost.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 6,
+          "root": "80e56d56b1439d7fb8dc6a0dabb226018a9a244258de4a462eacab8aa67e0f95"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "7"
+      },
+      "stage": "dispatching",
+      "reason": null,
+      "result": null,
+      "publications": []
+    },
+    "reconciled": {
+      "effectId": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+      "intentKey": "uncertain-intent",
+      "event": {
+        "id": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19:0",
+        "attemptId": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19",
+        "operationId": "uncertain-request",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929017187",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "uncertain-intent",
+          "message": "Committed but its response is lost.",
+          "requestedByLabel": "Application member",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19:0",
+          "attemptId": "1e642969594950572bda55475c911e65196b6458f2c473f3bcefc5a01344ad19",
+          "operationId": "uncertain-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929017187",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "uncertain-intent",
+            "message": "Committed but its response is lost.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 6,
+          "root": "80e56d56b1439d7fb8dc6a0dabb226018a9a244258de4a462eacab8aa67e0f95"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "7"
+      },
+      "stage": "completed",
+      "reason": null,
+      "result": {
+        "receipt": "34a5af12c791778e03467c82caa709af15e41200cead971b419c9a2b43a458cc"
+      },
+      "publications": []
+    },
+    "restored": {
+      "effectId": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+      "intentKey": "completed-intent",
+      "event": {
+        "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+        "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+        "operationId": "completed-request",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929016779",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "completed-intent",
+          "message": "One synthetic provider effect.",
+          "requestedByLabel": "Application member",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+          "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+          "operationId": "completed-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929016779",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "completed-intent",
+            "message": "One synthetic provider effect.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 4,
+          "root": "c1c80efb238d78dfa2b2247ba211dbf5ba122030cad43e8e8555a981cb8460e0"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "5"
+      },
+      "stage": "completed",
+      "reason": null,
+      "result": {
+        "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+      },
+      "publications": [
+        {
+          "operationId": "effect-result:effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "reapplyOf": null,
+          "status": "abandoned"
+        },
+        {
+          "operationId": "reviewed-result",
+          "reapplyOf": "effect-result:effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "status": "applied"
+        }
+      ]
+    },
+    "matching": {
+      "effectId": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+      "intentKey": "completed-intent",
+      "event": {
+        "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+        "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+        "operationId": "completed-request",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929016779",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "completed-intent",
+          "message": "One synthetic provider effect.",
+          "requestedByLabel": "Application member",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28:0",
+          "attemptId": "3f5d4be39f0fe3ea342b246083f305bb17f8234ddcc5bba64d2f5a7824400d28",
+          "operationId": "completed-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929016779",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "completed-intent",
+            "message": "One synthetic provider effect.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        },
+        {
+          "id": "160a21ece72e3e913e0b6fa473b984132913a4c1d112f88b36376a42ec411322:0",
+          "attemptId": "160a21ece72e3e913e0b6fa473b984132913a4c1d112f88b36376a42ec411322",
+          "operationId": "reviewed-request",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929023601",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "completed-intent",
+            "message": "One synthetic provider effect.",
+            "requestedByLabel": "Application member",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+        "point": {
+          "generation": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+          "sequence": 4,
+          "root": "c1c80efb238d78dfa2b2247ba211dbf5ba122030cad43e8e8555a981cb8460e0"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "5"
+      },
+      "stage": "completed",
+      "reason": null,
+      "result": {
+        "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+      },
+      "publications": [
+        {
+          "operationId": "effect-result:effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "reapplyOf": null,
+          "status": "abandoned"
+        },
+        {
+          "operationId": "reviewed-result",
+          "reapplyOf": "effect-result:effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "status": "applied"
+        }
+      ]
+    },
+    "externalBefore": {
+      "requests": [
+        {
+          "method": "POST",
+          "key": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        },
+        {
+          "method": "POST",
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": true
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "message": "Committed but its response is lost.",
+          "receipt": "34a5af12c791778e03467c82caa709af15e41200cead971b419c9a2b43a458cc"
+        },
+        {
+          "key": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "message": "One synthetic provider effect.",
+          "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+        }
+      ]
+    },
+    "externalAfter": {
+      "requests": [
+        {
+          "method": "GET",
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "found": true
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "message": "Committed but its response is lost.",
+          "receipt": "34a5af12c791778e03467c82caa709af15e41200cead971b419c9a2b43a458cc"
+        },
+        {
+          "key": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "message": "One synthetic provider effect.",
+          "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+        }
+      ]
+    },
+    "uncertainRetryRefused": true,
+    "journalReopened": true
+  },
+  "recovery": {
+    "previousGeneration": "b58b47c38ec597faddb62bc2d3018d2543701c9ad1c6e61ae5412c92a4e73d56",
+    "selectedGeneration": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+    "previousHead": 6,
+    "adoptedPosition": 2
+  },
+  "timers": {
+    "first": {
+      "occurrence": {
+        "occurrenceId": "occurrence_e865045be131667f203a6bb506735f1c26036c8c81c74514b660624988cf558a",
+        "timerId": "after-reopen",
+        "generation": "after-reopen-version",
+        "configuration": {
+          "id": "fc8f5a418acce830d8fd2abd8afddc74cbd0b109de9f2a64b863a342ad4ea163:0",
+          "attemptId": "fc8f5a418acce830d8fd2abd8afddc74cbd0b109de9f2a64b863a342ad4ea163",
+          "operationId": "schedule-after-reopen",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929029727",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 1000,
+            "generation": "after-reopen-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "after-reopen notification"
+            },
+            "timerId": "after-reopen",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 1000,
+        "observedAtMs": 1000,
+        "payload": {
+          "message": "after-reopen notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_e865045be131667f203a6bb506735f1c26036c8c81c74514b660624988cf558a",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 4,
+              "root": "6b0c7f3e8132ec8d13cf5b0335c940307f231b4b21706abb9ee850a40bac26e7"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "12"
+          },
+          "status": "applied",
+          "result": {
+            "status": "applied",
+            "attemptId": "58ce1617b12e06cad115e2539c4cef70a710f600922081526ce0f7755e324e82",
+            "operationId": "timer:occurrence_e865045be131667f203a6bb506735f1c26036c8c81c74514b660624988cf558a",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 5,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "retryPreserved": true,
+    "cancelled": {
+      "occurrence": {
+        "occurrenceId": "occurrence_fd89486355bc56e15c6f99a8ad181b2fe739e39d3ca71ad237d3c8c99972688e",
+        "timerId": "cancelled-during-publish",
+        "generation": "cancelled-during-publish-version",
+        "configuration": {
+          "id": "d18d1ee6a8e4c3f5e89b2c4cc8f98cb1e88fd6d7d7b6e112c98546d676a87c06:0",
+          "attemptId": "d18d1ee6a8e4c3f5e89b2c4cc8f98cb1e88fd6d7d7b6e112c98546d676a87c06",
+          "operationId": "schedule-cancelled-during-publish",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929032551",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 2000,
+            "generation": "cancelled-during-publish-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "cancelled-during-publish notification"
+            },
+            "timerId": "cancelled-during-publish",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 2000,
+        "observedAtMs": 2000,
+        "payload": {
+          "message": "cancelled-during-publish notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_fd89486355bc56e15c6f99a8ad181b2fe739e39d3ca71ad237d3c8c99972688e",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 8,
+              "root": "5b6a447975a721aff52e0831eca9c0d71d3384857593848a75fee9f2a05d4346"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "16"
+          },
+          "status": "cancelled",
+          "result": {
+            "status": "applied",
+            "attemptId": "2c851305399d387e887f5b2b90c1d844c3d6a1d677e94bf08a70969fb69d31e4",
+            "operationId": "timer:occurrence_fd89486355bc56e15c6f99a8ad181b2fe739e39d3ca71ad237d3c8c99972688e",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 10,
+            "outcome": "rejected",
+            "rejectionCode": "assert:timer_inactive_configuration"
+          }
+        }
+      ]
+    },
+    "race": {
+      "emitted": 0,
+      "cancelled": 1,
+      "reset": false,
+      "hasMore": false,
+      "awaitingReconciliation": false,
+      "nextDueAtMs": null
+    },
+    "uncertain": {
+      "occurrence": {
+        "occurrenceId": "occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+        "timerId": "lost-command-reply",
+        "generation": "lost-command-reply-version",
+        "configuration": {
+          "id": "085f68132c45ddbb43c90903290fdfeefacb7dde38c2211f7735c046c61af613:0",
+          "attemptId": "085f68132c45ddbb43c90903290fdfeefacb7dde38c2211f7735c046c61af613",
+          "operationId": "schedule-lost-command-reply",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929034495",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 3000,
+            "generation": "lost-command-reply-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "lost-command-reply notification"
+            },
+            "timerId": "lost-command-reply",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 3000,
+        "observedAtMs": 3000,
+        "payload": {
+          "message": "lost-command-reply notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 11,
+              "root": "567e88978727d4428d5e31187a0ba64b6240c51b106719848aa76b53ea7911db"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "18"
+          },
+          "status": "submitted",
+          "result": null
+        }
+      ]
+    },
+    "reconciled": {
+      "occurrence": {
+        "occurrenceId": "occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+        "timerId": "lost-command-reply",
+        "generation": "lost-command-reply-version",
+        "configuration": {
+          "id": "085f68132c45ddbb43c90903290fdfeefacb7dde38c2211f7735c046c61af613:0",
+          "attemptId": "085f68132c45ddbb43c90903290fdfeefacb7dde38c2211f7735c046c61af613",
+          "operationId": "schedule-lost-command-reply",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929034495",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 3000,
+            "generation": "lost-command-reply-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "lost-command-reply notification"
+            },
+            "timerId": "lost-command-reply",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 3000,
+        "observedAtMs": 3000,
+        "payload": {
+          "message": "lost-command-reply notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 11,
+              "root": "567e88978727d4428d5e31187a0ba64b6240c51b106719848aa76b53ea7911db"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "18"
+          },
+          "status": "applied",
+          "result": {
+            "status": "applied",
+            "attemptId": "33c1fd5a356f0bb5cbe8062caa63b582b90b4eb4483babc8254ad3e8bd0152be",
+            "operationId": "timer:occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 12,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "completed": {
+      "occurrence": {
+        "occurrenceId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "timerId": "retained-configuration",
+        "generation": "retained-configuration-version",
+        "configuration": {
+          "id": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1:0",
+          "attemptId": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1",
+          "operationId": "schedule-retained-configuration",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929035431",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 5000,
+            "generation": "retained-configuration-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "retained-configuration notification"
+            },
+            "timerId": "retained-configuration",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 5000,
+        "observedAtMs": 5000,
+        "payload": {
+          "message": "retained-configuration notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 13,
+              "root": "ad096465dc991d0502364355abe63a128a4819b05507c8d82b48e45d8e5c51ec"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "20"
+          },
+          "status": "applied",
+          "result": {
+            "status": "applied",
+            "attemptId": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3",
+            "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 14,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "abandoned": {
+      "occurrence": {
+        "occurrenceId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "timerId": "retained-configuration",
+        "generation": "retained-configuration-version",
+        "configuration": {
+          "id": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1:0",
+          "attemptId": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1",
+          "operationId": "schedule-retained-configuration",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929035431",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 5000,
+            "generation": "retained-configuration-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "retained-configuration notification"
+            },
+            "timerId": "retained-configuration",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 5000,
+        "observedAtMs": 5000,
+        "payload": {
+          "message": "retained-configuration notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 13,
+              "root": "ad096465dc991d0502364355abe63a128a4819b05507c8d82b48e45d8e5c51ec"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "20"
+          },
+          "status": "abandoned",
+          "result": {
+            "status": "applied",
+            "attemptId": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3",
+            "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 14,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "restored": {
+      "occurrence": {
+        "occurrenceId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "timerId": "retained-configuration",
+        "generation": "retained-configuration-version",
+        "configuration": {
+          "id": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1:0",
+          "attemptId": "09a8bf6a6cfb4c0fce0cf839faaa23be5c7b09032b23a40a4e690f3cbb636fa1",
+          "operationId": "schedule-retained-configuration",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929035431",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 5000,
+            "generation": "retained-configuration-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "retained-configuration notification"
+            },
+            "timerId": "retained-configuration",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 5000,
+        "observedAtMs": 5000,
+        "payload": {
+          "message": "retained-configuration notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "point": {
+              "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+              "sequence": 13,
+              "root": "ad096465dc991d0502364355abe63a128a4819b05507c8d82b48e45d8e5c51ec"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "20"
+          },
+          "status": "abandoned",
+          "result": {
+            "status": "applied",
+            "attemptId": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3",
+            "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+            "sequence": 14,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        },
+        {
+          "operationId": "reviewed-timer-occurrence",
+          "reapplyOf": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+            "point": {
+              "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+              "sequence": 0,
+              "root": "1c5a1c4e9e855fbdd47b9b1f11e7d2a740f8b8a7c9a73168e098af60e8293a17"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "26"
+          },
+          "status": "applied",
+          "result": {
+            "status": "applied",
+            "attemptId": "0267fdaf660570eaf5de1a72b0853e6d0815857f48fc74ca5f5f670573aafa65",
+            "operationId": "reviewed-timer-occurrence",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+            "sequence": 1,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "retainedEffect": {
+      "effectId": "effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+      "intentKey": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+      "event": {
+        "id": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3:1",
+        "attemptId": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3",
+        "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+        "authorTimestampMs": "1794929036139",
+        "topic": "notifications",
+        "payload": {
+          "intentId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "message": "retained-configuration notification",
+          "requestedByLabel": "Timer",
+          "type": "notification.requested",
+          "version": 1
+        }
+      },
+      "observedEvents": [
+        {
+          "id": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3:1",
+          "attemptId": "dfa4264bd958e4650bfb2c9e1df1572918836d867e6c949b6bc926fc7a7aa3b3",
+          "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929036139",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+            "message": "retained-configuration notification",
+            "requestedByLabel": "Timer",
+            "type": "notification.requested",
+            "version": 1
+          }
+        },
+        {
+          "id": "0267fdaf660570eaf5de1a72b0853e6d0815857f48fc74ca5f5f670573aafa65:1",
+          "attemptId": "0267fdaf660570eaf5de1a72b0853e6d0815857f48fc74ca5f5f670573aafa65",
+          "operationId": "reviewed-timer-occurrence",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929050715",
+          "topic": "notifications",
+          "payload": {
+            "intentId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+            "message": "retained-configuration notification",
+            "requestedByLabel": "Timer",
+            "type": "notification.requested",
+            "version": 1
+          }
+        }
+      ],
+      "observedAt": {
+        "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+        "historyId": "independent-application-workers",
+        "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+        "point": {
+          "generation": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+          "sequence": 15,
+          "root": "1ba2c7b4999a7296483e228bb78fad79e2353f7935730df685104258af08f6a0"
+        },
+        "controlRevision": 0,
+        "materializationRevision": "22"
+      },
+      "stage": "completed",
+      "reason": null,
+      "result": {
+        "receipt": "f16ce39ae0c5cc71e130b3c490f16bb2197f5f4fa5f1ea4cb1b2ebcdbb7a25da"
+      },
+      "publications": [
+        {
+          "operationId": "effect-result:effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+          "reapplyOf": null,
+          "status": "abandoned"
+        }
+      ]
+    },
+    "externalBeforeRecovery": {
+      "requests": [
+        {
+          "method": "GET",
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "found": true
+        },
+        {
+          "method": "POST",
+          "key": "effect_ae97e46d7c09f1e814837d026867de52c581ef1f8914f758ce3e7f903d2e2ca7",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        },
+        {
+          "method": "POST",
+          "key": "effect_f57ae138450bb63051a9891423c6d0199a57851047e0d39162d84985ae7b7feb",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        },
+        {
+          "method": "POST",
+          "key": "effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "message": "Committed but its response is lost.",
+          "receipt": "34a5af12c791778e03467c82caa709af15e41200cead971b419c9a2b43a458cc"
+        },
+        {
+          "key": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "message": "One synthetic provider effect.",
+          "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+        },
+        {
+          "key": "effect_ae97e46d7c09f1e814837d026867de52c581ef1f8914f758ce3e7f903d2e2ca7",
+          "message": "after-reopen notification",
+          "receipt": "8dc1de5549d0634e23545d89611749be13958e8a843155ec334b1296b722bd57"
+        },
+        {
+          "key": "effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+          "message": "retained-configuration notification",
+          "receipt": "f16ce39ae0c5cc71e130b3c490f16bb2197f5f4fa5f1ea4cb1b2ebcdbb7a25da"
+        },
+        {
+          "key": "effect_f57ae138450bb63051a9891423c6d0199a57851047e0d39162d84985ae7b7feb",
+          "message": "lost-command-reply notification",
+          "receipt": "cf35cb2f9c8c5224c03db6d838f7d6017ea9ceec66de0369f63c7b1684c9433a"
+        }
+      ]
+    },
+    "externalAfterRecovery": {
+      "requests": [
+        {
+          "method": "GET",
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "found": true
+        },
+        {
+          "method": "POST",
+          "key": "effect_ae97e46d7c09f1e814837d026867de52c581ef1f8914f758ce3e7f903d2e2ca7",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        },
+        {
+          "method": "POST",
+          "key": "effect_f57ae138450bb63051a9891423c6d0199a57851047e0d39162d84985ae7b7feb",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        },
+        {
+          "method": "POST",
+          "key": "effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+          "existing": false,
+          "resultCommitted": true,
+          "replyLost": false
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect_6119b951d4a9b5085b05a8cabfc40bfbbb64c12498bc9d3d3e48bb369ca04f83",
+          "message": "Committed but its response is lost.",
+          "receipt": "34a5af12c791778e03467c82caa709af15e41200cead971b419c9a2b43a458cc"
+        },
+        {
+          "key": "effect_a2ce027bff4a8eeb526c68a90927237d9db031cab4b5e83d480601e6a39158c2",
+          "message": "One synthetic provider effect.",
+          "receipt": "5187ee145e801b28161cebe2e19d7377786b22b248b97a89e13d9ee3f4d821d8"
+        },
+        {
+          "key": "effect_ae97e46d7c09f1e814837d026867de52c581ef1f8914f758ce3e7f903d2e2ca7",
+          "message": "after-reopen notification",
+          "receipt": "8dc1de5549d0634e23545d89611749be13958e8a843155ec334b1296b722bd57"
+        },
+        {
+          "key": "effect_e7b7b9a094afbbb8a1943e515a9f6536c98c7cb47e74257e145ae6e81b946f14",
+          "message": "retained-configuration notification",
+          "receipt": "f16ce39ae0c5cc71e130b3c490f16bb2197f5f4fa5f1ea4cb1b2ebcdbb7a25da"
+        },
+        {
+          "key": "effect_f57ae138450bb63051a9891423c6d0199a57851047e0d39162d84985ae7b7feb",
+          "message": "lost-command-reply notification",
+          "receipt": "cf35cb2f9c8c5224c03db6d838f7d6017ea9ceec66de0369f63c7b1684c9433a"
+        }
+      ]
+    },
+    "recovery": {
+      "previousGeneration": "ef630106fbc309d68d55ee5dd794a841908fbf7568c34ee4cad40b0d6e2ee8e6",
+      "selectedGeneration": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+      "previousHead": 18,
+      "adoptedPosition": 13
+    },
+    "excludedConfigurationRemoved": true,
+    "afterReset": {
+      "emitted": 0,
+      "cancelled": 0,
+      "reset": true,
+      "hasMore": false,
+      "awaitingReconciliation": true,
+      "nextDueAtMs": null
+    },
+    "waking": {
+      "occurrence": {
+        "occurrenceId": "occurrence_6152c0f6f4715e821c027093c77c10526200cf00c8d928e0ffcc8d938e928280",
+        "timerId": "owned-clock-wake",
+        "generation": "owned-clock-wake-version",
+        "configuration": {
+          "id": "6da38e53263b5e06fabe1052c242f50ee51a5c2693c61f5b930e0aadc3d229ef:0",
+          "attemptId": "6da38e53263b5e06fabe1052c242f50ee51a5c2693c61f5b930e0aadc3d229ef",
+          "operationId": "schedule-owned-clock-wake",
+          "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+          "authorTimestampMs": "1794929055711",
+          "topic": "schedules",
+          "payload": {
+            "dueAtMs": 8000,
+            "generation": "owned-clock-wake-version",
+            "intervalMs": null,
+            "payload": {
+              "message": "owned-clock-wake notification"
+            },
+            "timerId": "owned-clock-wake",
+            "type": "timer.scheduled",
+            "version": 1
+          }
+        },
+        "scheduledAtMs": 8000,
+        "observedAtMs": 8000,
+        "payload": {
+          "message": "owned-clock-wake notification"
+        }
+      },
+      "publications": [
+        {
+          "operationId": "timer:occurrence_6152c0f6f4715e821c027093c77c10526200cf00c8d928e0ffcc8d938e928280",
+          "reapplyOf": null,
+          "basedOn": {
+            "applicationId": "421a1aefc52ef984d17e2f9efde1af9401df5e666671eae3b4c5004241245c1b",
+            "historyId": "independent-application-workers",
+            "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+            "point": {
+              "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+              "sequence": 2,
+              "root": "a6e377f3baebd365874b046903104dcbea5dda87348706550d3ea4200c508614"
+            },
+            "controlRevision": 0,
+            "materializationRevision": "28"
+          },
+          "status": "applied",
+          "result": {
+            "status": "applied",
+            "attemptId": "24235289289a71271e125f0dc2c815d4d543a874d0e9134cc611f0bb84c3185e",
+            "operationId": "timer:occurrence_6152c0f6f4715e821c027093c77c10526200cf00c8d928e0ffcc8d938e928280",
+            "author": "4fba32845051f9103806fa324f089927a142cf7281b9128ac0bdc977b1def7d4",
+            "generation": "7eaaa2503b4ecac17808fc848e0c00bd8171a4e22258d4bb2cf07f98fe8c4183",
+            "sequence": 3,
+            "outcome": "accepted",
+            "rejectionCode": null
+          }
+        }
+      ]
+    },
+    "clockWakeOwned": true,
+    "closed": true,
+    "calls": [
+      {
+        "occurrenceId": "occurrence_e865045be131667f203a6bb506735f1c26036c8c81c74514b660624988cf558a",
+        "operationId": "timer:occurrence_e865045be131667f203a6bb506735f1c26036c8c81c74514b660624988cf558a",
+        "reapplyOf": null
+      },
+      {
+        "occurrenceId": "occurrence_fd89486355bc56e15c6f99a8ad181b2fe739e39d3ca71ad237d3c8c99972688e",
+        "operationId": "timer:occurrence_fd89486355bc56e15c6f99a8ad181b2fe739e39d3ca71ad237d3c8c99972688e",
+        "reapplyOf": null
+      },
+      {
+        "occurrenceId": "occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+        "operationId": "timer:occurrence_c02d7bede6a09f1fd1c9d204be60209d4ffa7edd2f7f0ad475a72e30571fc7fa",
+        "reapplyOf": null
+      },
+      {
+        "occurrenceId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "operationId": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "reapplyOf": null
+      },
+      {
+        "occurrenceId": "occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf",
+        "operationId": "reviewed-timer-occurrence",
+        "reapplyOf": "timer:occurrence_743e4cd84f6b0d3cc50b99e545e8a83ef58cc4f2efd659432332e6dc337fd7cf"
+      },
+      {
+        "occurrenceId": "occurrence_6152c0f6f4715e821c027093c77c10526200cf00c8d928e0ffcc8d938e928280",
+        "operationId": "timer:occurrence_6152c0f6f4715e821c027093c77c10526200cf00c8d928e0ffcc8d938e928280",
+        "reapplyOf": null
+      }
+    ]
+  },
+  "worker": {
+    "actualThread": true,
+    "publicFacade": true,
+    "identityBefore": "bb03089d2f9f92b97ff88dcddc07700ef4b97bca664ea3a237a2892de2e2690e",
+    "identityAfter": "bb03089d2f9f92b97ff88dcddc07700ef4b97bca664ea3a237a2892de2e2690e",
+    "initialDigest": "6fac8f428a6e29e5f90884111a0dc874aec3af50152faf6c4f8d3e66135c24f7",
+    "changedDigest": "773057c8feabbbb09528697ca91f55b50956635b9facdd0c0dd9fa362909901b",
+    "recoveredDigest": "6fac8f428a6e29e5f90884111a0dc874aec3af50152faf6c4f8d3e66135c24f7",
+    "reopenedDigest": "6fac8f428a6e29e5f90884111a0dc874aec3af50152faf6c4f8d3e66135c24f7",
+    "resetGeneration": "c4c40df376eb649899fe4257be3295761083616b55090da1594eeec2ba042aa5",
+    "resetObserved": true,
+    "followStopped": true,
+    "ownerClosedBeforeReopen": true
+  }
+}
