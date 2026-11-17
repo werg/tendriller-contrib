@@ -462,6 +462,10 @@ async function connect(session, browserRole) {
   ]);
   if (outcomes.some(value => value.status === 'rejected')) {
     if (outcomes[0].status === 'fulfilled') await outcomes[0].value.close();
+    report.negotiationFailures ??= [];
+    report.negotiationFailures.push({ signaling: mailbox.snapshot(),
+      endpoints: outcomes.map(value => value.status === 'rejected' ? { status: value.status, error: String(value.reason) } : { status: value.status }),
+      browser: await page.evaluate(() => fixture.observations().connectionFailures).catch(error => [{ error: String(error) }]) });
     throw outcomes.find(value => value.status === 'rejected').reason;
   }
   const nativeLink = outcomes[0].value, browserLink = outcomes[1].value;

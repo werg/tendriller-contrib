@@ -7,7 +7,7 @@ let worker, application, name;
 let resolveApplication;
 export const applicationReady = new Promise(resolve => { resolveApplication = resolve; });
 const links = new Map();
-const notices = [], statuses = [];
+const notices = [], statuses = [], connectionFailures = [];
 const ready = candidate => new Promise((resolve, reject) => {
   const timer = setTimeout(() => finish(Error('FIXTURE_WORKER_START_TIMEOUT')), 30_000);
   const receive = event => {
@@ -58,7 +58,27 @@ globalThis.fixture = {
       send: description => request(`${base}/send`, description),
       close: () => request(`${base}/close`, {}),
     };
-    const link = await connectWorkerApplicationWebRtc(worker, { role, signaling, expectedPeerId: peerId, timeoutMs: 30_000 });
+    const states = [], candidates = [];
+    let link;
+    try {
+      link = await connectWorkerApplicationWebRtc(worker, { role, signaling, expectedPeerId: peerId, timeoutMs: 30_000,
+        createPeerConnection(configuration) {
+          const peer = new RTCPeerConnection(configuration);
+          for (const name of ['icegatheringstatechange', 'iceconnectionstatechange', 'connectionstatechange']) peer.addEventListener(name, () => {
+            if (states.length < 64) states.push({ event: name, gathering: peer.iceGatheringState, ice: peer.iceConnectionState, connection: peer.connectionState });
+          });
+          peer.addEventListener('icecandidate', event => {
+            if (event.candidate && candidates.length < 32) candidates.push({ type: event.candidate.type, protocol: event.candidate.protocol });
+          });
+          peer.addEventListener('icecandidateerror', event => {
+            if (states.length < 64) states.push({ event: 'icecandidateerror', code: event.errorCode, message: event.errorText });
+          });
+          return peer;
+        } });
+    } catch (error) {
+      connectionFailures.push({ id, role, message: error.message, states, candidates });
+      throw error;
+    }
     links.set(id, link);
     return { peerId: link.peerId, stats: link.stats, route: await link.rtc.getRoute(), signaling: link.rtc.signaling };
   },
@@ -73,7 +93,7 @@ globalThis.fixture = {
     await application.close(); worker.terminate();
   },
   crash() { worker.terminate(); },
-  observations: () => ({ notices, statuses, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
+  observations: () => ({ notices, statuses, connectionFailures, secureContext: isSecureContext, storage: !!navigator.storage?.getDirectory,
     locks: !!navigator.locks, isolated: crossOriginIsolated, userAgent: navigator.userAgent }),
 };
 
