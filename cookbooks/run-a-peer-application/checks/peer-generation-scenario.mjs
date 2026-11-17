@@ -52,7 +52,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
   try {
     const hostDevice = await openDevice('control', true);
     const [deviceA, deviceB, deviceC] = await Promise.all(['a', 'b', 'c'].map(name => openDevice(name, true)));
-    await assert.rejects(openNativeDevice({ path: database('a') }), /AGENT_STORE_IN_USE/);
+    await assert.rejects(openNativeDevice({ path: database('a') }), /BYTES_STORE_IN_USE/);
     await assert.rejects(openNativeDevice({ path: database('missing') }), /APPLICATION_DEVICE_NOT_FOUND/);
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
     const applicationId = randomBytes(32).toString('hex');
