@@ -56,11 +56,12 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
     const applicationId = randomBytes(32).toString('hex');
     const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+    const definition = describeApplication(conversation);
     host = await createControl({ applicationId, hostDevice,
       configuration: {
         historyId: 'independent-peer-conversation',
         executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
-        definition: describeApplication(conversation),
+        definition, definitionDigest: await applicationDescriptionDigest(definition),
         schemaAdministrator: hostDevice.identity.publicKey, schema: null,
         epoch: 0, keyDigest: await bytesDigest(epochKey),
         members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { dataRole: 'member', administrator: device !== deviceC }) })),
@@ -274,8 +275,9 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
 async function createPortableControl({ applicationId, hostDevice, configuration }) {
   const { definition, schema, members, epoch, keyDigest, ...description } = configuration;
   assert.equal(schema, null, 'This independent conversation uses the events profile');
+  assert.equal(description.definitionDigest, await applicationDescriptionDigest(definition));
   const descriptor = await signApplicationDescriptor({ ...description, applicationId,
-    definitionDigest: await applicationDescriptionDigest(definition), schemaDigest: null,
+    schemaDigest: null,
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: hostDevice.identity.publicKey,
   }, hostDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
