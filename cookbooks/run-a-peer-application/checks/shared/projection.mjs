@@ -1,5 +1,5 @@
 // Page-owned task-board vocabulary. This reducer never authors a change or effect.
-export const REDUCER_VERSION = 'task-board/v2';
+export const REDUCER_VERSION = 'task-board/v3';
 export const TOPICS = Object.freeze(['conversation', 'job-requests', 'job-results', 'tasks']);
 export const DISPLAY_LIMIT = 100;
 
@@ -52,6 +52,9 @@ export function reduceEvent(state, event) {
     const entry = {
       jobId, requestEventId, status: job.type.slice(4),
       taskId: job.taskId, text: job.text ?? prior?.text ?? '', eventId: event.id,
+      // Each author comes from its own authenticated event, never payload lineage.
+      requestOrigin: result ? prior?.requestOrigin ?? null : event.origin,
+      resultOrigin: result ? event.origin : null,
     };
     jobs = [...jobs.filter(value => value.requestEventId !== requestEventId), entry].slice(-DISPLAY_LIMIT);
   } else return advance(state, {}, true);

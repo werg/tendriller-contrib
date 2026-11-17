@@ -48,6 +48,24 @@ test('message attribution retains authenticated provenance instead of payload ro
   assert.equal(rendered.role, undefined);
 });
 
+test('job replay preserves the authenticated requester separately from its result publisher', () => {
+  const request = jobRequest(1);
+  request.payload.origin = { authorId: 'spoofed-owner' };
+  request.payload.configurationOrigin = { authorId: 'spoofed-owner' };
+  const completed = jobResult(2, request);
+  completed.origin = { ...completed.origin, authorId: 'resident-worker' };
+  completed.payload.requestOrigin = { authorId: 'spoofed-owner' };
+  const source = batch([request, completed]);
+  const job = reduceBatch(emptyProjection(), source).jobs[0];
+  assert.deepEqual(job.requestOrigin, request.origin);
+  assert.deepEqual(job.resultOrigin, completed.origin);
+  assert.notDeepEqual(job.requestOrigin, job.resultOrigin);
+  assert.deepEqual(reduceBatch(emptyProjection(), structuredClone(source)).jobs[0], job);
+  const resultWithoutRetainedRequest = reduceBatch(emptyProjection(), batch([completed])).jobs[0];
+  assert.equal(resultWithoutRetainedRequest.requestOrigin, null);
+  assert.deepEqual(resultWithoutRetainedRequest.resultOrigin, completed.origin);
+});
+
 test('job results bind their original intent and duplicate display IDs cannot merge separate effects', () => {
   const request = jobRequest(1, 'same', 'one');
   const another = { ...request, id: 'second:0', proposalId: 'second' };

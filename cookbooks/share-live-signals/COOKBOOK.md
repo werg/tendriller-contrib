@@ -210,6 +210,13 @@ The transport must provide the required confidentiality and connection access.
 Do not assume a signed signal is encrypted or a successful introduction grants
 permission to read a database.
 
+In a governed Chronolog group, a signal-only writer grant explicitly declares
+`program: { sql: false, topics: [], signals: ['typing', 'job-progress'] }`.
+Writer permission does not imply SQL, durable topics or forwarding. The standard
+peer link independently requires reader admission; standalone and hosted
+channels instead use their own configured authorization. No membership or
+schema administration role is required to send live information.
+
 The peer RTC adapter uses an independent unordered live channel, separate from
 reliable history and detached-body transfer. Both channels share one authenticated
 connection but have separate queues. Saturated history credit cannot hold a
@@ -262,7 +269,7 @@ ephemeral typing with durable messages and final agent results.
 | A slow consumer follows replaceable progress | `latest` coalesces values and memory remains bounded. |
 | A chunk is missing, expires or overflows | The preview is marked incomplete; the complete durable result repairs it. |
 | Retry after reconnect | Only fresh live observations are sent; no old signal outbox replays. |
-| A sender lacks topic authorization | Delivery fails without acquiring a durable writer or administrator role. |
+| A sender lacks topic authorization | Delivery fails; connection access or another topic grant does not widen its rights. |
 
 These are adaptation checks. The standalone and integrated channel tests belong
 to Chronolog; existing source-pinned task/chat reports qualify only the exact

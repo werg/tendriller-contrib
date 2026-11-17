@@ -85,6 +85,39 @@ can verify a durable history without certifying it. A resident can run effects
 without holding the membership or finality key. Only combine these roles when
 the deployment intends to trust the same operator with each decision.
 
+Chronolog writer grants carry explicit `ProgramRights` in `program`:
+
+```js
+const writerProgram = { sql: false, topics: ['job-results'], signals: ['job-progress'] };
+```
+
+`sql` covers SQL and platform steps; `topics` and `signals` list exact durable
+and live topics. Omitted `forwarded` means false. One writer grant must cover
+the whole submitted program; the system does not combine fragments from
+several grants to authorize a mixed operation. Reader and validator grants do
+not carry program rights. There is no grantable administrator role: the genesis
+membership root and capability feed own membership administration, while the
+separately selected schema administrator owns schema changes. A writer's SQL
+permission still leaves row ownership, schema checks and domain assertions in
+force. It grants no private tool or provider credentials.
+The pinned membership root is a trusted key issuer: it can grant reader access
+and create or withhold content keys. Choose its operator with that power in mind.
+
+Enrollment requests and approvals name `writerProgram` explicitly when they
+include the writer role. An approval may narrow those requested rights, never
+widen them. A signal-only sender can request
+`{ sql: false, topics: [], signals: ['typing'] }`; a standard full peer also
+needs its independent reader grant for the authenticated peer connection.
+Standalone signals have their own explicit policy and require neither grant.
+
+Reader revocation and encryption-epoch advancement belong to the same signed
+membership revision. Key-delivery manifests supply material for that authorized
+state; their arrival order cannot activate a new epoch. Missing an authorized
+key blocks access without changing permissions or timestamp order. Enrollment
+readiness requires both captured history keys and the current active epoch's
+key. Future keys that happen to arrive early do not enlarge the captured target
+or activate a new epoch.
+
 Durable event provenance is supplied by the backend in `event.origin`. For a
 Chronolog event it identifies the verified group, author, original operation,
 membership revision, writer capability and signed author time. For a hosted
@@ -92,6 +125,11 @@ event it identifies the application, authenticated author, operation and role.
 Keep that metadata attached when building projections or handing work to an
 agent. A payload's `role`, `author` or `instruction` field is application data;
 it cannot replace verified provenance or grant permission to invoke a tool.
+The Chronolog author's canonical hex identity is the same `authorId` used by
+its live signals. The group, membership revision and writer grant are opaque
+base64url identities; signed author time is a decimal string. A null writer
+grant denotes an explicitly configured static membership resolver, not an
+implicit privilege. Keep the authenticated origin intact across checkpoints.
 
 Select a finality provider for the durable history independently of the page host
 and effect worker. The fixed native provider is an implementation of that role,
@@ -118,9 +156,10 @@ For application code, progress and outcome answer separate questions:
 
 Submission returns the operation's current state. Subscribe to
 `application.operations` when the workflow needs its final outcome. Native
-Chronolog operation handles provide `accepted()` to wait for final acceptance;
-it rejects on a final rejection. A provisional success never releases dependent
-work or an irreversible effect.
+Chronolog handles expose `local()` for the current executed result and `final()`
+for the immutable result. Both return accepted or rejected outcomes. Inspect
+`result.outcome.type`; waiting successfully does not mean the operation succeeded.
+A provisional success never releases dependent work or an irreversible effect.
 
 An inclusion receipt alone cannot establish either final application outcome.
 A final accepted operation also does not establish that another peer has a
@@ -172,6 +211,16 @@ publishes a result. If a provider acted before a crash, use its idempotency key 
 query its original result. Without either, retain an uncertain outcome for
 reconciliation.
 
+A timer preserves the original configuration event's authenticated
+`configurationOrigin` alongside `configurationEventId`, including after a
+scheduler restart or an uncertain publication. Its publisher checks whether
+that requester and the current schedule generation authorize the derived
+action, and retains the relevant guards in the atomic publication. The fired
+event's own `origin` identifies the scheduler. Its payload's
+`configurationOrigin` is scheduler-attested lineage: downstream consumers trust
+an explicitly authorized scheduler or verify the referenced retained event.
+Copying an origin-shaped object into JSON does not authenticate a requester.
+
 Disposable live work can stay live: a signal may update a cursor, request a
 preview, stop a local playback or produce an expiring progress indication under
 its explicit topic policy. No durable intent is required merely because an
@@ -188,12 +237,14 @@ Before changing the page, write down:
 
 1. Which values are local, live, durable, transactional and external.
 2. Which durable backend and execution profile own application writes.
-3. Which roles may publish topics, change schema, administer membership, certify
-   finality and dispatch each effect.
+3. Which explicit writer programs may publish topics or SQL, and who may change
+   schema, administer membership, certify finality and dispatch each effect.
 4. Which view is provisional, which progress is final, and what resets on loss of
    a live connection.
 5. Which failure would lose meaning: a lost signal, a failed assertion, a delayed
    retry, a rebase, a revoked capability or a crash after external dispatch.
+6. Which authenticated origin authorizes each private tool action, including
+   requester lineage for scheduled work; a final intent alone grants no access.
 
 Then implement the smallest path that meets those guarantees. Use the public
 signal channel, operation store, view changes, read views and effect service. Do not create a

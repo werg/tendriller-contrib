@@ -125,8 +125,18 @@ The service records the actual `effect.completed` envelope, including
 `originEventId` and the handler's `result`. The UI joins the result to that
 originating request event; a duplicate display `jobId` cannot merge effects.
 Browser writer grants include `job-requests`; only the trusted worker may write
-`job-results`. Selecting a handler is a trusted deployment decision; a JSON event
-cannot install a workflow or grant tool authority.
+`job-results`. These are explicit writer `program` rights: the page needs SQL
+plus `conversation`, `tasks` and `job-requests`, while the result publisher can
+use `sql: false` with `topics: ['job-results']`. Reader permission is independent.
+Selecting a handler is a trusted deployment decision; a JSON event cannot
+install a workflow or grant tool authority.
+
+The runnable handler reads shared final task data and formats a bounded response;
+it has no private tool or provider. A replacement handler with private files,
+email, account data or provider credentials must authorize the authenticated
+`event.origin` and the requested resource before using those powers. A final
+event and an allowed publication topic do not establish that policy. The public
+worker preserves the origin through retries and checkpoint recovery.
 
 The projection recognizes handler `summarize-task`, version `1`, and validates
 its bounded job, task, origin-event and effect identities. A topic grant permits
@@ -154,7 +164,11 @@ projection checkpoint helper instead of inventing a second receipt protocol.
 Operation progress is `queued`, `provisional` or `final`; its separate outcome
 is `accepted` or `rejected`. Both final outcomes stop the status subscription.
 The message projection retains authenticated `event.origin` separately from
-the JSON payload. Payload labels cannot impersonate an owner or effect worker.
+the JSON payload. Job projections keep the requester's `requestOrigin` distinct
+from the result publisher's `resultOrigin`. Payload labels cannot impersonate
+an owner or effect worker. For a timer-derived request, its event origin is the
+scheduler; `configurationOrigin` is lineage asserted by that scheduler, whose
+authority must be established or checked against the retained source event.
 
 Typing uses `signals.subscribe({ topics: ['typing'], mode: 'latest' })`; distinct
 transient messages use the channel's default FIFO policy. The page-owned

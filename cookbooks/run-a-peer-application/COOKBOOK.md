@@ -139,6 +139,22 @@ application descriptors or bodies. It can establish roster progress
 without establishing that an application replica has fetched or executed the
 corresponding payloads.
 
+Every writer grant includes explicit `program` rights. A page that authors the
+task board might receive
+`{ sql: true, topics: ['conversation', 'tasks', 'job-requests'], signals: ['typing'] }`.
+A resident that only publishes results can receive
+`{ sql: false, topics: ['job-results'], signals: ['job-progress'] }` plus a reader
+grant for shared history. A full mixed program must fit one grant. Enrollment
+requests and approvals use the same `ProgramRights` shape as `writerProgram`;
+approval may narrow the request. There is no implicit SQL permission and no
+administrator capability to add to these grants. Membership authority comes
+from the pinned root; schema administration and row ownership remain separate.
+
+Reader revocation and the corresponding encryption-epoch change form one signed
+membership revision. Key delivery makes that authorized epoch usable; it does
+not define a second activation timeline. A missing key is a readiness blocker.
+It cannot make a revoked reader current or alter the signed ordering timestamp.
+
 Keep these facts distinct in both the interface and operations:
 
 | Status | What it establishes |
@@ -213,16 +229,21 @@ identity; an older rejected edit is reviewed instead of silently upgraded.
 
 The operation API separates progress (`queued`, `provisional`, `final`) from
 the executed outcome (`accepted` or `rejected`). A terminal rejection is
-`{ status: 'final', outcome: 'rejected' }`. Native operation handles'
-`accepted()` waits for final acceptance; the browser adapter exposes the same
-decision through `operations.subscribe`. Submission resolving is not by itself
-permission to proceed.
+`{ status: 'final', outcome: 'rejected' }`. Native operation handles expose
+`local()` for the executed result at its current position and `final()` for its
+immutable result; both return accepted or rejected outcomes. Inspect
+`result.outcome.type` before dependent work. The browser adapter exposes the
+same decision through `operations.subscribe`. Submission resolving is not by
+itself permission to proceed.
 
 Use authenticated `event.origin` when attributing a record or choosing which
 agent policy may handle it. Chronolog supplies the verified group, author,
 operation, membership revision and writer capability. A JSON field that claims
 to be an owner instruction cannot confer that authority. The handler's allowed
 topics, verified sender policy and actual tool credentials are separate checks.
+The original signed timestamp and grant context stay attached through the
+worker's durable checkpoint. A later retry keeps this original operation; it
+does not become newly authorized future work after a revocation.
 
 ## Subscribe to views without consuming work
 
@@ -273,11 +294,27 @@ may need a retry using that same provider key or an explicit provider lookup.
 Without either facility, keep the outcome uncertain and expose a reconciliation
 action. The log cannot make an external service transactional after the fact.
 
+The runnable summary worker only reads shared final task data and formats a
+bounded result; it has no private provider or tool. A handler with email,
+filesystem, account or model-provider access must apply its own explicit
+requester and resource policy to authenticated `event.origin` before using
+those credentials. Publishing an allowed request topic and reaching finality
+do not grant those private powers. Handler selection remains deployment code.
+
 Start with one designated worker for each effect kind. Preserve stable timer
 occurrence IDs, cancellation boundaries, and notification intent. A timer firing
 is recorded intent; a page being open, a model being awake, and a notification
 being delivered are separate facts. Multiple dispatchers need an explicit
 ownership/fencing design, which this first profile does not assume.
+
+For scheduled work, retain both `configurationEventId` and authenticated
+`configurationOrigin` through schedule and pending-occurrence checkpoints.
+The timer publisher authorizes the original requester and current generation
+before publishing the derived action. The resulting event's `origin` remains
+the scheduler's identity; payload lineage does not replace it. A downstream
+worker trusts that lineage only from an authorized scheduler or after verifying
+the referenced retained configuration event. Generation and due-time guards
+protect the timer transition; they do not grant private tool access.
 
 ## Connect peers without hiding the route
 
