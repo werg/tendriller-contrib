@@ -23,7 +23,51 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Final clean runtime evidence
+## Projection and measured-recovery checkpoint
+
+The combined source changes are qualified separately from the earlier
+`08ee9f2a` evidence below. Three clean local lanes passed with Chronolog source
+`482c4a4c079345d990bd4d97e42cb947dec6778a`, tree
+`13887c218aa76862a41a8f4fe03584b39b41d4d5`, and isolated contrib source
+`6e6b3359d57e5cb8354ce97b79d34aa320b27019`, tree
+`7c6a8fb7ae73537b88dc644746ab6cc9df933463`.
+
+| Lane | Preserved evidence | Newly exercised behavior |
+| --- | --- | --- |
+| Direct events | [Raw report](evidence/2026-11-17-combined-direct-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-direct-482c4a4c-summary.json) | Owned projection reuse, selected-history reset, durable checkpoint reopen, definition-version reset, and the measured retained workload. |
+| Native RTC | [Raw report](evidence/2026-11-17-combined-rtc-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-rtc-482c4a4c-summary.json) | The same application/projection/recovery checks over real native ICE/DTLS/SCTP, with explicit loopback candidates. |
+| Native SQL | [Raw report](evidence/2026-11-17-combined-sql-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-sql-482c4a4c-summary.json) | Guarded claims and original-author rejection, coherent SQL/event recovery, deliberate reapplication, and identity-preserving durable reopen on the actual patched engine. |
+
+The RTC archive SHA-256 is
+`f69d7704e656f5986ce7dbbe03bb07ce9a5286f0bba1c29fc6736fa07136dd9f`.
+The native SQL archive SHA-256 is
+`d95fcac236368dd7228f65cb688de6ea9217f27c848df34dc7a14bb67076a83c`;
+the direct events lane uses those same bytes without selecting SQL. Each report
+also records and verifies the installed package provenance and content digests.
+
+The two events lanes submit 32 commands with 1,024-byte text payloads through
+ordinary `applied()` completion while the host is blocked. A single coverage
+wait after the burst observes another peer's signed retained receipt and
+independent storage identity. After coordinator loss, the selected takeover
+adopts that exact prefix and all 32 original-author outcomes remain accepted.
+No per-command shared wait is added to the application path.
+
+| Measured two-peer workload | Last-applied prefix age at disconnect | Takeover readiness after disconnect | Known lost workload commands |
+| --- | --- | --- | --- |
+| Direct events | 177.37 ms | 3,554.59 ms | 0 |
+| Native RTC | 368.47 ms | 2,107.38 ms | 0 |
+
+Both runs honor the configured 150 ms reconnect grace and remain below the
+300,000 ms target for this declared burst. These observations establish a
+bounded local workload result, not a universal loss limit, a sustained workload
+envelope, or a measurement of Internet/device availability. The cold-observer
+case still requires explicit approval when freshness is unknown.
+
+The actual hosted participant, real Chromium and exact five-gate composition
+manifest remain pending for this source pairing. The earlier all-green CI below
+is retained with its own identities and does not qualify these newer sources.
+
+## Earlier clean `08ee9f2a` runtime evidence
 
 All four local lanes below used Chronolog source
 `08ee9f2ab4a75f3b3396a9af2b420813e1d05f8c`, tree
@@ -89,9 +133,9 @@ and survival of the selected publication across host restart. Database,
 content and live-signal updates are filtered before HTTP and independently
 refused at raw host ingress.
 
-## Final CI and browser checkpoint
+## Earlier CI and browser checkpoint
 
-The final CI source is Chronolog
+The completed earlier CI source is Chronolog
 `26958effbc40a4881db66e1bd879558d106a02d5`, with contrib runtime fixtures
 `fdeac2da9d9893907c110efac8b0caa9c9c5279a` and Tendriller
 `bfe9daf89305fccc20ed008ce498f9746527e52e`. The later core commits contain
@@ -99,7 +143,7 @@ documentation, CI pins and a handover-test readiness correction; the runtime
 implementation is the one packed from `08ee9f2a` above. CI still built and tested
 its own exact source artifacts; the local archives are not relabeled as CI builds.
 
-| Final CI run | Result and scope |
+| Earlier exact-source CI run | Result and scope |
 | --- | --- |
 | [Quality and conformance](https://github.com/werg/chronolog-db/actions/runs/44116962939) | Passed: 504 tests, 6 WASM tests skipped in the ordinary suite; 61 files passed and 1 skipped. Coverage was 91.46% statements and 85.37% branches. Build/artifact gates and Linux/macOS conformance/digest jobs passed. |
 | [Dedicated native/WASM comparison](https://github.com/werg/chronolog-db/actions/runs/44116962911) | Passed: 6/6 actual native/WASM tests. The ordinary-suite skips are not used as equivalence evidence. |
@@ -176,7 +220,7 @@ study is not erased by combining their results.
 | --- | --- | --- |
 | G0 — Executable authenticated order and recovery | One public runtime executes signed selected order. Shared verification fences grants, excluded ancestry and recovery floors; actual SQL checks original-signer authorization. Core security/quality and dedicated native/WASM CI pass. | These exact-source results do not qualify arbitrary future engine artifacts or every deployed failure condition. |
 | G1 — Remove hosted steady-state commands | Native, actual workerd/native RTC and real Chromium gates pass host-blocked work. The host enforces its participant facet policy; required ordinary application-body bytes stay off its transport. | Deployed routes, TURN and provider traffic/cost require direct measurement. |
-| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. | The configured five-minute objective still needs a representative sustained workload, device availability and network envelope. No universal maximum loss is claimed. |
+| G2 — Recover with accepted recent loss | Explicit fault cases preserve adopted identities and inspectable excluded attempts across repeated generations. The maintained controller independently passes discovery, grace, automatic takeover and exact approval for unknown freshness. The `482c4a4c` direct/RTC lanes measure a 32-command, 1,024-byte two-peer burst, retain all its accepted commands, and recover below the five-minute target. | That bounded local workload does not qualify sustained workloads, device availability or the deployed network envelope. No universal maximum loss is claimed. |
 | G3 — Independent developer/agent experience | Empty-directory consumers use public archives and one journal. Actual SQL, host and Chromium gates pass. A fresh agent completes the bounded public-tools business workflow and a final-artifact repeat preserves its results. | The agent received fixture-owned installation/enrollment. A fresh agent independently performing the full install/create-enroll/deployed-discovery setup remains unqualified. The recorded assistance must remain visible. |
 | G4 — Real network, cost and operating envelope | Reports expose measured runtime, byte and source boundaries; cost calculations preserve unknown measurements. | Deployed login, home/mobile/restrictive networks, TURN, suspension, churn, quota, large content, battery, backup and provider billing remain unqualified. |
 
