@@ -28,7 +28,7 @@ export function validateBrowserPeerReport(report) {
   assert.ok(report.browserBundleInputs.length > 3);
   for (const input of report.browserBundleInputs) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') || relay && input.startsWith('node_modules/@tendriller/core/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs'].includes(input));
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs', 'peer-generation-browser-resources.mjs'].includes(input));
   assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
   for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) {
     assert.ok(report.runtime.dependencies.packages.some(item => item.path === `node_modules/${name}` && item.version === version && item.integrity));
@@ -42,6 +42,7 @@ export function validateBrowserPeerReport(report) {
   assert.equal(browser.interfaceEnumeration, relay ? 'not-used' : 'disabled-by-native-options');
   assert.deepEqual(browser.pageErrors, []);
   for (const field of ['secureContext', 'storage', 'locks']) assert.equal(browser.observations[field], true);
+  validateLazyDatabase(report);
   const ui = report.ui;
   assert.deepEqual(ui.pages, ['board.html', 'compact.html']); assert.equal(ui.domain, 'events');
   assert.equal(ui.sessionFacade, 'connectApplicationWorker'); assert.equal(ui.sentThroughForms, 3);
@@ -49,7 +50,7 @@ export function validateBrowserPeerReport(report) {
   assert.ok(typeof ui.draftBeforeRestart === 'string' && ui.draftBeforeRestart.length > 0);
   assert.equal(ui.draftAfterRestart, ui.draftBeforeRestart); assert.equal(ui.draftAfterRecovery, ui.draftBeforeRestart);
   const ownership = report.ownership;
-  for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceAwaitedKeys']) assert.equal(ownership[field], true);
+  for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceStartedWithoutKeys']) assert.equal(ownership[field], true);
   assert.equal(ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the fixture');
   assert.equal(ownership.pagePrivateKeys, 0);
   assert.equal(ownership.controlParticipant?.owner, 'application-session');
@@ -113,6 +114,9 @@ export function validateBrowserPeerReport(report) {
     recovery: { previousHead: recovery.priorHead.sequence, adoptedPrefix: recovery.adoptedPrefix.sequence,
       abandonedOperationId: recovery.originalAttempt.operationId, reappliedOperationId: recovery.reapplied.operationId },
     identityReopened: { graceful: true, abruptWorker: true },
+    lazyDatabase: { protocolBeforeData: true, liveBeforeData: true, codeBeforeData: true, concurrentFirstQueries: 3,
+      protocolWorkers: 1, additionalDatabaseWorkers: 0, durableOpenings: 1, sameIdentity: true,
+      storageFailureAtDataDemand: true, dormantCloseDoesNotOpenData: true, activeCloseReleasesLock: true },
     limitations: [
       ...(relay ? ['Control HTTP is blocked independently of relay availability; WebSocket ciphertext consumes observed host bandwidth.'] : []),
       relay ? 'Local Chromium/native WebSocket and Workerd only; no deployed WSS, Internet, home/mobile/restrictive network or provider billing qualification.' : 'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network or provider billing qualification.',
@@ -120,4 +124,57 @@ export function validateBrowserPeerReport(report) {
       'Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.',
       'The browser gate uses the event execution runtime; SQL engine behavior requires its separate public-artifact gate.',
     ] };
+}
+
+function validateLazyDatabase(report) {
+  const lazy = report.lazyDatabase, graph = lazy.moduleGraph;
+  for (const source of ['packages/peer-session/src/application-data.ts', 'packages/records/src/browser.ts']) assert.ok(graph.sourceModules.includes(source));
+  assert.ok(graph.packageModules.length >= 1); assert.ok(graph.browserModules.length >= 1);
+  for (const name of graph.packageModules) assert.match(name, /^node_modules\/@chronolog\/peer-session\/(?:chunks\/)?[A-Za-z0-9_.-]+\.mjs$/u);
+  for (const file of graph.browserModules) assert.ok(report.browserAssets.some(asset => asset.file === file));
+  const cold = resources => {
+    for (const key of ['opfsRoots', 'writableFiles', 'syncHandles', 'lockRequests']) assert.equal(resources[key], 0);
+    assert.deepEqual(resources.lockNames, []);
+  };
+  for (const stage of [lazy.shell, lazy.protocol, lazy.firstData]) {
+    assert.deepEqual(stage.databaseModulesRequested, stage.modulesRequested.filter(file => graph.browserModules.includes(file)).sort());
+    cold(stage.page);
+  }
+  assert.equal(lazy.shell.workers, 0); assert.deepEqual(lazy.shell.databaseModulesRequested, []);
+  assert.equal(lazy.protocol.workers, 1); assert.deepEqual(lazy.protocol.databaseModulesRequested, []);
+  const initial = lazy.protocol.observation;
+  assert.equal(initial.database, 'idle'); assert.equal(initial.revision, null); cold(initial.resources);
+  assert.ok(initial.resources.indexedDbOpens >= 1);
+  assert.equal(initial.protocol.attachRequests, 0); assert.equal(initial.protocol.database, 'idle');
+  assert.equal(initial.protocol.definitionVerified, true); assert.match(initial.protocol.publicationId, /^[a-f0-9]{64}$/u);
+  assert.match(initial.protocol.codeDigest, /^[a-f0-9]{64}$/u); assert.equal(initial.protocol.servedCodeDigest, initial.protocol.codeDigest);
+  assert.equal(initial.protocol.publicationVersion, 1);
+  for (const [facet, action] of [['control', 'read'], ['publication', 'definition'], ['publication', 'publish'], ['publication', 'read']]) {
+    assert.ok(initial.protocol.exchanges.some(exchange => exchange.facet === facet && exchange.action === action));
+  }
+  assert.equal(lazy.protocol.live.browserToNative, true); assert.equal(lazy.protocol.live.nativeToBrowser, true);
+  assert.equal(lazy.protocol.live.verifiedAuthors.length, 2);
+  assert.ok(lazy.protocol.live.verifiedAuthors.includes(report.ownership.initialDeviceId));
+  assert.notEqual(...lazy.protocol.live.verifiedAuthors);
+  const opened = lazy.firstData;
+  assert.equal(opened.workers, 1); assert.equal(opened.sameIdentity, true);
+  assert.equal(opened.requests.method, 'query'); assert.equal(opened.requests.concurrent, 3);
+  assert.match(opened.firstView, /^[a-f0-9]{64}$/u);
+  assert.deepEqual(opened.requests.results, Array(3).fill(opened.firstView));
+  assert.equal(opened.observation.database, 'ready');
+  assert.equal(opened.observation.resources.opfsRoots, 1); assert.equal(opened.observation.resources.lockRequests, 1);
+  assert.equal(opened.observation.resources.lockNames.length, 1); assert.ok(opened.observation.resources.writableFiles > 0);
+  assert.equal(opened.observation.resources.indexedDbOpens, initial.resources.indexedDbOpens);
+  assert.ok(opened.databaseModulesRequested.length >= 1);
+  assert.deepEqual(opened.transitions, ['idle', 'opening', 'ready']);
+  assert.deepEqual(opened.transitions, opened.statuses.map(value => value.database).filter((value, index, values) => index === 0 || value !== values[index - 1]));
+  for (const [result, expected] of [[lazy.secondOwner, 'BROWSER_STORAGE_IN_USE'], [lazy.unsupportedStorage, 'BROWSER_DURABLE_STORAGE_UNAVAILABLE']]) {
+    assert.equal(result.protocolOpened, true); assert.equal(result.deviceId, report.ownership.initialDeviceId);
+    assert.equal(result.storageId, report.ownership.initialStorageId); assert.equal(result.before.database, 'idle'); cold(result.before.resources);
+    assert.equal(result.before.protocol.definitionVerified, true); assert.equal(result.error, expected);
+    assert.equal(result.after.database, 'failed'); assert.equal(result.after.revision, null);
+  }
+  assert.equal(lazy.dormantClose.sameIdentity, true); assert.equal(lazy.dormantClose.before.database, 'idle'); cold(lazy.dormantClose.before.resources);
+  assert.deepEqual(lazy.dormantClose.heldLocks, opened.observation.resources.lockNames);
+  assert.equal(lazy.activeClose.before.database, 'ready'); assert.deepEqual(lazy.activeClose.heldLocks, []);
 }

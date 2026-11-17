@@ -4,15 +4,16 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { build } from 'esbuild';
-import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, createParticipantRequest, createParticipantResponse,
+import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, createPublicationRegistry, createParticipantRequest, createParticipantResponse, describeApplication,
   eventExecutionManifest, executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision,
-  signTransitionRequest, validateParticipantRequest } from '@chronolog/peer-session';
+  signTransitionRequest, validateParticipantRequest, verifyPublicationAsset } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
 import { openFixtureConnection, inspectFixtureConnection } from './peer-generation-native-transport.mjs';
 import { conversation } from './peer-generation-definition.mjs';
+import { observeBrowserResources } from './peer-generation-browser-resources.mjs';
 
 const path = resolve(process.argv[2]), report = JSON.parse(await readFile(path, 'utf8'));
 const relay = report.topology === 'browser-worker-opfs-websocket', relayBase = process.env.PEER_GENERATION_HOST_BRIDGE;
@@ -21,7 +22,9 @@ const sessions = new Set(), devices = new Set(), connections = [], introductions
 const timeout = () => AbortSignal.timeout(20_000);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const valueHash = value => hash(JSON.stringify(value));
-let browser, page, server, registry, authority, a, controlDevice, deviceA, deviceC, browserIdentity;
+let browser, page, server, registry, publications, authority, a, controlDevice, deviceA, deviceC, browserIdentity;
+const publicationAssets = new Map(), scriptRequests = [];
+let workerStarts = 0;
 let blocked = false, controlRequests = 0, controlBodyBytes = 0, signalingRequests = 0, signalingBodyBytes = 0;
 const applicationId = randomBytes(32).toString('hex'), key = new Uint8Array(randomBytes(32));
 const checkpoint = async stage => {
@@ -62,10 +65,11 @@ try {
     target: ['chrome145'], outExtension: { '.js': '.mjs' }, metafile: true, logLevel: 'warning' });
   for (const input of Object.keys(bundle.metafile.inputs)) assert.ok(input.startsWith('node_modules/@chronolog/peer-session/') || relay && input.startsWith('node_modules/@tendriller/core/') ||
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
-      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
+      'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs', 'peer-generation-browser-resources.mjs'].includes(input), `Unexpected browser bundle input: ${input}`);
   for (const file of ['board.html', 'compact.html', 'style.css']) await writeFile(join(assets, file), await readFile(join(process.cwd(), file)));
   report.browserAssets = await Promise.all((await readdir(assets)).map(async file => ({ file, sha256: hash(await readFile(join(assets, file))) })));
   report.browserBundleInputs = Object.keys(bundle.metafile.inputs).sort();
+  report.lazyDatabase = { moduleGraph: databaseModules(bundle.metafile, report.artifacts[0].provenance.runtimeModules) };
   [controlDevice, deviceA, deviceC] = await Promise.all(['control', 'a', 'c'].map(nativeDevice));
   server = createServer((request, response) => {
     void route(request, response).catch(error => {
@@ -87,33 +91,98 @@ try {
     nativeCandidateSource: relay ? 'not-used' : 'explicit-loopback-only', interfaceEnumeration: relay ? 'not-used' : 'disabled-by-native-options',
     pageErrors: [], consoleErrors: [] };
   const context = await browser.newContext();
+  await context.addInitScript(observeBrowserResources);
   page = await context.newPage();
+  page.on('worker', () => workerStarts++);
   page.on('pageerror', error => report.browser.pageErrors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') report.browser.consoleErrors.push(message.text()); });
   await page.goto(origin);
   await page.waitForFunction(() => !!globalThis.fixture);
+  report.lazyDatabase.shell = await startupObservation();
+  assert.equal(report.lazyDatabase.shell.workers, 0);
+  assertCold(report.lazyDatabase.shell.page);
+  assert.deepEqual(report.lazyDatabase.shell.databaseModulesRequested, []);
   const deviceName = `peer-browser-${randomBytes(8).toString('hex')}`;
   const opened = await page.evaluate(deviceName => fixture.open({ deviceName, provision: true }), deviceName);
   assert.equal(opened.deviceId, browserIdentity.deviceId);
-  assert.equal(opened.status.phase, 'awaiting-keys');
+  assert.equal(opened.status.database, 'idle');
+  assert.equal(opened.observation.revision, null);
   assert.equal(opened.capabilities.finality, false);
-  assert.equal(controlRequests, 0, 'Attaching the Worker control participant must not perform I/O');
+  assert.equal(opened.observation.protocol.attachRequests, 0, 'Attaching the Worker control participant must not perform I/O');
+  assert.equal(opened.observation.protocol.database, 'idle');
+  assert.equal(opened.observation.protocol.definitionVerified, true);
+  assert.equal(opened.observation.protocol.codeDigest, opened.observation.protocol.servedCodeDigest);
+  assert.ok(controlRequests > 0, 'The cold participant actually exchanged control and published code');
+
+  await post(a, 'anchor', 'A retained anchor');
+  let ab = await connect(a, 'answerer', { synchronize: false });
+  const coldLive = await exchangeColdSignals(a);
+  report.lazyDatabase.protocol = { ...await startupObservation(), ...await page.evaluate(() => fixture.observations()), live: coldLive };
+  assert.equal(report.lazyDatabase.protocol.workers, 1);
+  assertCold(report.lazyDatabase.protocol.page);
+  assertCold(report.lazyDatabase.protocol.observation.resources);
+  assert.equal(report.lazyDatabase.protocol.observation.database, 'idle');
+  assert.equal(report.lazyDatabase.protocol.observation.revision, null);
+  assert.deepEqual(report.lazyDatabase.protocol.databaseModulesRequested, []);
+
+  // Genuine concurrent view reads share initialization and initial synchronization
+  // through the already connected participant. The fixture does not initialize it.
+  const firstReads = await page.evaluate(() => Promise.all(Array.from({ length: 3 }, () => application.query('conversation', {}))));
+  assert.equal(firstReads.length, 3);
+  const firstView = firstReads[0];
+  for (const result of firstReads) assert.deepEqual(result, firstView);
+  assert.ok(firstView.value.messages.some(message => message.operationId === 'anchor'));
+  report.lazyDatabase.firstData = { ...await startupObservation(), ...await page.evaluate(() => fixture.observations()),
+    requests: { method: 'query', concurrent: 3, results: firstReads.map(valueHash) }, firstView: valueHash(firstView),
+    sameIdentity: await page.evaluate(id => application.deviceId === id, opened.deviceId) };
+  assert.equal(report.lazyDatabase.firstData.workers, 1, 'Database demand must use the existing protocol Worker');
+  assert.equal(report.lazyDatabase.firstData.observation.database, 'ready');
+  assert.equal(report.lazyDatabase.firstData.observation.resources.opfsRoots, 1);
+  assert.equal(report.lazyDatabase.firstData.observation.resources.lockRequests, 1);
+  assert.deepEqual(report.lazyDatabase.firstData.observation.resources.lockNames, [`chronolog:${deviceName}`]);
+  assert.ok(report.lazyDatabase.firstData.databaseModulesRequested.length > 0);
+  assertCold(report.lazyDatabase.firstData.page);
+  const transitions = report.lazyDatabase.firstData.statuses.map(value => value.database).filter((value, index, values) => index === 0 || value !== values[index - 1]);
+  assert.deepEqual(transitions, ['idle', 'opening', 'ready']);
+  report.lazyDatabase.firstData.transitions = transitions;
+  await page.evaluate(() => fixture.showApplication());
+
   assert.equal(await page.evaluate(() => fixture.windowStorage()), 'BROWSER_PEER_WORKER_REQUIRED');
-  assert.equal(await page.evaluate(() => fixture.secondOwner()), 'BROWSER_STORAGE_IN_USE');
-  assert.equal(await page.evaluate(() => fixture.unsupportedStorage()), 'BROWSER_DURABLE_STORAGE_UNAVAILABLE');
+  const secondOwner = await page.evaluate(() => fixture.secondOwner());
+  const unsupported = await page.evaluate(() => fixture.unsupportedStorage());
+  for (const result of [secondOwner, unsupported]) {
+    assert.equal(result.protocolOpened, true); assert.equal(result.deviceId, opened.deviceId); assert.equal(result.storageId, opened.storageId);
+    assert.equal(result.before.database, 'idle'); assertCold(result.before.resources);
+    assert.equal(result.before.protocol.definitionVerified, true);
+  }
+  assert.equal(secondOwner.error, 'BROWSER_STORAGE_IN_USE');
+  assert.equal(unsupported.error, 'BROWSER_DURABLE_STORAGE_UNAVAILABLE');
+  report.lazyDatabase.secondOwner = secondOwner; report.lazyDatabase.unsupportedStorage = unsupported;
   const otherTab = await page.context().newPage();
   try {
     await otherTab.goto(origin); await otherTab.waitForFunction(() => !!globalThis.fixture);
-    await assert.rejects(otherTab.evaluate(deviceName => fixture.open({ deviceName }), deviceName), /BROWSER_STORAGE_IN_USE/);
+    const other = await otherTab.evaluate(deviceName => fixture.open({ deviceName }), deviceName);
+    assert.equal(other.deviceId, opened.deviceId); assert.equal(other.storageId, opened.storageId);
+    assert.equal(other.status.database, 'idle'); assertCold(other.observation.resources);
+    await assert.rejects(otherTab.evaluate(() => application.query('conversation', {})), /BROWSER_STORAGE_IN_USE/);
+    await otherTab.evaluate(() => fixture.close());
   } finally { await otherTab.close(); }
+  const dormantTab = await page.context().newPage();
+  try {
+    await dormantTab.goto(origin); await dormantTab.waitForFunction(() => !!globalThis.fixture);
+    const dormant = await dormantTab.evaluate(deviceName => fixture.open({ deviceName }), deviceName);
+    assert.equal(dormant.deviceId, opened.deviceId); assert.equal(dormant.storageId, opened.storageId);
+    const closed = await dormantTab.evaluate(() => fixture.close());
+    assert.equal(closed.before.database, 'idle'); assertCold(closed.before.resources);
+    assert.deepEqual(closed.heldLocks, [`chronolog:${deviceName}`], 'Closing an idle participant must preserve the active data owner');
+    report.lazyDatabase.dormantClose = { sameIdentity: true, ...closed };
+  } finally { await dormantTab.close(); }
   report.ownership = { workerOnly: true, secondOwnerRefused: true, secondTabRefused: true,
     unsupportedStorageRefused: true, unsupportedFault: 'Worker navigator.storage.getDirectory removed by the fixture', initialDeviceId: opened.deviceId,
-    initialStorageId: opened.storageId, pagePrivateKeys: 0, freshDeviceAwaitedKeys: true,
-    controlParticipant: { owner: 'application-session', attachRequests: controlRequests } };
-  await checkpoint('opened a keyless Worker-owned browser and refused a second owner');
+    initialStorageId: opened.storageId, pagePrivateKeys: 0, freshDeviceStartedWithoutKeys: true,
+    controlParticipant: { owner: 'application-session', attachRequests: opened.observation.protocol.attachRequests } };
+  await checkpoint('live and code exchange preceded one shared durable opening; first data reads enforce ownership');
 
-  await post(a, 'anchor', 'A retained anchor');
-  let ab = await connect(a, 'answerer');
   assert.equal((await browserQuery()).revision.generation, authority.generations.at(-1).id);
   await disconnect(ab);
   const original = await submitMessage('Saved while disconnected', 'saved');
@@ -216,6 +285,7 @@ try {
   await page.goto(`${origin}/compact.html`); await page.waitForFunction(() => !!globalThis.fixture);
   const partialReopened = await page.evaluate(deviceName => fixture.open({ deviceName }), deviceName);
   assert.equal(partialReopened.deviceId, opened.deviceId); assert.equal(partialReopened.storageId, opened.storageId);
+  await page.evaluate(() => fixture.showApplication());
   await page.waitForFunction(() => !document.querySelector('#message').disabled);
   const draftAfterRestart = await page.locator('#message').inputValue(); assert.equal(draftAfterRestart, draft);
   assert.equal(await readRange(0, 65_536), 65_536);
@@ -298,7 +368,7 @@ try {
 
   authority = await registry.read();
   const c = await openNative(deviceC, authority);
-  assert.equal(c.status.phase, 'awaiting-keys');
+  assert.equal(c.status.database, 'idle');
   const bc = await connect(c, 'offerer');
   await synchronize(bc);
   const [browserResult, freshResult] = await Promise.all([browserQuery(), c.query('conversation', {})]);
@@ -313,8 +383,10 @@ try {
   await page.goto(`${origin}/board.html`); await page.waitForFunction(() => !!globalThis.fixture);
   const reopened = await page.evaluate(deviceName => fixture.open({ deviceName }), deviceName);
   assert.equal(reopened.deviceId, opened.deviceId); assert.equal(reopened.storageId, opened.storageId);
+  assert.equal(reopened.status.database, 'idle');
   assert.deepEqual((await browserQuery()).value, browserResult.value);
-  assert.equal(reopened.status.phase, 'ready');
+  assert.equal(await page.evaluate(() => application.status.phase), 'ready');
+  await page.evaluate(() => fixture.showApplication());
   assert.equal(await page.evaluate(async id => (await application.operations.get(id)).status, reappliedId), 'applied');
   report.ownership.gracefulReopen = { sameDeviceId: true, sameStorageId: true, sameView: true, storedKeysReused: true };
 
@@ -325,10 +397,18 @@ try {
   let crashReopened, attempts = 0;
   for (;;) {
     attempts++;
-    try { crashReopened = await page.evaluate(deviceName => fixture.open({ deviceName }), deviceName); break; }
+    try {
+      crashReopened = await page.evaluate(async deviceName => {
+        const opened = await fixture.open({ deviceName });
+        try { await application.query('conversation', {}); return opened; }
+        catch (error) { await fixture.close(); throw error; }
+      }, deviceName);
+      break;
+    }
     catch (error) { if (!String(error).includes('BROWSER_STORAGE_IN_USE') || attempts >= 20) throw error; await new Promise(resolveWait => setTimeout(resolveWait, 50)); }
   }
   assert.equal(crashReopened.deviceId, opened.deviceId); assert.equal(crashReopened.storageId, opened.storageId);
+  await page.evaluate(() => fixture.showApplication());
   assert.deepEqual((await browserQuery()).value, beforeCrash.value);
   assert.equal(await page.evaluate(async () => (await application.operations.get('before-worker-loss')).status), 'applied');
   report.ownership.abruptWorkerReopen = { sameDeviceId: true, sameStorageId: true, sameView: true, durableOperation: true, attempts };
@@ -336,7 +416,8 @@ try {
   assert.equal(report.browser.observations.secureContext, true);
   assert.equal(report.browser.observations.storage, true); assert.equal(report.browser.observations.locks, true);
   assert.equal(report.browser.pageErrors.length, 0);
-  await page.evaluate(() => fixture.close());
+  report.lazyDatabase.activeClose = await page.evaluate(() => fixture.close());
+  assert.deepEqual(report.lazyDatabase.activeClose.heldLocks, []);
   report.passed = true;
   await checkpoint('fresh peer replay and graceful plus abrupt Worker reopening passed');
 } catch (error) {
@@ -377,7 +458,9 @@ async function bootstrap(identity) {
   }, controlDevice.identity);
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
     revision: 0, previous: null, epoch: 0, keyDigest: await bytesDigest(key), recoveryFloor: null,
-    grants: [deviceA.identity.publicKey, identity.deviceId, deviceC.identity.publicKey].map(publicKey => participantGrant(publicKey, { administrator: true })),
+    grants: [deviceA.identity.publicKey, identity.deviceId, deviceC.identity.publicKey].map(publicKey => participantGrant(publicKey, {
+      administrator: true, publisher: publicKey === identity.deviceId,
+    })),
   }, controlDevice.identity);
   registry = await createGenerationRegistry({ store: controlDevice.store, descriptor, controls: [control], signer: controlDevice.identity });
   await registry.select(await signTransitionRequest({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
@@ -385,6 +468,7 @@ async function bootstrap(identity) {
     controlRevision: 0, reason: 'create', base: null,
   }, deviceA.identity));
   authority = await registry.read();
+  publications = await createPublicationRegistry({ store: controlDevice.store, authority: () => registry.read() });
   a = await openNative(deviceA, authority, new Map([[0, key]]));
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
   return { authority };
@@ -397,6 +481,11 @@ async function route(request, response) {
   const body = bytes ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined;
   const json = value => { response.setHeader('content-type', 'application/json'); response.end(JSON.stringify(value)); };
   if (pathname === '/fixture/bootstrap') { json(await bootstrap(body)); return; }
+  if (/^\/fixture\/publication\/[a-f0-9]{64}$/u.test(pathname)) {
+    const bytes = publicationAssets.get(pathname.split('/').at(-1));
+    if (!bytes) throw Error('FIXTURE_PUBLICATION_ASSET_UNKNOWN');
+    response.setHeader('content-type', 'text/javascript'); response.end(bytes); return;
+  }
   if (pathname === '/participant' && request.method === 'POST') {
     controlRequests++; controlBodyBytes += bytes;
     if (blocked) { response.statusCode = 503; json({ error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } }); return; }
@@ -405,6 +494,21 @@ async function route(request, response) {
     let payload;
     if (envelope.facet === 'control' && envelope.action === 'read') payload = await registry.read();
     else if (envelope.facet === 'control' && envelope.action === 'select') payload = await registry.select(envelope.payload.request);
+    else if (envelope.facet === 'publication' && envelope.action === 'definition') {
+      payload = { descriptor: authority.descriptor, definition: describeApplication(conversation), schema: null };
+    } else if (envelope.facet === 'publication' && envelope.action === 'read') {
+      const values = await publications.read(), selected = envelope.payload.id ? values.find(value => value.id === envelope.payload.id) : values.at(-1);
+      payload = selected ? { publication: selected, version: selected.payload.revision + 1 } : null;
+    } else if (envelope.facet === 'publication' && envelope.action === 'publish') {
+      const { publication, assets: files } = envelope.payload;
+      assert.equal(publication.payload.files.length, 1); assert.equal(files.length, 1);
+      const file = publication.payload.files[0], asset = files[0], bytes = Buffer.from(asset.bytes, 'base64');
+      assert.equal(asset.hash, file.hash); await verifyPublicationAsset(file, bytes);
+      const selected = await publications.publish(publication);
+      publicationAssets.set(file.hash, bytes);
+      assert.equal(publicationAssets.size, 1);
+      payload = { publication: selected, version: selected.payload.revision + 1 };
+    }
     else throw Error('FIXTURE_CONTROL_INTEREST_UNKNOWN');
     json(createParticipantResponse(envelope, payload));
     return;
@@ -421,13 +525,17 @@ async function route(request, response) {
   if (pathname === '/') { response.setHeader('content-type', 'text/html'); response.end(await readFile(join(assets, 'board.html'))); return; }
   if (pathname === '/favicon.ico') { response.statusCode = 204; response.end(); return; }
   if (/^\/[A-Za-z0-9_.-]+\.(mjs|html|css)$/u.test(pathname)) {
+    if (pathname.endsWith('.mjs')) {
+      assert.ok(scriptRequests.length < 1024, 'Fixture script request bound');
+      scriptRequests.push(pathname.slice(1));
+    }
     response.setHeader('content-type', pathname.endsWith('.mjs') ? 'text/javascript' : pathname.endsWith('.html') ? 'text/html' : 'text/css');
     response.end(await readFile(join(assets, pathname.slice(1)))); return;
   }
   throw Error('FIXTURE_ROUTE_UNKNOWN');
 }
 
-async function connect(session, browserRole) {
+async function connect(session, browserRole, { synchronize: withData = true } = {}) {
   const id = String(introductions.size + 1), mailbox = introduction(); introductions.set(id, mailbox);
   const start = performance.now();
   const outcomes = await Promise.allSettled([
@@ -437,7 +545,7 @@ async function connect(session, browserRole) {
         signal: session.signal, timeoutMs: 30_000, relayBase, channel: `browser:${id}` });
       try {
         const link = await session.connectPeer({ connection, peerIdentity: browserIdentity.deviceId });
-        await link.synchronize(); return Object.assign(link, { fixtureConnection: connection });
+        return Object.assign(link, { fixtureConnection: connection });
       } catch (error) { await connection.close(); throw error; }
     })(),
     page.evaluate(options => fixture.connect(options), { id, role: browserRole, peerId: session.deviceId, relayBase, channel: `browser:${id}` }),
@@ -454,9 +562,11 @@ async function connect(session, browserRole) {
   assert.equal(mailbox.snapshot().closed, true); assert.equal(mailbox.snapshot().descriptions, relay ? 0 : 2);
   const connection = { id, native: nativeLink, mailbox, observed: { peers: [session.deviceId, browserIdentity.deviceId],
     authenticated: true, routes, connectedInMs: performance.now() - start } };
-  connections.push(connection); return connection;
+  connections.push(connection);
+  if (withData) await synchronize(connection);
+  return connection;
 }
-async function synchronize(connection) { await Promise.all([connection.native.synchronize(), page.evaluate(id => fixture.inspect(id), connection.id)]); }
+async function synchronize(connection) { await Promise.all([connection.native.synchronize(), page.evaluate(id => fixture.synchronize(id), connection.id)]); }
 async function inspect(connection) {
   const browserLink = await page.evaluate(id => fixture.inspect(id), connection.id);
   return { reliable: { sentBytes: browserLink.stats.sentBytes + connection.native.stats.sentBytes,
@@ -485,4 +595,56 @@ function introduction() {
     browserClose() { browserClosed = true; if (!sentNative) deliverBrowser(null); },
     snapshot: () => ({ descriptions, bytes, closed: nativeClosed && browserClosed }),
   };
+}
+
+async function startupObservation() {
+  return { workers: workerStarts, page: await page.evaluate(() => fixtureResources),
+    modulesRequested: [...new Set(scriptRequests)].sort(),
+    databaseModulesRequested: [...new Set(scriptRequests)].filter(file => report.lazyDatabase.moduleGraph.browserModules.includes(file)).sort() };
+}
+function assertCold(resources) {
+  for (const key of ['opfsRoots', 'writableFiles', 'syncHandles', 'lockRequests']) assert.equal(resources[key], 0, `Protocol startup touched ${key}`);
+  assert.deepEqual(resources.lockNames, []);
+}
+function databaseModules(metafile, runtimeModules) {
+  assert.ok(runtimeModules && typeof runtimeModules === 'object', 'The archive must identify its runtime module graph');
+  const isDatabaseSource = source => source === 'packages/peer-session/src/application-data.ts' ||
+    source === 'packages/records/src/browser.ts' || /^packages\/materializer(?:-doltlite)?\//u.test(source);
+  const selected = Object.entries(runtimeModules).filter(([, module]) => module.inputs.some(isDatabaseSource));
+  const sourceModules = [...new Set(selected.flatMap(([, module]) => module.inputs.filter(isDatabaseSource)))].sort();
+  for (const source of ['packages/peer-session/src/application-data.ts', 'packages/records/src/browser.ts']) assert.ok(sourceModules.includes(source), `Missing durable source: ${source}`);
+  const packageModules = selected.map(([file]) => `node_modules/@chronolog/peer-session/${file}`).sort();
+  const browserModules = Object.entries(metafile.outputs).filter(([, output]) => Object.entries(output.inputs)
+    .some(([input, value]) => packageModules.includes(input) && value.bytesInOutput > 0)).map(([file]) => relative(assets, resolve(file))).sort();
+  assert.ok(browserModules.length > 0, 'The browser data path must remain present as lazy modules');
+  return { sourceModules, packageModules, browserModules };
+}
+async function exchangeColdSignals(native) {
+  const lifetime = new AbortController(), observed = native.signals.subscribe({ topics: ['cold-start'], signal: lifetime.signal })[Symbol.asyncIterator]();
+  const incoming = observed.next();
+  try {
+    await page.evaluate(() => {
+      globalThis.coldSignalLifetime = new AbortController();
+      globalThis.coldSignals = application.signals.subscribe({ topics: ['cold-start'], signal: coldSignalLifetime.signal })[Symbol.asyncIterator]();
+      globalThis.coldSignalReceived = coldSignals.next();
+    });
+    await page.evaluate(() => application.signals.send('cold-start', { stage: 'before-database', from: 'browser' }, { ttlMs: 10_000 }));
+    const received = await Promise.race([incoming, new Promise((_, reject) => {
+      const timer = setTimeout(() => reject(Error('COLD_NATIVE_SIGNAL_TIMEOUT')), 10_000);
+      lifetime.signal.addEventListener('abort', () => clearTimeout(timer), { once: true });
+    })]);
+    assert.equal(received.done, false); assert.equal(received.value.authorId, browserIdentity.deviceId);
+    assert.deepEqual(received.value.payload, { stage: 'before-database', from: 'browser' });
+    await native.signals.send('cold-start', { stage: 'before-database', from: 'native' }, { ttlMs: 10_000 });
+    const browserReceived = await page.evaluate(async () => {
+      const timer = setTimeout(() => coldSignalLifetime.abort(Error('COLD_BROWSER_SIGNAL_TIMEOUT')), 10_000);
+      try { return await coldSignalReceived; } finally { clearTimeout(timer); }
+    });
+    assert.equal(browserReceived.done, false); assert.equal(browserReceived.value.authorId, native.deviceId);
+    assert.deepEqual(browserReceived.value.payload, { stage: 'before-database', from: 'native' });
+    return { browserToNative: true, nativeToBrowser: true, verifiedAuthors: [browserIdentity.deviceId, native.deviceId] };
+  } finally {
+    lifetime.abort(); await observed.return?.();
+    await page.evaluate(async () => { coldSignalLifetime.abort(); await coldSignals.return?.(); });
+  }
 }

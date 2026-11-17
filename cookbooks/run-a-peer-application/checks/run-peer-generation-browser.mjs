@@ -25,6 +25,7 @@ const fixtures = await Promise.all([
   ['peer-generation-browser-consumer.mjs', join(here, 'peer-generation-browser-consumer.mjs')],
   ['peer-generation-browser-page.mjs', join(here, 'peer-generation-browser-page.mjs')],
   ['peer-generation-browser-worker.mjs', join(here, 'peer-generation-browser-worker.mjs')],
+  ['peer-generation-browser-resources.mjs', join(here, 'peer-generation-browser-resources.mjs')],
   ['peer-generation-browser-transport.mjs', join(here, relay ? 'peer-generation-websocket-transport.mjs' : 'peer-generation-browser-rtc-transport.mjs')],
   ['peer-generation-native-transport.mjs', join(here, relay ? 'peer-generation-websocket-transport.mjs' : 'peer-generation-native-rtc-transport.mjs')],
   ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
@@ -64,7 +65,7 @@ try {
   report.artifacts.push({ name: metadata.name, version: metadata.version, sha256: hash(await readFile(artifact)),
     sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty,
     provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, optionalNativeRtc: provenance.optionalNativeRtc,
-      sqlEngines: provenance.sqlEngines, files: provenance.sha256 } });
+      sqlEngines: provenance.sqlEngines, runtimeModules: provenance.runtimeModules, files: provenance.sha256 } });
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
   assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(relay ? ['@tendriller/core'] : []), 'esbuild', 'playwright', ...(relay ? [] : ['werift'])]);
   for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) assert.equal(tree.dependencies[name].version, version);
@@ -86,7 +87,7 @@ try {
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         '@chronolog/peer-session/browser', '@chronolog/peer-session/worker', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
         ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers'] : []),
-        './peer-generation-definition.mjs', './peer-generation-browser-transport.mjs', './peer-generation-native-transport.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
+        './peer-generation-definition.mjs', './peer-generation-browser-transport.mjs', './peer-generation-native-transport.mjs', './peer-generation-browser-resources.mjs', './deployment/bootstrap.mjs', '../peer-generation-browser-page.mjs',
         './typing.mjs', './recovery-choice.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
       if (['playwright', 'esbuild'].includes(specifier)) tools.add(specifier);

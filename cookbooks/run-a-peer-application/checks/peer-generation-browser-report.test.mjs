@@ -51,6 +51,28 @@ test('reopening must retain the browser identity, durable key enrollment, and th
   rejects(report => { report.contentRecovery.partialSurvivedRestart = false; });
 });
 
+test('cold protocol evidence requires live and code exchange before any durable resource or module', () => {
+  rejects(report => { delete report.lazyDatabase; });
+  rejects(report => { report.lazyDatabase.protocol.observation.resources.lockRequests = 1; });
+  rejects(report => { report.lazyDatabase.protocol.observation.resources.opfsRoots = 1; });
+  rejects(report => { report.lazyDatabase.protocol.modulesRequested.push('data.mjs'); });
+  rejects(report => { report.lazyDatabase.protocol.live.browserToNative = false; });
+  rejects(report => { report.lazyDatabase.protocol.observation.protocol.servedCodeDigest = 'f'.repeat(64); });
+  rejects(report => { report.lazyDatabase.protocol.observation.protocol.exchanges = []; });
+});
+
+test('first real queries must share one owner and preserve late ownership and close semantics', () => {
+  rejects(report => { report.lazyDatabase.firstData.workers = 2; });
+  rejects(report => { report.lazyDatabase.firstData.observation.resources.opfsRoots = 2; });
+  rejects(report => { report.lazyDatabase.firstData.requests.method = 'initialize'; });
+  rejects(report => { report.lazyDatabase.firstData.requests.results[1] = 'f'.repeat(64); });
+  rejects(report => { report.lazyDatabase.firstData.sameIdentity = false; });
+  rejects(report => { report.lazyDatabase.secondOwner.protocolOpened = false; });
+  rejects(report => { report.lazyDatabase.unsupportedStorage.before.resources.opfsRoots = 1; });
+  rejects(report => { report.lazyDatabase.dormantClose.before.resources.lockRequests = 1; });
+  rejects(report => { report.lazyDatabase.activeClose.heldLocks.push('chronolog:peer-browser-fixture'); });
+});
+
 
 test('browser relay evidence requires Worker sockets, private payload isolation and host byte observations', () => {
   const summary = validateBrowserPeerReport(syntheticBrowserRelayReport());

@@ -143,7 +143,7 @@ export function syntheticBrowserReport() {
     artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-fixture', sha256: digest,
       sourceCommit: 'c'.repeat(40), sourceTree: 'd'.repeat(40), sourceDirty: false }],
     fixtures: Array.from({ length: 4 }, (_, index) => ({ path: `fixture-${index}.mjs`, sha256: digest })),
-    browserAssets: [{ file: 'page.mjs', sha256: digest }, { file: 'worker.mjs', sha256: digest }],
+    browserAssets: [{ file: 'page.mjs', sha256: digest }, { file: 'worker.mjs', sha256: digest }, { file: 'data.mjs', sha256: digest }],
     browserBundleInputs: ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs',
       'peer-generation-definition.mjs', 'recovery-choice.mjs', 'node_modules/@chronolog/peer-session/browser.mjs'],
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/browser', '@chronolog/peer-session/native',
@@ -159,7 +159,7 @@ export function syntheticBrowserReport() {
       reapplicationConfirmed: true, recoveryNoticeVisible: true, originalReviewPreserved: true,
       draftBeforeRestart: 'An unsent draft', draftAfterRestart: 'An unsent draft', draftAfterRecovery: 'An unsent draft' },
     ownership: { workerOnly: true, secondOwnerRefused: true, secondTabRefused: true, unsupportedStorageRefused: true,
-      unsupportedFault: 'Worker navigator.storage.getDirectory removed by the fixture', freshDeviceAwaitedKeys: true, pagePrivateKeys: 0,
+      unsupportedFault: 'Worker navigator.storage.getDirectory removed by the fixture', freshDeviceStartedWithoutKeys: true, pagePrivateKeys: 0,
       initialDeviceId: id, initialStorageId: '00000000-0000-0000-0000-000000000000',
       controlParticipant: { owner: 'application-session', attachRequests: 0 },
       gracefulReopen: { sameDeviceId: true, sameStorageId: true, sameView: true, storedKeysReused: true },
@@ -180,6 +180,32 @@ export function syntheticBrowserReport() {
       unavailableRemainderRefused: true, completeAfterReconnect: true, retainedBy: id, retentionSignature: 'a'.repeat(128) },
     connections: Array.from({ length: 4 }, () => ({ authenticated: true, nativeClosed: true, peers: [id, other], signaling,
       routes: Array.from({ length: 2 }, () => ({ route: 'direct', localCandidateType: 'host', remoteCandidateType: 'host' })) })),
+    lazyDatabase: syntheticLazyDatabase(id, other, digest),
+  };
+}
+
+function syntheticLazyDatabase(id, other, digest) {
+  const empty = { indexedDbOpens: 0, opfsRoots: 0, writableFiles: 0, syncHandles: 0, lockRequests: 0, lockNames: [] };
+  const cold = { resources: { ...structuredClone(empty), indexedDbOpens: 1 }, database: 'idle', revision: null,
+    protocol: { attachRequests: 0, database: 'idle', definitionVerified: true, publicationId: digest,
+      publicationVersion: 1, codeDigest: digest, servedCodeDigest: digest,
+      exchanges: [['control', 'read'], ['publication', 'definition'], ['publication', 'publish'], ['publication', 'read']].map(([facet, action]) => ({ facet, action })) } };
+  const opened = { database: 'ready', resources: { indexedDbOpens: 1, opfsRoots: 1, writableFiles: 1, syncHandles: 0,
+    lockRequests: 1, lockNames: ['chronolog:peer-browser-fixture'] } };
+  const refusal = error => ({ protocolOpened: true, deviceId: id, storageId: '00000000-0000-0000-0000-000000000000',
+    before: structuredClone(cold), after: { ...structuredClone(cold), database: 'failed' }, error });
+  return {
+    moduleGraph: { sourceModules: ['packages/peer-session/src/application-data.ts', 'packages/records/src/browser.ts'],
+      packageModules: ['node_modules/@chronolog/peer-session/chunks/application-data.mjs'], browserModules: ['data.mjs'] },
+    shell: { workers: 0, page: structuredClone(empty), modulesRequested: ['page.mjs'], databaseModulesRequested: [] },
+    protocol: { workers: 1, page: structuredClone(empty), modulesRequested: ['page.mjs', 'worker.mjs'], databaseModulesRequested: [],
+      observation: structuredClone(cold), live: { browserToNative: true, nativeToBrowser: true, verifiedAuthors: [id, other] } },
+    firstData: { workers: 1, page: structuredClone(empty), modulesRequested: ['page.mjs', 'worker.mjs', 'data.mjs'], databaseModulesRequested: ['data.mjs'],
+      observation: structuredClone(opened), sameIdentity: true, requests: { method: 'query', concurrent: 3, results: Array(3).fill(digest) }, firstView: digest,
+      transitions: ['idle', 'opening', 'ready'], statuses: ['idle', 'opening', 'ready'].map(database => ({ database })) },
+    secondOwner: refusal('BROWSER_STORAGE_IN_USE'), unsupportedStorage: refusal('BROWSER_DURABLE_STORAGE_UNAVAILABLE'),
+    dormantClose: { sameIdentity: true, before: structuredClone(cold), heldLocks: ['chronolog:peer-browser-fixture'] },
+    activeClose: { before: structuredClone(opened), heldLocks: [] },
   };
 }
 
