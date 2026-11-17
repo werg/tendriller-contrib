@@ -28,6 +28,30 @@ The one-off in-process SDP mailbox is test infrastructure, not a claim to have
 exercised Tendriller rendezvous or deployed discovery. A new runner or a passing
 evidence-validator test does not mean the RTC runtime gate has run.
 
+For actual Tendriller controls and short-lived SDP rendezvous, run:
+
+```sh
+node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs \
+  --artifact /exact/peer-session-with-native-rtc.tgz \
+  --artifacts /exact/tendriller-dist --output /new/hosted-peer-evidence
+```
+
+The supplied Tendriller directory must include its provenance manifest and one
+packed SDK and engine. The runner verifies archive hashes and source identity,
+installs them into a new consumer, and starts the actual workerd runtime through
+the public `@tendriller/engine/testing` surface. Native application peers use the
+same recovery scenario and public maintained RTC composition.
+
+A bounded loopback bridge transports test fixture requests between the Node and
+workerd processes. It is separate from the application connection: it carries
+compact authority operations and one-off signaling, while commands and history
+travel between peers. The fixture records complete Worker HTTP/body/SDP counters
+and native bridge request counters before and after commands with hosted access
+blocked. Those values must remain unchanged while authenticated RTC application
+bytes increase. Test accounts are synthetic; no result is a deployed-login or
+Internet-route qualification. The runner has no private host imports or second
+application command queue.
+
 
 These are two page-owned adaptations of the same application decisions:
 

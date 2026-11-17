@@ -136,3 +136,40 @@ test('host-independent RTC commands require authenticated traffic after signalin
     assert.throws(() => validatePeerGenerationReport(report));
   }
 });
+
+function syntheticHostedReport() {
+  const report = syntheticRtcReport();
+  report.hostOutage.boundary = 'tendriller-workerd-http';
+  report.rtc.signalingBoundary = 'tendriller-workerd-rendezvous';
+  report.host = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
+    publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
+    dependencies: { lockSha256: '6'.repeat(64) }, artifacts: ['@tendriller/core', '@tendriller/engine'].map(name => ({
+      ...report.artifacts[0], name,
+    })) };
+  const observation = { requestBodyBytes: 2000, worker: { host: { httpRequests: 6, requestBodyBytes: 2000,
+    rendezvousUpgrades: 4, rendezvousSentBytes: 4000, rendezvousReceivedBytes: 4000 },
+  rendezvous: Array.from({ length: 4 }, () => ({ closed: true, sentBytes: 1000, receivedBytes: 1000 })) } };
+  report.hostOutage.observations = { before: structuredClone(observation), after: structuredClone(observation) };
+  return report;
+}
+
+test('actual hosted evidence retains its synthetic identity and exact public artifact pairing', () => {
+  const summary = validatePeerGenerationReport(syntheticHostedReport());
+  assert.equal(summary.host.runtime, 'workerd');
+  assert.ok(summary.limitations.some(value => value.includes('deployed login was not exercised')));
+  assert.equal(summary.hostedTraffic.before.worker.host.rendezvousUpgrades, 4);
+});
+
+test('actual host qualification refuses missing HTTP counters, hidden signaling and an unpinned host', () => {
+  for (const mutate of [
+    value => { delete value.hostOutage.observations.before.worker.host.httpRequests; },
+    value => { value.hostOutage.observations.after.worker.host.rendezvousReceivedBytes++; },
+    value => { value.hostOutage.observations.after.requestBodyBytes++; },
+    value => { value.hostOutage.observations.before.worker.rendezvous[0].closed = false; },
+    value => { delete value.host.artifacts[0].sourceDirty; },
+    value => { value.rtc.signalingBoundary = 'one-off-in-process-sdp-mailbox'; },
+  ]) {
+    const report = syntheticHostedReport(); mutate(report);
+    assert.throws(() => validatePeerGenerationReport(report));
+  }
+});

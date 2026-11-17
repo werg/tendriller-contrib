@@ -4,10 +4,12 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
 import { runPeerGenerationScenario } from './peer-generation-scenario.mjs';
+import { createHostedFixture } from './peer-generation-host-client.mjs';
 
 const connections = [];
+const host = process.env.PEER_GENERATION_HOST_BRIDGE ? createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE) : null;
 const connectSessions = async (a, b) => {
-  const introduction = signalingPair();
+  const introduction = host ? await host.signalingPair(a, b) : signalingPair();
   const native = { iceInterfaceAddresses: { udp4: '127.0.0.1' }, iceUseIpv6: false, iceUseTcp: false };
   const started = performance.now();
   const endpoints = await Promise.allSettled([
@@ -44,11 +46,12 @@ const connectSessions = async (a, b) => {
 };
 
 try {
-  await runPeerGenerationScenario({ path: process.argv[2], connectSessions });
+  await runPeerGenerationScenario({ path: process.argv[2], connectSessions,
+    ...(host ? { createControl: host.createControl } : {}) });
 } finally {
   const report = JSON.parse(await readFile(process.argv[2], 'utf8'));
   report.rtc = { implementation: 'werift', version: '0.27.0',
-    signalingBoundary: 'one-off-in-process-sdp-mailbox',
+    signalingBoundary: host ? 'tendriller-workerd-rendezvous' : 'one-off-in-process-sdp-mailbox',
     byteBoundary: 'authenticated-reliable-application-frames',
     connections: connections.map(value => ({ ...value.observed, ...value.inspect(), closed: value.closed() })) };
   await writeFile(process.argv[2], `${JSON.stringify(report, null, 2)}\n`);

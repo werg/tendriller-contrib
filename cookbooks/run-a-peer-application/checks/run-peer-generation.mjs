@@ -35,6 +35,10 @@ const report = {
   artifacts: [], fixtures: [], error: null,
 };
 try {
+  if (process.env.PEER_GENERATION_HOST_EVIDENCE) {
+    report.host = JSON.parse(await readFile(process.env.PEER_GENERATION_HOST_EVIDENCE, 'utf8'));
+    assert.equal(rtc, true, 'The hosted qualification requires actual peer RTC');
+  }
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-peer-generation-consumer', private: true, type: 'module' }));
   execFileSync('npm', ['install', ...(rtc ? [] : ['--offline', '--package-lock=false']), '--ignore-scripts', '--no-audit', '--no-fund',
     artifact, ...(rtc ? ['werift@0.27.0'] : [])], {
@@ -76,6 +80,7 @@ try {
   const entry = rtc ? 'peer-generation-rtc-consumer.mjs' : 'peer-generation-consumer.mjs';
   for (const [name, path] of [
     [entry, join(here, entry)],
+    ...(rtc ? [['peer-generation-host-client.mjs', join(here, 'peer-generation-host-client.mjs')]] : []),
     ['peer-generation-scenario.mjs', join(here, 'peer-generation-scenario.mjs')],
     ['peer-generation-definition.mjs', join(here, '../snippets/peer-conversation.mjs')],
   ]) {
@@ -85,7 +90,7 @@ try {
       const specifier = match[1];
       assert.ok(specifier.startsWith('node:') || ['@chronolog/peer-session', '@chronolog/peer-session/native',
         ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : []),
-        './peer-generation-definition.mjs', './peer-generation-scenario.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './peer-generation-definition.mjs', './peer-generation-scenario.mjs', './peer-generation-host-client.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
     await copyFile(path, join(consumer, name));

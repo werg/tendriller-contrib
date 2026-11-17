@@ -6,13 +6,13 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import {
   AbandonedOperationError, applicationDefinitionDigest, bytesDigest,
-  createGenerationRegistry, eventExecutionManifest,
+  createGenerationRegistry, describeApplication, eventExecutionManifest,
   executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest,
 } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
 import { conversation } from './peer-generation-definition.mjs';
 
-export async function runPeerGenerationScenario({ path, connectSessions }) {
+export async function runPeerGenerationScenario({ path, connectSessions, createControl = createPortableControl }) {
   const reportPath = resolve(path);
   const report = JSON.parse(await readFile(reportPath, 'utf8'));
   const storeRoot = join(dirname(reportPath), 'stores');
@@ -30,7 +30,7 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
     const device = await openNativeDevice({ path: database(name), ...(create ? { create: true } : {}) });
     devices.add(device); return device;
   };
-  let authority;
+  let authority, host;
   const epochKey = new Uint8Array(randomBytes(32)), epochKeys = new Map([[0, epochKey]]);
   const open = async (device, selected = authority) => {
     const session = await openNativeApplication({ device, authority: selected, epochKeys, definition: conversation });
@@ -55,25 +55,17 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
     const applicationId = randomBytes(32).toString('hex');
     const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
-    const descriptor = await signApplicationDescriptor({
-      applicationId, historyId: 'independent-peer-conversation', profile: 'peer-generation-v1', policy: 'eligible-members-v1',
-      controlPublicKey: hostDevice.identity.publicKey,
-      // This events-only application explicitly pins its durable control identity for schema administration.
-      schemaAdministrator: hostDevice.identity.publicKey,
-      executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
-      definitionDigest: await applicationDefinitionDigest(conversation), schemaDigest: null,
-    }, hostDevice.identity);
-    const control = await signControlRevision({
-      applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
-      revision: 0, previous: null, epoch: 0, keyDigest: await bytesDigest(epochKey), recoveryFloor: null,
-      grants: [deviceA, deviceB, deviceC].map(device => participantGrant(device.identity.publicKey, { administrator: device !== deviceC })),
-    }, hostDevice.identity);
-    const registry = await createGenerationRegistry({ store: hostDevice.store, descriptor, controls: [control], signer: hostDevice.identity });
-    let hostedRequests = 0, hostedApplicationBodyBytes = 0, hostBlocked = false;
-    const host = {
-      async read() { hostedRequests++; if (hostBlocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.read(); },
-      async select(request) { hostedRequests++; if (hostBlocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.select(request); },
-    };
+    host = await createControl({ applicationId, hostDevice,
+      configuration: {
+        historyId: 'independent-peer-conversation',
+        executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
+        definitionDigest: await applicationDefinitionDigest(conversation), definition: describeApplication(conversation),
+        schemaAdministrator: hostDevice.identity.publicKey, schemaDigest: null,
+        epoch: 0, keyDigest: await bytesDigest(epochKey),
+        members: [deviceA, deviceB, deviceC].map(device => ({ grant: participantGrant(device.identity.publicKey, { administrator: device !== deviceC }) })),
+      },
+    });
+    const descriptor = host.descriptor;
     const transition = async (requester, coordinator, expectedGeneration, base, transitionId, reason = 'takeover') => signTransitionRequest({
       applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
       transitionId, expectedGeneration, coordinator: coordinator.identity.publicKey, requester: requester.identity.publicKey,
@@ -128,9 +120,9 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
 
     // Bootstrap/control calls are counted separately. The public session receives
     // cached verified authority and must never invoke this host while commanding.
-    hostBlocked = true;
+    await host.block(true);
     await assert.rejects(host.read(), /CONTROL_HOST_UNAVAILABLE/);
-    const beforeRequests = hostedRequests, beforeBodies = hostedApplicationBodyBytes;
+    const hostBefore = await host.traffic();
     const transportBefore = await ab.inspect?.();
     await post(a, 'host-blocked-a', 'A continues without host access');
     await post(b, 'host-blocked-b', 'B continues through its coordinating peer');
@@ -144,9 +136,11 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
     signalAbort.abort(); await live.return?.();
     assert.deepEqual(await a.recoveryPoint(), beforeLive, 'Live signals must not append history');
     assert.deepEqual((await query(a)).value, (await query(b)).value);
-    report.hostOutage = { boundary: 'portable-control-port', blocked: true, blockedProbeRejected: true,
-      commandsApplied: 2, requests: { before: beforeRequests, after: hostedRequests },
-      applicationBodyBytes: { before: beforeBodies, after: hostedApplicationBodyBytes }, finalityCapability: a.capabilities.finality,
+    const hostAfter = await host.traffic();
+    report.hostOutage = { boundary: host.boundary, blocked: true, blockedProbeRejected: true,
+      commandsApplied: 2, requests: { before: hostBefore.requests, after: hostAfter.requests },
+      applicationBodyBytes: { before: hostBefore.applicationBodyBytes, after: hostAfter.applicationBodyBytes },
+      observations: { before: hostBefore, after: hostAfter }, finalityCapability: a.capabilities.finality,
       liveSignalsObserved: 1, peerReplicationObserved: true,
       ...(transportBefore === undefined ? {} : { transport: { before: transportBefore, after: await ab.inspect() } }) };
 
@@ -164,7 +158,7 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
     await a.close(); sessions.delete(a);
     await rename(join(storeRoot, 'a'), join(storeRoot, 'a-offline'));
 
-    hostBlocked = false;
+    await host.block(false);
     const takeoverRequest = await transition(deviceB, deviceB, g1.id, adopted, 'takeover-b');
     const selected = await host.select(takeoverRequest);
     // Discarding this selected response simulates a lost control reply; the exact
@@ -263,7 +257,27 @@ export async function runPeerGenerationScenario({ path, connectSessions }) {
     await Promise.allSettled([...links].map(link => link.close()));
     await Promise.allSettled([...sessions].map(session => session.close()));
     await Promise.allSettled([...devices].map(device => device.close()));
+    await host?.close?.();
     await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   }
   return report;
+}
+
+async function createPortableControl({ applicationId, hostDevice, configuration }) {
+  const { definition: _definition, members, epoch, keyDigest, ...description } = configuration;
+  const descriptor = await signApplicationDescriptor({ ...description, applicationId,
+    profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: hostDevice.identity.publicKey,
+  }, hostDevice.identity);
+  const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
+    revision: 0, previous: null, epoch, keyDigest, recoveryFloor: null, grants: members.map(value => value.grant),
+  }, hostDevice.identity);
+  const registry = await createGenerationRegistry({ store: hostDevice.store, descriptor, controls: [control], signer: hostDevice.identity });
+  let requests = 0, blocked = false;
+  return {
+    descriptor, boundary: 'portable-control-port',
+    block(value) { blocked = value; },
+    traffic() { return { requests, applicationBodyBytes: 0 }; },
+    async read() { requests++; if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.read(); },
+    async select(request) { requests++; if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.select(request); },
+  };
 }

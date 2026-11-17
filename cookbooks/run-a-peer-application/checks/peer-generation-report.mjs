@@ -47,7 +47,8 @@ export function validatePeerGenerationReport(report) {
   same(report.publicBoundary?.residentRequired, false, 'A permanent resident is not this profile');
 
   const host = report.hostOutage;
-  same(host?.boundary, 'portable-control-port', 'Host traffic scope must be explicit');
+  assert.ok(['portable-control-port', 'tendriller-workerd-http'].includes(host?.boundary), 'Host traffic scope must be explicit');
+  const hosted = host.boundary === 'tendriller-workerd-http';
   same(host?.blocked, true, 'Host endpoints were not blocked');
   same(host.blockedProbeRejected, true, 'Blocking must be observed by an actual refused request');
   count(host.commandsApplied, 'Missing completed command count');
@@ -56,6 +57,30 @@ export function validatePeerGenerationReport(report) {
   unchangedCounter(host.applicationBodyBytes, 'Hosted application body bytes');
   same(host.applicationBodyBytes.before, 0, 'Default commands must not upload application bodies');
   same(host.finalityCapability, false, 'Applied progress must not claim finality');
+  if (hosted) {
+    same(rtc, true, 'A real hosted gate also requires real peer transport');
+    same(report.host?.runtime, 'workerd', 'A mocked host cannot qualify HTTP controls');
+    same(report.host.identity, 'synthetic authenticated test accounts', 'Identity scope must be explicit');
+    same(report.host.publicImports, ['@tendriller/core/peers', '@tendriller/engine/testing'], 'Host fixture must consume public packages');
+    hex(report.host.fixtureSha256, 64, 'Missing exact workerd fixture');
+    hex(report.host.dependencies?.lockSha256, 64, 'Missing host dependency lock');
+    same(report.host.artifacts?.map(value => value.name), ['@tendriller/core', '@tendriller/engine'], 'Missing exact public host pairing');
+    for (const artifact of report.host.artifacts) {
+      nonempty(artifact.version, 'Missing host package version'); hex(artifact.sha256, 64, 'Missing host archive digest');
+      hex(artifact.sourceCommit, 40, 'Missing host source commit'); hex(artifact.sourceTree, 40, 'Missing host source tree');
+      same(typeof artifact.sourceDirty, 'boolean', 'Host cleanliness must be observed');
+    }
+    const before = host.observations?.before, after = host.observations?.after;
+    assert.ok(before?.worker.host && after?.worker.host, 'Missing complete actual workerd request counters');
+    for (const field of ['httpRequests', 'requestBodyBytes', 'rendezvousUpgrades', 'rendezvousSentBytes', 'rendezvousReceivedBytes']) {
+      count(before.worker.host[field], `Host ${field}`);
+      same(before.worker.host[field], after.worker.host[field], `Actual host ${field} changed during ordinary commands`);
+    }
+    assert.ok(before.worker.host.httpRequests > 0 && before.worker.host.rendezvousUpgrades >= 4, 'No actual hosted controls/reconnect introduction were observed');
+    unchangedCounter({ before: before.requestBodyBytes, after: after.requestBodyBytes }, 'Native host bridge body bytes');
+    same(before.worker.rendezvous, after.worker.rendezvous, 'Rendezvous traffic changed after introduction');
+    assert.ok(before.worker.rendezvous?.length >= 4 && before.worker.rendezvous.every(value => value.closed), 'Every hosted introduction must retire');
+  }
   if (rtc) {
     hex(report.runtime.dependencies?.lockSha256, 64, 'Missing exact RTC dependency lock');
     assert.ok(report.runtime.dependencies.packages?.length > 0, 'Missing RTC dependency provenance');
@@ -63,7 +88,7 @@ export function validatePeerGenerationReport(report) {
     const network = report.rtc;
     same(network?.implementation, 'werift', 'Missing maintained native RTC adapter');
     same(network.version, '0.27.0', 'RTC dependency must match the public adapter pin');
-    same(network.signalingBoundary, 'one-off-in-process-sdp-mailbox', 'The introduction boundary must be explicit');
+    same(network.signalingBoundary, hosted ? 'tendriller-workerd-rendezvous' : 'one-off-in-process-sdp-mailbox', 'The introduction boundary must be explicit');
     same(network.byteBoundary, 'authenticated-reliable-application-frames', 'Byte scope must exclude unobserved wire overhead');
     assert.ok(network.connections?.length >= 4, 'Recovery requires original, reconnect, fresh and returning-peer RTC sessions');
     for (const link of network.connections) {
@@ -148,6 +173,7 @@ export function validatePeerGenerationReport(report) {
     source: report.source,
     artifacts: report.artifacts,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
+    ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,
     hostRequestsDuringCommands: host.requests.after - host.requests.before,
     hostedApplicationBodyBytes: host.applicationBodyBytes.after,
@@ -161,9 +187,10 @@ export function validatePeerGenerationReport(report) {
     },
     reapplication: reapply,
     limitations: [
-      rtc ? 'Actual native loopback RTC with in-process SDP introduction; this is not a deployed-network or browser qualification.'
+      rtc ? `Actual native loopback RTC with ${hosted ? 'Tendriller workerd rendezvous' : 'in-process SDP introduction'}; this is not a deployed-network or browser qualification.`
         : 'Independent packed runtime execution; this is not a deployed-network or browser qualification.',
-      'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
+      hosted ? 'Tendriller HTTP controls and rendezvous ran in workerd with synthetic authenticated accounts; deployed login was not exercised.'
+        : 'Host measurements count portable control calls; Tendriller HTTP endpoints were not exercised.',
       'No physical route, provider cost, universal loss bound or unavailable optional service is inferred.',
     ],
   };
