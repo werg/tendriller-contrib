@@ -76,4 +76,4 @@ test('public host controls and rendezvous serve independent native application p
     for (const pair of sessions.values()) for (const endpoint of pair) endpoint.session.close();
     await Promise.allSettled(running);
   }
-}, 360_000);
+}, inject('fixtureLifetimeMs') ?? 360_000);

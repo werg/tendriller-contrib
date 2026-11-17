@@ -2,7 +2,7 @@
 // A bounded loopback bridge drives public test fixtures; it is not application RPC.
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
@@ -11,9 +11,11 @@ import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
+  'control-fixture': { type: 'boolean', default: false },
   'allow-dirty': { type: 'boolean', default: false },
 } });
-if (!values.artifact || !values.artifacts || !values.output) throw Error('Usage: --artifact /exact/native-rtc-session.tgz --artifacts /exact/tendriller-dist --output /new/evidence');
+if ((!values.artifact && !values['control-fixture']) || !values.artifacts || !values.output) throw Error('Usage: (--artifact /exact/native-rtc-session.tgz | --control-fixture) --artifacts /exact/tendriller-dist --output /new/evidence');
+const fixtureLifetimeMs = values['control-fixture'] ? 3_600_000 : 360_000;
 const here = dirname(fileURLToPath(import.meta.url)), output = resolve(values.output), artifacts = resolve(values.artifacts);
 try { await stat(output); throw Error('Use a new evidence directory'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const hostDirectory = join(output, 'host');
@@ -72,18 +74,34 @@ import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 const require = createRequire(import.meta.url);
 const migrations = await readD1Migrations(dirname(require.resolve('@tendriller/engine/accounts-schema')));
-export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:360000,provide:{d1Migrations:migrations,bridge:${JSON.stringify(bridge.url)}}}});
+export default defineConfig({plugins:[cloudflareTest({main:new URL('./entry.mjs',import.meta.url).pathname,wrangler:{configPath:new URL('./wrangler.jsonc',import.meta.url).pathname}})],test:{include:['host.test.mjs'],testTimeout:${fixtureLifetimeMs},provide:{d1Migrations:migrations,bridge:${JSON.stringify(bridge.url)},fixtureLifetimeMs:${fixtureLifetimeMs}}}});
 `);
 const worker = run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.config.mjs'], hostDirectory);
 try {
   await Promise.race([bridge.ready, worker.done.then(() => { throw Error('Workerd exited before becoming ready'); })]);
-  const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
-    '--transport', 'native-rtc', '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
-  { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath });
-  await peer.done;
-  await bridge.stop();
-  await worker.done;
-  console.log(`Independent workerd/native RTC qualification passed: ${join(output, 'peers/report.json')}`);
+  if (values['control-fixture']) {
+    const applicationId = randomBytes(32).toString('hex');
+    const response = await fetch(`${bridge.url}/testing/page`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ applicationId }) });
+    assert.equal(response.status, 200);
+    const fixture = { format: 'peer-control-development-fixture/v1', applicationId, api: `${bridge.url}/api`, token: 'synthetic-owner',
+      stopUrl: `${bridge.url}/testing/stop`, trafficUrl: `${bridge.url}/testing/traffic`, blockUrl: `${bridge.url}/testing/block`,
+      identity: 'The test bridge supplies the packed Worker fixture authenticated account; the token is an opaque local handle, not a deployed credential.',
+      boundary: 'Actual Tendriller workerd compact control HTTP. No public discovery/invitation WebSocket endpoint; use an explicit local peer transport for this DX exercise.',
+      lifetimeMs: fixtureLifetimeMs, hostEvidence: hostEvidencePath,
+      runnerSha256: hash(await readFile(fileURLToPath(import.meta.url))) };
+    const fixturePath = join(output, 'control-fixture.json');
+    await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, { flag: 'wx' });
+    console.log(`Control fixture ready: ${fixturePath}`);
+    await worker.done;
+  } else {
+    const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
+      '--transport', 'native-rtc', '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
+    { PEER_GENERATION_HOST_BRIDGE: bridge.url, PEER_GENERATION_HOST_EVIDENCE: hostEvidencePath });
+    await peer.done;
+    await bridge.stop();
+    await worker.done;
+    console.log(`Independent workerd/native RTC qualification passed: ${join(output, 'peers/report.json')}`);
+  }
 } finally {
   await bridge.close();
   worker.child.kill('SIGTERM');
@@ -92,7 +110,7 @@ try {
 
 function run(command, args, cwd, environment = {}) {
   const child = spawn(command, args, { cwd, stdio: 'inherit', env: { ...process.env, ...environment } });
-  const timer = setTimeout(() => child.kill('SIGTERM'), 420_000);
+  const timer = setTimeout(() => child.kill('SIGTERM'), fixtureLifetimeMs + 60_000);
   const done = new Promise((resolve, reject) => {
     child.on('error', reject);
     child.on('exit', (code, signal) => { clearTimeout(timer); code === 0 ? resolve() : reject(Error(`Process failed: ${command} (${code ?? signal})`)); });
@@ -129,6 +147,7 @@ async function createBridge() {
         body.error ? item.reject(Error(body.error)) : item.resolve(body.value); return json(res, 200, { received: true });
       }
       if (url.pathname === '/testing/block') { blocked = body.blocked === true; return json(res, 200, { blocked }); }
+      if (url.pathname === '/testing/stop') return json(res, 200, await enqueue({ kind: 'stop' }));
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));

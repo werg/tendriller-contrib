@@ -71,6 +71,17 @@ bytes increase. Test accounts are synthetic; no result is a deployed-login or
 Internet-route qualification. The runner has no private host imports or second
 application command queue.
 
+For a separate developer-experience exercise, `--control-fixture` replaces the
+session archive argument and leaves an empty application on that real Worker
+available for up to one hour. The emitted `control-fixture.json` gives its
+application ID, SDK API URL, synthetic owner handle, traffic/block controls and
+shutdown endpoint. The agent receives these infrastructure inputs and the
+public package documentation, then implements its own domain. This mode exposes
+compact control HTTP only; public `connectApplications` can supply the explicitly
+local peer transport. It does not qualify managed discovery, invitation sockets,
+RTC or deployed authentication. Preserve the fixture provenance separately from
+the agent's implementation and observations.
+
 For browser ownership and the maintained page/Worker application facade, run:
 
 ```sh
