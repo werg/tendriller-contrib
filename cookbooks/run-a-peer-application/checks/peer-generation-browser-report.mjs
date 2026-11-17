@@ -34,7 +34,7 @@ export function validateBrowserPeerReport(report) {
   assert.equal(browser.implementation, 'chromium'); assert.equal(typeof browser.version, 'string');
   assert.equal(browser.transportOwner, 'dedicated-worker'); assert.equal(browser.storage, 'opfs-with-exclusive-web-lock');
   assert.equal(browser.signalingBoundary, 'loopback-fixture-http');
-  assert.equal(browser.controlBoundary, 'portable-registry-over-loopback-http');
+  assert.equal(browser.controlBoundary, 'chronolog-participant-over-loopback-http');
   assert.equal(browser.nativeCandidateSource, 'explicit-loopback-only');
   assert.equal(browser.interfaceEnumeration, 'disabled-by-native-options');
   assert.deepEqual(browser.pageErrors, []);
@@ -49,6 +49,8 @@ export function validateBrowserPeerReport(report) {
   for (const field of ['workerOnly', 'secondOwnerRefused', 'secondTabRefused', 'unsupportedStorageRefused', 'freshDeviceAwaitedKeys']) assert.equal(ownership[field], true);
   assert.equal(ownership.unsupportedFault, 'Worker navigator.storage.getDirectory removed by the fixture');
   assert.equal(ownership.pagePrivateKeys, 0);
+  assert.equal(ownership.controlParticipant?.owner, 'application-session');
+  assert.equal(ownership.controlParticipant.attachRequests, 0);
   assert.match(ownership.initialDeviceId, /^[a-f0-9]{64}$/u); assert.match(ownership.initialStorageId, /^[a-f0-9-]{36}$/u);
   for (const field of ['sameDeviceId', 'sameStorageId', 'sameView', 'storedKeysReused']) assert.equal(ownership.gracefulReopen[field], true);
   for (const field of ['sameDeviceId', 'sameStorageId', 'sameView', 'durableOperation']) assert.equal(ownership.abruptWorkerReopen[field], true);

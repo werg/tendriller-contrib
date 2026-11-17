@@ -13,6 +13,9 @@ function syntheticReport() {
     artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-test', sha256: 'c'.repeat(64),
       sourceCommit: 'd'.repeat(40), sourceTree: 'e'.repeat(40), sourceDirty: false }],
     publicBoundary: { imports: ['@chronolog/peer-session', '@chronolog/peer-session/native'], siblingSourceImports: 0, applicationRetryQueues: 0, residentRequired: false },
+    controlParticipant: { owner: 'application-session', role: 'control', attachRequests: 0, definitionVerified: true,
+      recovery: { injectedAfterSelection: true, journalSavedBeforeRetry: true, originalRequest: 'a'.repeat(64), retriedRequest: 'a'.repeat(64),
+        originalSelection: 'g2', retriedSelection: 'g2', recoveryNoticeObserved: true } },
     hostOutage: { boundary: 'portable-control-port', blocked: true, blockedProbeRejected: true, commandsApplied: 3,
       requests: { before: 4, after: 4 }, applicationBodyBytes: { before: 0, after: 0 }, finalityCapability: false },
     lostReply: { injectedAfterPersistence: true, originalOperationId: 'op-retained', retriedOperationId: 'op-retained',
@@ -71,6 +74,21 @@ test('lost-reply recovery must retain identity, original receipt and record coun
   rejects(value => { value.lostReply.retriedOperationId = 'replacement'; });
   rejects(value => { value.lostReply.retriedReceipt.sequence += 1; });
   rejects(value => { value.lostReply.orderedRecords.after += 1; });
+});
+
+test('control participant qualification requires owned lifecycle and exact journaled takeover recovery', () => {
+  for (const mutate of [
+    value => { delete value.controlParticipant; },
+    value => { value.controlParticipant.owner = 'fixture-retry-queue'; },
+    value => { value.controlParticipant.attachRequests++; },
+    value => { value.controlParticipant.definitionVerified = false; },
+    value => { value.controlParticipant.recovery.injectedAfterSelection = false; },
+    value => { value.controlParticipant.recovery.journalSavedBeforeRetry = false; },
+    value => { value.controlParticipant.recovery.retriedRequest = 'b'.repeat(64); },
+    value => { value.controlParticipant.recovery.retriedSelection = 'g3'; },
+    value => { value.controlParticipant.recovery.originalSelection = 'g3'; value.controlParticipant.recovery.retriedSelection = 'g3'; },
+    value => { value.controlParticipant.recovery.recoveryNoticeObserved = false; },
+  ]) rejects(mutate);
 });
 
 test('tolerant recovery must remove the source, lose a suffix and preserve adopted and abandoned evidence', () => {
@@ -150,6 +168,7 @@ function syntheticHostedReport() {
     publication: { author: '1'.repeat(64), nonAdministrator: '2'.repeat(64),
       first: { id: '3'.repeat(64), version: 1, expectedCodeDigest: '4'.repeat(64), servedCodeDigest: '4'.repeat(64) },
       second: { id: '5'.repeat(64), version: 2, previous: '3'.repeat(64), expectedCodeDigest: '6'.repeat(64), servedCodeDigest: '6'.repeat(64) },
+      sessionOwned: true, lostReplyAfterPersistence: true, savedIdentityRecovered: true,
       exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
       authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true },
     publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
@@ -178,7 +197,8 @@ test('hosted publication evidence requires actual signed code, permissions, retr
     value => { value.host.publication.second.expectedCodeDigest = value.host.publication.first.expectedCodeDigest;
       value.host.publication.second.servedCodeDigest = value.host.publication.first.servedCodeDigest; },
     value => { value.host.publication.nonAdministrator = value.host.publication.author; },
-    ...['exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+    ...['sessionOwned', 'lostReplyAfterPersistence', 'savedIdentityRecovered',
+      'exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
       'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']
       .map(field => value => { value.host.publication[field] = false; }),
   ]) {

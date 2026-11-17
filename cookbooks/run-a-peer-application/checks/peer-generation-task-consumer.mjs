@@ -4,7 +4,8 @@ import { createHash, randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { bytesDigest, connectApplications, controlParticipantGrant, createGenerationRegistry,
-  participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
+  createParticipantResponse, createParticipantTransport, participantGrant, signApplicationDescriptor,
+  signControlRevision, signTransitionRequest, validateParticipantRequest } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { openNativeSqlApplication, prepareNativeSqlApplication } from '@chronolog/peer-session/sql-native';
 import { taskBoard } from './peer-generation-task-definition.mjs';
@@ -37,6 +38,17 @@ try {
     resources.push(session); return session;
   };
   const [creator, member] = await Promise.all([open(devices[0], 'creator', true), open(devices[1], 'member', true)]);
+  const transport = createParticipantTransport({ applicationId, exchange: async input => {
+    const request = validateParticipantRequest(input);
+    assert.equal(request.applicationId, applicationId);
+    assert.equal(request.facet, 'control');
+    let payload;
+    if (request.action === 'read') payload = await registry.read();
+    else if (request.action === 'select') payload = await registry.select(request.payload.request);
+    else throw Error('UNEXPECTED_TASK_CONTROL_REQUEST');
+    return createParticipantResponse(request, payload);
+  } });
+  const participant = member.connectControlParticipant({ exchange: transport.exchange });
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
   let link = await connectApplications(creator, member); links.push(link);
   assert.equal((await applied(creator, 'addTask', { taskId: 'claim-race', title: 'One claimant at a time' }, 'add-claim-race')).outcome, 'accepted');
@@ -56,10 +68,12 @@ try {
   assert.equal(claimedView.value.tasks.find(value => value.id === 'claim-race').claimedBy, winner.deviceId);
   assert.equal((await applied(creator, 'postMessage', { messageId: 'excluded-message', text: 'This event is excluded with the claims' }, 'excluded-message')).outcome, 'accepted');
   await link.synchronize(); const oldHead = await creator.recoveryPoint(); await link.close();
-  const successor = await registry.select(await signTransitionRequest({ applicationId, profile: descriptor.payload.profile,
+  // Deliberately request the earlier complete prefix to check atomic SQL/event
+  // rollback. Normal latest-prefix takeover uses session.recovery.takeover.
+  const successor = await participant.selectGeneration(await signTransitionRequest({ applicationId, profile: descriptor.payload.profile,
     policy: descriptor.payload.policy, expectedGeneration: initial.id, requester: devices[1].identity.publicKey,
     coordinator: devices[1].identity.publicKey, controlRevision: 0, base: retained, reason: 'takeover', transitionId: 'task-recovery' }, devices[1].identity));
-  const authority = await registry.read(); await Promise.all([creator.adopt(authority), member.adopt(authority)]);
+  const authority = await participant.application(); await creator.adopt(authority);
   const recovered = await member.query('board', {}), recoveredCreator = await creator.query('board', {});
   assert.deepEqual(recovered.value, retainedView.value); assert.deepEqual(recoveredCreator.value, recovered.value);
   assert.equal(recovered.value.tasks.find(value => value.id === 'claim-race').claimedBy, null);

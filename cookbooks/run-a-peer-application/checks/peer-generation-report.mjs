@@ -20,7 +20,7 @@ const unchangedCounter = (value, name) => {
 export function validatePeerGenerationReport(report) {
   same(report?.format, 'peer-generation-consumer/v1', 'Wrong report format');
   same(report.mode, 'runtime', 'A build cannot qualify runtime behavior');
-  same(report.profile, 'peer-generation-v1', 'A different profile cannot qualify tolerant recovery');
+  same(report.profile, 'peer-generation-v1', 'Report the signed protocol version that was exercised');
   hex(report.executionManifestDigest, 64, 'Missing exact execution manifest');
   assert.ok(['independent-packed-peers', 'independent-native-rtc'].includes(report.topology), 'Report the actual execution topology');
   const rtc = report.topology === 'independent-native-rtc';
@@ -44,7 +44,18 @@ export function validatePeerGenerationReport(report) {
     ...(rtc ? ['@chronolog/peer-session/webrtc-native'] : [])], 'Use only the documented public session entry');
   same(report.publicBoundary?.siblingSourceImports, 0, 'A sibling source checkout is not an independent consumer');
   same(report.publicBoundary?.applicationRetryQueues, 0, 'The consumer must use the session journal');
-  same(report.publicBoundary?.residentRequired, false, 'A permanent resident is not this profile');
+  same(report.publicBoundary?.residentRequired, false, 'The common session must not depend on a permanent resident');
+  const control = report.controlParticipant;
+  same(control?.owner, 'application-session', 'Lifecycle control must belong to the public application session');
+  same(control.role, 'control', 'The host must be an explicit selective participant');
+  same(control.attachRequests, 0, 'Attaching the control participant must not perform I/O');
+  same(control.definitionVerified, true, 'The session must verify the published definition');
+  same(control.recovery?.injectedAfterSelection, true, 'The control reply fault must follow durable selection');
+  same(control.recovery.journalSavedBeforeRetry, true, 'Takeover must save its exact signed transition before retry');
+  hex(control.recovery.originalRequest, 64, 'Missing original signed transition digest');
+  same(control.recovery.retriedRequest, control.recovery.originalRequest, 'Control retry changed the signed transition');
+  same(control.recovery.retriedSelection, control.recovery.originalSelection, 'Control retry created a new selection');
+  same(control.recovery.recoveryNoticeObserved, true, 'The owned control path must return its recovery notice');
 
   const host = report.hostOutage;
   assert.ok(['portable-control-port', 'tendriller-workerd-http'].includes(host?.boundary), 'Host traffic scope must be explicit');
@@ -81,7 +92,8 @@ export function validatePeerGenerationReport(report) {
     assert.notEqual(publication.first.expectedCodeDigest, publication.second.expectedCodeDigest, 'Publication must update actual code bytes');
     assert.ok(publication.second.version > publication.first.version, 'Code update did not advance the served version');
     same(publication.second.previous, publication.first.id, 'Code publication lost its signed chain');
-    for (const field of ['exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+    for (const field of ['sessionOwned', 'lostReplyAfterPersistence', 'savedIdentityRecovered',
+      'exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
       'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']) {
       same(publication[field], true, `Missing publication observation: ${field}`);
     }
@@ -151,6 +163,7 @@ export function validatePeerGenerationReport(report) {
   const recovery = report.recovery;
   nonempty(recovery?.previousGeneration, 'Missing predecessor generation');
   nonempty(recovery.selectedGeneration, 'Missing selected successor');
+  same(control.recovery.originalSelection, recovery.selectedGeneration, 'The recorded control retry did not select the recovered generation');
   assert.notEqual(recovery.selectedGeneration, recovery.previousGeneration, 'No takeover happened');
   count(recovery.previousHead, 'Missing previous head');
   count(recovery.adoptedPosition, 'Missing adopted prefix');
@@ -198,6 +211,7 @@ export function validatePeerGenerationReport(report) {
     topology: report.topology,
     source: report.source,
     artifacts: report.artifacts,
+    controlParticipant: report.controlParticipant,
     ...(rtc ? { rtc: report.rtc, runtimeDependencies: report.runtime.dependencies } : {}),
     ...(hosted ? { host: report.host, hostedTraffic: host.observations } : {}),
     commandsWithHostBlocked: host.commandsApplied,

@@ -17,7 +17,7 @@ test('public host controls and rendezvous serve independent native application p
     switch (job.kind) {
       case 'page':
         assert.equal(page, undefined, 'The fixture owns exactly one application');
-        page = await createTestPage({ application: { kind: 'peer', id: job.applicationId } });
+        page = await createTestPage({ application: { id: job.applicationId } });
         return { ready: true };
       case 'api': {
         assert.ok(page);

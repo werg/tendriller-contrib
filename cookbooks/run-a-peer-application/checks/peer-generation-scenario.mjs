@@ -6,7 +6,8 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import {
   AbandonedOperationError, applicationDescriptionDigest, bytesDigest,
-  createGenerationRegistry, describeApplication, eventExecutionManifest,
+  createGenerationRegistry, createParticipantResponse, createParticipantTransport,
+  describeApplication, eventExecutionManifest, validateParticipantRequest,
   executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest,
 } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
@@ -55,7 +56,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     await assert.rejects(openNativeDevice({ path: database('missing') }), /APPLICATION_DEVICE_NOT_FOUND/);
     report.nativeOwnership = { secondOwnerRefused: true, implicitIdentityCreationRefused: true };
     const applicationId = randomBytes(32).toString('hex');
-    const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+    const execution = await executionManifestArtifacts(await eventExecutionManifest());
     const definition = describeApplication(conversation);
     host = await createControl({ applicationId, hostDevice,
       configuration: {
@@ -69,7 +70,6 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     });
     const descriptor = host.descriptor;
     if (host.qualifyParticipant) report.host.participant = await host.qualifyParticipant();
-    if (host.qualifyPublication) report.host.publication = await host.qualifyPublication({ signer: deviceA.identity, reader: deviceC.identity });
     const transition = async (requester, coordinator, expectedGeneration, base, transitionId, reason = 'takeover') => signTransitionRequest({
       applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
       transitionId, expectedGeneration, coordinator: coordinator.identity.publicKey, requester: requester.identity.publicKey,
@@ -78,6 +78,28 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     const g1 = await host.select(await transition(deviceA, deviceA, null, null, 'create', 'create'));
     authority = await host.read();
     let a = await open(deviceA), b = await open(deviceB);
+    let loseControlReply = false;
+    const transitionExchanges = [];
+    const beforeAttach = await host.traffic();
+    const aControl = a.connectControlParticipant({ exchange: host.exchange });
+    const bControl = b.connectControlParticipant({ exchange: async (request, options) => {
+      const response = await host.exchange(request, options);
+      if (request.facet === 'control' && request.action === 'select') {
+        transitionExchanges.push({ request: structuredClone(request.payload.request), selected: response.payload.id });
+        if (loseControlReply) { loseControlReply = false; throw Error('CONTROL_REPLY_LOST_AFTER_SELECTION'); }
+      }
+      return response;
+    } });
+    const afterAttach = await host.traffic();
+    assert.equal(afterAttach.requests, beforeAttach.requests, 'Attaching the control participant must not contact the host');
+    assert.equal(aControl.role, 'control');
+    assert.equal(bControl.policy.role, 'control');
+    assert.deepEqual((await aControl.definition()).definition, definition);
+    report.controlParticipant = { owner: 'application-session', role: aControl.role,
+      attachRequests: afterAttach.requests - beforeAttach.requests, definitionVerified: true };
+    if (host.qualifyPublication) report.host.publication = await host.qualifyPublication({
+      control: aControl, signer: deviceA.identity, reader: deviceC.identity,
+    });
     assert.equal(a.status.role, 'coordinator');
     assert.equal(b.status.role, 'follower');
     assert.equal(a.describe().capabilities.finality, false);
@@ -132,7 +154,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     // Bootstrap/control calls are counted separately. The public session receives
     // cached verified authority and must never invoke this host while commanding.
     await host.block(true);
-    await assert.rejects(host.read(), /CONTROL_HOST_UNAVAILABLE/);
+    await assert.rejects(bControl.application(), /CONTROL_HOST_UNAVAILABLE/);
     const hostBefore = await host.traffic();
     const transportBefore = await ab.inspect?.();
     await post(a, 'host-blocked-a', 'A continues without host access');
@@ -170,13 +192,27 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     await rename(join(storeRoot, 'a'), join(storeRoot, 'a-offline'));
 
     await host.block(false);
-    const takeoverRequest = await transition(deviceB, deviceB, g1.id, adopted, 'takeover-b');
-    const selected = await host.select(takeoverRequest);
-    // Discarding this selected response simulates a lost control reply; the exact
-    // same transition must return the already persisted selection.
-    assert.deepEqual(await host.select(takeoverRequest), selected);
-    authority = await host.read();
-    const reset = await b.adopt(authority);
+    // Discard the persisted selection at the transport boundary. The session
+    // journal must retain the exact signed request and retry its original base.
+    loseControlReply = true;
+    await assert.rejects(b.recovery.takeover(bControl, { transitionId: 'takeover-b' }), /CONTROL_REPLY_LOST_AFTER_SELECTION/);
+    const savedTransition = (await b.recovery.inspect()).find(value => value.request.payload.transitionId === 'takeover-b');
+    assert.ok(savedTransition);
+    assert.equal(savedTransition.selected, null);
+    assert.deepEqual(savedTransition.request.payload.base, adopted);
+    const reset = await b.recovery.takeover(bControl, { transitionId: 'takeover-b' });
+    authority = await bControl.application();
+    const selected = authority.generations.at(-1);
+    const retriedTransition = (await b.recovery.inspect()).find(value => value.request.payload.transitionId === 'takeover-b');
+    assert.deepEqual(retriedTransition.request, savedTransition.request);
+    assert.equal(retriedTransition.selected, selected.id);
+    assert.equal(transitionExchanges.length, 2);
+    assert.deepEqual(transitionExchanges[0], transitionExchanges[1]);
+    report.controlParticipant.recovery = { injectedAfterSelection: true, journalSavedBeforeRetry: true,
+      originalRequest: hash(savedTransition.request), retriedRequest: hash(retriedTransition.request),
+      originalSelection: transitionExchanges[0].selected, retriedSelection: transitionExchanges[1].selected,
+      recoveryNoticeObserved: reset !== null };
+    assert.ok(reset);
     assert.equal(reset.generation, selected.id);
     assert.deepEqual(await b.operations.get('reply-lost'), retainedOperation);
     const coherentB = await query(b);
@@ -184,6 +220,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     assert.equal(coherentB.value.messages.some(message => message.operationId === 'abandoned-a'), false);
     await checkpoint('selected older prefix on survivor');
     const c = await open(deviceC);
+    const cControl = c.connectControlParticipant({ exchange: host.exchange });
     const bc = await connect(b, c);
     await bc.synchronize();
     const coherentC = await query(c);
@@ -240,9 +277,10 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
     await bc.synchronize();
     await assert.rejects(host.select(await transition(deviceC, deviceC, selected.id, oldHead, 'resurrect-old-tail')),
       /PEER_PREFIX_EXCLUDED/);
-    const third = await host.select(await transition(deviceC, deviceC, selected.id, await c.recoveryPoint(), 'takeover-c'));
-    authority = await host.read();
-    await c.adopt(authority); await b.adopt(authority); await a.adopt(authority);
+    await c.recovery.takeover(cControl, { transitionId: 'takeover-c' });
+    authority = await cControl.application();
+    const third = authority.generations.at(-1);
+    await b.adopt(authority); await a.adopt(authority);
     assert.equal(third.payload.number, 2);
     assert.equal((await a.operations.get('abandoned-a')).status, 'abandoned');
     assert.deepEqual(await a.operations.get('reapplied-a'), reappliedResult);
@@ -276,7 +314,7 @@ export async function runPeerGenerationScenario({ path, connectSessions, createC
 
 async function createPortableControl({ applicationId, hostDevice, configuration }) {
   const { definition, schema, members, epoch, keyDigest, ...description } = configuration;
-  assert.equal(schema, null, 'This independent conversation uses the events profile');
+  assert.equal(schema, null, 'This independent conversation requires no SQL schema');
   const descriptor = await signApplicationDescriptor({ ...description, applicationId,
     definitionDigest: await applicationDescriptionDigest(definition), schemaDigest: null,
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: hostDevice.identity.publicKey,
@@ -286,11 +324,23 @@ async function createPortableControl({ applicationId, hostDevice, configuration 
   }, hostDevice.identity);
   const registry = await createGenerationRegistry({ store: hostDevice.store, descriptor, controls: [control], signer: hostDevice.identity });
   let requests = 0, blocked = false;
+  const transport = createParticipantTransport({ applicationId, exchange: async input => {
+    const request = validateParticipantRequest(input);
+    requests++;
+    if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE');
+    let payload;
+    if (request.facet === 'control' && request.action === 'read') payload = await registry.read();
+    else if (request.facet === 'control' && request.action === 'select') payload = await registry.select(request.payload.request);
+    else if (request.facet === 'publication' && request.action === 'definition') payload = { descriptor, definition, schema };
+    else throw Error('UNEXPECTED_CONTROL_REQUEST');
+    return createParticipantResponse(request, payload);
+  } });
   return {
     descriptor, boundary: 'portable-control-port',
+    exchange: transport.exchange,
     block(value) { blocked = value; },
     traffic() { return { requests, applicationBodyBytes: 0 }; },
-    async read() { requests++; if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.read(); },
-    async select(request) { requests++; if (blocked) throw Error('CONTROL_HOST_UNAVAILABLE'); return registry.select(request); },
+    read: () => transport.request('control', 'read', {}),
+    select: request => transport.request('control', 'select', { request }),
   };
 }

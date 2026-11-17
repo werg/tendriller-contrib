@@ -37,6 +37,12 @@ older complete prefix, joins a fresh peer, isolates the returning abandoned
 branch, deliberately reapplies reviewed intent, rejects excluded ancestry in a
 third generation, and reopens the same durable identity.
 
+The session attaches its explicit control participant without I/O and verifies
+the published definition. A second fault loses a persisted takeover response;
+the maintained recovery journal retries the identical signed request and
+receives the original selection and recovery notice. The fixture does not
+implement another transition queue or recovery policy.
+
 The direct run uses the maintained in-process transport. The RTC run uses the
 public native connection composition and real ICE/DTLS/SCTP. Its explicit
 loopback candidate and one-off in-process SDP mailbox do not qualify network
@@ -76,6 +82,9 @@ only public browser entries. The Worker owns OPFS, identity, keyring, the attemp
 journal and both RTC channels. `connectApplicationWorker` exposes the same
 commands and queries to the page; `connectWorkerApplicationWebRtc` owns channel
 transfer. The page copies neither protocol lifecycle nor request maps.
+The Worker attaches the same session-owned control participant over the shared
+envelope; fixture HTTP hosts the public registry without introducing separate
+application/read and generation/select APIs.
 
 Board and compact layouts submit domain commands, preserve unsent drafts across
 replacement and recovery, inspect original attempts and deliberately reapply
@@ -112,7 +121,9 @@ and requires the host to reject them too. This demonstrates selective
 participation in the same protocol.
 
 The publication facet publishes a signed HTML/module graph and verifies actual
-served code. Exact retry preserves the selected version. Tampered bytes, a
+served code. The owned session saves the exact signed publication before a
+deliberately lost persisted response; retry preserves that identity and selected
+version. Tampered bytes, a
 member without publication authority and a stale predecessor fail. A second
 signed revision updates HTML and code while retaining the original immutable
 version. Restarting the Durable Object preserves the publication and served

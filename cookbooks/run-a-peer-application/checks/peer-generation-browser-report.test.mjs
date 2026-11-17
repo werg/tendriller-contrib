@@ -23,7 +23,7 @@ function fixture() {
     runtime: { dependencies: { lockSha256: digest, packages: Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })
       .map(([name, version]) => ({ path: `node_modules/${name}`, version, integrity: 'sha512-synthetic' })) } },
     browser: { implementation: 'chromium', version: '156.0.0', transportOwner: 'dedicated-worker', storage: 'opfs-with-exclusive-web-lock',
-      signalingBoundary: 'loopback-fixture-http', controlBoundary: 'portable-registry-over-loopback-http',
+      signalingBoundary: 'loopback-fixture-http', controlBoundary: 'chronolog-participant-over-loopback-http',
       nativeCandidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options', pageErrors: [],
       observations: { secureContext: true, storage: true, locks: true } },
     ui: { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker', sentThroughForms: 3,
@@ -32,6 +32,7 @@ function fixture() {
     ownership: { workerOnly: true, secondOwnerRefused: true, secondTabRefused: true, unsupportedStorageRefused: true,
       unsupportedFault: 'Worker navigator.storage.getDirectory removed by the fixture', freshDeviceAwaitedKeys: true, pagePrivateKeys: 0,
       initialDeviceId: id, initialStorageId: '00000000-0000-0000-0000-000000000000',
+      controlParticipant: { owner: 'application-session', attachRequests: 0 },
       gracefulReopen: { sameDeviceId: true, sameStorageId: true, sameView: true, storedKeysReused: true },
       abruptWorkerReopen: { sameDeviceId: true, sameStorageId: true, sameView: true, durableOperation: true } },
     operations: { cancelledWaitPreservedAttempt: true, resumedExactAttempt: true, enrolledFromPeer: true, receiptPeer: other },
@@ -66,6 +67,8 @@ test('a page proxy simulation or bundled source checkout cannot qualify the Work
   rejects(report => { report.browser.transportOwner = 'page'; });
   rejects(report => { report.browserBundleInputs.push('../chronolog/packages/peer-session/src/session.ts'); });
   rejects(report => { report.ownership.secondOwnerRefused = false; });
+  rejects(report => { report.ownership.controlParticipant.owner = 'fixture-adapter'; });
+  rejects(report => { report.ownership.controlParticipant.attachRequests = 1; });
   rejects(report => { report.ui.sessionFacade = 'fixture-rpc'; });
   rejects(report => { report.ui.reapplicationConfirmed = false; });
   rejects(report => { report.ui.draftAfterRecovery = ''; });

@@ -18,8 +18,22 @@ The complete deployment supplies `deployment/bootstrap.mjs`. Its
 `applicationReady` export resolves to the client returned by
 `connectApplicationWorker(worker)` from `@chronolog/peer-session/browser`.
 The Worker first opens the device and application using its authorized
-enrollment and pinned execution runtime, then calls
-`serveApplicationWorker(session, self)` from that same public entry.
+enrollment and pinned execution runtime. It attaches the host's dedicated
+participant transport before serving the page facade:
+
+```js
+const host = session.connectControlParticipant({
+  exchange: (envelope, { signal }) => peers.exchange(envelope, { signal }),
+});
+serveApplicationWorker(session, self, { host });
+```
+
+`peers` is the deployment's public Tendriller peer client. It carries the shared
+participant envelope over authenticated HTTP and applies the host interest
+policy. The session owns authority verification, exact takeover/publication
+journals and shutdown. Attaching performs no host request; explicit lifecycle
+actions are the only users of that transport. `serveApplicationWorker` comes
+from the public browser entry.
 That owner also installs and closes the maintained Worker RTC transport. Use
 `connectWorkerApplicationWebRtc` from the public `webrtc` entry on the page for
 negotiation and authenticated handoff.

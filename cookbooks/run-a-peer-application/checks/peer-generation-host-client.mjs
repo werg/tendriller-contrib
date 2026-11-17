@@ -20,7 +20,15 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
   return {
     async createControl({ applicationId, configuration }) {
       await request('/testing/page', { method: 'POST', body: { applicationId } });
-      const exchange = (body, { signal } = {}) => request('/api/peers/participant', { method: 'POST', body, signal });
+      let losePublicationReply = false;
+      const exchange = async (body, { signal } = {}) => {
+        const response = await request('/api/peers/participant', { method: 'POST', body, signal });
+        if (losePublicationReply && body.facet === 'publication' && body.action === 'publish') {
+          losePublicationReply = false;
+          throw Error('PUBLICATION_REPLY_LOST_AFTER_PERSISTENCE');
+        }
+        return response;
+      };
       const participant = createParticipantTransport({ applicationId, exchange });
       const configured = await participant.request('control', 'configure', configuration);
       const published = await participant.request('publication', 'definition', {});
@@ -50,10 +58,10 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
             transport: 'public-chronolog-participant', clientFiltered: excluded.map(value => value.join('.')),
             hostRejected: excluded.map(value => value.join('.')), clientFilteredHttpRequests: after.requests - before.requests };
         },
-        async qualifyPublication({ signer, reader }) {
-          const authority = await participant.request('control', 'read', {});
+        async qualifyPublication({ control, signer, reader }) {
+          const authority = await control.application();
           const verified = await verifyAuthorityBundle(authority, configured.descriptor);
-          assert.equal(await participant.request('publication', 'read', {}), null);
+          assert.equal(await control.publication(), null);
           const prepare = async (revision, previous, author = signer) => {
             const marker = `participant-publication-${revision}`;
             const content = [ ['index.html', 'text/html', `<!doctype html><html><head><meta charset="utf-8"></head><body><p>${marker}</p><script type="module" src="./page.mjs"></script></body></html>`],
@@ -64,17 +72,24 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
               files.push({ path, type, size: bytes.length, hash });
               assets.push({ hash, bytes: Buffer.from(bytes).toString('base64') });
             }
-            const publication = await signPublicationManifest({ applicationId,
+            const intent = { operationId: `publish-${revision}-${author.publicKey}`, entry: 'index.html', files };
+            const publication = author === signer ? await control.preparePublication(intent) : await signPublicationManifest({ applicationId,
               historyId: verified.descriptor.historyId, profile: verified.descriptor.profile,
               controlRevision: verified.control.payload.revision, author: author.publicKey,
-              operationId: `publish-${revision}-${author.publicKey}`, revision, previous,
+              operationId: intent.operationId, revision, previous,
               definitionDigest: verified.descriptor.definitionDigest,
               executionManifestDigest: verified.descriptor.executionManifestDigest,
               entry: 'index.html', files }, author);
-            return { publication, assets, marker, code: content[1][2] };
+            assert.equal(publication.payload.revision, revision);
+            assert.equal(publication.payload.previous, previous);
+            return { publication, assets, intent, marker, code: content[1][2] };
           };
-          const publish = ({ publication, assets }) => participant.request('publication', 'publish', { publication, assets });
+          const publish = ({ publication, assets }) => control.publish(publication, assets);
+          const publishRaw = ({ publication, assets }) => participant.request('publication', 'publish', { publication, assets });
           const first = await prepare(0, null);
+          losePublicationReply = true;
+          await assert.rejects(publish(first), /PUBLICATION_REPLY_LOST_AFTER_PERSISTENCE/);
+          assert.deepEqual(await control.preparePublication(first.intent), first.publication, 'A lost reply must retain the exact saved publication');
           const selected = await publish(first);
           assert.deepEqual(selected.publication, first.publication);
           await verifyPublicationManifest(selected.publication, verified);
@@ -87,15 +102,16 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
           const second = await prepare(1, first.publication.id);
           const damaged = structuredClone(second);
           damaged.assets[1].bytes = Buffer.from('different unsigned code').toString('base64');
-          await assert.rejects(publish(damaged), error => error.status >= 400 && error.status < 500);
-          assert.deepEqual(await participant.request('publication', 'read', {}), selected);
-          await assert.rejects(publish(await prepare(1, first.publication.id, reader)), error => error.status === 403);
+          await assert.rejects(publishRaw(damaged), error => error.status >= 400 && error.status < 500);
+          assert.deepEqual(await control.publication(), selected);
+          await assert.rejects(publishRaw(await prepare(1, first.publication.id, reader)), error => error.status === 403);
           const updated = await publish(second);
           assert.deepEqual(updated.publication, second.publication);
           assert.ok(updated.version > selected.version);
-          const conflict = await prepare(1, first.publication.id);
-          conflict.publication = await signPublicationManifest({ ...conflict.publication.payload, operationId: 'stale-publication-head' }, signer);
-          await assert.rejects(publish(conflict), error => error.status === 409);
+          const conflict = { ...second, publication: await signPublicationManifest({
+            ...second.publication.payload, operationId: 'stale-publication-head',
+          }, signer) };
+          await assert.rejects(publishRaw(conflict), error => error.status === 409);
           const secondCode = await asset('page.mjs');
           assert.equal(secondCode.status, 200); assert.equal(secondCode.text, second.code);
           const secondPage = await asset('');
@@ -103,15 +119,16 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
           const retained = await asset(`_publications/${selected.version}/page.mjs`);
           assert.equal(retained.status, 200); assert.equal(retained.text, first.code);
           await request('/testing/restart', { method: 'POST' });
-          assert.deepEqual(await participant.request('publication', 'read', {}), updated);
+          assert.deepEqual(await control.publication(), updated);
           const restarted = await asset('page.mjs');
           assert.equal(restarted.status, 200); assert.equal(restarted.text, second.code);
-          assert.deepEqual(await participant.request('control', 'read', {}), authority, 'Page publication cannot rewrite application controls or history');
+          assert.deepEqual(await control.application(), authority, 'Page publication cannot rewrite application controls or history');
           return { author: signer.publicKey, nonAdministrator: reader.publicKey,
             first: { id: selected.publication.id, version: selected.version,
               expectedCodeDigest: first.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(firstCode.text)) },
             second: { id: updated.publication.id, version: updated.version, previous: updated.publication.payload.previous,
               expectedCodeDigest: second.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(restarted.text)) },
+            sessionOwned: true, lostReplyAfterPersistence: true, savedIdentityRecovered: true,
             exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
             authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true };
         },

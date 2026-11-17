@@ -7,8 +7,9 @@ import { mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { build } from 'esbuild';
-import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, eventExecutionManifest,
-  executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision, signTransitionRequest } from '@chronolog/peer-session';
+import { applicationDefinitionDigest, bytesDigest, createGenerationRegistry, createParticipantRequest, createParticipantResponse,
+  eventExecutionManifest, executionManifestArtifacts, participantGrant, signApplicationDescriptor, signControlRevision,
+  signTransitionRequest, validateParticipantRequest } from '@chronolog/peer-session';
 import { openNativeApplication, openNativeDevice } from '@chronolog/peer-session/native';
 import { connectNativeApplicationWebRtc } from '@chronolog/peer-session/webrtc-native';
 import { conversation } from './peer-generation-definition.mjs';
@@ -64,7 +65,8 @@ try {
   [controlDevice, deviceA, deviceC] = await Promise.all(['control', 'a', 'c'].map(nativeDevice));
   server = createServer((request, response) => {
     void route(request, response).catch(error => {
-      if (!response.writableEnded) { response.statusCode = 500; response.setHeader('content-type', 'application/json'); response.end(JSON.stringify({ error: error.message })); }
+      if (!response.writableEnded) { response.statusCode = 500; response.setHeader('content-type', 'application/json');
+        response.end(JSON.stringify({ error: { code: error.code ?? 'fixture_failure', message: error.message } })); }
     });
   });
   await new Promise((resolveListen, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolveListen); });
@@ -74,7 +76,7 @@ try {
     args: ['--disable-features=WebRtcHideLocalIpsWithMdns'] });
   report.browser = { implementation: 'chromium', version: browser.version(), headless: true,
     transportOwner: 'dedicated-worker', storage: 'opfs-with-exclusive-web-lock',
-    signalingBoundary: 'loopback-fixture-http', controlBoundary: 'portable-registry-over-loopback-http',
+    signalingBoundary: 'loopback-fixture-http', controlBoundary: 'chronolog-participant-over-loopback-http',
     nativeCandidateSource: 'explicit-loopback-only', interfaceEnumeration: 'disabled-by-native-options',
     pageErrors: [], consoleErrors: [] };
   const context = await browser.newContext();
@@ -88,6 +90,7 @@ try {
   assert.equal(opened.deviceId, browserIdentity.deviceId);
   assert.equal(opened.status.phase, 'awaiting-keys');
   assert.equal(opened.capabilities.finality, false);
+  assert.equal(controlRequests, 0, 'Attaching the Worker control participant must not perform I/O');
   assert.equal(await page.evaluate(() => fixture.windowStorage()), 'BROWSER_PEER_WORKER_REQUIRED');
   assert.equal(await page.evaluate(() => fixture.secondOwner()), 'BROWSER_STORAGE_IN_USE');
   assert.equal(await page.evaluate(() => fixture.unsupportedStorage()), 'BROWSER_DURABLE_STORAGE_UNAVAILABLE');
@@ -98,7 +101,8 @@ try {
   } finally { await otherTab.close(); }
   report.ownership = { workerOnly: true, secondOwnerRefused: true, secondTabRefused: true,
     unsupportedStorageRefused: true, unsupportedFault: 'Worker navigator.storage.getDirectory removed by the fixture', initialDeviceId: opened.deviceId,
-    initialStorageId: opened.storageId, pagePrivateKeys: 0, freshDeviceAwaitedKeys: true };
+    initialStorageId: opened.storageId, pagePrivateKeys: 0, freshDeviceAwaitedKeys: true,
+    controlParticipant: { owner: 'application-session', attachRequests: controlRequests } };
   await checkpoint('opened a keyless Worker-owned browser and refused a second owner');
 
   await post(a, 'anchor', 'A retained anchor');
@@ -141,7 +145,9 @@ try {
     await application.query('conversation', {});
   });
   blocked = true;
-  const rejected = await fetch(`${origin}/control/application`);
+  const rejected = await fetch(`${origin}/participant`, { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(createParticipantRequest({ applicationId, facet: 'control', action: 'read', payload: {} })),
+  });
   assert.equal(rejected.status, 503);
   const beforeTraffic = traffic(), beforeTransport = await inspect(ab);
   assert.equal((await submitMessage('Browser commands without host access')).outcome, 'accepted');
@@ -332,7 +338,7 @@ async function bootstrap(identity) {
   if (browserIdentity) { assert.deepEqual(identity, browserIdentity); return { authority: await registry.read() }; }
   assert.match(identity.deviceId, /^[a-f0-9]{64}$/u); assert.match(identity.storageId, /^[a-f0-9-]{36}$/u);
   browserIdentity = identity;
-  const execution = await executionManifestArtifacts(await eventExecutionManifest('peer-generation-v1'));
+  const execution = await executionManifestArtifacts(await eventExecutionManifest());
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'browser-peer-conversation',
     executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),
     definitionDigest: await applicationDefinitionDigest(conversation), schemaAdministrator: controlDevice.identity.publicKey, schemaDigest: null,
@@ -360,12 +366,16 @@ async function route(request, response) {
   const body = bytes ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined;
   const json = value => { response.setHeader('content-type', 'application/json'); response.end(JSON.stringify(value)); };
   if (pathname === '/fixture/bootstrap') { json(await bootstrap(body)); return; }
-  if (pathname.startsWith('/control/')) {
+  if (pathname === '/participant' && request.method === 'POST') {
     controlRequests++; controlBodyBytes += bytes;
-    if (blocked) { response.statusCode = 503; json({ error: 'CONTROL_HOST_UNAVAILABLE' }); return; }
-    if (pathname === '/control/application' && request.method === 'GET') json(await registry.read());
-    else if (pathname === '/control/generations' && request.method === 'POST') json(await registry.select(body));
-    else throw Error('FIXTURE_CONTROL_ROUTE_UNKNOWN');
+    if (blocked) { response.statusCode = 503; json({ error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } }); return; }
+    const envelope = validateParticipantRequest(body);
+    assert.equal(envelope.applicationId, applicationId);
+    let payload;
+    if (envelope.facet === 'control' && envelope.action === 'read') payload = await registry.read();
+    else if (envelope.facet === 'control' && envelope.action === 'select') payload = await registry.select(envelope.payload.request);
+    else throw Error('FIXTURE_CONTROL_INTEREST_UNKNOWN');
+    json(createParticipantResponse(envelope, payload));
     return;
   }
   if (pathname.startsWith('/signaling/')) {
