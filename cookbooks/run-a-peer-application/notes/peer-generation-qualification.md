@@ -103,9 +103,12 @@ under the follower's default identity. The test correction in `6e6b335` supplies
 the original author explicitly; all four successful runs above use that
 committed correction and new output directories.
 
-The strict five-gate composition assembler is now wired into contrib CI with
-Chronolog `ae9d95de` and Tendriller `56f758ce`. It revalidates raw evidence and
-refuses incomplete, dirty or mixed-source compositions. No complete local
+The strict five-gate composition assembler is wired into contrib CI. The
+reported local checkpoint is Chronolog `ae9d95de` and Tendriller `56f758ce`;
+the subsequent workflow pin selects core `28c74d6`, including the shared cursor
+bound and Worker projection-handle lifetime fixes, for a new exact-source run.
+The assembler revalidates raw evidence and refuses incomplete, dirty or
+mixed-source compositions. No complete local
 manifest is emitted because this environment could not run the browser gate.
 A successful exact-source CI browser lane and all its companion gates are
 required for that manifest. Internet/TURN, deployed authentication, sustained
@@ -115,7 +118,7 @@ qualification boundaries.
 ## Earlier projection and measured-recovery checkpoint: `482c4a4c`
 
 The combined source changes are qualified separately from the earlier
-`08ee9f2a` evidence below. Three clean local lanes passed with Chronolog source
+`08ee9f2a` evidence below. Four clean local lanes passed with Chronolog source
 `482c4a4c079345d990bd4d97e42cb947dec6778a`, tree
 `13887c218aa76862a41a8f4fe03584b39b41d4d5`, and isolated contrib source
 `6e6b3359d57e5cb8354ce97b79d34aa320b27019`, tree
@@ -126,6 +129,7 @@ The combined source changes are qualified separately from the earlier
 | Direct events | [Raw report](evidence/2026-11-17-combined-direct-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-direct-482c4a4c-summary.json) | Owned projection reuse, selected-history reset, durable checkpoint reopen, definition-version reset, and the measured retained workload. |
 | Native RTC | [Raw report](evidence/2026-11-17-combined-rtc-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-rtc-482c4a4c-summary.json) | The same application/projection/recovery checks over real native ICE/DTLS/SCTP, with explicit loopback candidates. |
 | Native SQL | [Raw report](evidence/2026-11-17-combined-sql-482c4a4c-report.json), [checked summary](evidence/2026-11-17-combined-sql-482c4a4c-summary.json) | Guarded claims and original-author rejection, coherent SQL/event recovery, deliberate reapplication, and identity-preserving durable reopen on the actual patched engine. |
+| Actual hosted participant | [Raw report](evidence/2026-11-17-combined-hosted-482c4a4c-56f758ce-report.json), [checked summary](evidence/2026-11-17-combined-hosted-482c4a4c-56f758ce-summary.json) | Real workerd/HTTP/introductions/native RTC, signed code delivery, distinct publisher authorization, owned projections and the measured retained workload. |
 
 The RTC archive SHA-256 is
 `f69d7704e656f5986ce7dbbe03bb07ce9a5286f0bba1c29fc6736fa07136dd9f`.
@@ -134,7 +138,7 @@ The native SQL archive SHA-256 is
 the direct events lane uses those same bytes without selecting SQL. Each report
 also records and verifies the installed package provenance and content digests.
 
-The two events lanes submit 32 commands with 1,024-byte text payloads through
+The direct, RTC and hosted events lanes submit 32 commands with 1,024-byte text payloads through
 ordinary `applied()` completion while the host is blocked. A single coverage
 wait after the burst observes another peer's signed retained receipt and
 independent storage identity. After coordinator loss, the selected takeover
@@ -145,16 +149,41 @@ No per-command shared wait is added to the application path.
 | --- | --- | --- | --- |
 | Direct events | 177.37 ms | 3,554.59 ms | 0 |
 | Native RTC | 368.47 ms | 2,107.38 ms | 0 |
+| Actual hosted participant | 8,073.64 ms | 10,089.85 ms | 0 |
 
-Both runs honor the configured 150 ms reconnect grace and remain below the
+All three runs honor the configured 150 ms reconnect grace and remain below the
 300,000 ms target for this declared burst. These observations establish a
 bounded local workload result, not a universal loss limit, a sustained workload
 envelope, or a measurement of Internet/device availability. The cold-observer
 case still requires explicit approval when freshness is unknown.
 
-The actual hosted participant, real Chromium and exact five-gate composition
-manifest remain pending for this source pairing. The earlier all-green CI below
-is retained with its own identities and does not qualify these newer sources.
+The hosted lane used clean Tendriller
+`56f758ce9a0b5556e61462b4444995147d1b4533`, tree
+`38b20056517d12eb2a12fd84e4971d77ba2ad0b3`. Its SDK archive SHA-256 is
+`613f87f98e0170a19f0c6874be00f01de87192b8c9f636c6c1222bf1b365fffe`;
+the engine archive SHA-256 is
+`263ea187057ae7f749cd2970e592225750eaa4286b859fb9e6cc4c36d66746a6`.
+The installed engine provenance binds storage schema revision 9 and the clean
+embedded verifier `f62b8bdcc80918dbf7a1af376bc0450df8c590cb`, tree
+`0ac0d4d1710c2d4e76a128ca9d328b7a37a41015`.
+
+Actual code publication succeeds for the signed publisher and rejects the
+administrator without a publisher grant. The publishing fixture device also
+has administrator permission; this independent run does not itself test a
+publisher-only device. It additionally checks exact publication retry after a
+lost persisted reply, byte tampering, stale-head rejection, retained prior
+assets, authored HTML and selected code surviving a host restart.
+
+During the hosted controller workload, bridge requests stayed at 106 and body
+bytes at 41,335; Worker HTTP requests stayed at 74 and body bytes at 33,006.
+The complete invitation/rendezvous counters were unchanged, and required host
+application-body bytes remained zero. Owned introduction listeners closed on
+shutdown. The workerd run passed 1/1, with 81.86 s in the scenario and 99.66 s
+total duration.
+
+Real Chromium and the exact five-gate composition manifest remain pending for
+this source pairing. The earlier all-green CI below is retained with its own
+identities and does not qualify these newer sources.
 
 ## Earlier clean `08ee9f2a` runtime evidence
 
