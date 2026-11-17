@@ -62,6 +62,8 @@ test('cold protocol evidence requires live and code exchange before any durable 
 });
 
 test('first real queries must share one owner and preserve late ownership and close semantics', () => {
+  rejects(report => { report.lazyDatabase.identityRace.participants[1].deviceId = 'f'.repeat(64); });
+  rejects(report => { report.lazyDatabase.identityRace.closed[1].before.resources.opfsRoots = 1; });
   rejects(report => { report.lazyDatabase.firstData.workers = 2; });
   rejects(report => { report.lazyDatabase.firstData.observation.resources.opfsRoots = 2; });
   rejects(report => { report.lazyDatabase.firstData.requests.method = 'initialize'; });

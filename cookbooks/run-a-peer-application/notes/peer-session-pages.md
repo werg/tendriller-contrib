@@ -59,7 +59,10 @@ The first command, query, content operation or durable observation loads the
 database component and acquires its storage lock inside that same Worker.
 Concurrent data requests share that initialization. There is no alternate
 application profile, second client or replacement identity. A deployment using
-SQL must keep its SQL-module import inside its `createMaterializer` callback.
+`openSqlApplication` supplies `createEngine: async ({ signal }) => ...` and keeps
+its `sql-browser` import inside that callback. Chronolog calls it only for real
+data demand. `prepareSqlApplication` still takes an engine because explicitly
+preparing a signed schema and execution manifest is itself database work.
 
 The maintained pages start live observation as soon as `applicationReady`
 resolves, then query the visible conversation. Showing that durable view is

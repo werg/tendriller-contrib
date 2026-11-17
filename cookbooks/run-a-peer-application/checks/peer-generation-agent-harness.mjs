@@ -50,7 +50,7 @@ try {
     throw Error('UNEXPECTED_EXERCISE_CONTROL_REQUEST');
   } });
   const open = async (device, name, initialize = false) => {
-    const session = await openSqlApplication({ engine, device, databasePath: join(directory, `${name}-view.sqlite`),
+    const session = await openSqlApplication({ createEngine: () => engine, device, databasePath: join(directory, `${name}-view.sqlite`),
       definition: taskBoard, schema: prepared.schema, authority: await registry.read(),
       ...(initialize ? { epochKeys: new Map([[0, key]]) } : {}) });
     resources.push(session); return session;

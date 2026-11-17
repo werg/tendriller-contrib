@@ -55,14 +55,14 @@ try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions, createControl: host.createControl,
     qualifyParticipation: options => qualifyParticipation({ ...options, ports, copyPrefix: connectSessions, graceMs: 3000,
       async qualifyTransport({ coordinator, follower, secondary }) {
-        const generation = follower.revision.generation, before = rawConnections.length;
+        const generation = follower.status.generation, before = rawConnections.length;
         await host.cutRelays();
         const deadline = performance.now() + 15_000;
         while (rawConnections.length <= before || !secondary.status.connectedPeers.includes(coordinator.deviceId)) {
           assert.ok(performance.now() < deadline, 'Owned relay reconnection timed out');
           await new Promise(resolve => setTimeout(resolve, 10));
         }
-        assert.equal(follower.revision.generation, generation, 'A transient relay loss must reconnect within grace');
+        assert.equal(follower.status.generation, generation, 'A transient relay loss must reconnect within grace');
         ownedReconnect = { owner: 'application-session', physicalLinksCut: true, reconnected: true,
           sameGeneration: true, identity: follower.deviceId, beforeConnections: before, afterConnections: rawConnections.length };
       },

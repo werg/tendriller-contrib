@@ -108,7 +108,7 @@ npm run test:peer-generation -- \
   --domain tasks --output /new/sql-evidence
 ```
 
-The public `/sql` entry prepares and opens the same application with an explicit engine capability. `/sql-native` supplies `createNativeSqlEngine`; `/sql-browser` supplies a browser engine for that same composition. Neither introduces another command API.
+The public `/sql` entry prepares and opens the same application with an explicit engine capability. `prepareSqlApplication` takes the engine needed to prepare its signed schema and execution manifest. `openSqlApplication` takes a `createEngine` callback which Chronolog calls only for real data demand; a browser deployment imports `/sql-browser` inside that callback. `/sql-native` supplies `createNativeSqlEngine` for the same composition. Neither introduces another command API.
 
 This archive includes the exact patched native engine and records its manifest
 and patch digest. Two members race to claim a task; exactly one complete program
@@ -127,8 +127,10 @@ npm run test:peer-browser -- \
 ```
 
 The isolated consumer installs declared Playwright/esbuild tools and imports
-only public browser entries. The Worker owns OPFS, identity, keyring, the attempt
-journal and both RTC channels. `connectApplicationWorker` exposes the same
+only public browser entries. One Worker immediately owns the protocol and
+identity, retained in small IndexedDB metadata transactions. Real data demand
+loads the durable component, OPFS, keyring and attempt journal inside that same
+Worker. `connectApplicationWorker` exposes the same
 commands and queries to the page. The page's `serveWorkerWebRtcConnections`
 supplies RTC mechanics; the Worker calls `openWorkerWebRtcConnection`, owns the
 raw frames and authenticates its peer through the session. The page copies
@@ -136,6 +138,21 @@ neither protocol lifecycle nor request maps.
 The Worker attaches the same session-owned control participant over the shared
 envelope; fixture HTTP hosts the public registry without introducing separate
 application/read and generation/select APIs.
+
+Before showing the data view, the same scenario verifies a cold participant's
+control exchange, signed code publication and served code digest, plus live
+signals in both directions. Browser requests are matched to the exact archive's
+module graph; neither the data implementation nor OPFS adapter may be fetched
+before demand. Actual Window and Worker platform calls must show no OPFS access,
+file writer, synchronous handle or Web Lock. Two concurrent first enrollments
+must obtain one stable identity and close without opening data.
+
+Three concurrent conversation queries then share one durable opening and the
+already connected peer. The gate requires one storage lock, one OPFS root,
+the same identity and no additional Worker. A second participant or a browser
+without OPFS may start the protocol; its first data read must refuse the data
+ownership or missing capability. Closing an unused participant must preserve an
+existing data owner's lock, and closing the active owner must release it.
 
 Board and compact layouts submit domain commands, preserve unsent drafts across
 replacement and recovery, inspect original attempts and deliberately reapply

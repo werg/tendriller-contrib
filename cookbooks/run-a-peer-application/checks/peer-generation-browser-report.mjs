@@ -141,6 +141,14 @@ function validateLazyDatabase(report) {
     cold(stage.page);
   }
   assert.equal(lazy.shell.workers, 0); assert.deepEqual(lazy.shell.databaseModulesRequested, []);
+  assert.equal(lazy.identityRace.workers, 2); assert.equal(lazy.identityRace.participants.length, 2); assert.equal(lazy.identityRace.closed.length, 2);
+  for (const participant of lazy.identityRace.participants) {
+    assert.equal(participant.deviceId, report.ownership.initialDeviceId); assert.equal(participant.storageId, report.ownership.initialStorageId);
+    assert.equal(participant.observation.database, 'idle'); cold(participant.observation.resources);
+  }
+  for (const closed of lazy.identityRace.closed) {
+    assert.equal(closed.before.database, 'idle'); cold(closed.before.resources); assert.deepEqual(closed.heldLocks, []);
+  }
   assert.equal(lazy.protocol.workers, 1); assert.deepEqual(lazy.protocol.databaseModulesRequested, []);
   const initial = lazy.protocol.observation;
   assert.equal(initial.database, 'idle'); assert.equal(initial.revision, null); cold(initial.resources);

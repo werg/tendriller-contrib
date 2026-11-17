@@ -22,7 +22,7 @@ const sessions = new Set(), devices = new Set(), connections = [], introductions
 const timeout = () => AbortSignal.timeout(20_000);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const valueHash = value => hash(JSON.stringify(value));
-let browser, page, server, registry, publications, authority, a, controlDevice, deviceA, deviceC, browserIdentity;
+let browser, page, server, registry, publications, authority, a, controlDevice, deviceA, deviceC, browserIdentity, bootstrapTask;
 const publicationAssets = new Map(), scriptRequests = [];
 let workerStarts = 0;
 let blocked = false, controlRequests = 0, controlBodyBytes = 0, signalingRequests = 0, signalingBodyBytes = 0;
@@ -103,6 +103,22 @@ try {
   assertCold(report.lazyDatabase.shell.page);
   assert.deepEqual(report.lazyDatabase.shell.databaseModulesRequested, []);
   const deviceName = `peer-browser-${randomBytes(8).toString('hex')}`;
+  // Simultaneous first enrollment uses real browser IndexedDB transactions.
+  // Both otherwise ordinary participants close without ever claiming OPFS.
+  const raceTabs = await Promise.all([context.newPage(), context.newPage()]);
+  let raceWorkers = 0;
+  try {
+    for (const tab of raceTabs) tab.on('worker', () => raceWorkers++);
+    await Promise.all(raceTabs.map(async tab => { await tab.goto(origin); await tab.waitForFunction(() => !!globalThis.fixture); }));
+    const raced = await Promise.all(raceTabs.map(tab => tab.evaluate(deviceName => fixture.open({ deviceName, provision: true }), deviceName)));
+    assert.equal(raced[0].deviceId, raced[1].deviceId); assert.equal(raced[0].storageId, raced[1].storageId);
+    for (const opened of raced) { assert.equal(opened.status.database, 'idle'); assertCold(opened.observation.resources); }
+    const closed = await Promise.all(raceTabs.map(tab => tab.evaluate(() => fixture.close())));
+    for (const result of closed) { assert.equal(result.before.database, 'idle'); assertCold(result.before.resources); assert.deepEqual(result.heldLocks, []); }
+    assert.equal(raceWorkers, 2);
+    report.lazyDatabase.identityRace = { workers: raceWorkers,
+      participants: raced.map(opened => ({ deviceId: opened.deviceId, storageId: opened.storageId, observation: opened.observation })), closed };
+  } finally { await Promise.all(raceTabs.map(tab => tab.close())); }
   const opened = await page.evaluate(deviceName => fixture.open({ deviceName, provision: true }), deviceName);
   assert.equal(opened.deviceId, browserIdentity.deviceId);
   assert.equal(opened.status.database, 'idle');
@@ -447,9 +463,13 @@ try {
 }
 
 async function bootstrap(identity) {
-  if (browserIdentity) { assert.deepEqual(identity, browserIdentity); return { authority: await registry.read() }; }
-  assert.match(identity.deviceId, /^[a-f0-9]{64}$/u); assert.match(identity.storageId, /^[a-f0-9-]{36}$/u);
+  if (browserIdentity) { assert.deepEqual(identity, browserIdentity); await bootstrapTask; return { authority: await registry.read() }; }
   browserIdentity = identity;
+  bootstrapTask = configure(identity);
+  return bootstrapTask;
+}
+async function configure(identity) {
+  assert.match(identity.deviceId, /^[a-f0-9]{64}$/u); assert.match(identity.storageId, /^[a-f0-9-]{36}$/u);
   const execution = await executionManifestArtifacts(await eventExecutionManifest());
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'browser-peer-conversation',
     executionManifestDigest: Buffer.from(execution.executionManifestDigest).toString('hex'),

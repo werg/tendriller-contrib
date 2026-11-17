@@ -34,7 +34,7 @@ try {
     policy: descriptor.payload.policy, expectedGeneration: null, requester: devices[0].identity.publicKey,
     coordinator: devices[0].identity.publicKey, controlRevision: 0, base: null, reason: 'create', transitionId: 'task-initial' }, devices[0].identity));
   const open = async (device, name, initialize) => {
-    const session = await openSqlApplication({ engine, device, databasePath: join(directory, `${name}-materialized.sqlite`),
+    const session = await openSqlApplication({ createEngine: () => engine, device, databasePath: join(directory, `${name}-materialized.sqlite`),
       definition: taskBoard, schema: prepared.schema, authority: await registry.read(),
       ...(initialize ? { epochKeys: new Map([[0, epochKey]]) } : {}) });
     resources.push(session); return session;
