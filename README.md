@@ -29,6 +29,11 @@ short decision path through local state, ephemeral signals, durable events,
 transactions and final effects. [Live signals](cookbooks/share-live-signals/COOKBOOK.md)
 cover typing, presence, cursors, progress and transient messages without requiring
 a database or finality service.
+The [standalone composition check](cookbooks/share-live-signals/checks/README.md)
+uses an actual public signal module for live readings and token previews. For
+durable applications, `application.changes` refreshes current views while
+`events.subscribe` drives recoverable work. Authenticated event provenance and
+final accepted outcomes determine which work an agent may safely perform.
 
 For an application with an always-running native agent, start with
 [Run a shared application with a resident agent](cookbooks/run-a-peer-application/COOKBOOK.md).

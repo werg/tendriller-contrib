@@ -172,10 +172,12 @@ a conflict. A final accepted or rejected original outcome remains the answer aft
 lost response, reload, or membership change.
 
 For a claim, assert availability and update the row in the same program as its
-event. For a dependent second action, either batch it with the first or wait for
-the first action's final result and author the dependent change with a later
-timestamp. Total order by itself does not discover causal dependencies submitted
-through different paths. If an earlier authored edit and a later reset are both
+event. For a dependent second action, either batch it with the first or observe
+the first action's final accepted result before authoring the dependent change.
+Chronolog advances the author's clock past observed durable history; application
+code does not choose protocol timestamps. Keep the dependency's business guard
+inside the new program because another final change may intervene. Total order
+cannot discover a prerequisite the author has not observed. If an earlier authored edit and a later reset are both
 included before closure, replay applies the edit first and the reset clears it,
 even when the reset arrived first. A stale-generation assertion fails when the
 edit executes after the reset; receipt order alone cannot cause that rejection.
@@ -202,6 +204,31 @@ with ordinary SQL: capture an exact scope/generation, assert it in the authored
 write, and rotate monotonically in a separate atomic reset. Its executable
 builders share the public application bundle and the core's original operation
 identity; an older rejected edit is reviewed instead of silently upgraded.
+
+The operation API separates progress (`queued`, `provisional`, `final`) from
+the executed outcome (`accepted` or `rejected`). A terminal rejection is
+`{ status: 'final', outcome: 'rejected' }`. Native operation handles'
+`accepted()` waits for final acceptance; the browser adapter exposes the same
+decision through `operations.subscribe`. Submission resolving is not by itself
+permission to proceed.
+
+Use authenticated `event.origin` when attributing a record or choosing which
+agent policy may handle it. Chronolog supplies the verified group, author,
+operation, membership revision and writer capability. A JSON field that claims
+to be an owner instruction cannot confer that authority. The handler's allowed
+topics, verified sender policy and actual tool credentials are separate checks.
+
+## Subscribe to views without consuming work
+
+A display follows `backend.changes({ view, signal })`. It receives the current
+revision immediately and later coalesced invalidations, including SQL-only
+updates, provisional rebases and finality transitions. Capture and release a
+fresh read view for each needed render. Keep a `local` view visibly provisional;
+use a `final` view before authoring work that depends on a confirmed state.
+
+The change stream has no work cursor. It is allowed to skip intermediate
+revisions, and it does not acknowledge events. This keeps an ordinary current
+state UI small without weakening the event consumer contract below.
 
 ## Read events without skipping processing
 

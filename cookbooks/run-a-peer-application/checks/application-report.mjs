@@ -37,7 +37,7 @@ function hostSignaling(host) {
 }
 
 export function validateApplicationReport(report) {
-  assert.equal(report?.format, 'chronolog-application-pilot/v2', 'A current RTC application-pilot report is required');
+  assert.equal(report?.format, 'chronolog-application-pilot/v3', 'A current RTC application-pilot report is required');
   assert.equal(report.passed, true, 'Build-only, failed and incomplete runs cannot qualify an application');
   assert.equal(report.status, 'passed', 'The runtime scenarios must have completed');
   assert(!report.error, 'A report with an error cannot pass');
@@ -123,7 +123,7 @@ export function validateApplicationReport(report) {
   const outcomes = new Set();
   for (const page of originals.before) for (const operation of page) {
     assert(nonempty(operation?.operationId) && nonempty(operation?.proposalId), 'The original operation and proposal identities are required');
-    assert(['final', 'rejected'].includes(operation.status) && ['accepted', 'rejected'].includes(operation.outcome), 'Every original operation must have its terminal outcome');
+    assert(operation.status === 'final' && ['accepted', 'rejected'].includes(operation.outcome), 'Every original operation must have its final accepted or rejected outcome');
     outcomes.add(operation.outcome);
   }
   assert(outcomes.has('accepted') && outcomes.has('rejected'), 'Both successful work and the rejected contested claim must remain observable');

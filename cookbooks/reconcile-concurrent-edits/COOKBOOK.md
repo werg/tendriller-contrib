@@ -17,10 +17,15 @@ Use a shared collection for notes, packing items, tasks, or decisions edited by 
 
 Consider two people preparing an event. One edits an item's quantity while another changes its supplier; later, both change the quantity. The first pair may combine naturally, but the second needs an explicit rule. A reorder or deletion during either edit must not redirect a pending command to another item.
 
+Choose the application's durable backend first. The hosted examples below use
+`tendril.state`; a peer application uses `tendril.application` and a Chronolog
+SQL/event program. Both need one atomic guard-and-mutation boundary. A peer page
+must not call the hosted state service as a second writer.
+
 ## Make the everyday editing loop complete
 
 1. **Read.** Load current authorized records and show connection/freshness separately from saved state. A cached collection may be useful but must not masquerade as current authority.
-2. **Start a draft.** Use `await tendril.state.snapshot()` while connected to capture the record ID, authoritative base values, revision, and relevant scope generations together. Keep the draft separate from accepted shared state. `state.get()` is useful for rendering but can include ordinary optimistic writes; pairing it with `state.revision` does not create an authoritative snapshot.
+2. **Start a draft.** Capture the record ID, confirmed base values, revision and relevant scope generation together. Use `await tendril.state.snapshot()` for hosted state, or one final `application.readView()` for a peer application. Keep the draft separate from shared state; pairing an optimistic value with an unrelated revision does not create a coherent snapshot.
 3. **Edit.** Keep the input stable while remote changes arrive. Mark relevant remote changes without overwriting local typing.
 4. **Submit.** Capture an immutable edit snapshot and its concurrency context. Show a proposed value in the draft or pending card; conditional core writes do not change the optimistic shared view before acceptance.
 5. **Accept or reconcile.** On acceptance, reconcile by command and record identity. On conflict, show the base, current accepted value, and proposed value, with a meaningful choice to merge, discard, or revise.
@@ -39,7 +44,7 @@ A dense spreadsheet-like interface, a mobile item editor, and an append-only not
 | Explicit human merge | Competing intent remains inspectable. | Review costs attention; reserve it for meaningful conflicts. |
 | Last-write-wins | A disposable shared preference is easy to update. | Define ordering and expose that concurrent intent may be lost; avoid it for important records. |
 
-Core's [conditional state contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md#shared-state-writes) supplies the atomic check and mutation. `state.set(path,value,options)` handles one field; `state.apply(ops,options)` commits several changes together. All `conditions` read the same pre-mutation state. `exists:false` requires a genuinely absent path, while `equals:null` requires a present null value. Use the first for an unused record ID, the second when null means “unassigned.” Scope generations independently protect the context against resets or rebinding and cover condition-read paths as well as written paths.
+The hosted [conditional state contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md#shared-state-writes) supplies the atomic check and mutation. `state.set(path,value,options)` handles one field; `state.apply(ops,options)` commits several changes together. All `conditions` read the same pre-mutation state. `exists:false` requires a genuinely absent path, while `equals:null` requires a present null value. Use the first for an unused record ID, the second when null means “unassigned.” Scope generations independently protect the context against resets or rebinding and cover condition-read paths as well as written paths.
 
 For example, records below have a numeric `quantity` and an explicit `deleted:false`. Capture `base` when opening the editor, retain it with the draft, and pass the person's validated `submittedQuantity` on Save:
 
@@ -65,6 +70,32 @@ The example guards all observed scopes conservatively; a task can select only it
 Admitted results carry `cid`. Rebuild per-item pending indicators after reload from `state.pending()` and follow `state_queue`; each entry includes the original normalized operations and predicates. A later `state_result` carries those same operations, so its `["items",itemId,...]` path identifies the edited record even after navigation. This uses core's existing durable outbox, not another page delivery queue. Empty unconditional work returns `unchanged` without a CID or server receipt; handle that separately from a saved edit.
 
 Fields can participate in a joint constraint: quantity and total price, for example. Check every input used in the calculation and write both outputs with one conditional `apply`. These optional cooperative guards do not enforce business rules against an authorized client that omits them. A mandatory pricing, access, or ownership rule belongs in an authorized trusted operation; generic compare-and-set itself needs no custom server policy.
+
+For a peer application, express the same invariant in one program. Here `base`
+is the quantity and row revision captured from one final read view, and the
+schema increments `revision` for every edit:
+
+```js
+const operation = await application.submit(program(
+  sqlStatement(`SELECT chronolog_assert(EXISTS(
+    SELECT 1 FROM items WHERE id = ? AND revision = ? AND deleted = 0
+  ), 'item_changed')`, [itemId, base.revision]),
+  sqlStatement('UPDATE items SET quantity = ?, revision = revision + 1 WHERE id = ?',
+    [submittedQuantity, itemId]),
+  emit('items', { type: 'item.changed', itemId }),
+), { operationId });
+```
+
+The public `program`, `sqlStatement` and `emit` builders are supplied by
+`@chronolog/protocol`. Retain the original operation ID; `status: 'final'` with
+`outcome: 'accepted'` confirms the edit, while a final rejected outcome needs
+review. A provisional outcome may change during peer replay. Follow
+`application.changes({ view: 'final', signal })` to refresh the display, and use
+`operations.subscribe` to observe this particular save. Chronolog owns its
+author clock and durable outbox. The
+[peer application guide](../run-a-peer-application/COOKBOOK.md) explains these
+contracts and the [scope recipe](../run-a-peer-application/notes/scoped-json-state.md)
+adds reset generations when the task requires them.
 
 ## Separate identity, order, and visibility
 

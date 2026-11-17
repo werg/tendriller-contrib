@@ -1,14 +1,15 @@
 import './deployment/bootstrap.mjs';
 import { claimTask, postMessage, requestSummary } from './actions.mjs';
-import { mergeOperation, operationLabel, readBoard, TOPICS } from './projection.mjs';
+import { mergeOperation, operationLabel, readBoard } from './projection.mjs';
 import { canRemoveReference, captureMessageDraft, clearSubmittedText, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './drafts.mjs';
 import { observeTyping } from './typing.mjs';
 
 const $ = selector => document.querySelector(selector);
 const api = window.tendril;
 const lifecycle = new AbortController();
-let backend, drafts = newDrafts(), storageKey, painting = false, dirty = false, currentView, currentRead, submittingMessage = false;
+let backend, drafts = newDrafts(), storageKey, painting = false, dirty = false, currentRead, submittingMessage = false;
 let lastTyping = 0, typingActive = false;
+let viewWatcher;
 const outcomes = new Map();
 const operationWatchers = new Map();
 const submissions = new Set();
@@ -40,6 +41,7 @@ function paintOperations() {
     const row = element('li');
     row.dataset.operation = reference.operationId;
     row.dataset.status = operation?.status ?? 'unknown';
+    if (operation?.outcome) row.dataset.outcome = operation.outcome;
     row.append(element('strong', reference.text || reference.domainId), element('p', operationLabel(operation)));
     const copy = element('button', reference.kind === 'message' ? 'Copy to editor' : 'Keep for review');
     copy.type = 'button';
@@ -51,7 +53,7 @@ function paintOperations() {
       catch (error) { status(`Draft could not be saved: ${error.message}`, true); }
     };
     row.append(copy);
-    if (!submissions.has(reference.operationId) && !['final', 'rejected'].includes(operation?.status)) {
+    if (!submissions.has(reference.operationId) && operation?.status !== 'final') {
       const recheck = element('button', 'Check original status');
       recheck.type = 'button';
       recheck.dataset.operation = reference.operationId;
@@ -108,7 +110,6 @@ function taskRow(task) {
 }
 
 function paint(view) {
-  currentView = view;
   const tasks = $('#tasks');
   const live = new Set(view.tasks.map(task => task.id));
   for (const [id, row] of rowNodes) if (!live.has(id)) { row.remove(); rowNodes.delete(id); }
@@ -177,7 +178,7 @@ async function submit(kind, domainId, submittedText, editorSnapshot = submittedT
     }
     paintOperations();
     const observed = outcomes.get(operationId);
-    status(operationLabel(observed), observed.status === 'rejected');
+    status(operationLabel(observed), observed.status === 'final' && observed.outcome === 'rejected');
     await refresh();
   } catch (error) {
     try { const operation = await backend.operations.get(operationId); outcomes.set(operationId, mergeOperation(outcomes.get(operationId), operation)); }
@@ -191,19 +192,28 @@ async function submit(kind, domainId, submittedText, editorSnapshot = submittedT
   }
 }
 
-async function watchEvents() {
-  // This is only a wake-up stream for replacement views, not a worker checkpoint.
-  // Durable consumers must commit processed state/cursor atomically in their store.
+async function watchViews() {
+  viewWatcher?.abort();
+  const controller = new AbortController();
+  viewWatcher = controller;
+  const signal = AbortSignal.any([lifecycle.signal, controller.signal]);
+  const view = $('#include-pending').checked ? 'local' : 'final';
+  // View invalidation includes provisional replay, SQL-only and finality changes.
+  // It deliberately has no processed cursor or promise to deliver every revision.
   try {
-    for await (const batch of backend.events.subscribe({ topics: TOPICS, limit: 32, ...(currentView ? { cursor: currentView.cursor } : {}), signal: lifecycle.signal })) {
-      void batch;
+    for await (const change of backend.changes({ view, signal })) {
+      void change;
       await refresh();
     }
-  } catch (error) { if (!lifecycle.signal.aborted) status(`Live history paused: ${error.message}. Refresh to read durable history.`, true); }
+  } catch (error) { if (!signal.aborted) status(`View updates paused: ${error.message}. Refresh to read durable history.`, true); }
+  finally {
+    controller.abort();
+    if (viewWatcher === controller) viewWatcher = undefined;
+  }
 }
 
 async function watchOperation(operationId) {
-  if (operationWatchers.has(operationId) || ['final', 'rejected'].includes(outcomes.get(operationId)?.status)) return;
+  if (operationWatchers.has(operationId) || outcomes.get(operationId)?.status === 'final') return;
   const controller = new AbortController();
   operationWatchers.set(operationId, controller);
   const signal = AbortSignal.any([lifecycle.signal, controller.signal]);
@@ -214,7 +224,7 @@ async function watchOperation(operationId) {
       paintOperations();
       // Status-only changes also trigger a coherent replacement, even with equal rows.
       await refresh();
-      if (['final', 'rejected'].includes(operation.status)) break;
+      if (operation.status === 'final') break;
     }
   } catch (error) { if (!signal.aborted) status(`Operation updates paused: ${error.message}`, true); }
   finally {
@@ -255,7 +265,7 @@ $('#message').addEventListener('input', () => {
   sendTyping($('#message').value.length > 0);
 });
 $('#refresh').addEventListener('click', () => void refresh());
-$('#include-pending').addEventListener('change', () => { currentRead?.abort(); void refresh(); });
+$('#include-pending').addEventListener('change', () => { currentRead?.abort(); if (backend) void watchViews(); });
 addEventListener('pagehide', () => { sendTyping(false); lifecycle.abort(); currentRead?.abort(); });
 
 try {
@@ -271,7 +281,7 @@ try {
   paintOperations();
   await refresh();
   $('#message').disabled = $('#send').disabled = false;
-  void watchEvents();
+  void watchViews();
   for (const reference of drafts.operations) void watchOperation(reference.operationId);
   void watchTyping();
 } catch (error) { status(`Application unavailable: ${error.message}`, true); }

@@ -38,7 +38,7 @@ export function clearSubmittedText(drafts, submittedText) {
 
 export function canRemoveReference(operation, { submitting = false } = {}) {
   // undefined is an unresolved/failed lookup; null is an observed absence.
-  return !submitting && (operation === null || ['final', 'rejected'].includes(operation?.status));
+  return !submitting && (operation === null || operation?.status === 'final');
 }
 
 export function removeReviewedReference(drafts, operationId, operation, options) {

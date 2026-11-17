@@ -44,7 +44,16 @@ For shared records, retain stable object identity and the exact before/after rev
 
 ## Reverse accepted work against current truth
 
-A proposed inverse must be reviewed under current authority and task context. For example, undoing a rename from “A” to “B” should check that the object still has the reviewed resulting value before restoring “A.” If someone renamed it to “C,” the inverse is stale. Use core's `conditions` with `state.set` or `state.apply`: the authority checks the predicate and applies the whole batch atomically. No custom trusted transaction is needed merely to make that comparison safe.
+A proposed inverse must be reviewed under current authority and task context. For example, undoing a rename from “A” to “B” should check that the object still has the reviewed resulting value before restoring “A.” If someone renamed it to “C,” the inverse is stale. The selected durable backend must check the predicate and apply the inverse atomically.
+
+The hosted example below uses `conditions` with `state.set` or `state.apply`.
+For a peer application, use one Chronolog SQL/event program instead: assert the
+reviewed row version and resulting value, apply the inverse, and emit its
+correction event under a new operation ID. Read the prerequisite from a final
+view; observe `status: 'final', outcome: 'accepted'` before dependent redo.
+The [concurrent-edit guide](../reconcile-concurrent-edits/COOKBOOK.md) shows that
+program boundary. Peer pages use their selected application backend and do not
+fall back to hosted state for Undo.
 
 Read a coherent current view with `await tendril.state.snapshot()`. A failed/offline read leaves the local history available but cannot establish current authority. `state.get()` may include optimistic ordinary writes, so do not pair it with `state.revision` to manufacture a base. Show the inverse and any intervening changes before offering an accepted shared reversal.
 
@@ -77,6 +86,12 @@ Use the admitted result's `cid` to correlate this reversal. `state.pending()` an
 These predicates are optional cooperative guards. They do not authorize reversal of someone else's work or prevent another authorized writer from omitting them. Enforced role rules, approval revocation, and external compensation still need their actual authorized operations. For a shared file, restoration needs the current path revision; publication rollback changes the publication-head revision. Restoring earlier bytes does not reset those concurrency histories.
 
 A Redo after an accepted reversal is also new reviewed work, not permission to replay the original command with new meaning. Recheck current authority, generation, referenced evidence, and any external conditions.
+
+Chronolog's internal rollback and re-execution is separate: it revises a
+provisional suffix when earlier eligible history arrives. It does not ask the
+person to approve new intent or reverse final history. A pure view rebuild
+follows `application.changes`; the original signed operations retain their
+identity. Never dispatch an external action from that replay path.
 
 ## Keep evidence and decisions traceable
 

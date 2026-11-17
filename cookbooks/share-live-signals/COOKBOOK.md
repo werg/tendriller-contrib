@@ -90,11 +90,34 @@ Never queue yesterday's typing or preview to be resent after reconnect.
 
 For native or standalone use, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
-authorization callback, bounded frame transport and optional credential. Attach
+authorization callback and bounded frame routes. Attach
 that transport's incoming frames to `receive()`. No group history, reader grant,
 SQL engine, durable proposal or finality provider is required by the standalone
 channel. A Chronolog integration can supply a membership-backed policy instead
 of implementing capability checks in application code.
+
+The [executable standalone composition](checks/README.md) creates two public
+channels from an explicitly supplied `@chronolog/signals` build. It combines
+replaceable instrument readings with ordered token previews, deliberately loses
+a chunk, refuses an unauthorized topic, disconnects and sends a fresh reading
+after reconnect. Its transport is an in-process route so the check isolates
+these primitives without opening a database or starting finality. Replace that
+route with the chosen live transport; keep its access, confidentiality and
+lifecycle policy explicit.
+
+Each channel is constructed with `{ scope, identity, authorize }`. Its explicit
+`attach({ send(frame, { signal }) })` route returns a detach function; pass
+incoming original frames to `receive(frame, route)`. Receive verifies the sender
+and relays through other live routes without rewriting the signature, identity
+or expiry. Closing a route cancels its pending sends. Closing the channel ends
+subscriptions; an unattached send fails immediately. The module provides no
+database, proposal, capability-log or finality dependency to configure.
+
+An agent can participate in the same way as another live endpoint. A disposable
+preview request, attention cue or immediate local Stop can be governed by its
+live topic policy. Give any required final answer a durable companion, and
+publish irreversible work as final durable intent before dispatch. An agent's
+presence alone does not turn every live interaction into a transaction.
 
 The standard governed adapter uses an active publisher capability, represented
 by a writer-kind grant with explicit signal topics. For a participant who may

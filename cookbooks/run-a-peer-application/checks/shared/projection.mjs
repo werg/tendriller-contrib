@@ -30,6 +30,8 @@ export function reduceEvent(state, event) {
     const entry = {
       eventId: event.id, messageId: data.messageId, text: data.text,
       inReplyTo: data.inReplyTo ?? null,
+      // Authenticated adapter metadata, never a role claimed by the JSON payload.
+      origin: event.origin,
     };
     // Identity is the effective event, not a mutable display position or label.
     messages = [...messages.filter(value => value.eventId !== entry.eventId), entry].slice(-DISPLAY_LIMIT);
@@ -84,7 +86,7 @@ export function mergeOperation(previous, observed) {
   if (previous.operationId !== observed.operationId || previous.proposalId !== observed.proposalId) {
     throw new Error('An operation reference resolved to different durable intent');
   }
-  if (['final', 'rejected'].includes(previous.status)) return previous;
+  if (previous.status === 'final') return previous;
   if (observed.status === 'queued' && previous.status !== 'queued') return previous;
   return observed;
 }
@@ -113,9 +115,21 @@ export async function readBoard(backend, { view = 'final', signal } = {}) {
 export function operationLabel(operation) {
   if (operation === undefined) return 'Checking the original operation…';
   if (operation === null) return 'No durable submission found; review the saved draft';
-  if (operation.status === 'rejected') return `Rejected: ${operation.message || operation.error || 'Review this intent'}`;
-  if (operation.status === 'final') return 'Accepted and final';
+  if (operation.status === 'final') return operation.outcome === 'rejected'
+    ? `Rejected: ${operation.message || operation.error || 'Review this intent'}` : 'Accepted and final';
   if (operation.status === 'provisional') return operation.outcome === 'rejected'
     ? 'Provisional rejection; awaiting finality' : 'Provisional; awaiting finality';
   return 'Prepared locally; awaiting inclusion';
+}
+
+/** Dependent intent is authored only after observing its confirmed prerequisite. */
+export async function requireFinalClaim(backend, taskId) {
+  const final = await backend.readView({ view: 'final' });
+  try {
+    const result = await final.query('SELECT claimed_by FROM tasks WHERE id = ?', [taskId]);
+    if (result.truncated || result.rows.length !== 1 || typeof result.rows[0][0] !== 'string') {
+      throw new Error('Wait for the task claim to be accepted and final before asking the agent');
+    }
+    return result.rows[0][0];
+  } finally { await final.release(); }
 }

@@ -52,6 +52,20 @@ signal-topic rights live on a writer-kind publisher grant; `sql: false` and empt
 durable `topics` restrict it to its declared signals. This does not make a signal
 a durable change, and the standalone channel requires no such grant.
 
+The practical deployment decision is who holds each key and what stops if that
+process disappears. A page host can serve a signal-only application. A reader
+can verify a durable history without certifying it. A resident can run effects
+without holding the membership or finality key. Only combine these roles when
+the deployment intends to trust the same operator with each decision.
+
+Durable event provenance is supplied by the backend in `event.origin`. For a
+Chronolog event it identifies the verified group, author, original operation,
+membership revision, writer capability and signed author time. For a hosted
+event it identifies the application, authenticated author, operation and role.
+Keep that metadata attached when building projections or handing work to an
+agent. A payload's `role`, `author` or `instruction` field is application data;
+it cannot replace verified provenance or grant permission to invoke a tool.
+
 Select a finality provider for the durable history independently of the page host
 and effect worker. The fixed native provider is an implementation of that role,
 not a requirement that every signal, page or agent action pass through one
@@ -66,23 +80,55 @@ and closes an author-time range. It does not choose SQL winners by network
 arrival order. A replica still needs complete bodies and the pinned execution
 profile to determine the accepted or rejected application outcome.
 
-For application code, keep four useful states distinct:
+For application code, progress and outcome answer separate questions:
 
-| State | What the application can say |
-| --- | --- |
-| Queued | The original proposal is prepared locally and awaits progress. |
-| Provisional | The replica has a current result that may change as eligible history arrives. |
-| Final accepted | The agreed prefix was executed and this operation succeeded. |
-| Final rejected | The original operation has a stable rejection; recovery is a newly reviewed action. |
+| `status` | `outcome` | What the application can say |
+| --- | --- | --- |
+| `queued` | Absent | The original proposal is prepared locally and awaits progress. |
+| `provisional` | `accepted` or `rejected` | The current result may change as eligible history arrives. |
+| `final` | `accepted` | The agreed prefix was executed and this operation succeeded. |
+| `final` | `rejected` | The original operation has a stable rejection; recovery is a newly reviewed action. |
+
+Submission returns the operation's current state. Subscribe to
+`application.operations` when the workflow needs its final outcome. Native
+Chronolog operation handles provide `accepted()` to wait for final acceptance;
+it rejects on a final rejection. A provisional success never releases dependent
+work or an irreversible effect.
 
 An inclusion receipt alone cannot establish either final application outcome.
 A final accepted operation also does not establish that another peer has a
 backup, that a person read the result, or that an external provider acted.
 
-Author dependent work after observing the prerequisite's final result, and retain
-the appropriate guards inside the new transaction. An operation ID identifies
-one immutable request. Retry preserves its bytes and meaning; updating a guard,
-timestamp or payload creates new intent and needs a new operation ID.
+Author dependent work after observing the prerequisite's final accepted result,
+and retain the appropriate guards inside the new transaction. Chronolog advances
+its author clock past the durable history it has observed; applications never
+calculate timestamps to order dependent work. An operation ID identifies one
+immutable request. Retry preserves its signed bytes and meaning; updating a
+guard or payload creates new intent and needs a new operation ID. The clock does
+not invent dependencies on work the replica has not observed.
+
+## Observe state or consume work
+
+Use `application.changes({ view: 'final', signal })` to keep a confirmed view
+current, or select `view: 'local'` for provisional feedback. The stream yields
+the current `{ view, revision, finalRevision }` immediately and then coalesces
+invalidations. Each notification means to capture a fresh `readView`, read its
+SQL and events, and release it. SQL-only changes, rollback/re-execution and
+finality changes can invalidate a view even when no matching event was added.
+
+```js
+for await (const change of application.changes({ view: 'final', signal })) {
+  const view = await application.readView({ view: change.view });
+  try { render(await readProjection(view)); }
+  finally { await view.release(); }
+}
+```
+
+This is a display subscription: it has no durable cursor and may skip
+intermediate revisions. A worker that must handle each final event uses
+`application.events.subscribe`, and commits its handled cursor with its
+projection or effect journal. Do not use event history as an ad hoc UI wake
+protocol, or treat a view notification as a work acknowledgement.
 
 ## Treat rollback and redo as replica work
 
@@ -98,6 +144,12 @@ The effect worker consumes final intents, journals a stable effect identity, and
 publishes a result. If a provider acted before a crash, use its idempotency key or
 query its original result. Without either, retain an uncertain outcome for
 reconciliation.
+
+Disposable live work can stay live: a signal may update a cursor, request a
+preview, stop a local playback or produce an expiring progress indication under
+its explicit topic policy. No durable intent is required merely because an
+agent participates. Choose a final intent when losing, repeating or reversing
+the requested action would lose required work or create an irreversible effect.
 
 Application Undo is different from replica rollback. Undo of final work is a
 new guarded reversal or compensation; it does not erase the agreed history or
@@ -117,7 +169,7 @@ Before changing the page, write down:
    retry, a rebase, a revoked capability or a crash after external dispatch.
 
 Then implement the smallest path that meets those guarantees. Use the public
-signal channel, operation store, read views and effect service. Do not create a
+signal channel, operation store, view changes, read views and effect service. Do not create a
 second proposal outbox, manually refresh guards on retries, infer completion
 from a live preview, or promote a UI checkpoint into a worker's handled cursor.
 

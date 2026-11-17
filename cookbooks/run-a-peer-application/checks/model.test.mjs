@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DISPLAY_LIMIT, emptyProjection, mergeOperation, operationLabel, readBoard, reduceBatch } from './shared/projection.mjs';
+import { DISPLAY_LIMIT, emptyProjection, mergeOperation, operationLabel, readBoard, reduceBatch, requireFinalClaim } from './shared/projection.mjs';
 import { canRemoveReference, captureMessageDraft, clearSubmittedText, MAX_OPERATION_REFERENCES, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './shared/drafts.mjs';
 
-const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${index}`, eventOrdinal: 0, topic: 'conversation', payload: { type: 'message.posted', version: 1, messageId: `message-${index}`, text: `Text ${index}` } });
+const message = index => ({ id: `proposal-${index}:0`, proposalId: `proposal-${index}`, eventOrdinal: 0, topic: 'conversation',
+  origin: { kind: 'chronolog', groupId: 'team', authorId: 'writer', operationId: `operation-${index}`, membershipRevision: 'membership-1', writerCapability: 'grant-1', authorTimestampMs: String(index) },
+  payload: { type: 'message.posted', version: 1, messageId: `message-${index}`, text: `Text ${index}` } });
 const jobRequest = (index, jobId = 'job-1', taskId = 'task-1') => ({ ...message(index), topic: 'job-requests',
   payload: { type: 'job.requested', version: 1, jobId, taskId, kind: 'summarize-task' } });
 const jobResult = (index, request, overrides = {}) => ({ ...message(index), topic: 'job-results', payload: {
@@ -34,6 +36,16 @@ test('message identity and final job results survive pure rebuild without effect
   assert.equal(first.jobs[0].status, 'completed');
   assert.equal(first.jobs[0].requestEventId, 'proposal-2:0');
   assert.equal(first.messages[0].eventId, 'proposal-1:0');
+});
+
+test('message attribution retains authenticated provenance instead of payload role claims', () => {
+  const event = message(1);
+  event.payload.role = 'owner';
+  event.payload.authorId = 'spoofed-owner';
+  const rendered = reduceBatch(emptyProjection(), batch([event])).messages[0];
+  assert.deepEqual(rendered.origin, event.origin);
+  assert.equal(rendered.origin.authorId, 'writer');
+  assert.equal(rendered.role, undefined);
 });
 
 test('job results bind their original intent and duplicate display IDs cannot merge separate effects', () => {
@@ -176,15 +188,15 @@ test('an observed absent operation can be reviewed away without discarding unres
   assert.equal(reviewed.operations.length, MAX_OPERATION_REFERENCES - 1);
   assert.equal(drafts.operations.length, MAX_OPERATION_REFERENCES);
   assert.equal(retainReference(reviewed, next).operations.length, MAX_OPERATION_REFERENCES);
-  assert(canRemoveReference({ status: 'final' }));
-  assert(canRemoveReference({ status: 'rejected' }));
+  assert(canRemoveReference({ status: 'final', outcome: 'accepted' }));
+  assert(canRemoveReference({ status: 'final', outcome: 'rejected' }));
   assert.throws(() => removeReviewedReference(drafts, 'operation-0', { operationId: 'another', status: 'final' }), /different operation/);
 });
 
 test('provisional rejection is distinct from final rejection or unknown submission', () => {
   assert.match(operationLabel({ status: 'provisional', outcome: 'rejected' }), /awaiting finality/);
-  assert.match(operationLabel({ status: 'rejected', error: 'already_claimed' }), /Rejected: already_claimed/);
-  assert.equal(operationLabel({ status: 'final' }), 'Accepted and final');
+  assert.match(operationLabel({ status: 'final', outcome: 'rejected', error: 'already_claimed' }), /Rejected: already_claimed/);
+  assert.equal(operationLabel({ status: 'final', outcome: 'accepted' }), 'Accepted and final');
   assert.match(operationLabel(null), /No durable submission found/);
   assert.match(operationLabel(undefined), /Checking the original/);
 });
@@ -193,7 +205,7 @@ test('delayed submit replies cannot regress an observed final or provisional out
   const receipt = { operationId: 'one', proposalId: 'signed-one', status: 'queued' };
   const provisional = { ...receipt, status: 'provisional', outcome: 'accepted' };
   const final = { ...provisional, status: 'final' };
-  const rejected = { ...receipt, status: 'rejected', outcome: 'rejected' };
+  const rejected = { ...receipt, status: 'final', outcome: 'rejected' };
   assert.equal(mergeOperation(provisional, receipt), provisional);
   assert.equal(mergeOperation(final, receipt), final);
   assert.equal(mergeOperation(rejected, receipt), rejected);
@@ -201,4 +213,21 @@ test('delayed submit replies cannot regress an observed final or provisional out
   assert.equal(mergeOperation(provisional, rejected), rejected);
   assert.equal(mergeOperation(final, null), final);
   assert.throws(() => mergeOperation(final, { ...receipt, proposalId: 'different' }), /different durable intent/);
+});
+
+test('dependent agent intent requires a final claim and releases its read on every outcome', async () => {
+  let released = 0;
+  for (const rows of [[], [[null]], [['confirmed-author']]]) {
+    const backend = { readView: async options => {
+      assert.deepEqual(options, { view: 'final' });
+      return { query: async (sql, parameters) => {
+        assert.match(sql, /SELECT claimed_by/);
+        assert.deepEqual(parameters, ['task-1']);
+        return { rows, truncated: false };
+      }, release: () => { released++; } };
+    } };
+    if (rows[0]?.[0]) assert.equal(await requireFinalClaim(backend, 'task-1'), 'confirmed-author');
+    else await assert.rejects(requireFinalClaim(backend, 'task-1'), /accepted and final/);
+  }
+  assert.equal(released, 3);
 });

@@ -1,5 +1,6 @@
 // This exact public bundle is supplied to build-pages.mjs; it is not a sibling import.
 import { program, emit, sqlStatement } from './public-application.mjs';
+import { requireFinalClaim } from './projection.mjs';
 
 export function claimTask(backend, taskId, operationId) {
   return backend.submit(program(
@@ -9,7 +10,10 @@ export function claimTask(backend, taskId, operationId) {
   ), { operationId });
 }
 
-export function requestSummary(backend, taskId, jobId, operationId) {
+export async function requestSummary(backend, taskId, jobId, operationId) {
+  // A provisional claim cannot authorize dependent work. This read controls when
+  // to author; the program's assertion still protects execution against changes.
+  await requireFinalClaim(backend, taskId);
   return backend.submit(program(
     sqlStatement("SELECT chronolog_assert((SELECT claimed_by = lower(hex(chronolog_actor())) FROM tasks WHERE id = ?), 'claim_required')", [taskId]),
     emit('job-requests', { type: 'job.requested', version: 1, taskId, jobId, kind: 'summarize-task' }),

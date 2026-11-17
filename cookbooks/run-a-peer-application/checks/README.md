@@ -101,6 +101,11 @@ SQL program. Seed shared rows under a real collective and have writers accept
 that membership. A table created by one signer does not automatically let other
 writers modify its rows. The sample claim asserts availability, updates
 `claimed_by` from `chronolog_actor()`, and emits `task.claimed` atomically.
+The summary action first reads a final claim before preparing its dependent
+intent; a provisional claim in the optional local view cannot start agent work.
+Its program retains the ownership assertion for deterministic execution.
+Chronolog owns author-clock advancement. The page never constructs a timestamp
+or refreshes a captured guard to make a dependent action fit the protocol.
 
 Install one designated resident worker for `job-requests` intents whose
 `type` is `job.requested` and `kind` is `summarize-task`. It consumes final intent
@@ -129,10 +134,18 @@ of a mixed group's SQL results.
 
 The page rebuilds a bounded projection from each pinned read handle. It is a
 deliberately small initial implementation, with no persistent projection cache.
-Only editor drafts and operation references persist locally. Its event
-subscription is a wake-up path for replacement views, not a worker's handled
-cursor. A larger application should consume the public atomic projection
-checkpoint helper instead of inventing a second receipt protocol.
+Only editor drafts and operation references persist locally. Its event history
+is read through that captured handle. Its `backend.changes({ view, signal })`
+subscription receives the current revision and coalesced invalidations for the
+selected local/final view; it does not consume durable events merely to wake the
+renderer. A SQL-only change, a provisional rebase or a finality-only transition
+can refresh the UI. A larger durable projection should use the public atomic
+projection checkpoint helper instead of inventing a second receipt protocol.
+
+Operation progress is `queued`, `provisional` or `final`; its separate outcome
+is `accepted` or `rejected`. Both final outcomes stop the status subscription.
+The message projection retains authenticated `event.origin` separately from
+the JSON payload. Payload labels cannot impersonate an owner or effect worker.
 
 Typing uses `signals.subscribe({ topics: ['typing'], mode: 'latest' })`; distinct
 transient messages use the channel's default FIFO policy. The page-owned
@@ -199,7 +212,7 @@ exiting nonzero. A passing build does not imply that a runtime scenario ran.
 Preserve the new raw RTC report under its exact source/artifact pairing; older
 WSS and relay reports below remain historical evidence for those routes.
 
-Successful runtime invocations validate the current `chronolog-application-pilot/v2`
+Successful runtime invocations validate the current `chronolog-application-pilot/v3`
 report before accepting it. Required observations include both independent RTC
 replicas, the packaged runtime and host digests, the exact introduction recipe
 and bundle, zero application requests, retired introduction sockets, warm work
@@ -207,6 +220,9 @@ while the host listener is stopped, matching signed history/capability/finality
 state, and unchanged original accepted/rejected operations after reconnect.
 Native session history spans the full run; page reloads restart browser session
 history, so their session counts need not match.
+Version 3 requires the orthogonal operation contract: every terminal operation
+has `status: 'final'` and an `accepted` or `rejected` outcome. Earlier version 2
+reports remain historical evidence for their exact sources.
 
 To validate an existing raw run and preserve its SHA-256 with a derived summary:
 

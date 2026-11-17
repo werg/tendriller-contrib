@@ -11,10 +11,10 @@ function report() {
   const peer = { route: 'webrtc', authenticatedMs: 15, sentBytes: 10000, receivedBytes: 1000000, queuedBytes: 0 };
   const state = { records: 100, recordDigest: 'a'.repeat(43), capabilityDigest: 'b'.repeat(43), finalOrderLength: 12 };
   const operations = [[{ operationId: 'claim-a', proposalId: 'proposal-a', status: 'final', outcome: 'accepted' }],
-    [{ operationId: 'claim-b', proposalId: 'proposal-b', status: 'rejected', outcome: 'rejected', error: 'already claimed' }]];
+    [{ operationId: 'claim-b', proposalId: 'proposal-b', status: 'final', outcome: 'rejected', error: 'already claimed' }]];
   const artifactFields = ['kernelSha256', 'peerIntroductionRecipeSha256', 'peerIntroductionBundleSha256', 'wasmManifestSha256',
     'wasmSha256', 'publicModuleSha256', 'scopeModuleSha256', 'specimenManifestSha256'];
-  return { format: 'chronolog-application-pilot/v2', passed: true, status: 'passed', error: '', browser: 'fixture-browser-version',
+  return { format: 'chronolog-application-pilot/v3', passed: true, status: 'passed', error: '', browser: 'fixture-browser-version',
     pageErrors: [], checks: ['browser task/chat runtime', 'warm host outage', 'RTC reconnect'],
     revisions: { chronolog: { head: 'a'.repeat(40), dirty: false }, contrib: { head: 'b'.repeat(40), dirty: false },
       tendrillerRuntime: { head: 'not-a-git-checkout', dirty: true } },
@@ -61,6 +61,7 @@ test('application summary preserves exact measured boundaries, outcomes, pins an
 test('old, failed, incomplete and build-only reports cannot qualify the RTC application', () => {
   reject([
     value => { value.format = 'chronolog-application-pilot/v1'; },
+    value => { value.format = 'chronolog-application-pilot/v2'; },
     value => { value.passed = false; },
     value => { value.status = 'built; browser scenarios not run'; },
     value => { value.error = 'RTC connection failed'; },
@@ -139,6 +140,7 @@ test('original accepted and rejected operations survive RTC reconnect without re
     value => { value.diagnostics.routes.originalOperations.before[0] = []; },
     value => { value.diagnostics.routes.originalOperations.after[0][0].proposalId = 'replacement-proposal'; },
     value => { value.diagnostics.routes.originalOperations.before[0][0].status = 'queued'; },
+    value => { value.diagnostics.routes.originalOperations.before[1][0].status = 'rejected'; },
     value => { value.diagnostics.routes.originalOperations.after[1][0].outcome = 'accepted'; },
     value => { value.diagnostics.routes.originalOperations.before[1][0].outcome = 'accepted';
       value.diagnostics.routes.originalOperations.after = structuredClone(value.diagnostics.routes.originalOperations.before); },
