@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { mkdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import {
@@ -35,9 +34,6 @@ function errorRecord(error) {
     name: error?.name, message: error?.message, code: error?.code, stack: error?.stack,
     ...(error?.cause ? { cause: errorRecord(error.cause) } : {}),
   };
-}
-function fingerprint(attempt) {
-  return createHash('sha256').update(JSON.stringify(attempt)).digest('hex');
 }
 function records(result) {
   return result.value.rows.map(row => Object.fromEntries(result.value.columns.map((column, i) => [column.name, row[i]])));
@@ -157,7 +153,7 @@ try {
   await lost.retry();
   const retried = await lost.applied({ signal: AbortSignal.timeout(10000) });
   const inspectedRetry = await bob.operations.inspect(lost.operationId);
-  assert.equal(fingerprint(saved.attempt), fingerprint(inspectedRetry.attempt));
+  assert.deepEqual(saved.attempt, inspectedRetry.attempt);
   assert.equal(retried.outcome, 'accepted');
   await aliceBob.synchronize();
   const retryEvents = (await bob.query('taskEvents', null)).value.events;
@@ -166,8 +162,9 @@ try {
     cancellation,
     savedState: saved.state,
     result: retried,
-    attemptFingerprintBefore: fingerprint(saved.attempt),
-    attemptFingerprintAfter: fingerprint(inspectedRetry.attempt),
+    attemptIdBefore: saved.attempt.id,
+    attemptIdAfter: inspectedRetry.attempt.id,
+    fullSignedAttemptDeepEquality: true,
     eventCopies: retryEvents.filter(event => event.operationId === lost.operationId).length,
   });
 
@@ -210,11 +207,12 @@ try {
 
   const abandoned = await bob.operations.inspect(suffix.operation.operationId, { author: originalIdentities.alice.publicKey });
   assert(['abandoned', 'needsReapply'].includes(abandoned.state.status));
-  assert.equal(fingerprint(abandoned.attempt), fingerprint(originalAttempt.attempt));
+  assert.deepEqual(abandoned.attempt, originalAttempt.attempt);
   log('abandoned.foreign.operation.inspected', {
     state: abandoned.state,
     author: abandoned.attempt.payload.header.author,
-    retainedAttemptFingerprint: fingerprint(abandoned.attempt),
+    retainedAttemptId: abandoned.attempt.id,
+    fullSignedAttemptDeepEquality: true,
   });
   const reapplied = await bob.reapply(suffix.operation.operationId, 'completeTask', { id: 'launch-checklist', expectedVersion: 1 }, {
     operationId: 'bob-deliberate-reapply', originalAuthor: originalIdentities.alice.publicKey, basedOn: recovered.revision,
@@ -261,7 +259,7 @@ try {
   const resumedOperation = await resumedBob.operations.inspect('bob-deliberate-reapply');
   assert.equal(resumedOperation.attempt.id, inspectedReapply.attempt.id);
   const resumedAbandoned = await resumedBob.operations.inspect(suffix.operation.operationId, { author: originalIdentities.alice.publicKey });
-  assert.equal(fingerprint(resumedAbandoned.attempt), fingerprint(abandoned.attempt));
+  assert.deepEqual(resumedAbandoned.attempt, abandoned.attempt);
   assert.equal(requests.length, requestsBeforeReopen);
   log('device.resumed.without.replacement', {
     publicKey: resumedBobDevice.identity.publicKey,
