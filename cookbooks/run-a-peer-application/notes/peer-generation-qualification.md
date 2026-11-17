@@ -23,7 +23,48 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Current exact package checkpoint: `ae9d95de`
+## Complete CI composition checkpoint: `ae9d95de`
+
+All five independent public-package gates passed in
+[GitHub Actions run 44121043353](https://github.com/werg/tendriller-contrib/actions/runs/44121043353).
+The unchanged strict composition assembler then passed against those five raw
+reports, downloaded from that one run with each GitHub artifact ZIP digest
+verified. The exact [composition manifest](evidence/2026-11-17-ci-composition-ae9d95de/composition.json)
+and [origin record](evidence/2026-11-17-ci-composition-ae9d95de/origin.json) retain
+all package/content digests, source identities, runtime versions, report hashes,
+artifact IDs and the limits of the result.
+
+| Required gate | Retained passing raw report |
+| --- | --- |
+| Native events | [Direct report](evidence/2026-11-17-ci-composition-ae9d95de/direct/report.json) |
+| Native RTC | [RTC report](evidence/2026-11-17-ci-composition-ae9d95de/native-rtc/report.json) |
+| Browser Worker | [Browser report](evidence/2026-11-17-ci-composition-ae9d95de/browser/report.json) |
+| Native SQL | [SQL report](evidence/2026-11-17-ci-composition-ae9d95de/native-sql/report.json) |
+| Hosted participant | [Hosted report](evidence/2026-11-17-ci-composition-ae9d95de/hosted/report.json) |
+
+The package source is Chronolog `ae9d95def049e309c53657944b3f8ad4a7fe4126`;
+the host source is Tendriller `56f758ce9a0b5556e61462b4444995147d1b4533`.
+The CI checkout is the clean contrib pull-request merge
+`3b43d2109dfbfaa9de7a3ac5f38ccd42b4a75d2c`, tree
+`09ff97b74f9e522fbb37ff159f02bf8ed337b96f`, which is identical to the
+`a4a4cdff2903c7b06c32a0f6302f1b4663ba5be4` branch tree. These reports are not
+mixed with the separate local attempts below. Chromium 158.0.8127.18 ran the
+actual dedicated Worker with OPFS and exclusive Web Locks; page-owned private
+keys remained zero, and graceful/abrupt Worker reopen retained device/store
+identity and durable operations.
+
+The remote aggregation job initially failed before invoking the validator
+because its runner lacked `rg`. Reassembling the downloaded reports uses the
+unchanged validator and all five exact reports; no claim is based on a modified
+assertion or a synthetic browser. Workflow report discovery now uses standard
+`find` with null-delimited paths, removing that incidental tool dependency.
+The complete composition remains a local public-artifact qualification: deployed
+authentication, real network/TURN conditions, sustained suspension/quota,
+browser SQL/WASM, device/provider cost and an unassisted fresh-agent exercise
+are explicitly unqualified. Later runtime changes need their own exact-source
+qualification and do not inherit this checkpoint automatically.
+
+## Supplemental local package checkpoint: `ae9d95de`
 
 Four independent local lanes now pass with clean Chronolog source
 `ae9d95def049e309c53657944b3f8ad4a7fe4126`, tree
@@ -110,8 +151,8 @@ bound and Worker projection-handle lifetime fixes, for a new exact-source run.
 The assembler revalidates raw evidence and refuses incomplete, dirty or
 mixed-source compositions. No complete local
 manifest is emitted because this environment could not run the browser gate.
-A successful exact-source CI browser lane and all its companion gates are
-required for that manifest. Internet/TURN, deployed authentication, sustained
+The separate complete CI checkpoint above supplies its own browser lane and
+all companion gates. Internet/TURN, deployed authentication, sustained
 suspension/quota, browser SQL/WASM and provider/device cost remain separate
 qualification boundaries.
 
