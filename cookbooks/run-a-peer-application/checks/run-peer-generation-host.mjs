@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
 import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,9 +13,13 @@ import { parseArgs } from 'node:util';
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
   'control-fixture': { type: 'boolean', default: false },
+  'fixture-script': { type: 'string' }, 'fixture-cwd': { type: 'string' }, 'fixture-log': { type: 'string' },
+  'application-id': { type: 'string' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
 if ((!values.artifact && !values['control-fixture']) || !values.artifacts || !values.output) throw Error('Usage: (--artifact /exact/native-rtc-session.tgz | --control-fixture) --artifacts /exact/tendriller-dist --output /new/evidence');
+if (values['fixture-script']) assert.ok(values['control-fixture'], '--fixture-script needs --control-fixture');
+if (values['application-id']) assert.match(values['application-id'], /^[a-f0-9]{64}$/u);
 const fixtureLifetimeMs = values['control-fixture'] ? 3_600_000 : 360_000;
 const here = dirname(fileURLToPath(import.meta.url)), output = resolve(values.output), artifacts = resolve(values.artifacts);
 try { await stat(output); throw Error('Use a new evidence directory'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
@@ -80,7 +85,7 @@ const worker = run(process.execPath, ['node_modules/vitest/vitest.mjs', 'run', '
 try {
   await Promise.race([bridge.ready, worker.done.then(() => { throw Error('Workerd exited before becoming ready'); })]);
   if (values['control-fixture']) {
-    const applicationId = randomBytes(32).toString('hex');
+    const applicationId = values['application-id'] ?? randomBytes(32).toString('hex');
     const response = await fetch(`${bridge.url}/testing/page`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ applicationId }) });
     assert.equal(response.status, 200);
     const fixture = { format: 'peer-control-development-fixture/v1', applicationId, api: `${bridge.url}/api`, token: 'synthetic-owner',
@@ -92,7 +97,26 @@ try {
     const fixturePath = join(output, 'control-fixture.json');
     await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, { flag: 'wx' });
     console.log(`Control fixture ready: ${fixturePath}`);
-    await worker.done;
+    if (values['fixture-script']) {
+      // The independently authored consumer runs in the fixture's process network
+      // namespace. This infrastructure wrapper supplies no application protocol.
+      const script = resolve(values['fixture-script']), cwd = resolve(values['fixture-cwd'] ?? dirname(script));
+      const logPath = resolve(values['fixture-log'] ?? join(output, 'consumer.jsonl'));
+      const scriptSha256 = hash(await readFile(script));
+      const consumer = run(process.execPath, [script], cwd, { TASK_HOST_CONFIG: fixturePath }, logPath);
+      try { await consumer.done; }
+      finally {
+        await writeFile(join(output, 'fixture-consumer.json'), `${JSON.stringify({
+          format: 'independent-control-consumer/v1', scriptSha256, node: process.version,
+          scriptUnchanged: hash(await readFile(script)) === scriptSha256,
+          exitCode: consumer.child.exitCode, signalCode: consumer.child.signalCode,
+          logSha256: hash(await readFile(logPath)), hostEvidence: 'host-artifacts.json',
+          boundary: 'Independent native consumer and actual workerd control fixture share one command network namespace.',
+        }, null, 2)}\n`);
+        await bridge.stop();
+        await worker.done;
+      }
+    } else await worker.done;
   } else {
     const peer = run(process.execPath, [join(here, 'run-peer-generation.mjs'), '--artifact', resolve(values.artifact),
       '--transport', 'native-rtc', '--output', join(output, 'peers'), ...(values['allow-dirty'] ? ['--allow-dirty'] : [])], dirname(here),
@@ -108,12 +132,21 @@ try {
   await worker.done.catch(() => undefined);
 }
 
-function run(command, args, cwd, environment = {}) {
-  const child = spawn(command, args, { cwd, stdio: 'inherit', env: { ...process.env, ...environment } });
+function run(command, args, cwd, environment = {}, logPath) {
+  const log = logPath ? createWriteStream(logPath, { flags: 'wx' }) : undefined;
+  const child = spawn(command, args, { cwd, stdio: log ? ['ignore', 'pipe', 'pipe'] : 'inherit', env: { ...process.env, ...environment } });
+  if (log) {
+    child.stdout.pipe(process.stdout, { end: false }); child.stderr.pipe(process.stderr, { end: false });
+    child.stdout.pipe(log, { end: false }); child.stderr.pipe(log, { end: false });
+  }
   const timer = setTimeout(() => child.kill('SIGTERM'), fixtureLifetimeMs + 60_000);
   const done = new Promise((resolve, reject) => {
     child.on('error', reject);
-    child.on('exit', (code, signal) => { clearTimeout(timer); code === 0 ? resolve() : reject(Error(`Process failed: ${command} (${code ?? signal})`)); });
+    child.on('close', (code, signal) => {
+      clearTimeout(timer);
+      const finish = () => { code === 0 ? resolve() : reject(Error(`Process failed: ${command} (${code ?? signal})`)); };
+      log ? log.end(finish) : finish();
+    });
   });
   void done.catch(() => undefined);
   return { child, done };
@@ -154,7 +187,7 @@ async function createBridge() {
       if (blocked) return json(res, 503, { error: 'CONTROL_HOST_UNAVAILABLE' });
       if (url.pathname.startsWith('/api/')) {
         const path = url.pathname.slice(5);
-        assert.ok(['peers/application', 'peers/generations', 'peers/definition'].includes(path), 'Only public compact control routes belong to this fixture');
+        assert.ok(['peers/application', 'peers/generations', 'peers/definition', 'peers/directory'].includes(path), 'Only public compact control routes belong to this fixture');
         const response = await enqueue({ kind: 'api', method: req.method, path, body });
         return json(res, response.status, response.value);
       }
