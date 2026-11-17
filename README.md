@@ -24,21 +24,21 @@ The default core installs no application workflow. Deliberately selected trusted
 references live beside the cookbook that explains their policy.
 
 For new application architecture, start with
-[application primitives and roles](guides/application-primitives.md):
-`peer-generation-v1` is the adopted target, with implementation and qualification
-in progress. Use one selected-history contract: `local()` means applied here;
-`final()` means committed and applied under the selected history. Explicit
-recovery may abandon a recent suffix, including work previously reported final.
-Ordinary effects use reset-aware journaling and reconciliation; protect a
-prerequisite only when the application requires it to survive recovery. The
-[peer application preview](cookbooks/run-a-peer-application/COOKBOOK.md) develops
-the target APIs with an independent consumer; executable examples require an
-explicitly supplied matching `@chronolog/peer-session` archive.
-The preview currently calls its execution wait `applied()`; examples keep the
-actual archive API without adding aliases. The [historical implementation guide](guides/finalized-peer-applications.md)
-records the older packages' immutable-prefix guarantee and original test scope.
-Method names alone do not imply that guarantee, and those checks do not establish
-generation API availability or qualification.
+[application primitives and roles](guides/application-primitives.md).
+`peer-generation-v1` uses the implemented `applied()` and `shared()` waits:
+execution belongs to the selected generation, and independent retained coverage
+is an additional observation. Explicit recovery may abandon a recent suffix.
+The [peer application recipe](cookbooks/run-a-peer-application/COOKBOOK.md)
+uses the maintained bootstrap, peer lifecycle, Worker facade and local MCP
+surface through an exact supplied `@chronolog/peer-session` archive.
+
+The [qualification inventory](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
+records separate clean native RTC, actual-host, browser events/OPFS, native SQL
+and independently authored consumer results. Browser SQL recovery, Internet/TURN
+and deployed operation require their own complete evidence. The
+[historical implementation guide](guides/finalized-peer-applications.md) retains
+the older immutable-prefix contract and its original test scope.
+
 [Live signals](cookbooks/share-live-signals/COOKBOOK.md)
 cover typing, presence, cursors, progress and transient messages without requiring
 a database or finality service.

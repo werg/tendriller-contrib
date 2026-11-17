@@ -1,26 +1,22 @@
 # Choose application primitives by their guarantees
 
-**Implementation status:** `peer-generation-v1` is the adopted target for new
-peer applications. The encrypted replica, public session/native/browser entries,
-framed network transport and maintained RTC composition are implemented as a
-preview; qualification is in progress. The unified target contract uses `local()` for a result applied here and `final()` for a
-result committed and applied under the selected history. Explicit recovery may
-abandon a recent suffix, including work previously reported final. Design around
-that recovery exception and the effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
-develops the target APIs alongside an independent consumer; using those APIs
-requires an explicitly supplied matching `@chronolog/peer-session` archive.
-The preview currently spells its execution wait `applied()`; use the actual API
-of the supplied archive, without inventing aliases or additional protocol stages.
-The [historical implementation guide](finalized-peer-applications.md) records the
-older packages' immutable-prefix guarantee. That guarantee comes from their
-implementation, not from the name `final()`, and their checks do not qualify
-generation recovery.
+**Implemented contract:** New peer applications use `peer-generation-v1` with
+one public session, one command journal and explicit recovery. `applied()`
+reports execution in the selected generation. `shared()` observes independently
+retained complete coverage. Neither promises that an explicit recovery retains
+every recent operation. The public package owns native/browser bootstrap,
+authenticated peer networking, coherent views, durable identity and deliberate
+reapplication.
 
-The preserved package report uses separate native/events stores over an in-process
-link with dirty-source provenance. Maintained RTC code and its independent
-consumer now exist, but their exact-archive result, browser behavior and deployed
-Internet readiness require separate evidence. No declaration or method name
-promotes that earlier run to those qualifications.
+The [peer application recipe](../cookbooks/run-a-peer-application/COOKBOOK.md)
+uses those implemented APIs and an exact supplied `@chronolog/peer-session`
+archive. The [qualification inventory](../cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
+separates clean native RTC, actual-host controls, browser events/OPFS, native SQL
+and the independently authored consumer. Current browser SQL recovery and
+Internet/deployed operation need their own complete passing evidence. Historical
+reports keep their original source and scope; the
+[older immutable-prefix implementation](finalized-peer-applications.md) does not
+qualify this recovery contract.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application
@@ -105,21 +101,18 @@ A stable application/team identity must outlive the creating device.
 
 ## Distinguish completion from recovery
 
-These are observations, not a required ladder of protocol stages. The target
-method names describe scope: `local()` is applied here; `final()` is committed
-and applied in the selected history. The current preview's `applied()` spelling
-remains an implementation detail of that archive.
+These are observations, not a required ladder of protocol stages. Use the
+implemented `applied()` and `shared()` waits. No completion method removes the
+selected-prefix recovery exception.
 
 | Observation | What it establishes |
 | --- | --- |
 | Saved | The exact attempt is durably recorded locally with its original generation and guards. |
 | Waiting | The original attempt is retained; no current execution outcome is known. |
-| Local | The program has an execution result on this replica. |
 | Applied accepted | The selected sequence executed the complete program successfully at a stated position. |
 | Applied rejected | That execution rejected the complete program; no partial mutation or effective event escaped. |
 | Shared | A named independent peer retained a complete usable prefix; reachability may change. |
 | Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
-| Final | The accepted or rejected result is committed and applied under the selected history; explicit recovery may later abandon it. |
 
 Applied outcomes are stable while their position remains in the selected
 ancestry. Inherited attempts keep their original identity and outcome. An
@@ -168,8 +161,8 @@ completeness. Missing bodies inside a candidate prefix must be repaired or the
 candidate must choose an earlier complete point. Two tabs sharing one storage
 owner are one copy.
 
-Five minutes is the initial measured freshness objective with another suitable
-peer available. It is not an unconditional maximum loss. A long partition or a
+Five minutes is a qualification objective with another suitable peer available.
+It remains unmeasured and is not an unconditional maximum loss. A long partition or a
 single remaining copy can leave much more work exposed. Show the adopted base,
 known abandoned range and unknown loss explicitly. If no usable state survives,
 report unavailable; never silently create a new empty application.
