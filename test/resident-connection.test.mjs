@@ -25,14 +25,14 @@ const { connectResidentWorker } = await import('../cookbooks/run-a-peer-applicat
 hooks.deregister();
 
 function fixture() {
-  const rtc = new AbortController(), worker = new AbortController(), channel = {};
+  const rtc = new AbortController(), worker = new AbortController(), channel = { reliable: {}, live: {} };
   const observed = { signalingClosed: 0, rtcClosed: 0, workerClosed: 0, transferred: false };
   const attachment = { signal: worker.signal, async close() { observed.workerClosed++; worker.abort(); } };
   globalThis[ports] = {
     signaling: () => ({ stats: { requests: 1, requestBytes: 100, responseBytes: 100, closed: true },
       close() { observed.signalingClosed++; } }),
     async negotiate(options) {
-      options.onDataChannel(channel);
+      options.onDataChannels(channel);
       assert.equal(observed.transferred, true, 'The Worker port must transfer before the callback returns');
       return { signal: rtc.signal, signaling: { sentMessages: 1, receivedMessages: 1 }, async close() { observed.rtcClosed++; rtc.abort(); } };
     },
@@ -101,7 +101,7 @@ test('negotiation failure after an already acknowledged Worker handoff fences an
   const value = fixture();
   let attemptSignal;
   globalThis[ports].negotiate = async options => {
-    options.onDataChannel(value.channel);
+    options.onDataChannels(value.channel);
     await turn();
     throw new Error('ICE negotiation failed after handoff');
   };

@@ -2,7 +2,7 @@ import { createHttpWebRtcSignaling, negotiateWebRtc, supervisePeerSession } from
 
 /**
  * Maintain one authenticated connection to the resident declared in the initial
- * page configuration. attach must synchronously transfer the untouched channel
+ * page configuration. attach must synchronously transfer both untouched channels
  * and return an authenticated attachment lifetime { signal, close }. Its signal
  * ends when the Worker peer link ends, even if ICE remains connected.
  * The signal owns that Worker lifetime; replacing it stops attempts and retries.
@@ -23,10 +23,10 @@ export function connectResidentWorker({ endpoint, headers, attach, configuration
     };
     try {
       session = await negotiateWebRtc({ role: 'offerer', signaling, configuration, signal: attemptSignal, timeoutMs,
-        onDataChannel(channel) {
+        onDataChannels(channels) {
           // Calling attach is synchronous, so its postMessage transfer happens
           // before this callback returns. Its result is the later auth boundary.
-          attached = Promise.resolve(attach(channel, attemptSignal));
+          attached = Promise.resolve(attach(channels, attemptSignal));
           // Even a Worker RPC port that ignores cancellation owns any late
           // attachment it returns. Retire it without reviving this attempt.
           void attached.then(value => {

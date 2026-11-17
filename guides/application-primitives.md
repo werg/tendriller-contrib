@@ -11,7 +11,7 @@ different requirements, even when one screen uses all four.
 | --- | --- | --- |
 | A value useful only on this device | Local state or a local draft | The application chooses whether it survives reload. |
 | Live information that may be lost or replaced | Ephemeral signals | No history, offline queue, replay, transaction or finality. Reconnect with fresh observations. |
-| A message, observation or intent that must remain available | Durable events | Retained operations, stable retry identity, replay and final outcomes. |
+| A message, observation or intent that must remain available | Durable events | Retained operations, stable retry identity and replay; the live profile also supplies final outcomes. |
 | A guarded transition in shared state | A durable transaction | Assertions, mutations and emitted events succeed or fail together. |
 | An external effect that must follow an agreed decision | A final durable intent and an effect worker | Journal dispatch, use provider idempotency when available, and record the result. |
 
@@ -26,6 +26,33 @@ connects event-only and mixed SQL/event profiles to public APIs. Choose one
 durable application backend for each application. A hosted backend and a peer
 backend have different execution and availability contracts; the UI should not
 submit the same intent to both.
+
+## Use the live collaboration profile by default
+
+Tendriller defaults to live collaboration: peers share one timestamp-ordered
+application history, may show a provisional local view, and observe final
+accepted or rejected outcomes when the selected provider closes a verified
+prefix. Keep that progression visible. Inclusion, deterministic execution and
+finality answer different questions; a receipt is not proof that SQL succeeded.
+Live signals remain independent of that progression and can start while durable
+history is catching up or finality is unavailable.
+
+Signed operations, immutable operation identity, timestamp ordering and
+deterministic replay are the reusable foundation. A collaboration policy decides
+which operations participate. The live policy adds finality and workers that
+consume final intents. A future asynchronous branch/merge policy can select and
+merge operations without any finality concept, API or operation states. Do not
+model a branch tip as finality or impose the live worker contract on it. Such a
+mode needs its own explicit execution/effect policy; it is not implemented or
+selected by the live recipes here.
+
+For the current live profile, an offline proposal can become too old to enter an
+already closed prefix. Preserve that original proposal and its rejection. Retry
+asks for the same original outcome; it never updates its timestamp or guards.
+If the person still wants the action, review current state and author a new
+operation with a new ID. Preserve the original observation time in domain data
+when it matters, separately from the new operation's ordering timestamp. This
+keeps signed chronological semantics and recovery meaning explicit.
 
 ## Name roles precisely
 
@@ -72,7 +99,7 @@ not a requirement that every signal, page or agent action pass through one
 machine. Its unavailability pauses new coordinated final outcomes; established
 signal connections and existing local reads have their own lifetimes.
 
-## Separate inclusion, execution and finality
+## Separate inclusion, execution and finality in live mode
 
 In Chronolog, replicas order included proposals by signed author time, author
 identity and stable proposal identity. The finality provider certifies inclusion
@@ -130,7 +157,7 @@ intermediate revisions. A worker that must handle each final event uses
 projection or effect journal. Do not use event history as an ad hoc UI wake
 protocol, or treat a view notification as a work acknowledgement.
 
-## Treat rollback and redo as replica work
+## Keep replay, retry and user Undo distinct
 
 Use a coherent `final` view for confirmed work. A `local` view may include
 provisional work when immediate feedback is useful. When eligible earlier

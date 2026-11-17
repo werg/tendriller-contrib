@@ -1,4 +1,4 @@
-import './deployment/bootstrap.mjs';
+import { applicationReady } from './deployment/bootstrap.mjs';
 import { claimTask, postMessage, requestSummary } from './actions.mjs';
 import { mergeOperation, operationLabel, readBoard } from './projection.mjs';
 import { canRemoveReference, captureMessageDraft, clearSubmittedText, newDrafts, removeReviewedReference, retainReference, validateDrafts } from './drafts.mjs';
@@ -268,7 +268,11 @@ $('#refresh').addEventListener('click', () => void refresh());
 $('#include-pending').addEventListener('change', () => { currentRead?.abort(); if (backend) void watchViews(); });
 addEventListener('pagehide', () => { sendTyping(false); lifecycle.abort(); currentRead?.abort(); });
 
+// Live observation has its own lifetime and never waits for durable readiness.
+void watchTyping();
+
 try {
+  await applicationReady;
   if (!api?.application) throw new Error('This page requires a peer-selected Tendriller application');
   backend = await api.application.ready();
   if (!backend.capabilities.includes('events') || !backend.capabilities.includes('revision-views')) throw new Error('The selected backend lacks the required event and coherent-view capabilities');
@@ -283,5 +287,4 @@ try {
   $('#message').disabled = $('#send').disabled = false;
   void watchViews();
   for (const reference of drafts.operations) void watchOperation(reference.operationId);
-  void watchTyping();
 } catch (error) { status(`Application unavailable: ${error.message}`, true); }

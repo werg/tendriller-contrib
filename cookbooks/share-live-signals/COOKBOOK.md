@@ -133,6 +133,57 @@ The database peer connection also requires its reader capability to exchange
 group data. These are choices of the group adapter, not requirements of a
 standalone signal channel.
 
+## Use the same primitive for progress, previews and attention
+
+The small [live-run specimen](snippets/live-run.mjs) consumes only the public
+`Signals` port. It has no durable backend, database, transaction or finality
+request. `observeLiveRun` shows independently expiring progress and complete
+preview snapshots for one run and selected publisher. Use a run ID that identifies
+one execution attempt, and choose the publisher from the application's known
+identity policy; a payload cannot name itself the authorized publisher.
+
+```js
+const lifetime = new AbortController();
+const observing = observeLiveRun(tendril.signals, {
+  runId: selectedRun.id,
+  publisher: selectedRun.publisher,
+  signal: lifetime.signal,
+  onChange: ({ progress, preview }) => {
+    showProgress(progress); // null means current progress is unknown.
+    showPreview(preview?.text ?? '');
+  },
+});
+
+// The authorized producer sends independent live observations.
+await signals.send('progress', { runId, completed: 300, total: 500 }, { ttlMs: 3000 });
+await signals.send('preview', { runId, text: completeCurrentPreview }, { ttlMs: 3000 });
+```
+
+Complete preview snapshots use `latest`; losing an intermediate snapshot does
+not create a hidden gap in concatenated text. The specimen bounds text to 8,192
+characters and expires progress and preview separately. If bandwidth calls for
+chunked previews instead, use `all`, chunk indexes and explicit incomplete-state
+handling as described above. A required final result is recorded through the
+application's durable path and replaces the disposable preview.
+
+`observeAttention` uses the same channel with `mode: 'all'` for distinct harmless
+highlight suggestions. It accepts only the selected publisher, active run and a
+local allowlist of targets, and respects the receiving person's follow/pause
+choice before highlighting. It does not invoke tools or grant authority. This
+supports live walkthroughs and collaborative focus without recording every
+attention change as a transaction. If a transition requires acknowledgement or
+must be recovered, use a durable operation instead.
+
+Start these observers independently of durable application readiness. In the
+[peer specimen](../run-a-peer-application/checks/README.md), live subscription
+starts while the bootstrap's separate `applicationReady` promise is pending.
+Stopping or failing that durable initialization does not silently cancel live
+observation; the page lifetime cancels both when the person leaves.
+
+The [focused checks](checks/live-run.test.mjs) exercise payload selection,
+independent expiry, replaceable previews and local attention policy. They establish
+page-owned behavior, not network delivery or deployed authorization.
+
 ## Keep access and lifetime explicit
 
 The scope separates applications; topics describe payloads. Neither is a secret
@@ -141,6 +192,14 @@ policy for the topic, with session/sequence replay protection and bounded expiry
 The transport must provide the required confidentiality and connection access.
 Do not assume a signed signal is encrypted or a successful introduction grants
 permission to read a database.
+
+The peer RTC adapter uses an independent unordered live channel, separate from
+reliable history and detached-body transfer. Both channels share one authenticated
+connection but have separate queues. Saturated history credit cannot hold a
+progress update behind a large replay. A congested live send rejects; a slow live
+receiver may drop queued datagrams. Network bandwidth is still shared, so no
+latency or guaranteed delivery is implied. There is no reconnect outbox or
+fallback that turns a signal into a durable frame.
 
 Choose a TTL from the actual interaction: a few seconds can suit typing while a
 slower sensor may need a longer freshness interval. Bound payloads, sessions,

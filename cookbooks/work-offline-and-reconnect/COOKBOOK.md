@@ -52,6 +52,25 @@ Bound draft bytes, attachment count, and pending items. When storage fails or a 
 
 A connectivity indicator should report transport separately from service authority and feature readiness. It can explain that the connection returned while the task is still reconciling. Keep status updates readable and accessible without stealing focus or repeatedly announcing each reconnect attempt.
 
+## Distinguish retry from reauthoring in live peer applications
+
+Tendriller's peer recipe defaults to live timestamp-ordered collaboration. Its
+finality provider can close the time range containing an offline proposal before
+that proposal reaches the shared history. A late admission rejection is then a
+stable outcome for those original signed bytes; it is different from a SQL guard
+rejecting a stale generation or an authorization check rejecting a revoked writer.
+
+Use the selected `tendril.application` backend's operation store to recover the
+original outcome. Do not repair a retry by changing its timestamp, operation ID,
+payload or captured guards. When the person wants to try again, show current
+state and author a new reviewed operation with a new ID. Retain the original
+observation time as domain data if it matters. The new operation may still fail a
+business guard; a fresh timestamp is not permission to overwrite a reset.
+
+These are live-mode rules. Asynchronous branch/merge collaboration has no
+finality concept and needs its own inclusion/merge and effect policy. It is not
+provided by switching a live page's backend during an outage.
+
 ## Reconnect without changing historical intent
 
 1. Establish the current page identity, reader authority, service capabilities, and task context. Reauthorize before restoring sensitive projections when required.

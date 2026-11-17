@@ -51,8 +51,8 @@ an application that chooses the recipe consume the same built program module.
    the configured resident HTTPS endpoint for one bounded offer/answer, then
    close introduction resources and authenticate the Chronolog peer over the
    data channel. The page owns RTC negotiation and
-   synchronously transfers the untouched data channel to the exclusive replica
-   Worker, which owns framing, authentication and durable replication. The
+   synchronously transfers both untouched reliable/live data channels to the
+   exclusive replica Worker, which owns framing, authentication and replication. The
    [public resident connection recipe](../snippets/connect-resident-worker.mjs)
    keeps this handoff separate from membership and application ownership. The
    native [resident task](../snippets/serve-resident-webrtc.mjs) starts its HTTPS
@@ -65,6 +65,15 @@ an application that chooses the recipe consume the same built program module.
    The namespace's `available` flag reports whether a channel is installed.
    Grant/session/sequence/expiry validation belongs to the channel. Signals can
    also be installed on a page with no durable application backend.
+
+Export `applicationReady`, a promise for successful durable initialization. Install
+the independent signal binding before returning from module evaluation and run
+connect/catch-up/membership-finality work inside that promise, without awaiting
+it at the module top level. The page starts its live subscription immediately;
+only durable controls await `applicationReady`. A rejected readiness promise
+becomes a visible durable initialization error and does not suppress live
+observation. This is the specimen's bootstrap contract, not another outbox or
+an alternate application writer.
 
 The [peer network contract](../notes/peer-network.md) specifies ownership,
 connection lifetime and the warm host-independence assertions. The WSS/relay

@@ -5,8 +5,9 @@ the initial page and authenticates participant administration. A reachable
 resident peer accepts a bounded HTTPS introduction directly; deployment places
 that endpoint in the initial page configuration. Tendriller also provides an
 explicit rendezvous when both endpoints already participate in the same attempt.
-After introduction, an authenticated WebRTC data channel carries the application
-history, inclusion and closure evidence, detached envelopes and transient signals.
+After introduction, one authenticated WebRTC connection has independent reliable
+and live channels. The reliable channel carries history, inclusion and closure
+evidence and detached envelopes; the live channel carries transient signals.
 The page's normal operation has no hosted application socket or health poll.
 
 This is the current architecture being implemented across
@@ -30,7 +31,7 @@ and host-independent exchange, with the packaged-host integration scope explicit
 | Account authentication and participant approval | Tendriller with the portable membership administrator | Enrollment, roster inspection, approval, revocation and key rotation |
 | Cold peer introduction | Resident-owned HTTPS offer endpoint | None; the initial page already declares the endpoint |
 | Coordinated peer introduction | Optional Tendriller rendezvous | One bounded offer and answer when both endpoints participate |
-| ICE, reliable data channel and flow control | Chronolog WebRTC transport | No application payload relay through the page host |
+| ICE, separate reliable/live channels and their bounds | Chronolog WebRTC transport | No application payload relay through the page host |
 | Peer identity, reader grants and signed records | Chronolog authenticated peer link | Independent of the introduction service |
 | Durable proposals, retry, SQL, events and proofs | Chronolog replica | No hosted application-state command or replay queue |
 | Inclusion and author-time closure | Selected Chronolog finality provider | Provider placement is independent of page hosting |
@@ -95,8 +96,8 @@ protocol domains and authorization. RTC transport configuration cannot choose a
 new signer, rewrite a proposal or change finality.
 
 A browser page owns its `RTCPeerConnection` and introduction. The synchronous
-`negotiateWebRtc` data-channel callback transfers the untouched `RTCDataChannel`
-to the exclusive OPFS Worker before it loses transferability. That Worker owns
+`negotiateWebRtc` callback transfers both untouched `RTCDataChannel` objects
+together to the exclusive OPFS Worker before either loses transferability. That Worker owns
 the framed channel, authenticated peer link, replica and signing identity. This
 requires a browser implementing transferable RTC data channels; unsupported
 transfer must fail visibly. Closing the page or replacing the Worker must close
@@ -127,10 +128,10 @@ const connection = connectResidentWorker({
   configuration: rtcConfiguration,
   signal: workerLifetime.signal,
   retry: { initialDelayMs: 500, maxDelayMs: 8000, maxAttempts: 6 },
-  attach(channel, attemptSignal) {
+  attach(channels, attemptSignal) {
     // This application port transfers immediately and acknowledges only after
     // the Worker has framed, authenticated and attached the actual peer.
-    return attachPeerChannel(replicaWorker, channel, attemptSignal);
+    return attachPeerChannels(replicaWorker, channels, attemptSignal);
   },
 });
 await connection.ready;
@@ -141,8 +142,8 @@ await connection.ready;
 // await connection.close();
 ```
 
-`attachPeerChannel` is the deployment's Worker RPC port, not a new Chronolog
-identity or writer. It calls `postMessage` with the channel transfer list before
+`attachPeerChannels` is the deployment's Worker RPC port, not a new Chronolog
+identity or writer. It calls `postMessage` with both channels in the transfer list before
 returning its authentication acknowledgement promise. The promise resolves to
 `{signal, close}` for that authenticated Worker connection. The signal ends when
 the peer link ends, even if ICE remains connected. The recipe supervises both
@@ -160,16 +161,17 @@ next authenticated attachment. That readiness does not assert that retained
 history has finished replaying or that a finality provider is available.
 
 The message shape is chosen by the deployment. Transfer inside `attach`
-synchronously, without awaiting, attaching a listener or wrapping the channel
+synchronously, without awaiting, attaching a listener or wrapping either channel
 first. Its acknowledgement promise may settle later, after Worker authentication. Introduction
 admission does not authorize a group read or change the durable signing identity.
 
-In the receiving Worker, use public `frameRtcDataChannel(channel)` from
+In the receiving Worker, use public `frameRtcPeerChannels(channels)` from
 `@chronolog/transport-webrtc`, and await its bounded `ready` handshake. Call the
 opened browser peer's `connectPeer({ connection })`. That public composition
 uses its persisted signing identity, verifies current reader capabilities,
-attaches durable replication and attaches its signal channel to the same live
-connection. An optional `peerIdentity` pins the expected remote endpoint as well
+attaches durable replication to the reliable lane and its signal channel to the
+independent live lane. Signals never wait behind history credit or body replay.
+Both lanes still share network bandwidth; this is not a latency guarantee. An optional `peerIdentity` pins the expected remote endpoint as well
 as checking membership. Application bootstrap need not recreate the handshake,
 signal routing or cleanup. Neither the recipe nor the rendezvous grants access.
 Install `createChronologApplicationBackend` through the selected

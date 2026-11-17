@@ -22,6 +22,12 @@ running an agent does not itself grant finality or membership rights. Every
 replica computes the same application order from signed author time and
 deterministic tie-breakers.
 
+This is Tendriller's default **live collaboration** profile. Signed operations,
+timestamp ordering and deterministic replay are common foundations; finality is
+the live policy's additional contract. An asynchronous branch/merge policy would
+select and merge operations without finality APIs or final/provisional states.
+This recipe does not implement that alternative or require it to use finality.
+
 Start with the [primitive and role decision guide](../../guides/application-primitives.md).
 Durable events and transactions use this history. Live typing, presence, cursor
 motion and progress use the independent [signal channel](../share-live-signals/COOKBOOK.md)
@@ -298,8 +304,8 @@ FIFO delivery by default; select `latest` for replaceable values such as typing.
 
 Keep the page host out of the warm data path: peer pages have no implicit hosted
 application socket, event stream or health poll. The browser owns its RTC
-connection; its synchronous channel callback transfers the untouched data
-channel to the exclusive replica Worker for framing and authentication. A warm
+connection; its synchronous channel callback transfers both untouched reliable/live data
+channels to the exclusive replica Worker for framing and authentication. A warm
 session continues while introduction services are unavailable.
 Cold page loads, new introductions and participant administration retain their
 declared service dependencies.
