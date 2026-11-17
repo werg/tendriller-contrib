@@ -167,7 +167,9 @@ async function createBridge() {
   });
   const server = createServer(async (req, res) => {
     try {
-      const url = new URL(req.url, 'http://localhost'), body = await readBody(req);
+      const url = new URL(req.url, 'http://localhost');
+      const binaryRoute = /^\/api\/peers\/releases\/content\/[a-f0-9]{64}$/u.test(url.pathname);
+      const body = await readBody(req, binaryRoute);
       if (url.pathname === '/testing/ready') { markReady(); return json(res, 200, { ready: true }); }
       if (url.pathname === '/testing/next') {
         if (queue.length) return json(res, 200, queue.shift());
@@ -183,11 +185,21 @@ async function createBridge() {
       if (url.pathname === '/testing/stop') return json(res, 200, await enqueue({ kind: 'stop' }));
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
-      requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
+      requests++; requestBodyBytes += body === undefined ? 0 : Buffer.isBuffer(body) ? body.length : Buffer.byteLength(JSON.stringify(body));
       if (blocked) return json(res, 503, { error: 'CONTROL_HOST_UNAVAILABLE' });
       if (url.pathname.startsWith('/api/')) {
         const path = url.pathname.slice(5);
-        assert.ok(['peers/application', 'peers/generations', 'peers/definition', 'peers/directory'].includes(path), 'Only public compact control routes belong to this fixture');
+        if (binaryRoute) {
+          assert.ok(['GET', 'PUT'].includes(req.method), 'Release bytes use GET or PUT');
+          const response = await enqueue({ kind: 'api.binary', method: req.method, path,
+            ...(body === undefined ? {} : { base64: body.toString('base64') }) });
+          const bytes = Buffer.from(response.base64, 'base64');
+          res.writeHead(response.status, { 'Content-Type': response.contentType, 'Content-Length': bytes.length });
+          return res.end(bytes);
+        }
+        assert.ok(['peers/application', 'peers/generations', 'peers/definition', 'peers/directory'].includes(path) ||
+          /^peers\/releases(?:\/(?:policy|manifests|activations)|\/manifests\/[a-f0-9]{64})?$/u.test(path),
+        'Only public compact control and release routes belong to this fixture');
         const response = await enqueue({ kind: 'api', method: req.method, path, body });
         return json(res, response.status, response.value);
       }
@@ -206,10 +218,12 @@ async function createBridge() {
     },
   };
 }
-async function readBody(request) {
+async function readBody(request, raw = false) {
   const chunks = []; let length = 0;
   for await (const chunk of request) { length += chunk.length; assert.ok(length <= 1_048_576, 'Test request exceeded bound'); chunks.push(chunk); }
-  return length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : undefined;
+  if (!length) return undefined;
+  const bytes = Buffer.concat(chunks);
+  return raw ? bytes : JSON.parse(bytes.toString('utf8'));
 }
 function json(response, status, value) { response.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(value)); }
 function hash(value) { return createHash('sha256').update(value).digest('hex'); }

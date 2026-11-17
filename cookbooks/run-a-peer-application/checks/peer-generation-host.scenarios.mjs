@@ -1,5 +1,6 @@
 // Executes only in Cloudflare's workerd test pool, from installed public packages.
 import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
 import { inject, test } from 'vitest';
 import { createPeerRendezvous } from '@tendriller/core/peers';
 import { createTestPage, initializeTestService } from '@tendriller/engine/testing';
@@ -23,6 +24,13 @@ test('public host controls and rendezvous serve independent native application p
         assert.ok(page);
         const response = await page.api(job.method, job.path, job.body);
         return { status: response.status, value: await response.json() };
+      }
+      case 'api.binary': {
+        assert.ok(page);
+        const body = job.base64 === undefined ? undefined : new Uint8Array(Buffer.from(job.base64, 'base64'));
+        const response = await page.api(job.method, job.path, body);
+        return { status: response.status, contentType: response.headers.get('Content-Type') ?? 'application/octet-stream',
+          base64: Buffer.from(await response.arrayBuffer()).toString('base64') };
       }
       case 'traffic':
         assert.ok(page);
