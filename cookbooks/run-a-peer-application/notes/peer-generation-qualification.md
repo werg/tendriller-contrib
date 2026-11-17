@@ -23,7 +23,96 @@ contain peer/storage identities and routes; grants and usable history are
 verified by the session. The application does not implement a parallel
 coordinator policy or command queue.
 
-## Projection and measured-recovery checkpoint
+## Current exact package checkpoint: `ae9d95de`
+
+Four independent local lanes now pass with clean Chronolog source
+`ae9d95def049e309c53657944b3f8ad4a7fe4126`, tree
+`4928f8f8c1240a16a5ddc5b091f16bcfab79b7ef`, and clean contrib source
+`6e6b3359d57e5cb8354ce97b79d34aa320b27019`, tree
+`7c6a8fb7ae73537b88dc644746ab6cc9df933463`. This source includes the owned
+projection API, explicit publisher permission and captured-view/range-storage
+work. The actual hosted gate uses clean Tendriller
+`56f758ce9a0b5556e61462b4444995147d1b4533`, tree
+`38b20056517d12eb2a12fd84e4971d77ba2ad0b3`.
+
+| Lane | Result | Exact retained evidence |
+| --- | --- | --- |
+| Direct events | Passed | [Raw report](evidence/2026-11-17-composition-direct-ae9d95de-report.json), [checked summary](evidence/2026-11-17-composition-direct-ae9d95de-summary.json) |
+| Native RTC | Passed | [Raw report](evidence/2026-11-17-composition-rtc-ae9d95de-report.json), [checked summary](evidence/2026-11-17-composition-rtc-ae9d95de-summary.json) |
+| Native SQL | Passed | [Raw report](evidence/2026-11-17-composition-sql-ae9d95de-report.json), [checked summary](evidence/2026-11-17-composition-sql-ae9d95de-summary.json) |
+| Actual hosted participant | Passed | [Raw report](evidence/2026-11-17-composition-hosted-ae9d95de-report.json), [checked summary](evidence/2026-11-17-composition-hosted-ae9d95de-summary.json) |
+| Local Chromium attempt | Blocked before application startup | [Raw failed report](evidence/2026-11-17-composition-browser-ae9d95de-blocked-report.json) |
+
+The RTC archive SHA-256 is
+`930e3726bbac2b6f742c0bd49101863c2917ac41b47ff0532e64ff5a94f20fe9`.
+The SQL archive SHA-256 is
+`d5043d3a46db642702432fadf097a3f14a2b06bee17251d8788da497f16257b3`;
+the direct events lane uses that same archive without selecting its SQL engine.
+The host SDK archive is
+`613f87f98e0170a19f0c6874be00f01de87192b8c9f636c6c1222bf1b365fffe`;
+the engine archive is
+`263ea187057ae7f749cd2970e592225750eaa4286b859fb9e6cc4c36d66746a6`.
+Installed content digests are verified and retained in the reports. The engine
+records storage schema revision 9 and embeds the clean portable verifier at
+`f62b8bdcc80918dbf7a1af376bc0450df8c590cb`, with its exact source tree and hashes.
+
+The three events lanes exercise the same 32-command burst, with 1,024-byte text
+per command, ordinary `applied()` completion and a single post-burst retention
+observation from an independent store. They then remove the coordinator and
+verify the selected successor retains every original-author operation.
+
+| Observed workload | Burst apply time | Complete-prefix age at coordinator loss | Time to usable takeover | Known lost workload commands |
+| --- | --- | --- | --- | --- |
+| Direct events | 7,770.78 ms | 468.99 ms | 474.11 ms | 0 |
+| Native RTC | 10,103.83 ms | 962.89 ms | 1,472.18 ms | 0 |
+| Hosted controls with native RTC | 4,697.71 ms | 503.79 ms | 717.68 ms | 0 |
+
+All three record zero host request growth during both the explicit two-command
+outage scenario and the controller-owned 33-command outage window. The actual
+host also records unchanged complete Worker HTTP, invitation, rendezvous and
+body-byte counters. Required hosted application-body bytes remain zero.
+The different timings are observations of separate local runs, not a controlled
+performance comparison or a claim about production networks. The five-minute
+target applies only to the declared workload; unknown freshness still requires
+review and no universal loss bound is asserted.
+
+The public projection gate moves from six old-branch messages to four selected
+messages at recovery, emits an explicit reset, persists/reopens its checkpoint,
+and invokes no reducer on unchanged reads or same-generation reopen. Changing
+the reducer version triggers an explicit definition reset. The SQL gate recovers
+from a seven-command head to a three-command prefix with coherent SQL/events,
+original-author guards, deliberate reapplication and stable identity after
+reopen. Neither projection callbacks nor applied events dispatch irreversible
+external effects.
+
+Hosted publication verifies an administrator **without** publisher permission
+cannot release code, while the explicitly granted publisher can. The session
+retains exact release identity across a lost persisted response; altered bytes,
+stale selection and unauthorized publication fail. Served signed HTML/JavaScript
+and the selected release survive Durable Object restart. Client filtering and
+raw ingress both reject ordinary database, private-content and live-signal
+updates; the host never obtains application reader authority from hosting code.
+
+The local browser attempt used the same clean RTC package and clean contrib
+`7ee29dbbaa78808422ccbbd23b086200944b4e17`. Package installation and public import
+checks completed, then Chromium 156.0.8078.79 failed its process-singleton Unix
+socket with `EPERM` before a page or Worker could run. That is preserved as a
+failed attempt, not browser evidence. Earlier direct/RTC attempts at `7ee29db`
+reached the new recovery workload but queried coordinator-authored operations
+under the follower's default identity. The test correction in `6e6b335` supplies
+the original author explicitly; all four successful runs above use that
+committed correction and new output directories.
+
+The strict five-gate composition assembler is now wired into contrib CI with
+Chronolog `ae9d95de` and Tendriller `56f758ce`. It revalidates raw evidence and
+refuses incomplete, dirty or mixed-source compositions. No complete local
+manifest is emitted because this environment could not run the browser gate.
+A successful exact-source CI browser lane and all its companion gates are
+required for that manifest. Internet/TURN, deployed authentication, sustained
+suspension/quota, browser SQL/WASM and provider/device cost remain separate
+qualification boundaries.
+
+## Earlier projection and measured-recovery checkpoint: `482c4a4c`
 
 The combined source changes are qualified separately from the earlier
 `08ee9f2a` evidence below. Three clean local lanes passed with Chronolog source
