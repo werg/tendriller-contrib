@@ -67,7 +67,8 @@ repeat the complete native RTC scenario with both source checkouts clean:
 - Consumer: `8d308a6e5cfb12de4fe3eb6d7da6c2132407a039`.
 - Session archive SHA-256: `79ab3c6ead93e539e90940fe13d74968a0173156e2d9ee1d7afe83f641b0b89c`.
 
-The independent workflow now pins that exact Chronolog source. The run verifies
+That run used the exact Chronolog source above. The workflow separately pins
+the source for its current qualification. The recorded run verifies
 native SQLite ownership, real loopback RTC, exact operation retry, selected-prefix
 recovery and old-branch exclusion. Its portable-control boundary does not qualify
 Tendriller HTTP or browser Worker ownership; those remain separate gates.
@@ -92,6 +93,7 @@ make a dirty package source clean.
 | --- | --- |
 | Current-generation host outage | A real host probe fails while ordinary commands complete. Complete request counters stay unchanged; hosted application bodies remain zero. |
 | Selective hosted participant | Bootstrap and controls use `chronolog-participant-v1` through `peers/participant`. Ordinary database, content and live-signal updates are suppressed before HTTP, and bypassing that suppression still receives an explicit host rejection. |
+| Signed code/page publication | Actual served HTML and module bytes follow the authenticated publication chain; exact retry preserves the selected version. Altered bytes, unauthorized authors and stale publication heads are rejected, and the selected code survives a host restart without changing application authority. |
 | Lost reply after persistence | The original operation, ordered receipt and record count survive exact retry. |
 | Coordinator loss | Remove its process/store from usable recovery sources. Another peer adopts a complete earlier prefix. |
 | Coherent recovery | SQL/events/outcomes switch together; a fresh peer reconstructs the same selected state. |

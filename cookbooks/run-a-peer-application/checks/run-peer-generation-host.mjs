@@ -130,6 +130,8 @@ async function createBridge() {
       }
       if (url.pathname === '/testing/block') { blocked = body.blocked === true; return json(res, 200, { blocked }); }
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
+      if (url.pathname === '/testing/asset') return json(res, 200, await enqueue({ kind: 'asset', path: url.searchParams.get('path') ?? '' }));
+      if (url.pathname === '/testing/restart') return json(res, 200, await enqueue({ kind: 'restart' }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
       if (blocked) return json(res, 503, { error: { code: 'control_host_unavailable', message: 'CONTROL_HOST_UNAVAILABLE' } });

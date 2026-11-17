@@ -79,6 +79,14 @@ and requires the actual host to reject those categories. The evidence validator
 requires both observations; a route rename alone cannot qualify a light control
 participant. Supply archives containing this protocol on both sides.
 
+The same participant transport publishes a signed HTML/module graph, verifies
+the actual served code bytes, and advances to a second signed revision. Exact
+retry must preserve the selected version; tampered bytes, a member without
+publication authority and a stale publication head must fail. Restarting the
+real Durable Object must preserve the signed publication and served code while
+leaving application authority unchanged. This checks an actual page update;
+accepting a manifest alone is insufficient evidence.
+
 For browser ownership and the maintained page/Worker application facade, run:
 
 ```sh

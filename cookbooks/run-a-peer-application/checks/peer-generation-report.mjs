@@ -67,6 +67,24 @@ export function validatePeerGenerationReport(report) {
     same(report.host.participant.clientFiltered, ['database.submit', 'content.chunk', 'ephemeral.signal'], 'Client filtering must exclude ordinary data and live UI traffic');
     same(report.host.participant.hostRejected, report.host.participant.clientFiltered, 'The host must reject bypassed disallowed updates');
     same(report.host.participant.clientFilteredHttpRequests, 0, 'Filtered updates must not reach the hosted transport');
+    const publication = report.host.publication;
+    hex(publication?.author, 64, 'Missing verified publication author');
+    hex(publication.nonAdministrator, 64, 'Missing non-administrator rejection identity');
+    assert.notEqual(publication.author, publication.nonAdministrator, 'Publication authority must be tested separately from ordinary membership');
+    for (const value of [publication.first, publication.second]) {
+      hex(value?.id, 64, 'Missing signed publication identity');
+      count(value.version, 'Missing served publication version');
+      hex(value.expectedCodeDigest, 64, 'Missing signed code digest');
+      same(value.servedCodeDigest, value.expectedCodeDigest, 'Served code must match its signed publication');
+    }
+    assert.notEqual(publication.first.id, publication.second.id, 'No signed code update happened');
+    assert.notEqual(publication.first.expectedCodeDigest, publication.second.expectedCodeDigest, 'Publication must update actual code bytes');
+    assert.ok(publication.second.version > publication.first.version, 'Code update did not advance the served version');
+    same(publication.second.previous, publication.first.id, 'Code publication lost its signed chain');
+    for (const field of ['exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+      'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']) {
+      same(publication[field], true, `Missing publication observation: ${field}`);
+    }
     same(report.host.publicImports, ['@tendriller/core/peers', '@tendriller/engine/testing'], 'Host fixture must consume public packages');
     hex(report.host.fixtureSha256, 64, 'Missing exact workerd fixture');
     hex(report.host.dependencies?.lockSha256, 64, 'Missing host dependency lock');

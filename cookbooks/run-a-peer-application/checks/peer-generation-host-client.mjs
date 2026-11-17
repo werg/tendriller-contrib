@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 
-export function createHostedFixture(base, { createParticipantTransport, createParticipantRequest, PEER_PARTICIPANT_POLICY }) {
+export function createHostedFixture(base, { createParticipantTransport, createParticipantRequest, PEER_PARTICIPANT_POLICY,
+  bytesDigest, signPublicationManifest, verifyPublicationManifest, verifyAuthorityBundle }) {
   const request = async (path, { method = 'GET', body, signal } = {}) => {
     const response = await fetch(new URL(path, base), { method,
       ...(body === undefined ? {} : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
@@ -48,6 +49,71 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
           return { protocol: 'chronolog-participant-v1', route: 'peers/participant',
             transport: 'public-chronolog-participant', clientFiltered: excluded.map(value => value.join('.')),
             hostRejected: excluded.map(value => value.join('.')), clientFilteredHttpRequests: after.requests - before.requests };
+        },
+        async qualifyPublication({ signer, reader }) {
+          const authority = await participant.request('control', 'read', {});
+          const verified = await verifyAuthorityBundle(authority, configured.descriptor);
+          assert.equal(await participant.request('publication', 'read', {}), null);
+          const prepare = async (revision, previous, author = signer) => {
+            const marker = `participant-publication-${revision}`;
+            const content = [ ['index.html', 'text/html', `<!doctype html><html><head><meta charset="utf-8"></head><body><p>${marker}</p><script type="module" src="./page.mjs"></script></body></html>`],
+              ['page.mjs', 'text/javascript', `export const publication = '${marker}';\n`] ];
+            const assets = [], files = [];
+            for (const [path, type, text] of content) {
+              const bytes = new TextEncoder().encode(text), hash = await bytesDigest(bytes);
+              files.push({ path, type, size: bytes.length, hash });
+              assets.push({ hash, bytes: Buffer.from(bytes).toString('base64') });
+            }
+            const publication = await signPublicationManifest({ applicationId,
+              historyId: verified.descriptor.historyId, profile: verified.descriptor.profile,
+              controlRevision: verified.control.payload.revision, author: author.publicKey,
+              operationId: `publish-${revision}-${author.publicKey}`, revision, previous,
+              definitionDigest: verified.descriptor.definitionDigest,
+              executionManifestDigest: verified.descriptor.executionManifestDigest,
+              entry: 'index.html', files }, author);
+            return { publication, assets, marker, code: content[1][2] };
+          };
+          const publish = ({ publication, assets }) => participant.request('publication', 'publish', { publication, assets });
+          const first = await prepare(0, null);
+          const selected = await publish(first);
+          assert.deepEqual(selected.publication, first.publication);
+          await verifyPublicationManifest(selected.publication, verified);
+          assert.deepEqual(await publish(first), selected, 'Exact publication retry must recover the same selected version');
+          const asset = async path => request(`/testing/asset?path=${encodeURIComponent(path)}`);
+          const firstCode = await asset('page.mjs');
+          assert.equal(firstCode.status, 200); assert.equal(firstCode.text, first.code);
+          const firstPage = await asset('');
+          assert.equal(firstPage.status, 200); assert.ok(firstPage.text.includes(first.marker));
+          const second = await prepare(1, first.publication.id);
+          const damaged = structuredClone(second);
+          damaged.assets[1].bytes = Buffer.from('different unsigned code').toString('base64');
+          await assert.rejects(publish(damaged), error => error.status >= 400 && error.status < 500);
+          assert.deepEqual(await participant.request('publication', 'read', {}), selected);
+          await assert.rejects(publish(await prepare(1, first.publication.id, reader)), error => error.status === 403);
+          const updated = await publish(second);
+          assert.deepEqual(updated.publication, second.publication);
+          assert.ok(updated.version > selected.version);
+          const conflict = await prepare(1, first.publication.id);
+          conflict.publication = await signPublicationManifest({ ...conflict.publication.payload, operationId: 'stale-publication-head' }, signer);
+          await assert.rejects(publish(conflict), error => error.status === 409);
+          const secondCode = await asset('page.mjs');
+          assert.equal(secondCode.status, 200); assert.equal(secondCode.text, second.code);
+          const secondPage = await asset('');
+          assert.equal(secondPage.status, 200); assert.ok(secondPage.text.includes(second.marker));
+          const retained = await asset(`_publications/${selected.version}/page.mjs`);
+          assert.equal(retained.status, 200); assert.equal(retained.text, first.code);
+          await request('/testing/restart', { method: 'POST' });
+          assert.deepEqual(await participant.request('publication', 'read', {}), updated);
+          const restarted = await asset('page.mjs');
+          assert.equal(restarted.status, 200); assert.equal(restarted.text, second.code);
+          assert.deepEqual(await participant.request('control', 'read', {}), authority, 'Page publication cannot rewrite application controls or history');
+          return { author: signer.publicKey, nonAdministrator: reader.publicKey,
+            first: { id: selected.publication.id, version: selected.version,
+              expectedCodeDigest: first.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(firstCode.text)) },
+            second: { id: updated.publication.id, version: updated.version, previous: updated.publication.payload.previous,
+              expectedCodeDigest: second.publication.payload.files[1].hash, servedCodeDigest: await bytesDigest(new TextEncoder().encode(restarted.text)) },
+            exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
+            authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true };
         },
       };
     },

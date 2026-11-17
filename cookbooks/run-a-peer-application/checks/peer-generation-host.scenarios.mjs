@@ -24,6 +24,13 @@ test('public host controls and rendezvous serve independent native application p
         const response = await page.api(job.method, job.path, job.body);
         return { status: response.status, value: await response.json() };
       }
+      case 'asset': {
+        assert.ok(page);
+        const response = await page.asset(job.path);
+        return { status: response.status, text: await response.text() };
+      }
+      case 'restart':
+        assert.ok(page); await page.restart(); return { restarted: true };
       case 'traffic':
         assert.ok(page);
         return { host: page.hostTraffic, rendezvous: [...sessions.values()].flatMap(pair => pair.map(value => value.session.stats)) };

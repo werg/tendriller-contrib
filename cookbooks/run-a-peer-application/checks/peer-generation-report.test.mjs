@@ -147,6 +147,11 @@ function syntheticHostedReport() {
     participant: { protocol: 'chronolog-participant-v1', route: 'peers/participant', transport: 'public-chronolog-participant',
       clientFiltered: ['database.submit', 'content.chunk', 'ephemeral.signal'],
       hostRejected: ['database.submit', 'content.chunk', 'ephemeral.signal'], clientFilteredHttpRequests: 0 },
+    publication: { author: '1'.repeat(64), nonAdministrator: '2'.repeat(64),
+      first: { id: '3'.repeat(64), version: 1, expectedCodeDigest: '4'.repeat(64), servedCodeDigest: '4'.repeat(64) },
+      second: { id: '5'.repeat(64), version: 2, previous: '3'.repeat(64), expectedCodeDigest: '6'.repeat(64), servedCodeDigest: '6'.repeat(64) },
+      exactRetry: true, alteredBytesRejected: true, nonAdministratorRejected: true, staleHeadRejected: true,
+      authoredHtmlObserved: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true },
     publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'], fixtureSha256: '5'.repeat(64),
     dependencies: { lockSha256: '6'.repeat(64) }, artifacts: ['@tendriller/core', '@tendriller/engine'].map(name => ({
       ...report.artifacts[0], name,
@@ -163,6 +168,23 @@ test('actual hosted evidence retains its synthetic identity and exact public art
   assert.equal(summary.host.runtime, 'workerd');
   assert.ok(summary.limitations.some(value => value.includes('deployed login was not exercised')));
   assert.equal(summary.hostedTraffic.before.worker.host.rendezvousUpgrades, 4);
+});
+
+test('hosted publication evidence requires actual signed code, permissions, retry and restart observations', () => {
+  for (const mutate of [
+    value => { delete value.host.publication; },
+    value => { value.host.publication.second.servedCodeDigest = '0'.repeat(64); },
+    value => { value.host.publication.second.previous = '0'.repeat(64); },
+    value => { value.host.publication.second.expectedCodeDigest = value.host.publication.first.expectedCodeDigest;
+      value.host.publication.second.servedCodeDigest = value.host.publication.first.servedCodeDigest; },
+    value => { value.host.publication.nonAdministrator = value.host.publication.author; },
+    ...['exactRetry', 'alteredBytesRejected', 'nonAdministratorRejected', 'staleHeadRejected',
+      'authoredHtmlObserved', 'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']
+      .map(field => value => { value.host.publication[field] = false; }),
+  ]) {
+    const report = syntheticHostedReport(); mutate(report);
+    assert.throws(() => validatePeerGenerationReport(report));
+  }
 });
 
 test('actual host qualification refuses missing HTTP counters, hidden signaling and an unpinned host', () => {
