@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 
 /** Validate the observations this gate actually runs; never infer deployment. */
 export function validateBrowserPeerReport(report) {
-  assert.equal(report.format, 'peer-generation-browser/v1');
+  assert.equal(report.format, 'peer-generation-browser/v2');
   assert.equal(report.profile, 'peer-generation-v1'); assert.equal(report.mode, 'runtime');
   assert.equal(report.topology, 'browser-worker-opfs-native-rtc'); assert.equal(report.passed, true);
   assert.match(report.executionManifestDigest, /^[a-f0-9]{64}$/u);
@@ -77,7 +77,11 @@ export function validateBrowserPeerReport(report) {
   assert.notEqual(recovery.reapplied.attemptId, recovery.originalAttempt.attemptId);
   assert.notEqual(recovery.reapplied.operationId, recovery.originalAttempt.operationId);
   assert.equal(recovery.reapplyOf, recovery.originalAttempt.attemptId); assert.equal(recovery.currentGuardsChecked, true);
-  assert.equal(recovery.staleViewError, 'RecoveredViewError');
+  assert.equal(recovery.capturedViewPreserved, true);
+  assert.match(recovery.capturedGeneration, /^[a-f0-9]{64}$/u);
+  assert.notEqual(recovery.capturedGeneration, recovery.currentViewGeneration);
+  assert.equal(recovery.currentViewGeneration, recovery.selectedGeneration);
+  assert.equal(recovery.staleCursorError, 'RecoveredViewError');
   assert.ok(recovery.noticesPersisted > 0); assert.equal(recovery.transitionJournalEntries, 1);
   assert.equal(report.freshPeer.joinedAfterOriginatorLoss, true); assert.equal(report.freshPeer.enrolledFromBrowser, true);
   assert.equal(report.freshPeer.generation, recovery.selectedGeneration);
@@ -91,13 +95,14 @@ export function validateBrowserPeerReport(report) {
     assert.equal(connection.routes.length, 2);
     for (const route of connection.routes) assert.ok(route.route === 'direct' && route.localCandidateType && route.remoteCandidateType);
   }
-  return { format: 'peer-generation-browser-summary/v1', passed: true,
+  return { format: 'peer-generation-browser-summary/v2', passed: true,
     qualification: !report.source.dirty && !artifact.sourceDirty ? 'clean-source-pair' : 'development-preview',
     source: report.source, artifacts: report.artifacts, ui, browser: { version: browser.version, transportOwner: browser.transportOwner, storage: browser.storage },
     hostRequestsDuringCommands: outage.after.controlRequests - outage.before.controlRequests,
     signalingRequestsDuringCommands: outage.after.signalingRequests - outage.before.signalingRequests,
     recovery: { previousHead: recovery.priorHead.sequence, adoptedPrefix: recovery.adoptedPrefix.sequence,
-      abandonedOperationId: recovery.originalAttempt.operationId, reappliedOperationId: recovery.reapplied.operationId },
+      abandonedOperationId: recovery.originalAttempt.operationId, reappliedOperationId: recovery.reapplied.operationId,
+      capturedViewPreserved: true, staleCursorError: recovery.staleCursorError },
     identityReopened: { graceful: true, abruptWorker: true },
     limitations: [
       'Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.',

@@ -32,7 +32,7 @@ const fixtures = await Promise.all([
 }));
 await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
-const report = { format: 'peer-generation-browser/v1', profile: 'peer-generation-v1', mode: 'runtime',
+const report = { format: 'peer-generation-browser/v2', profile: 'peer-generation-v1', mode: 'runtime',
   topology: 'browser-worker-opfs-native-rtc', passed: false, source, artifacts: [], fixtures: [], error: null,
   runtime: { node: process.version, platform: process.platform, architecture: process.arch } };
 try {

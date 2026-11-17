@@ -8,7 +8,7 @@ function fixture() {
   const traffic = { controlRequests: 2, controlBodyBytes: 42, signalingRequests: 3, signalingBodyBytes: 1000 };
   const signaling = { descriptions: 2, bytes: 1000, closed: true };
   return {
-    format: 'peer-generation-browser/v1', profile: 'peer-generation-v1', mode: 'runtime',
+    format: 'peer-generation-browser/v2', profile: 'peer-generation-v1', mode: 'runtime',
     topology: 'browser-worker-opfs-native-rtc', passed: true, executionManifestDigest: digest,
     source: { commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: true },
     artifacts: [{ name: '@chronolog/peer-session', version: '0.0.0-fixture', sha256: digest,
@@ -43,7 +43,8 @@ function fixture() {
     recovery: { originatorClosed: true, originatorStoreUnavailable: true, priorHead: { sequence: 6 }, adoptedPrefix: { sequence: 4 },
       selectedGeneration: id, originalAttempt: { status: 'needsReapply', operationId: 'old-op', attemptId: 'old-attempt' },
       reapplied: { outcome: 'accepted', operationId: 'new-op', attemptId: 'new-attempt' }, reapplyOf: 'old-attempt',
-      currentGuardsChecked: true, staleViewError: 'RecoveredViewError', noticesPersisted: 1, transitionJournalEntries: 1 },
+      currentGuardsChecked: true, capturedViewPreserved: true, capturedGeneration: other, currentViewGeneration: id,
+      staleCursorError: 'RecoveredViewError', noticesPersisted: 1, transitionJournalEntries: 1 },
     freshPeer: { joinedAfterOriginatorLoss: true, enrolledFromBrowser: true, generation: id, browserViewSha256: digest, nativeViewSha256: digest },
     contentRecovery: { bytes: 131_095, interruptedAfter: 65_536, partialRetentionRefused: true, partialSurvivedRestart: true,
       unavailableRemainderRefused: true, completeAfterReconnect: true, retainedBy: id, retentionSignature: 'a'.repeat(128) },
@@ -91,4 +92,12 @@ test('reopening must retain the browser identity, durable key enrollment, and th
   rejects(report => { report.ownership.abruptWorkerReopen.durableOperation = false; });
   rejects(report => { report.contentRecovery.partialRetentionRefused = false; });
   rejects(report => { report.contentRecovery.partialSurvivedRestart = false; });
+});
+test('recovery preserves held captures and rejects their old cursors on the new generation', () => {
+  rejects(report => { report.format = 'peer-generation-browser/v1'; });
+  rejects(report => { report.recovery.capturedViewPreserved = false; });
+  rejects(report => { report.recovery.capturedGeneration = report.recovery.currentViewGeneration; });
+  rejects(report => { report.recovery.currentViewGeneration = 'f'.repeat(64); });
+  rejects(report => { report.recovery.staleCursorError = 'Error'; });
+  rejects(report => { delete report.recovery.staleCursorError; });
 });

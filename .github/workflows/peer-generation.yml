@@ -101,7 +101,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/tendriller
-          ref: 8adaf7bd0a4d63c0ca7490ad169a3c0ffb83c1d2
+          ref: 4ff69e1152b4eab92369959aaa41fcb4f9dfc19f
           path: .core-build
           persist-credentials: false
       - name: Install the pinned public session build dependencies

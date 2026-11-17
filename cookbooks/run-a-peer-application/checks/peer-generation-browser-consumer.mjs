@@ -214,7 +214,10 @@ try {
   report.contentRecovery = { bytes: resumableBytes.length, interruptedAfter: 65_536, partialRetentionRefused: true,
     partialSurvivedRestart: true, unavailableRemainderRefused: true, completeAfterReconnect: true,
     retainedBy: completeRetention.payload.peer, retentionSignature: completeRetention.signature };
-  await page.evaluate(async () => { globalThis.capturedView = await application.readView(); });
+  await page.evaluate(async () => {
+    globalThis.capturedView = await application.readView();
+    globalThis.capturedEvents = await capturedView.readEvents();
+  });
   await checkpoint('partial encrypted content survived Worker restart and completed after reconnect');
 
   const retainedPrefix = await page.evaluate(() => application.recoveryPoint());
@@ -230,12 +233,19 @@ try {
   blocked = false;
   const recovered = await page.evaluate(async operationId => {
     const notice = await application.recovery.takeover({ transitionId: 'browser-retained-prefix' });
-    let abandoned, staleView;
+    let abandoned, staleCursor;
     try { await application.operations.wait(operationId); } catch (error) { abandoned = { name: error.name, state: error.operation }; }
-    try { await capturedView.readEvents(); } catch (error) { staleView = error.name; }
-    await capturedView.release();
+    // A held capture stays coherent. Its old cursor must not cross into the
+    // newly selected generation through a fresh view.
+    const heldEvents = await capturedView.readEvents();
+    const currentView = await application.readView();
+    try { await currentView.readEvents({ cursor: capturedEvents.cursor }); } catch (error) { staleCursor = error.name; }
+    finally {
+      try { await currentView.release(); } finally { await capturedView.release(); }
+    }
     const selected = await application.query('conversation', {});
-    return { notice, abandoned, staleView, selected,
+    return { notice, abandoned, staleCursor, selected, heldEvents, capturedEvents,
+      capturedGeneration: capturedView.revision.generation, currentViewGeneration: currentView.revision.generation,
       journal: await application.recovery.inspect(), recovery: await application.inspectRecovery(), status: application.status };
   }, excluded.operationId);
   await page.locator('#recovery').waitFor({ state: 'visible' });
@@ -251,7 +261,10 @@ try {
   assert.equal(recovered.status.role, 'coordinator');
   assert.equal(recovered.abandoned.name, 'AbandonedOperationError');
   assert.ok(['abandoned', 'needsReapply'].includes(recovered.abandoned.state.status));
-  assert.equal(recovered.staleView, 'RecoveredViewError');
+  assert.deepEqual(recovered.heldEvents, recovered.capturedEvents);
+  assert.notEqual(recovered.capturedGeneration, recovered.currentViewGeneration);
+  assert.equal(recovered.currentViewGeneration, recovered.status.generation);
+  assert.equal(recovered.staleCursor, 'RecoveredViewError');
   assert.equal(recovered.applied.outcome, 'accepted');
   assert.equal(recovered.applied.operationId, reappliedId);
   assert.equal(recovered.inspected.attempt.payload.header.reapplyOf, recovered.abandoned.state.attemptId);
@@ -263,14 +276,16 @@ try {
   assert.ok(recovered.selected.value.messages.every(message => !message.operationId.startsWith('originator-tail-')));
   report.recovery = { originatorClosed: true, originatorStoreUnavailable: true, priorHead: lostHead.point,
     adoptedPrefix: retainedPrefix.point, selectedGeneration: recovered.status.generation,
-    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied, staleViewError: recovered.staleView,
+    originalAttempt: recovered.abandoned.state, reapplied: recovered.applied,
+    capturedViewPreserved: true, capturedGeneration: recovered.capturedGeneration,
+    currentViewGeneration: recovered.currentViewGeneration, staleCursorError: recovered.staleCursor,
     reapplyOf: recovered.inspected.attempt.payload.header.reapplyOf, currentGuardsChecked: true,
     noticesPersisted: recovered.recovery.length, transitionJournalEntries: recovered.journal.length };
   report.ui = { pages: ['board.html', 'compact.html'], domain: 'events', sessionFacade: 'connectApplicationWorker',
     sentThroughForms: 3, reapplicationConfirmed: true, recoveryNoticeVisible: await page.locator('#recovery').isVisible(),
     draftBeforeRestart: draft, draftAfterRestart, draftAfterRecovery: await page.locator('#message').inputValue(),
     originalReviewPreserved: await page.locator(`#operations [data-operation="${excluded.operationId}"]`).count() === 1 };
-  await checkpoint('browser took over its retained prefix and visibly abandoned old-generation intent');
+  await checkpoint('browser took over its retained prefix, preserved captured views, rejected old cursors, and visibly abandoned old-generation intent');
 
   authority = await registry.read();
   const c = await openNative(deviceC, authority);
