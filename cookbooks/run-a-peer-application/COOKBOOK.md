@@ -40,6 +40,10 @@ package tests are distinct from this recipe's browser/native network
 qualification. Its types do not change the live adapter's finality, worker or
 retry contract.
 
+Use the [optional generation guide](../../guides/peer-generation-applications.md)
+when an application explicitly chooses that recovery contract. It preserves
+applied observations and retained attempt identity without introducing finality.
+
 Start with the [primitive and role decision guide](../../guides/application-primitives.md).
 Durable events and transactions use this history. Live typing, presence, cursor
 motion and progress use the independent [signal channel](../share-live-signals/COOKBOOK.md)

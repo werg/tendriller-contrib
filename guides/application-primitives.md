@@ -46,7 +46,8 @@ The common host interface also declares a generation profile with applied and
 abandoned results and no finality fields. Chronolog implements that separate
 runtime in `@chronolog/peer-generation` and `@chronolog/peer-session`. Tendriller
 provides explicit hosted generation controls, but no application binding for that
-session yet. These recipes use the live adapter and its
+session yet. The [optional generation guide](peer-generation-applications.md)
+explains that composition separately. These live recipes use the live adapter and its
 local/final guarantees. The standalone session's applied result is an observation
 at a revision: later included work or recovery can change it. A generation's
 receipt sequence selects ancestry, while execution uses the same signed

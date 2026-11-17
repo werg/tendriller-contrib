@@ -42,6 +42,13 @@ the public application-backend boundary, and a task-board/chat verification
 specimen. Its qualification checklist covers both paired core PRs and separates
 local correctness checks from real-network and cost evidence.
 
+The live profile is the default peer integration. Applications that deliberately
+choose selected-history recovery without finality can use the separate
+[optional generation guide](guides/peer-generation-applications.md). Its applied
+results are observations at a revision and may change after replay. Native RTC
+and hosted-control development reports retain their exact source and test scope;
+they do not establish browser or deployed-network readiness.
+
 ## Use the collection
 
 Read [the adaptation loop](guides/using-cookbooks.md), choose only relevant guides,
