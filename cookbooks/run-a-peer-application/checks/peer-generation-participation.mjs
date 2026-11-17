@@ -216,7 +216,8 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);
     assert.equal(automatic.recovery, null);
     for (let index = 0; index < workload.commands; index++) {
-      assert.equal((await follower.operations.get(`freshness-${index}`)).outcome, 'accepted', 'The observed retained workload must survive takeover');
+      assert.equal((await follower.operations.get(`freshness-${index}`, { author: coordinator.deviceId })).outcome,
+        'accepted', 'The original author\'s observed retained workload must survive takeover');
     }
     assert.ok(recoveredAt - disconnectedAt >= graceMs, 'Takeover must honor reconnect grace');
 
