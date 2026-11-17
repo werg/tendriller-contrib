@@ -628,8 +628,11 @@ function assertCold(resources) {
 }
 function databaseModules(metafile, runtimeModules) {
   assert.ok(runtimeModules && typeof runtimeModules === 'object', 'The archive must identify its runtime module graph');
-  const isDatabaseSource = source => source === 'packages/peer-session/src/application-data.ts' ||
-    source === 'packages/records/src/browser.ts' || /^packages\/materializer(?:-doltlite)?\//u.test(source);
+  // Execution-manifest helpers are lightweight protocol metadata. Observe the
+  // actual materializers, record stores and durable session implementation.
+  const isDatabaseSource = source => /^packages\/peer-session\/src\/(?:application-data|content|keys|projection|recovery|network-data)\.ts$/u.test(source) ||
+    source === 'packages/peer-generation/src/replica.ts' || /^packages\/records\/src\/(?:browser|native)\.ts$/u.test(source) ||
+    /^packages\/materializer\/src\/(?:runtime|events|event-store)\.ts$/u.test(source) || source.startsWith('packages/materializer-doltlite/');
   const selected = Object.entries(runtimeModules).filter(([, module]) => module.inputs.some(isDatabaseSource));
   const sourceModules = [...new Set(selected.flatMap(([, module]) => module.inputs.filter(isDatabaseSource)))].sort();
   for (const source of ['packages/peer-session/src/application-data.ts', 'packages/records/src/browser.ts']) assert.ok(sourceModules.includes(source), `Missing durable source: ${source}`);
