@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        transport: [direct, native-rtc]
+        transport: [direct, native-rtc, browser-native]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,7 +48,10 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Build clean public session archive
         working-directory: .chronolog-build
-        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ matrix.transport == 'native-rtc' && '--native-rtc' || '' }}
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ matrix.transport != 'direct' && '--native-rtc' || '' }}
+      - name: Install pinned Chromium and browser system dependencies
+        if: ${{ matrix.transport == 'browser-native' }}
+        run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
       - name: Exercise independent application through the packed public API
         shell: bash
         run: |
@@ -62,5 +65,6 @@ jobs:
           path: |
             test-results/peer-generation/report.json
             test-results/peer-generation/summary.json
+            test-results/peer-generation/consumer/package-lock.json
             .chronolog-build/artifacts/peer-session/*.tgz
             .chronolog-build/artifacts/peer-session/package/provenance.json
