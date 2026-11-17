@@ -1,11 +1,15 @@
 # Choose application primitives by their guarantees
 
-**Implementation status:** `peer-generation-v1` is a proposed target. It is not
-implemented or qualified by the current pinned Chronolog and Tendriller packages.
-The generation-scoped session, applied/shared/abandoned outcomes and recovery
-controls below describe intended behavior, not callable APIs. For applications
-using the current packages, follow the [finalized-profile guide](finalized-peer-applications.md)
-and its actual `local()` / `final()` outcomes and immutable final-prefix contract.
+**Implementation status:** `peer-generation-v1` is the adopted target for new
+peer applications. Its implementation and qualification are in progress. Design
+around the generation-scoped session, applied/shared/abandoned outcomes and
+protected-effect contract below. The [peer application preview](../cookbooks/run-a-peer-application/COOKBOOK.md)
+develops the target APIs alongside an independent consumer; using those APIs
+requires an explicitly supplied matching `@chronolog/peer-session` archive.
+The existing pinned finalized packages expose the separate chronological
+`local()` / `final()` contract described in the [stronger-profile guide](finalized-peer-applications.md).
+Those APIs and their historical checks do not establish generation API availability
+or qualification.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application
@@ -50,9 +54,10 @@ inspectable and may be deliberately reapplied as a new attempt. A returning old
 branch never silently merges. If G2 excluded G1 positions 81–100, G3 cannot
 readopt them merely because an old peer returns with valid signatures.
 
-This profile is proposed as a future default composition. Its evidence gate
-defines required checks; it does not establish implementation or qualification.
-The recipe and reports identify which public packages and runtime scenarios actually pass.
+This profile is the adopted target composition. Implementation and independent
+qualification are in progress. Its evidence gate defines required checks;
+the recipe and reports identify which exact public packages and runtime scenarios
+actually pass.
 Existing timestamp-ordered, finalized histories retain their own meaning; the
 [stronger-profile guide](finalized-peer-applications.md) documents their separate
 APIs and evidence. There is no conversion or compatibility layer between these

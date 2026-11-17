@@ -1,10 +1,12 @@
 # Use an explicitly finalized peer profile
 
-This guide describes the explicitly selected chronological finality profiles and
-their existing public APIs. Use it when building with the current pinned packages.
-The [proposed peer-generation profile](application-primitives.md) has a different
-recovery contract and is not implemented or qualified by those packages. These
-guarantees must not be inferred from its proposed generation-scoped applied result.
+This guide describes the explicitly selected stronger chronological finality
+profiles and their existing packaged APIs. New application architecture follows
+the [adopted peer-generation target](application-primitives.md), whose implementation
+and qualification are in progress. Select this chronological profile explicitly
+when its immutable final-prefix contract is required. Its `local()` / `final()`
+methods and existing checks do not define or qualify the generation-scoped
+applied/shared/abandoned contract.
 
 Start with what must survive. A live cursor can disappear. A submitted message
 must be recoverable. A resource reservation must satisfy its condition. Sending

@@ -2,8 +2,8 @@
 
 > Adaptable reasoning for page-owned applications. No UI package or install graph.
 
-- [Implemented finalized peer APIs](guides/finalized-peer-applications.md)
-- [Proposed peer-generation architecture](guides/application-primitives.md)
+- [Adopted peer-generation architecture](guides/application-primitives.md)
+- [Explicit chronological finality profile](guides/finalized-peer-applications.md)
 - [Application journeys](guides/use-cases.md)
 - [Agent reading index](agent.md)
 - [Catalog](catalog.json)
