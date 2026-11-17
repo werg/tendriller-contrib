@@ -1,5 +1,14 @@
 # Task-board and conversation specimens
 
+## Peer-generation qualification
+
+The [independent peer-generation gate](../notes/peer-generation-qualification.md)
+defines the new tolerant-recovery consumer contract. Its evidence validator and
+synthetic tests are separate from runtime qualification. The resident/browser
+checks below exercise explicitly finalized chronological profiles and retain
+their own original guarantees and source pins.
+
+
 These are two page-owned adaptations of the same application decisions:
 
 - `board.html` puts shared tasks and conversation alongside each other.
