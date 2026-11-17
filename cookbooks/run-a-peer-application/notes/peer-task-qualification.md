@@ -40,6 +40,23 @@ separate shared task. Reopening that member's owned native device preserved its
 identity, storage identity, complete view and applied operation. The reopen call
 did not supply epoch keys: the device's retained keyring supplied them.
 
+## Current public preparation contract
+
+The [later native report](evidence/2026-11-17-peer-generation-task-fe752b7f-report.json)
+and [validated summary](evidence/2026-11-17-peer-generation-task-fe752b7f-summary.json)
+repeat the complete native task scenario with clean consumer
+`bf140dbdb0c13365a05b2a24896ed6637082e680` and clean Chronolog
+`fe752b7f6fd7095b6f45c61a176e34b6f37d0674`. The native archive SHA-256 is
+`c19b6f806c39873c79a94613c107f0fcdf3979f2221f7beb700da2e52f9b58b2`.
+All task, recovery, reapplication and reopen checks passed.
+
+This run explicitly asserts the actual installed
+`prepareNativeSqlApplication()` result has `schema` and `binding` fields before
+building the signed descriptor from that binding. It verifies the package
+contract directly. Consumer commit `9736489` corrected an unsupported assumption
+that those binding fields had moved to the top level; no alternate shape or
+compatibility path remains.
+
 ## Scope of this result
 
 This is native SQL with direct authenticated peer transport and a portable local
@@ -64,3 +81,29 @@ labeled instrumented run that reached RTC gathering without browser candidates.
 Those attempts preserve the original errors and remain unsuccessful runtime
 evidence; they do not replace the independent native task result or a required
 clean browser task result.
+
+## Browser SQL evidence before the final receipt failure
+
+The [clean CI task report](evidence/2026-11-17-peer-generation-browser-task-ci-b05979c6-report.json)
+is from [Chronolog browser run 44095421612](https://github.com/werg/chronolog-db/actions/runs/44095421612),
+with clean consumer `1029c7cfb69a16a0f7b403a9e654b962b0304260` and clean
+Chronolog `b05979c6407de9dc8c8a73a2866cb026a5ad172b`. Its combined archive
+SHA-256 is `de92302a48d4397d5c5320bc75d4f183219a9b76e8ad1ee5b35951820c69aa23`.
+The downloaded workflow ZIP was verified against GitHub's recorded SHA-256
+`54cdabc7d1c97e9c8f21de6118356089dd2b0faa36ba7ac3879a521dbe0cd4fc`.
+
+That real browser run opened Worker-owned SQL/OPFS, enrolled its keys from a
+native peer, and created, claimed and finished a task through the board forms.
+Two authors then claimed from the same captured revision: one claim applied,
+the other was rejected, and only the successful claim emitted its task event.
+Unauthorized completion was rejected. A separately saved offline message later
+applied with its original identity over authenticated RTC.
+
+The run subsequently failed while waiting for the operation row from a new task
+submitted with the control host blocked. The report records a 30-second DOM wait
+timeout, with no page or console error. It does not capture the original
+operation state at that point, so it cannot distinguish delayed rendering from
+an operation that remained saved. Consumer `bf140db` now records bounded DOM,
+original operation and query observations from both peers for that failure.
+The partial observations above are preserved; `passed: false` remains the overall
+result, and SQL browser recovery is not qualified by this run.

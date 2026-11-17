@@ -1,0 +1,110 @@
+{
+  "format": "peer-generation-task-summary/v1",
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "bf140dbdb0c13365a05b2a24896ed6637082e680",
+    "tree": "a95fca6c901ffe8b604eee9f660f9247670409b9",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-gfe752b7f-sql",
+      "sha256": "c19b6f806c39873c79a94613c107f0fcdf3979f2221f7beb700da2e52f9b58b2",
+      "sourceCommit": "fe752b7f6fd7095b6f45c61a176e34b6f37d0674",
+      "sourceTree": "e1fb126210b09ff87bfea826509a8e83fcb7efe2",
+      "sourceDirty": false
+    }
+  ],
+  "sqlEngine": {
+    "implementation": "@dolthub/doltlite@0.11.29",
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v24.22.1",
+    "manifest": {
+      "doltliteVersion": "0.11.29",
+      "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+      "sqliteVecVersion": "0.1.9",
+      "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+      "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+      "fts5": true,
+      "json1": true,
+      "rtree": true,
+      "dynamicExtensions": false
+    },
+    "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+  },
+  "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+  "tasks": {
+    "definitionId": "shared-peer-task-board",
+    "signedSchemaDigest": "21719c2ee677dabf6d0ee5d0d3c630b9db5caf904280d1dba69957250aef4f73",
+    "schemaAdministrator": "97f67275fd09f0c853e0d10452dda5863b8b8fc93cddccd4c7191de714a7a75c",
+    "sharedCreatorClosed": true,
+    "claims": [
+      {
+        "operationId": "creator-claim",
+        "attemptId": "55b219ac9ff72628e2976d9cfb05db91d413159ae99fb0c964e8f3f66b9323b9",
+        "outcome": "accepted"
+      },
+      {
+        "operationId": "member-claim",
+        "attemptId": "51cbd99e7c24779b4aa645e4b1acac082e23717fdff64a53fb23aeb4618b0766",
+        "outcome": "rejected"
+      }
+    ],
+    "unauthorizedCompletion": "rejected",
+    "completionAfterCreatorClosed": "accepted"
+  },
+  "recovery": {
+    "previousGeneration": "c40074794b0f3f251b441aed2553c65f31b8eb336f0f14eb08451f3abc6dea0f",
+    "selectedGeneration": "d92133d3441b078eaad0884a0faf35c9f0c7a91b87c9a3ef28e90a393bee5e3f",
+    "previousHead": 7,
+    "adoptedPosition": 3,
+    "retainedDigest": "e1e08f4eda2b008b9012d766b571eb46a2b31395059af747f642af1bfdd05a84",
+    "recoveredDigest": "e1e08f4eda2b008b9012d766b571eb46a2b31395059af747f642af1bfdd05a84",
+    "otherPeerDigest": "e1e08f4eda2b008b9012d766b571eb46a2b31395059af747f642af1bfdd05a84",
+    "sqlAndEventsResetTogether": true,
+    "inheritedIdentityPreserved": true,
+    "returningTailExcluded": true,
+    "retryRefused": true,
+    "originalOperationId": "creator-claim",
+    "originalAttemptId": "55b219ac9ff72628e2976d9cfb05db91d413159ae99fb0c964e8f3f66b9323b9",
+    "reappliedOperationId": "reviewed-claim",
+    "reappliedAttemptId": "2202916edc5fe58bd0447808849a5a0ccff2084724e883a092296e6f1901c753",
+    "reapplyOf": "55b219ac9ff72628e2976d9cfb05db91d413159ae99fb0c964e8f3f66b9323b9"
+  },
+  "reopen": {
+    "identityBefore": "8fcefecaf751928a8ad47765763bdc40f3b9189cc56732ba81d2fee9ebc5ce06",
+    "identityAfter": "8fcefecaf751928a8ad47765763bdc40f3b9189cc56732ba81d2fee9ebc5ce06",
+    "storageBefore": "b8acf006-ed2b-4f3c-894c-bc1d76f94d36",
+    "storageAfter": "b8acf006-ed2b-4f3c-894c-bc1d76f94d36",
+    "digestBefore": "2eec45cdd2c9d608943f037cc923c8c34a2aa85025afa7b5f595bc4388ccd196",
+    "digestAfter": "2eec45cdd2c9d608943f037cc923c8c34a2aa85025afa7b5f595bc4388ccd196",
+    "operationBefore": {
+      "status": "applied",
+      "attemptId": "1a67048c8b9e48fe56fc6ea61cb73fde9797be5f89d569a3af0f46ed378e257f",
+      "operationId": "finish-without-creator",
+      "author": "8fcefecaf751928a8ad47765763bdc40f3b9189cc56732ba81d2fee9ebc5ce06",
+      "generation": "d92133d3441b078eaad0884a0faf35c9f0c7a91b87c9a3ef28e90a393bee5e3f",
+      "sequence": 3,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "operationAfter": {
+      "status": "applied",
+      "attemptId": "1a67048c8b9e48fe56fc6ea61cb73fde9797be5f89d569a3af0f46ed378e257f",
+      "operationId": "finish-without-creator",
+      "author": "8fcefecaf751928a8ad47765763bdc40f3b9189cc56732ba81d2fee9ebc5ce06",
+      "generation": "d92133d3441b078eaad0884a0faf35c9f0c7a91b87c9a3ef28e90a393bee5e3f",
+      "sequence": 3,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "epochKeysProvided": false
+  },
+  "limitations": [
+    "Actual native SQL with direct authenticated peer transport; browser WASM and RTC are separate gates.",
+    "Generation selection used a local portable control registry; Tendriller HTTP and deployed identities were not exercised."
+  ],
+  "reportSha256": "bc6f40b02362e80427dd8c0c127f5c342cbab965ae98e951610ea025b5e4b221"
+}
