@@ -7,3 +7,5 @@ test-results/
 .core-build/
 
 .chronolog-build/
+
+.tendriller-build/
