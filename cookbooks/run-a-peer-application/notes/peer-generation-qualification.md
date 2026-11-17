@@ -221,6 +221,24 @@ The checked summary preserves those limitations and hashes the raw input.
 
 ## Additional gates
 
+The [native guarded-task qualification](peer-task-qualification.md) now records
+an all-clean run of the actual cookbook SQL domain against Chronolog
+`c685d393e900828278ca401285fded2c17ab1753`. Transactional claim guards, mixed
+SQL/event recovery, shared ownership after the creator closes, and keyring-backed
+reopening passed. Its direct transport is separate from the RTC observations.
+
+The [additional clean hosted report](evidence/2026-11-17-peer-generation-host-c685d393-report.json)
+and [validated summary](evidence/2026-11-17-peer-generation-host-c685d393-summary.json)
+pair that same Chronolog source with clean Tendriller
+`e4939047ee1740fa494e51365af7e31d90c32f4c` and clean consumer
+`004b8b26731c6fbe4f872e05ed074319f2467986`. The public archive includes both SQL
+engines, but this hosted scenario uses the conversation events definition.
+Actual workerd controls and rendezvous passed the full native RTC recovery gate,
+including the roles assigned by the hosted rendezvous. The archive SHA-256 is
+`231b25d53a7e4d7eb7d99b1f74d8233b9c4a24212dd00f326701598fa2417010`.
+The exact host SDK/engine archive hashes and every installed dependency integrity
+remain in the raw report. This additional result preserves the earlier pairings.
+
 The portable authority/model gate must separately cover unauthorized recovery,
 coordinator impersonation, missing bodies, continuity conflicts, restrictive
 controls and protected floors. Production adapters must use that same verifier.
