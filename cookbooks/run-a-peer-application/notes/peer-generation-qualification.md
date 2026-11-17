@@ -92,6 +92,8 @@ The same workflow head also passed the
 [quality verification job](https://github.com/werg/chronolog-db/actions/runs/44123123740/job/134179586200):
 524 tests passed, 6 WASM tests were skipped in that ordinary suite, and 62 files
 passed with 1 skipped. Coverage was 91.60% statements and 85.64% branches.
+The complete [quality workflow](https://github.com/werg/chronolog-db/actions/runs/44123123740)
+also passed Linux and macOS conformance and the portable digest comparison.
 The separate [native/WASM run](https://github.com/werg/chronolog-db/actions/runs/44123123484)
 passed all 6 actual comparisons; ordinary-suite skips do not supply equivalence
 evidence.
