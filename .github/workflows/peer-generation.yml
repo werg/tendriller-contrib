@@ -20,7 +20,7 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '76129c3cbe3ef6623d54aba155decb68cecf49e1'
+        default: '7b9bd41d1a3eb2fa3173af86871208d331630797'
 permissions:
   contents: read
 concurrency:
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: werg/chronolog-db
-          ref: ${{ inputs.chronolog_ref || '76129c3cbe3ef6623d54aba155decb68cecf49e1' }}
+          ref: ${{ inputs.chronolog_ref || '7b9bd41d1a3eb2fa3173af86871208d331630797' }}
           path: .chronolog-build
       - name: Install pinned build dependencies without lifecycle scripts
         working-directory: .chronolog-build

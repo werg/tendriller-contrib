@@ -19,8 +19,16 @@ operating limits. It treats each runtime gate separately. Its current
 browser SQL recovery now has its own passing exact-source report; local runtime
 results do not qualify deployed networks, provider cost or a recovery-age bound.
 
+The current source, Chronolog `7b9bd41d`, passed the complete native/host,
+browser events/SQL and quality workflows. The raw reports are preserved under
+their exact artifact identities. Older passing and failed evidence remains
+unchanged below.
+
 | Gate | Recorded result | Scope |
 | --- | --- | --- |
+| Current native RTC and actual host at `7b9bd41d` + consumer `3107cba` | Passed | Real RTC, public Tendriller workerd controls/rendezvous, host-blocked commands, prefix loss, fresh replay, branch isolation and reopen. |
+| Current browser events and SQL at `7b9bd41d` + consumer `3107cba` | Passed | Real Chromium, dedicated Worker/OPFS, canonical bootstrap/host bridge, guarded SQL forms, recovery, content and reopen. |
+| Current quality workflow at `7b9bd41d` | All four jobs passed | Lint/docs/types, full coverage, packed consumers, native crash/storage rehearsal, build/distribution, Linux/macOS conformance and matching digests. |
 | Core/session regression at `3187d9df` | Producer reported 149 passing tests; original log unavailable | Kept separate from independently preserved acceptance evidence. |
 | Native/WASM conformance at `3187d9df` | Seven tests passed in the [preserved CI stage](evidence/2026-11-17-peer-native-wasm-3187d9df-stage.log) | Actual engine replay/recovery under Node. The overall job later failed at browser bundle isolation. |
 | Browser events at `572fded7` | Passed | Actual Chromium, Worker/OPFS, RTC, content, selected-prefix recovery and reopen. |
@@ -29,6 +37,55 @@ results do not qualify deployed networks, provider cost or a recovery-age bound.
 | Fresh consumer at `fe752b7f` + Tendriller `2e8200a3` | Passed with recorded coaching | Independent domain source, canonical bootstrap and actual Worker controls; native stores use local direct transport. |
 | Complete browser SQL at `76129c3c` + consumer `1a63e2a` | Passed | Actual guarded forms, same-view claim race, host-blocked work, partial-content restart, earlier-prefix recovery, fresh replay and graceful/abrupt Worker reopen. |
 | Deployed networks, TURN, cost and five-minute freshness | Not executed/measured | No release-wide green status is inferred. |
+
+## Current source qualification
+
+The final source pair is clean Chronolog
+`7b9bd41d1a3eb2fa3173af86871208d331630797` (tree
+`9b672f6b62b9ce53a8993c91fb29c8f95de538dc`) and clean consumer
+`3107cba13007633177b5003c379ff481b20e5481` (tree
+`7d20296bf2d36b22455363387cd84bc73382e465`). The hosted gate adds clean Tendriller
+`2e8200a33a47da4029a96b3699e23d2b1441f823` and its separately hashed SDK/engine
+archives. The manifest records every archive and engine binary independently.
+
+| Completed workflow | Preserved evidence |
+| --- | --- |
+| [Native transport and hosted control](https://github.com/werg/chronolog-db/actions/runs/44101030661) | [Native RTC report](evidence/2026-11-17-peer-generation-rtc-7b9bd41d-report.json), [actual host report](evidence/2026-11-17-peer-generation-host-7b9bd41d-report.json), [verified retrieval receipt](evidence/2026-11-17-native-host-7b9bd41d-retrieval.json). |
+| [Browser qualification](https://github.com/werg/chronolog-db/actions/runs/44101030662) | [Events report](evidence/2026-11-17-peer-browser-events-7b9bd41d-report.json), [SQL task report](evidence/2026-11-17-peer-browser-tasks-7b9bd41d-report.json), [verified retrieval receipt](evidence/2026-11-17-peer-browser-7b9bd41d-retrieval.json). |
+| [Quality and tests](https://github.com/werg/chronolog-db/actions/runs/44101030826) | [All four completed jobs and steps](evidence/2026-11-17-quality-7b9bd41d-jobs.json), [completed source-specific workflows](evidence/2026-11-17-quality-7b9bd41d-runs.json). |
+
+The native RTC/archive SHA-256 is
+`e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51`.
+The browser SQL CI archive SHA-256 is
+`a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986`.
+The same-source locally built combo has different recorded engine bytes and
+archive SHA-256 `810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4`;
+its [producer-owned native SQL report](evidence/2026-11-17-peer-session-producer-sql-7b9bd41d-report.json)
+also passed. It is kept separate from the independent browser and fresh-agent
+results. Both CI ZIP digests and every published package content hash were
+verified before copying these reports without modification.
+
+In the browser SQL run, five commands completed with control/signaling HTTP
+blocked, including three task commands. Control requests stayed at **3**, signaling
+requests at **6**, and their body counters at **0** and **1,192 bytes**. Logical
+authenticated reliable traffic increased from **42,492 to 223,104 bytes** while
+typing and a 32,768-byte attachment crossed the established peer connection.
+Those are logical frame counters, excluding RTC/SCTP/DTLS/IP overhead.
+
+The actual task forms passed create/claim/finish, an atomic same-view claim race,
+and an unauthorized-finish rejection. Recovery selected prefix **16** from head
+**19** after the originator and its store became unavailable. SQL rows and events
+switched together; the excluded attempt remained reviewable and deliberate
+reapplication created a new linked attempt. Another member completed shared work
+after the creator closed. The same run covered keyless enrollment, exclusive
+Worker ownership, held-view consistency, fresh-peer reconstruction, interrupted
+content resumption, and graceful/abrupt Worker reopen with unchanged identities.
+
+These remain local topology gates. The browser uses a portable HTTP control
+fixture; actual Tendriller workerd controls are exercised separately with native
+RTC and synthetic accounts. Neither proves a deployed browser/host lifecycle,
+Internet or TURN reachability, provider cost, eviction/quota behavior, or the
+five-minute recovery-age objective. `releaseReady` therefore remains false.
 
 ## Fresh public-API exercise
 

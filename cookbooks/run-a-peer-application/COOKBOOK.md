@@ -16,7 +16,7 @@ sources: ["https://github.com/werg/chronolog-db/blob/dd8bf9dcf6d22b6f755ed3c5fde
 **Current implementation:** The public `@chronolog/peer-session` package owns
 bootstrap, saved attempts, generation recovery, peer connections and browser
 Worker storage. Independent clean reports cover native RTC, actual Tendriller
-control routes, browser/Worker/OPFS events, and native guarded SQL at their
+control routes, browser/Worker/OPFS events, and native/browser guarded SQL at their
 [recorded revisions](notes/peer-generation-qualification.md). Each result has its
 own artifact pairing and scope. Internet, TURN, deployed cost and a recovery-age
 bound remain unqualified.

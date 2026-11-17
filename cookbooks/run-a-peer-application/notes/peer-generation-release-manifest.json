@@ -1,7 +1,7 @@
 {
   "format": "tendriller-peer-release-qualification/v1",
-  "recordedAt": "2026-11-17T14:15:16.612956+00:00",
-  "overallStatus": "partially-qualified",
+  "recordedAt": "2026-11-17T14:28:18.393419+00:00",
+  "overallStatus": "current-source-local-runtime-and-quality-passed; deployed-operating-envelope-unqualified",
   "releaseReady": false,
   "interpretation": "Each gate applies only to its exact inputs and scope. No single green release gate is inferred across different revisions or unexecuted topologies.",
   "profile": "peer-generation-v1",
@@ -9,15 +9,16 @@
   "currentPublicContract": {
     "chronolog": {
       "repository": "werg/chronolog-db",
-      "commit": "17a1b64ae0fae6954d9e094db19e17edfbedc7ac",
-      "tree": "c14a4ecc1f17d660f241eb38b3d43f43ca767285",
+      "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
       "dirty": false
     },
     "contrib": {
       "repository": "werg/tendriller-contrib",
-      "commit": "3107cba13007633177b5003c379ff481b20e5481",
-      "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
-      "dirty": false
+      "commit": "9ba517fae81c31452e36f13ad812299fc6d2cc99",
+      "tree": "408e470466938175f2b52af85f0fe661f57cf041",
+      "dirty": false,
+      "scope": "Last clean evidence checkpoint before this manifest update; each gate names the exact consumer implementation that ran."
     },
     "tendriller": {
       "repository": "werg/tendriller",
@@ -36,7 +37,12 @@
     "nativeBootstrap": "openApplicationSession / openNativeSqlSession",
     "browserBootstrap": "connectApplicationWorkerHost + openApplicationSession / openBrowserSqlSession + serveApplicationWorker",
     "networkLifecycle": "maintainNativeApplicationWebRtc / maintainWorkerApplicationWebRtc",
-    "sqlPreparation": "flat public definition/schema/executionManifestDigest/schemaAdministrator; no alternate binding-shape support"
+    "sqlPreparation": "flat public definition/schema/executionManifestDigest/schemaAdministrator; no alternate binding-shape support",
+    "artifactReceipt": {
+      "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-7b9bd41d-archives.json",
+      "sha256": "10f5a409797970723f87ad7afd19051748f358fac5a2df67d0edc0793988c3cf"
+    },
+    "effectAdmission": "The automatic append-only source contract does not admit recovery-capable peer sessions; no default peer effect dispatcher."
   },
   "artifacts": [
     {
@@ -69,29 +75,19 @@
     {
       "name": "@tendriller/core",
       "version": "0.3.0-rc.9",
-      "file": "tendriller-sdk-0.3.0-rc.9.tgz",
       "sha256": "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614",
       "sourceCommit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
       "sourceTree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
       "sourceDirty": false,
-      "provenance": {
-        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-tendriller-2e8200a3-provenance.json",
-        "sha256": "8f85d4c380d347560b785d8eaa924f39650d3d2056184b844548fa20c289eba6"
-      },
       "repository": "werg/tendriller"
     },
     {
       "name": "@tendriller/engine",
       "version": "0.3.0-rc.9",
-      "file": "tendriller-engine-0.3.0-rc.9.tgz",
       "sha256": "05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468",
       "sourceCommit": "2e8200a33a47da4029a96b3699e23d2b1441f823",
       "sourceTree": "c74862ec912c3dcdc769df5cc1adf0849eb62176",
       "sourceDirty": false,
-      "provenance": {
-        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-tendriller-2e8200a3-provenance.json",
-        "sha256": "8f85d4c380d347560b785d8eaa924f39650d3d2056184b844548fa20c289eba6"
-      },
       "repository": "werg/tendriller"
     },
     {
@@ -174,64 +170,92 @@
       "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
       "sourceDirty": false,
       "repository": "werg/chronolog-db"
-    }
-  ],
-  "engines": {
-    "artifact": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
-    "native": {
-      "implementation": "@dolthub/doltlite@0.11.29",
-      "platform": "linux",
-      "architecture": "x64",
-      "node": "v24.22.1",
-      "manifest": {
-        "doltliteVersion": "0.11.29",
-        "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
-        "sqliteVecVersion": "0.1.9",
-        "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
-        "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
-        "fts5": true,
-        "json1": true,
-        "rtree": true,
-        "dynamicExtensions": false
-      },
-      "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
     },
-    "wasm": {
-      "directory": "browser-engine",
-      "manifest": {
-        "format": 1,
-        "toolchain": "emscripten-4.0.20",
-        "nativeManifest": {
-          "doltliteVersion": "0.11.29",
-          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
-          "sqliteVecVersion": "0.1.9",
-          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
-          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
-          "fts5": true,
-          "json1": true,
-          "rtree": true,
-          "dynamicExtensions": false
-        },
-        "runtimeVersions": {
-          "doltlite": "doltlite-amalgamation",
-          "sqlite": "3.54.0",
-          "vec": "v0.1.9"
-        },
-        "portabilityPatches": [
-          "chunk-store-optional-sector-size-v1",
-          "chunk-store-optional-has-moved-v1",
-          "vfs-identity-forwarding-v1"
-        ],
-        "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
-        "wasmSha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
-        "wasmBytes": 2761242
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g3e6e579f-rtc",
+      "sha256": "0196d434e083edddf22cce60b0158964a4fd50d12d55f883abfdeacf87724e3e",
+      "sourceCommit": "3e6e579fea6ec3d248245c4233205629f0f6002b",
+      "sourceTree": "4731da5dd178b72594c94c5c5dfe3676e888241b",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-3e6e579f-provenance.json",
+        "sha256": "304791423591d94fc32f76a8dbd2606c583fd7f80c6e7c58054d028f47539bd1"
       }
     },
-    "nativeBinarySha256": "291e75ef09c0e07482f2a2f6030eaf588127c62db1d4444cd914f60ea43e27e2",
-    "wasmBinarySha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
-    "manifestIdentityEqual": true,
-    "scope": "Actual native/WASM conformance is a separate gate; packed engine identity alone does not qualify browser OPFS recovery."
-  },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g3e6e579f-rtc-sql-wasm",
+      "sha256": "34e02c67f572f14343746b9cc4652414ea682875bb7dd67138b78a5a1d3d8001",
+      "sourceCommit": "3e6e579fea6ec3d248245c4233205629f0f6002b",
+      "sourceTree": "4731da5dd178b72594c94c5c5dfe3676e888241b",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-3e6e579f-provenance.json",
+        "sha256": "c81dbaf72aaf7e2b126e69bf48b36a1b6b8d0c8faee70c10935318b4fe22fc3a"
+      }
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g7b9bd41d-rtc",
+      "sha256": "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-7b9bd41d-rtc-provenance.json",
+        "sha256": "5ec12a3cce8afaf0cc3393f17e5ab710b773ecb844fc36bc7f9f9922a62a0f72"
+      },
+      "additionalProvenance": [
+        {
+          "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-7b9bd41d-provenance.json",
+          "sha256": "5ec12a3cce8afaf0cc3393f17e5ab710b773ecb844fc36bc7f9f9922a62a0f72"
+        }
+      ]
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "file": "chronolog-peer-session-7b9bd41d-rtc-sql-wasm.tgz",
+      "sha256": "810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-7b9bd41d-combo-provenance.json",
+        "sha256": "7394f57954e44286a1810881c2f5dd8abcd258a77eb6d4292b0f8ca6175eff0a"
+      }
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "file": "chronolog-peer-session-7b9bd41d.tgz",
+      "sha256": "3d9298de752eaedeb23953a9b0e288d3c11c45c1740fc59902244cd9bd0337f2",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-7b9bd41d-default-provenance.json",
+        "sha256": "0ae1575135669bfa184bc34b3a99bce58ab8311af99e065d7e9530811d16e3b6"
+      }
+    },
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g7b9bd41d-rtc-sql-wasm",
+      "sha256": "a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986",
+      "sourceCommit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+      "sourceTree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+      "sourceDirty": false,
+      "repository": "werg/chronolog-db",
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-7b9bd41d-provenance.json",
+        "sha256": "101eb4b9ed8cebc3f858eede1b558f55b1aa10880118cfac6a50226f492fc6be"
+      }
+    }
+  ],
   "storageContract": {
     "source": "17a1b64ae0fae6954d9e094db19e17edfbedc7ac",
     "ownedDeviceRecord": "peer-session/device/v1",
@@ -290,7 +314,7 @@
     },
     {
       "kind": "Chromium Worker/OPFS to native WebRTC over loopback",
-      "qualification": "Events and complete guarded SQL task recovery passed with clean core76129 and consumer1a63; exact archives and boundaries are recorded per gate."
+      "qualification": "Events and complete SQL forms/recovery passed at final source 7b9bd41d with consumer 3107cba; earlier 76129 and 3e6e artifact/source pairings remain separately recorded."
     },
     {
       "kind": "managed browser/native lifecycle against deployed host; Internet/TURN",
@@ -625,7 +649,21 @@
       ]
     },
     {
-      "id": "G1-current-browser-sql",
+      "id": "G4-deployed-operation",
+      "status": "not-executed",
+      "scope": [
+        "Home/mobile/restrictive networks and TURN",
+        "Deployed authentication and actual managed lifecycle under host outages",
+        "Suspension, eviction, quota pressure and interrupted-write crashes",
+        "Five-minute recovery-age objective with a second suitable peer",
+        "Comparable deployed provider usage/cost including guarantee differences"
+      ],
+      "limitations": [
+        "Unknown metrics remain unknown; no zero-cost, universal loss-bound or deployed readiness claim."
+      ]
+    },
+    {
+      "id": "G1-browser-sql-76129",
       "status": "passed",
       "scope": "Actual Chromium Worker/OPFS, maintained bootstrap and host bridge, authenticated native RTC, host-blocked commands/signals/content, selected-prefix recovery, fresh replay and durable reopen.",
       "consumer": {
@@ -688,18 +726,597 @@
       }
     },
     {
-      "id": "G4-deployed-operation",
-      "status": "not-executed",
-      "scope": [
-        "Home/mobile/restrictive networks and TURN",
-        "Deployed authentication and actual managed lifecycle under host outages",
-        "Suspension, eviction, quota pressure and interrupted-write crashes",
-        "Five-minute recovery-age objective with a second suitable peer",
-        "Comparable deployed provider usage/cost including guarantee differences"
+      "id": "G1-browser-events-3e6e",
+      "status": "passed",
+      "scope": "Actual Chromium Worker/OPFS, canonical session/host bridge, authenticated RTC, host-blocked work/content, selected-prefix recovery, fresh replay and reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "1a63e2a69bdcb80b36a10759f7dac10cdf690a45",
+        "tree": "72ef2d8b83c56e3483c167283fd22f0ff43979d5",
+        "dirty": false
+      },
+      "artifacts": [
+        "0196d434e083edddf22cce60b0158964a4fd50d12d55f883abfdeacf87724e3e"
       ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-3e6e579f-report.json",
+        "sha256": "42bfa4c6867215fac6a91f2aea089af5c1f805212dc504e46f0407393aba491e"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-3e6e579f-summary.json",
+        "sha256": "2ec4f17957f3c107d30836fb7ec36151c745aa1cfded9f10a3fc0374f5d0de63"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44098971211",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44098971211/job/134093521892",
       "limitations": [
-        "Unknown metrics remain unknown; no zero-cost, universal loss-bound or deployed readiness claim."
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate."
+      ],
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-3e6e579f-retrieval.json",
+        "sha256": "4dfa323d27b91614faee638316e8f6c080272c028437040b3604105854859b6b"
+      }
+    },
+    {
+      "id": "G1-browser-tasks-3e6e",
+      "status": "passed",
+      "scope": "Actual Chromium Worker/OPFS, canonical session/host bridge, authenticated RTC, host-blocked work/content, selected-prefix recovery, fresh replay and reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "1a63e2a69bdcb80b36a10759f7dac10cdf690a45",
+        "tree": "72ef2d8b83c56e3483c167283fd22f0ff43979d5",
+        "dirty": false
+      },
+      "artifacts": [
+        "34e02c67f572f14343746b9cc4652414ea682875bb7dd67138b78a5a1d3d8001"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-3e6e579f-report.json",
+        "sha256": "21e0f3fb9fc198a471f4dbfe9b0fd8a82c1cfc0a65f69956c982d0b10ff00c85"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-3e6e579f-summary.json",
+        "sha256": "1e9009dc0a65e9c22b7e0299ca5e74310fdfc1ad05d617b404cd4d913e27620f"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44098971211",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44098971211/job/134093521892",
+      "limitations": [
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The task domain used both packaged SQL engines; this result applies to the recorded native platform and browser build."
+      ],
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-3e6e579f-retrieval.json",
+        "sha256": "4dfa323d27b91614faee638316e8f6c080272c028437040b3604105854859b6b"
+      }
+    },
+    {
+      "id": "G1-final-rtc-7b9",
+      "status": "passed",
+      "scope": "Independent packed native RTC with portable controls and full selected-history recovery.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+        "dirty": false
+      },
+      "artifacts": [
+        "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-rtc-7b9bd41d-report.json",
+        "sha256": "73551497b805fbdadcf82593ce53cd989ce523d6fbfa28f85514d0ac4ce43aca"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-rtc-7b9bd41d-summary.json",
+        "sha256": "0f635cd434a049e8763b7aebc2c35415891f3ac534744c25515d31d9aa1bff37"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44101030661",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44101030661/job/134100756310",
+      "limitations": [
+        "Explicit local loopback; no Internet/TURN, deployed authentication or provider billing.",
+        "Hosted account identities are synthetic; introduction and recovery faults are explicitly controlled."
+      ],
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-native-host-7b9bd41d-retrieval.json",
+        "sha256": "bcaf5a4320bda4359801c21051cfbff84b608d5fe67bf390ab93f7f1c30c8b68"
+      },
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-native-host-7b9bd41d-jobs.json",
+        "sha256": "2787683add3a39a0cc2436b642e26c91f9b289078cafeaa3ea38f82f4b4e7ae1"
+      }
+    },
+    {
+      "id": "G1-final-host-7b9",
+      "status": "passed",
+      "scope": "Actual Tendriller workerd compact control and rendezvous, native RTC, host-blocked commands and recovery.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+        "dirty": false
+      },
+      "artifacts": [
+        "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51",
+        "71cc9b1c32f34531a650e3eeb04eeec15158106c7187c01f601d72177f5d6614",
+        "05d6444114c2fdbef5dca5f8070c21d94c4407004854dca3e45a2ccc2f1f5468"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-host-7b9bd41d-report.json",
+        "sha256": "e35ac92bbdf636c39961d0e9696da898d10a3db997bbf40530149f29ed46c80f"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-generation-host-7b9bd41d-summary.json",
+        "sha256": "5288c007e9c3480b4982b1615afb108f1a7297aa0181407d096024ce70632546"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44101030661",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44101030661/job/134100756310",
+      "limitations": [
+        "Explicit local loopback; no Internet/TURN, deployed authentication or provider billing.",
+        "Hosted account identities are synthetic; introduction and recovery faults are explicitly controlled."
+      ],
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-native-host-7b9bd41d-retrieval.json",
+        "sha256": "bcaf5a4320bda4359801c21051cfbff84b608d5fe67bf390ab93f7f1c30c8b68"
+      },
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-native-host-7b9bd41d-jobs.json",
+        "sha256": "2787683add3a39a0cc2436b642e26c91f9b289078cafeaa3ea38f82f4b4e7ae1"
+      }
+    },
+    {
+      "id": "G1-final-producer-native-sql-7b9",
+      "status": "passed",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "artifact": "810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4",
+      "scope": [
+        "canonical hosted configuration",
+        "signed schema bootstrap",
+        "real SQL constraints",
+        "earlier prefix recovery",
+        "shared rows after creator closes",
+        "native reopen identity and outcomes"
+      ],
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-producer-sql-7b9bd41d-report.json",
+        "sha256": "406320bd06950d9401590fe3a4f41410bae9493073b8737ea50b1e6c34b85dcf"
+      },
+      "limitations": [
+        "Producer-owned packed consumer; separate from the fresh independent G3 exercise.",
+        "Native SQL only."
       ]
+    },
+    {
+      "id": "G0-quality-76129",
+      "status": "passed",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
+        "tree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
+        "dirty": false
+      },
+      "scope": [
+        "Lint, docs, typecheck, full coverage suite",
+        "Independent packed event/native SQL consumers",
+        "Native crash/storage rehearsal, build and isolated distribution",
+        "Linux/macOS conformance and matching portable digests"
+      ],
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44098541721",
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-quality-76129c3c-jobs.json",
+        "sha256": "864c2b0c3553f2f91e36e14902113651995d15868245c36450ed09301b1574d7"
+      },
+      "runMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-quality-76129c3c-runs.json",
+        "sha256": "ef4bbf43dff22d2400c9f9bc00d3a74a138a3da221a999e80823b03e64da79db"
+      },
+      "limitations": [
+        "Completed result applies to 76129; the final 7b quality result has its own gate.",
+        "Job success does not establish deployed G4."
+      ]
+    },
+    {
+      "id": "G1-final-browser-events-7b9",
+      "status": "passed",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "scope": "Actual Chromium dedicated Worker/OPFS, canonical bootstrap and host bridge, authenticated RTC, host-blocked commands/content, earlier-prefix recovery, fresh replay and reopen.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+        "dirty": false
+      },
+      "artifacts": [
+        "e95ae0553d4c7235a689df1b539bebec901aea3d44f09485918e31d0be26aa51"
+      ],
+      "executionManifestDigest": "2175dbd0f9f0a4fdc22820e91a61b5868cd44aa80e4d2266db8794c4c40b4dbe",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-7b9bd41d-report.json",
+        "sha256": "3217ea248ba7701c26db247803945f0bd51975ca44bc7514819b48d75f8b95e1"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-events-7b9bd41d-summary.json",
+        "sha256": "d44e54e5f7e2323a00c681abac86a9cbc07e4fc7d9dddacd59d2921c16822636"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44101030662",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44101030662/job/134100755943",
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-browser-7b9bd41d-jobs.json",
+        "sha256": "641c46acc5783ee0561953b8cafd490d6d7bf41ab2151bc7fc4d3bf0d4605031"
+      },
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-7b9bd41d-retrieval.json",
+        "sha256": "d7e0b62641313def14edb449bfcf60608b831d7b3e2b8c2ee250dbd9c40f0d05"
+      },
+      "limitations": [
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The browser gate uses the event execution profile; SQL engine behavior requires its separate public-artifact gate."
+      ]
+    },
+    {
+      "id": "G1-final-browser-tasks-7b9",
+      "status": "passed",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "scope": "Actual Chromium dedicated Worker/OPFS, canonical bootstrap and host bridge, authenticated RTC, host-blocked commands/content, earlier-prefix recovery, fresh replay and reopen. Real guarded SQL task forms, simultaneous same-view claims, rejected unauthorized finish, shared rows after creator departure, and SQL/events selected together.",
+      "consumer": {
+        "repository": "werg/tendriller-contrib",
+        "commit": "3107cba13007633177b5003c379ff481b20e5481",
+        "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+        "dirty": false
+      },
+      "artifacts": [
+        "a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986"
+      ],
+      "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+      "report": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-7b9bd41d-report.json",
+        "sha256": "d592cbd47c40192670773164b79d87768a02956ecb75b78194d19b07a2f8f8cf"
+      },
+      "summary": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-7b9bd41d-summary.json",
+        "sha256": "6caa128a1c6e9d719819f884e4cb9a920702df2b95f509d2fd71ba1fb71952fb"
+      },
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44101030662",
+      "job": "https://github.com/werg/chronolog-db/actions/runs/44101030662/job/134100755943",
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-browser-7b9bd41d-jobs.json",
+        "sha256": "641c46acc5783ee0561953b8cafd490d6d7bf41ab2151bc7fc4d3bf0d4605031"
+      },
+      "retrieval": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-7b9bd41d-retrieval.json",
+        "sha256": "d7e0b62641313def14edb449bfcf60608b831d7b3e2b8c2ee250dbd9c40f0d05"
+      },
+      "limitations": [
+        "Local Chromium and native UDP loopback only; no deployed Internet, home/mobile/restrictive network, TURN, or provider billing qualification.",
+        "Control and signaling use a measured portable registry HTTP fixture; actual Tendriller workerd HTTP is qualified by the separate hosted gate.",
+        "Abrupt Worker loss occurs after an observed durable apply; quota exhaustion, storage eviction, and interrupted-write crash injection are not covered.",
+        "The task domain used both packaged SQL engines; this result applies to the recorded native platform and browser build."
+      ]
+    },
+    {
+      "id": "G0-final-quality-7b9",
+      "status": "passed",
+      "source": {
+        "repository": "werg/chronolog-db",
+        "commit": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+        "tree": "9b672f6b62b9ce53a8993c91fb29c8f95de538dc",
+        "dirty": false
+      },
+      "scope": [
+        "Lint, docs, typecheck and full coverage suite",
+        "Independent packed event and native SQL consumers",
+        "Native authority crash/storage rehearsal, build and isolated native distribution",
+        "Linux/macOS conformance with matching portable digests"
+      ],
+      "workflow": "https://github.com/werg/chronolog-db/actions/runs/44101030826",
+      "jobs": [
+        134100756933,
+        134100756795,
+        134100756981,
+        134105470716
+      ],
+      "jobMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-quality-7b9bd41d-jobs.json",
+        "sha256": "12c789e458e7d0a5fc5a70868487cad9822decae2ffe31e4e8c589e4921e611f"
+      },
+      "runMetadata": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-quality-7b9bd41d-runs.json",
+        "sha256": "cba18b1e201a814ddddb0c45cd1018f6a06a0833a831393e5e8e9c3539b843a5"
+      },
+      "limitations": [
+        "Preserved GitHub job/step metadata establishes the completed CI result; detailed full coverage logs are available in the linked workflow.",
+        "These local producer and package gates do not establish deployed G4."
+      ]
+    }
+  ],
+  "currentHeadVerification": {
+    "source": "7b9bd41d1a3eb2fa3173af86871208d331630797",
+    "producerPackedNativeSql": "passed",
+    "nativeRtcAndActualHost": "passed",
+    "browserEventsAndSql": "passed",
+    "qualityAndTests": "passed",
+    "linuxAndMacosConformance": "passed with matching portable digests",
+    "containerChaos": "passed workflow conclusion",
+    "runMetadata": {
+      "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-quality-7b9bd41d-runs.json",
+      "sha256": "cba18b1e201a814ddddb0c45cd1018f6a06a0833a831393e5e8e9c3539b843a5"
+    },
+    "g4": "not executed"
+  },
+  "enginePairs": [
+    {
+      "artifact": "45d4a1f328ace4f51545f1ab6fdc17061f3461005d60548996564a44093cf77c",
+      "native": {
+        "implementation": "@dolthub/doltlite@0.11.29",
+        "platform": "linux",
+        "architecture": "x64",
+        "node": "v24.22.1",
+        "manifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+      },
+      "wasm": {
+        "directory": "browser-engine",
+        "manifest": {
+          "format": 1,
+          "toolchain": "emscripten-4.0.20",
+          "nativeManifest": {
+            "doltliteVersion": "0.11.29",
+            "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+            "sqliteVecVersion": "0.1.9",
+            "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+            "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+            "fts5": true,
+            "json1": true,
+            "rtree": true,
+            "dynamicExtensions": false
+          },
+          "runtimeVersions": {
+            "doltlite": "doltlite-amalgamation",
+            "sqlite": "3.54.0",
+            "vec": "v0.1.9"
+          },
+          "portabilityPatches": [
+            "chunk-store-optional-sector-size-v1",
+            "chunk-store-optional-has-moved-v1",
+            "vfs-identity-forwarding-v1"
+          ],
+          "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+          "wasmSha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+          "wasmBytes": 2761242
+        }
+      },
+      "nativeBinarySha256": "291e75ef09c0e07482f2a2f6030eaf588127c62db1d4444cd914f60ea43e27e2",
+      "wasmBinarySha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+      "manifestIdentityEqual": true,
+      "scope": "Actual native/WASM conformance is a separate gate; packed engine identity alone does not qualify browser OPFS recovery.",
+      "id": "fresh-consumer-fe752"
+    },
+    {
+      "id": "browser-qualified-3e6e",
+      "artifact": "34e02c67f572f14343746b9cc4652414ea682875bb7dd67138b78a5a1d3d8001",
+      "native": {
+        "implementation": "@dolthub/doltlite@0.11.29",
+        "platform": "linux",
+        "architecture": "x64",
+        "node": "v24.22.2",
+        "manifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+      },
+      "wasm": {
+        "directory": "browser-engine",
+        "manifest": {
+          "format": 1,
+          "toolchain": "emscripten-4.0.20",
+          "nativeManifest": {
+            "doltliteVersion": "0.11.29",
+            "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+            "sqliteVecVersion": "0.1.9",
+            "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+            "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+            "fts5": true,
+            "json1": true,
+            "rtree": true,
+            "dynamicExtensions": false
+          },
+          "runtimeVersions": {
+            "doltlite": "doltlite-amalgamation",
+            "sqlite": "3.54.0",
+            "vec": "v0.1.9"
+          },
+          "portabilityPatches": [
+            "chunk-store-optional-sector-size-v1",
+            "chunk-store-optional-has-moved-v1",
+            "vfs-identity-forwarding-v1"
+          ],
+          "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+          "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+          "wasmBytes": 2761242
+        }
+      },
+      "nativeBinarySha256": "cca093a1ca607b5d8478515f04ae27c03893af0a91ce91a9c566c6aa4fe961d4",
+      "wasmBinarySha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+      "manifestIdentityEqual": true,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-3e6e579f-provenance.json",
+        "sha256": "c81dbaf72aaf7e2b126e69bf48b36a1b6b8d0c8faee70c10935318b4fe22fc3a"
+      }
+    },
+    {
+      "id": "producer-packed-7b9",
+      "artifact": "810a7063cd59747855b6258b0f2f9f2b85e0d9a7f3d0ed67000eefb6089eaaf4",
+      "native": {
+        "implementation": "@dolthub/doltlite@0.11.29",
+        "platform": "linux",
+        "architecture": "x64",
+        "node": "v24.22.1",
+        "manifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+      },
+      "wasm": {
+        "directory": "browser-engine",
+        "manifest": {
+          "format": 1,
+          "toolchain": "emscripten-4.0.20",
+          "nativeManifest": {
+            "doltliteVersion": "0.11.29",
+            "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+            "sqliteVecVersion": "0.1.9",
+            "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+            "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+            "fts5": true,
+            "json1": true,
+            "rtree": true,
+            "dynamicExtensions": false
+          },
+          "runtimeVersions": {
+            "doltlite": "doltlite-amalgamation",
+            "sqlite": "3.54.0",
+            "vec": "v0.1.9"
+          },
+          "portabilityPatches": [
+            "chunk-store-optional-sector-size-v1",
+            "chunk-store-optional-has-moved-v1",
+            "vfs-identity-forwarding-v1"
+          ],
+          "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+          "wasmSha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+          "wasmBytes": 2761242
+        }
+      },
+      "nativeBinarySha256": "291e75ef09c0e07482f2a2f6030eaf588127c62db1d4444cd914f60ea43e27e2",
+      "wasmBinarySha256": "89cf286d7ac3147da8beac5c121c0a236787b30a7199be48453d0b4118f1f4f4",
+      "manifestIdentityEqual": true,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-session-7b9bd41d-combo-provenance.json",
+        "sha256": "7394f57954e44286a1810881c2f5dd8abcd258a77eb6d4292b0f8ca6175eff0a"
+      }
+    },
+    {
+      "id": "browser-qualified-7b9",
+      "artifact": "a2afa91a1fe93c8e8aa0df6b8bfc6f1810162737afa4e734868e3fe99e68c986",
+      "native": {
+        "implementation": "@dolthub/doltlite@0.11.29",
+        "platform": "linux",
+        "architecture": "x64",
+        "node": "v24.22.2",
+        "manifest": {
+          "doltliteVersion": "0.11.29",
+          "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+          "sqliteVecVersion": "0.1.9",
+          "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+          "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+          "fts5": true,
+          "json1": true,
+          "rtree": true,
+          "dynamicExtensions": false
+        },
+        "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+      },
+      "wasm": {
+        "directory": "browser-engine",
+        "manifest": {
+          "format": 1,
+          "toolchain": "emscripten-4.0.20",
+          "nativeManifest": {
+            "doltliteVersion": "0.11.29",
+            "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+            "sqliteVecVersion": "0.1.9",
+            "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+            "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+            "fts5": true,
+            "json1": true,
+            "rtree": true,
+            "dynamicExtensions": false
+          },
+          "runtimeVersions": {
+            "doltlite": "doltlite-amalgamation",
+            "sqlite": "3.54.0",
+            "vec": "v0.1.9"
+          },
+          "portabilityPatches": [
+            "chunk-store-optional-sector-size-v1",
+            "chunk-store-optional-has-moved-v1",
+            "vfs-identity-forwarding-v1"
+          ],
+          "deterministicSourceSha256": "fc6d3fabcda79e21554fc3e9d248d64edfbbe0ddf39c789dc46d1756e2d35610",
+          "wasmSha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+          "wasmBytes": 2761242
+        }
+      },
+      "nativeBinarySha256": "cca093a1ca607b5d8478515f04ae27c03893af0a91ce91a9c566c6aa4fe961d4",
+      "wasmBinarySha256": "0c106a6a89a4c44d10ed679fbc817d7dd0beb6600469fc0d2a8a65499183fa81",
+      "manifestIdentityEqual": true,
+      "provenance": {
+        "path": "cookbooks/run-a-peer-application/notes/evidence/2026-11-17-peer-browser-tasks-7b9bd41d-provenance.json",
+        "sha256": "101eb4b9ed8cebc3f858eede1b558f55b1aa10880118cfac6a50226f492fc6be"
+      },
+      "scope": "CI-built pair used by the final current-source browser SQL gate; separate bytes from the same-source locally built combo."
     }
   ]
 }

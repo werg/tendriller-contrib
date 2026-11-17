@@ -1,9 +1,12 @@
 # Guarded shared-task qualification
 
-The [complete browser SQL report](evidence/2026-11-17-peer-generation-browser-task-76129c3c-report.json)
-and [validated summary](evidence/2026-11-17-peer-generation-browser-task-76129c3c-summary.json)
-now qualify the real Worker/OPFS, native RTC, task forms and recovery scenario.
-Its exact pairing and scope are recorded below, alongside the native results.
+The current [complete browser SQL report](evidence/2026-11-17-peer-browser-tasks-7b9bd41d-report.json)
+and [validated summary](evidence/2026-11-17-peer-browser-tasks-7b9bd41d-summary.json)
+qualify the real Worker/OPFS, native RTC, task forms and recovery scenario at
+clean Chronolog `7b9bd41d` and consumer `3107cba`. The
+[current-source qualification](peer-generation-qualification.md#current-source-qualification)
+records its exact archives, engine identities and completed workflow. The earlier
+`76129c3c` browser pairing and native results are preserved below.
 
 The [native task report](evidence/2026-11-17-peer-generation-task-clean-report.json)
 and [validated summary](evidence/2026-11-17-peer-generation-task-clean-summary.json)

@@ -12,8 +12,9 @@ The [peer application recipe](../cookbooks/run-a-peer-application/COOKBOOK.md)
 uses those implemented APIs and an exact supplied `@chronolog/peer-session`
 archive. The [qualification inventory](../cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
 separates clean native RTC, actual-host controls, browser events/OPFS, native SQL
-and the independently authored consumer. Current browser SQL recovery and
-Internet/deployed operation need their own complete passing evidence. Historical
+and the independently authored consumer. Complete browser SQL recovery has
+its own passing exact-source report. Internet/TURN and deployed operating
+conditions still require separate evidence. Historical
 reports keep their original source and scope; the
 [older immutable-prefix implementation](finalized-peer-applications.md) does not
 qualify this recovery contract.

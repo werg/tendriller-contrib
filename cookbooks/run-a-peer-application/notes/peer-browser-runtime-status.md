@@ -7,6 +7,12 @@ host-blocked work, partial-content restart and explicit recovery. Each report
 retains its exact tested artifact and consumer revisions. Deployed operating
 conditions remain outside these local browser/native topology results.
 
+The [current-source qualification](peer-generation-qualification.md#current-source-qualification)
+repeats both complete scenarios at clean Chronolog `7b9bd41d` with clean consumer
+`3107cba`. Its [events report](evidence/2026-11-17-peer-browser-events-7b9bd41d-report.json)
+and [SQL report](evidence/2026-11-17-peer-browser-tasks-7b9bd41d-report.json) both
+passed. The earlier failures below remain evidence of their original attempts.
+
 ## Earlier workspace launch failure
 
 The [preserved attempted runtime report](evidence/2026-11-17-peer-generation-browser-blocked-report.json)
