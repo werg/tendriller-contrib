@@ -1,0 +1,139 @@
+{
+  "format": "peer-generation-consumer/v1",
+  "profile": "peer-generation-v1",
+  "mode": "runtime",
+  "topology": "independent-packed-tasks",
+  "passed": true,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "source": {
+    "repository": "werg/tendriller-contrib",
+    "commit": "3107cba13007633177b5003c379ff481b20e5481",
+    "tree": "7d20296bf2d36b22455363387cd84bc73382e465",
+    "dirty": false
+  },
+  "artifacts": [
+    {
+      "name": "@chronolog/peer-session",
+      "version": "0.0.0-g76129c3c-sql",
+      "sha256": "a3c9ec7046c880a8d0c5f0b6b127b4f8d7b8e76767e07efee98713f745c40a27",
+      "sourceCommit": "76129c3cbe3ef6623d54aba155decb68cecf49e1",
+      "sourceTree": "5beb048fe482d545d8ae6c3822840a4376b9709b",
+      "sourceDirty": false
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "cookbooks/run-a-peer-application/checks/peer-generation-task-consumer.mjs",
+      "sha256": "3b9a847e1c73fc4f661c6fc1ea6743c0c3ce96a3ae9f1669ea2542ea65e791d4"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-task-board.mjs",
+      "sha256": "982c984cc66233640001db78cd7a5dac5a140ec85ee79ef60ecd75967c69b7bf"
+    },
+    {
+      "path": "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
+      "sha256": "02737442598ebfec1f895fe86df0a7cc25e54211ee81335d606eb99d536de6db"
+    }
+  ],
+  "error": null,
+  "sqlEngine": {
+    "implementation": "@dolthub/doltlite@0.11.29",
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v24.22.1",
+    "manifest": {
+      "doltliteVersion": "0.11.29",
+      "doltliteSourceSha256": "6611b083ea08cf1e4a9ca71d8e873e9fccd989ad893d6ab38b3df3a48aeac6a8",
+      "sqliteVecVersion": "0.1.9",
+      "sqliteVecSourceSha256": "3acd67cb4aff080c7050926fd3cf8227905fe5b7ee3829d8ee5024ab1283cf61",
+      "chronologPatchProfile": "authorizer-progress-limits-tailoffset-dolt-refs-static-vec-dolt-compat-real-empty-blob-bind-deterministic-context-assert-parameters-actor-policy-trigger-lint-actor-id-vec-innocuous-row-key-exact-values-tx-id-v8",
+      "fts5": true,
+      "json1": true,
+      "rtree": true,
+      "dynamicExtensions": false
+    },
+    "patchSha256": "5eab7980053e68d3e6749d6011cc145d361649d678b1823735c00ac1a96e5fa2"
+  },
+  "publicBoundary": {
+    "imports": [
+      "@chronolog/peer-session",
+      "@chronolog/peer-session/native",
+      "@chronolog/peer-session/sql-native"
+    ],
+    "siblingSourceImports": 0,
+    "applicationRetryQueues": 0,
+    "residentRequired": false
+  },
+  "executionManifestDigest": "c962c4d407c4c99a46fd202ace615074523c4d49434924e9ed9248f31756a65b",
+  "tasks": {
+    "definitionId": "shared-peer-task-board",
+    "signedSchemaDigest": "459dd067f8147033f9997f8dd3c5b31d59dbe29c711d8a4cbc644069febc5f71",
+    "schemaAdministrator": "b9e8480eea8853d2da9eb4b01fc90529be136ab3823d534f28a8d77eeca1d21c",
+    "sharedCreatorClosed": true,
+    "claims": [
+      {
+        "operationId": "creator-claim",
+        "attemptId": "457ed692fd1ba5cf12665dae2f1db9e6a80285f397fc796ef198b0ff6c132358",
+        "outcome": "accepted"
+      },
+      {
+        "operationId": "member-claim",
+        "attemptId": "e9927c12882c70ffa40c7da35d048915af1539583d2ce69b2283cd379308ed23",
+        "outcome": "rejected"
+      }
+    ],
+    "unauthorizedCompletion": "rejected",
+    "completionAfterCreatorClosed": "accepted"
+  },
+  "recovery": {
+    "previousGeneration": "2f5e83a54670e079752133d2fe1c1aef1db1c9772077706d4a1aaf2a1539377d",
+    "selectedGeneration": "65d8fe78048b00f655e774dbabb20441527146bd6b9c22ac14416bc1d1157aeb",
+    "previousHead": 7,
+    "adoptedPosition": 3,
+    "retainedDigest": "953def8036f68829eec6c24fafefe00fcd78a8345a9b4fbbdcb9a658844e0634",
+    "recoveredDigest": "953def8036f68829eec6c24fafefe00fcd78a8345a9b4fbbdcb9a658844e0634",
+    "otherPeerDigest": "953def8036f68829eec6c24fafefe00fcd78a8345a9b4fbbdcb9a658844e0634",
+    "sqlAndEventsResetTogether": true,
+    "inheritedIdentityPreserved": true,
+    "returningTailExcluded": true,
+    "retryRefused": true,
+    "originalOperationId": "creator-claim",
+    "originalAttemptId": "457ed692fd1ba5cf12665dae2f1db9e6a80285f397fc796ef198b0ff6c132358",
+    "reappliedOperationId": "reviewed-claim",
+    "reappliedAttemptId": "9f85df71066272a3e46eea63d9871d0a48b1b9e08bf7858f724ca594f5562ba2",
+    "reapplyOf": "457ed692fd1ba5cf12665dae2f1db9e6a80285f397fc796ef198b0ff6c132358"
+  },
+  "reopen": {
+    "identityBefore": "917f68ed626b34e6a2ef33783978c8695e50be891715512a4d4ebe99b74b5b89",
+    "identityAfter": "917f68ed626b34e6a2ef33783978c8695e50be891715512a4d4ebe99b74b5b89",
+    "storageBefore": "a80730ae-f70b-4b53-b5a3-b14799b744f4",
+    "storageAfter": "a80730ae-f70b-4b53-b5a3-b14799b744f4",
+    "digestBefore": "5ae854712effe08de9c62237cdef71d441e7e38978758ded04668e258e6e668b",
+    "digestAfter": "5ae854712effe08de9c62237cdef71d441e7e38978758ded04668e258e6e668b",
+    "operationBefore": {
+      "status": "applied",
+      "attemptId": "6a395acdfc5be96351465f43f76c2ca045c05ad4f0689a06028c3056852c1266",
+      "operationId": "finish-without-creator",
+      "author": "917f68ed626b34e6a2ef33783978c8695e50be891715512a4d4ebe99b74b5b89",
+      "generation": "65d8fe78048b00f655e774dbabb20441527146bd6b9c22ac14416bc1d1157aeb",
+      "sequence": 3,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "operationAfter": {
+      "status": "applied",
+      "attemptId": "6a395acdfc5be96351465f43f76c2ca045c05ad4f0689a06028c3056852c1266",
+      "operationId": "finish-without-creator",
+      "author": "917f68ed626b34e6a2ef33783978c8695e50be891715512a4d4ebe99b74b5b89",
+      "generation": "65d8fe78048b00f655e774dbabb20441527146bd6b9c22ac14416bc1d1157aeb",
+      "sequence": 3,
+      "outcome": "accepted",
+      "rejectionCode": null
+    },
+    "epochKeysProvided": false
+  }
+}

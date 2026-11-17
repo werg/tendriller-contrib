@@ -66,6 +66,15 @@ schema/definition digests through public helpers. Canonical
 applications. The fixture accepts only this current shape. The fe752b7f report
 above remains unchanged as evidence of its actual earlier artifact.
 
+That current shape is verified by the [clean 76129c3c native report](evidence/2026-11-17-peer-generation-task-76129c3c-report.json)
+and [validated summary](evidence/2026-11-17-peer-generation-task-76129c3c-summary.json).
+The consumer source is `3107cba13007633177b5003c379ff481b20e5481`; Chronolog is
+`76129c3cbe3ef6623d54aba155decb68cecf49e1`, both clean. Archive SHA-256 is
+`a3c9ec7046c880a8d0c5f0b6b127b4f8d7b8e76767e07efee98713f745c40a27`.
+The four-key public configuration assertion and the complete guarded-task,
+SQL/events recovery, explicit reapplication and retained-key reopen scenario
+all passed. This is the latest native pairing recorded here.
+
 ## Scope of this result
 
 This is native SQL with direct authenticated peer transport and a portable local
