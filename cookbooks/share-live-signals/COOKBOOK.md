@@ -8,7 +8,7 @@ choices: ["Live signal or durable event", "Every transient message or latest val
 capabilities: []
 evidence: "explained"
 related: ["choose-data-model", "coordinate-devices", "observe-long-running-process", "present-live-measurements", "run-a-peer-application"]
-sources: ["https://github.com/werg/chronolog-db/blob/84e229991657a577257dcee91906227b87f98bdd/packages/agent-service/src/signals.ts"]
+sources: ["https://github.com/werg/chronolog-db/blob/92264b64cff41746aa9520f8c9f9047e616659cc/packages/signals/src/index.ts"]
 ---
 
 # Share live signals without recording history
