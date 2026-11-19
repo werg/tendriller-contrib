@@ -421,9 +421,9 @@ try {
   a.retainOperation(reference); b.retainOperation(reference); a.removeOperation(reference);
   assert.equal(a.pending().length, 0); assert.equal(b.pending().length, 1);
   assert.deepEqual(b.pending()[0].reference, reference);
-  assert.throws(() => b.retainOperation({ ...reference, historyId: 'another-history' }), /OPERATION_SCOPE_MISMATCH/u);
-  await assert.rejects(clients[0].inspectOperation({ ...reference, historyId: 'another-history' }), /OPERATION_SCOPE_MISMATCH/u);
-  await assert.rejects(clients[0].retry(reference), /ORIGINAL_SIGNER_REQUIRED/u);
+  assert.throws(() => b.retainOperation({ ...reference, historyId: 'another-history' }), { code: 'OPERATION_SCOPE_MISMATCH' });
+  await assert.rejects(clients[0].inspectOperation({ ...reference, historyId: 'another-history' }), { code: 'OPERATION_SCOPE_MISMATCH' });
+  await assert.rejects(clients[0].retry(reference), { code: 'ORIGINAL_SIGNER_REQUIRED' });
   observed('independentPendingReferences', { firstViewReferences: a.pending().length, secondViewReferences: b.pending().length,
     originalOperationId: reference.operationId, foreignHistoryRejected: true, foreignSignerRetryRejected: true, journalChanged: false });
   report.passed = true;
