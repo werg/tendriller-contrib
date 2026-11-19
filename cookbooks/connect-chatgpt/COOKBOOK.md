@@ -8,7 +8,7 @@ choices: ["On-demand tools or subscribed background help", "Enrolled remote read
 capabilities: []
 evidence: "explained"
 related: ["run-a-peer-application", "manage-sensitive-data", "recover-outdated-work", "resume-across-sessions", "review-exact-proposal", "share-live-signals"]
-sources: ["https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/docs/INTEGRATION_OAUTH.md", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/deploy/README.md", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/config.host-account.example.mjs", "https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/scripts/test-chatgpt-host.mjs", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
+sources: ["https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/INTEGRATION_OAUTH.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/deploy/README.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/config.host-account.example.mjs", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/scripts/test-chatgpt-host.mjs", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
 ---
 
 # Connect an application to an assistant and choose a fallback
@@ -62,7 +62,7 @@ retrievable through that API. Have the configured agent call the authorized
 write-back tool. Keep this route's credential and conversation identity separate
 from MCP Events subscriptions.
 
-The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/WORKSPACE_AGENT.md)
+The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/WORKSPACE_AGENT.md)
 becomes available through `trigger_workspace_agent` and
 `get_workspace_agent_run` when the operator configures `workspaceAgent`. It
 checks current account access, selected source and event consent, persists the
@@ -146,7 +146,7 @@ separately.
 
 ## Adapt the connected kitchen specimen
 
-The [core kitchen source](https://github.com/werg/tendriller/tree/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/examples/kitchen)
+The [core kitchen source](https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/examples/kitchen)
 includes a real public-session bootstrap, browser Worker, page, signed release
 build, dedicated bridge-device setup, declared commands and deterministic
 queries. Its current definition is version 2 and binds each request to the
@@ -248,8 +248,8 @@ use `config.host-account.example.mjs` and the generated exact host registration;
 the included adapter supplies trusted issuer/JWKS and current account/owner
 checks. External-provider mode instead imports the deployment's verified
 account/owner adapters. Consult
-[the pinned integration guide](https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/docs/CHATGPT_INTEGRATION.md)
-and [service configuration](https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/README.md)
+[the pinned integration guide](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/CHATGPT_INTEGRATION.md)
+and [service configuration](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/README.md)
 for setup, retained storage and process lifetime. Do not replace a missing owner
 adapter with an
 always-true function or put private handles, store keys or signers in the page.

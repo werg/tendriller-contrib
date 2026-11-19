@@ -10,14 +10,14 @@ installation or a deployed OpenAI conversation.
 
 ## Review follow-up release
 
-Core revision [`14f1543`](https://github.com/werg/tendriller/commit/14f15432bbc5055b91b4bbf8909af51315bbd2b7)
-passed [the exact-source release gate](https://github.com/werg/tendriller/actions/runs/44523608997)
+Core revision [`ee7f1bf`](https://github.com/werg/tendriller/commit/ee7f1bf7c444e04e5712bf63e0bda7240c115820)
+passed [the exact-source release gate](https://github.com/werg/tendriller/actions/runs/44524005124)
 with 180 native-enabled integration tests, zero skips, and the packed
-Worker-to-Node account test. Download the [release bundle](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529895568)
-and [qualification logs](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529940523)
+Worker-to-Node account test. Download the [release bundle](https://github.com/werg/tendriller/actions/runs/44524005124/artifacts/14528478012)
+and [qualification logs](https://github.com/werg/tendriller/actions/runs/44524005124/artifacts/14528198442)
 for that revision. It adds callback revalidation at TLS connect, login handoff
 without unauthenticated journal reservations, and verified export of released
-operation references. It qualifies the separate Node bridge. The sections below
+operation references. It also checks the exact OAuth grant in the final account read and requires fresh review after an enrollment owner changes. The result qualifies the separate Node bridge. The sections below
 retain the original release evidence.
 
 
