@@ -8,6 +8,19 @@ release build. The alternate Workspace Agent adapter has synthetic-provider
 tests. These results do not establish a human upstream login, a public service
 installation or a deployed OpenAI conversation.
 
+## Review follow-up release
+
+Core revision [`14f1543`](https://github.com/werg/tendriller/commit/14f15432bbc5055b91b4bbf8909af51315bbd2b7)
+passed [the exact-source release gate](https://github.com/werg/tendriller/actions/runs/44523608997)
+with 180 native-enabled integration tests, zero skips, and the packed
+Worker-to-Node account test. Download the [release bundle](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529895568)
+and [qualification logs](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529940523)
+for that revision. It adds callback revalidation at TLS connect, login handoff
+without unauthenticated journal reservations, and verified export of released
+operation references. It qualifies the separate Node bridge. The sections below
+retain the original release evidence.
+
+
 ## Tested core source and release artifacts
 
 The combined implementation is pinned to Tendriller

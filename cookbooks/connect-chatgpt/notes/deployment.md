@@ -1,11 +1,16 @@
 # Deployment choices and readiness evidence
 
-Use this note with the pinned [deployment guide](https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/deploy/README.md)
-and [host OAuth guide](https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/INTEGRATION_OAUTH.md).
+Use this note with the pinned [deployment guide](https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/integrations/chatgpt/deploy/README.md)
+and [host OAuth guide](https://github.com/werg/tendriller/blob/14f15432bbc5055b91b4bbf8909af51315bbd2b7/docs/INTEGRATION_OAUTH.md).
 The [evidence record](evidence.md) identifies the exact qualified source, passed
 release gates and downloadable artifacts. This procedure prepares a deployment;
 it is not a record that a public host or ChatGPT account has already been
 connected.
+
+The Tendriller Worker supplies OAuth and page-access checks. Its existing host
+MCP tools manage pages. The Node bridge in this bundle exposes the
+application-facing MCP endpoint and runs as a separate enrolled participant.
+The host can be deployed without enabling that optional endpoint.
 
 ## Choose the account route
 
@@ -49,8 +54,8 @@ The release builder accepts exact source inputs, builds public Tendriller and
 pinned Chronolog archives in isolated checkouts, and requires native integration
 and packed-host/account tests before sealing the release. `RELEASE.json` records
 source revisions, package hashes and all release-file hashes. The downloadable
-[`tendriller-chatgpt-release`](https://github.com/werg/tendriller/actions/runs/44518721328/artifacts/14527855129)
-and [`chatgpt-integration-qualification`](https://github.com/werg/tendriller/actions/runs/44518721328/artifacts/14526333293) artifacts are
+[`tendriller-chatgpt-release`](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529895568)
+and [`chatgpt-integration-qualification`](https://github.com/werg/tendriller/actions/runs/44523608997/artifacts/14529940523) artifacts are
 build evidence. They do not certify a public deployment or a live model answer.
 
 Use the tools in this order, substituting real private paths and copied client
