@@ -5,7 +5,12 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 // Synthetic values test the validator; they are never emitted as qualification.
 function example() {
   const observations = {
-    exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected' },
+    exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_immutable' },
+    rawForgedResultGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_result_disposition', retainedForgedResult: false },
+    schemaDdlGuard: { outcome: 'rejected', rejectionCode: 'denied' },
+    scaleProfile: { signingParticipants: 8, simultaneousAttachments: 32, successfulViews: 32,
+      owners: Array.from({ length: 8 }, (_, index) => `owner-${index}`), attachmentsPerOwner: Array(8).fill(4) },
+    noisyEndpointIsolation: { rejected: 'APPLICATION_WORKER_STREAM_LIMIT', siblingQuerySucceeded: true, ownerClosed: false },
     staleClaimRejected: { acceptedAsCurrent: false, disposition: 'superseded' }, resultIdentityConflict: { conflict: 'rejected' },
     generationFence: { before: 'generation-1', after: 'generation-2', oldFenceAcceptedAsCurrent: false },
     explicitRebind: { outcome: 'accepted' }, operationIdentityAfterReopen: {
@@ -20,8 +25,8 @@ function example() {
     fixtures: [{ path: 'consumer.mjs', sha256: 'f'.repeat(64) }],
     publicBoundary: { siblingSourceImports: 0, applicationRetryQueues: 0,
       imports: ['@tendriller/core/collaboration', '@chronolog/peer-session/sql-native'] },
-    topology: { transport: 'direct-authenticated', signers: ['1', '2', '3', '4', '5', '6'].map(value => value.repeat(64)),
-      attachments: 2, independentAgents: 2 },
+    topology: { transport: 'direct-authenticated', signers: ['1', '2', '3', '4', '5', '6', '7', '8'].map(value => value.repeat(64)),
+      journeySigners: ['1', '2', '3', '4', '5', '6'].map(value => value.repeat(64)), attachments: 32, independentAgents: 2 },
     checks: requiredChecks.map(name => ({ name, passed: true, observation: observations[name] ?? { observed: true } })),
     claims: { browserQualified: false, physicalDeviceQualified: false, deployedHostQualified: false,
       conversationalResumeQualified: false, exactlyOnceExternalEffects: false }, runtime: { node: 'synthetic' },
@@ -30,7 +35,7 @@ function example() {
 
 test('one exact public composition retains local-only evidence boundaries', () => {
   const result = validateCollaborationReport(example());
-  assert.equal(result.topology.signers.length, 6);
+  assert.equal(result.topology.signers.length, 8); assert.equal(result.topology.journeySigners.length, 6);
   assert.equal(result.claims.conversationalResumeQualified, false);
 });
 
@@ -43,6 +48,8 @@ test('missing, repeated, failed or dirty observations cannot qualify the composi
     report => { report.artifacts[0].sourceDirty = true; },
     report => { report.publicBoundary.siblingSourceImports = 1; },
     report => { report.topology.signers[1] = report.topology.signers[0]; },
+    report => { report.checks.find(value => value.name === 'scaleProfile').observation.successfulViews = 31; },
+    report => { report.checks.find(value => value.name === 'noisyEndpointIsolation').observation.siblingQuerySucceeded = false; },
   ]) { const report = example(); mutate(report); assert.throws(() => validateCollaborationReport(report)); }
 });
 

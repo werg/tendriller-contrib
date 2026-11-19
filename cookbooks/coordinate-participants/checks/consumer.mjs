@@ -34,7 +34,7 @@ const stores = [];
 try {
   const authorityDevice = await openNativeDevice({ path: join(directory, 'authority.sqlite'), create: true });
   resources.push(authorityDevice);
-  const roles = ['coordinator', 'laptop', 'phone', 'reviewer-a', 'reviewer-b', 'provider'];
+  const roles = ['coordinator', 'laptop', 'phone', 'reviewer-a', 'reviewer-b', 'provider', 'observer', 'display'];
   const devices = [];
   for (const role of roles) {
     const path = join(directory, `${role}.sqlite`); stores.push(path);
@@ -84,9 +84,10 @@ try {
   await connect(0);
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
   report.topology = { transport: 'direct-authenticated', signers: sessions.map(session => session.deviceId),
+    journeySigners: sessions.slice(0, 6).map(session => session.deviceId),
     roles, independentAgents: 2, attachments: 2, liveDelivery: 'application' };
-  assert.equal(new Set(report.topology.signers).size, 6);
-  observed('sixIndependentSigners', { signers: report.topology.signers, coordinator: sessions[0].deviceId });
+  assert.equal(new Set(report.topology.signers).size, 8);
+  observed('sixIndependentSigners', { signers: report.topology.journeySigners, coordinator: sessions[0].deviceId });
 
   const owner = createApplicationOwner(sessions[1], {
     prepareCommand: (binding, name, input) => prepareCollaborationCommand(binding, name, input, sessions[1].deviceId),
@@ -149,15 +150,74 @@ try {
   assert.equal((await boardClient.inspect('board-request')).value.task.taskId, 'board-request');
   observed('malformedPortIsolation', { attachmentEnded: true, siblingUsable: true });
 
-  const progress = sessions[1].signals.subscribe({ topics: ['progress'], mode: 'latest',
+  // The representative journey above remains six independent roles. Exercise a
+  // separate scale envelope with eight signers and four live views per owner.
+  const owners = sessions.map((session, index) => {
+    if (index === 1) return owner;
+    const instance = createApplicationOwner(session, {
+      prepareCommand: (binding, name, input) => prepareCollaborationCommand(binding, name, input, session.deviceId),
+    });
+    resources.push(instance); return instance;
+  });
+  const scaleViews = sessions.map((_, index) => index === 1 ? [board] : []);
+  for (let index = 0; index < sessions.length; index++) {
+    while (scaleViews[index].length < 4) {
+      const channel = new MessageChannel(); channels.push(channel.port1, channel.port2);
+      const narrow = index === 1 && scaleViews[index].length === 1;
+      owners[index].attach(channel.port1, narrow ? { maxStreams: 2, maxRequests: 4,
+        capabilities: ['commands', 'queries', 'events', 'signals', 'operations'] } : {});
+      const view = await connectApplicationOwner(channel.port2, { applicationId, definitionId: definition.id,
+        definitionVersion: definition.version, context: { viewId: `scale-${index}-${scaleViews[index].length}`,
+          documentPath: `/scale/${roles[index]}/${scaleViews[index].length}.html` } });
+      resources.push(view); scaleViews[index].push(view);
+    }
+  }
+  const scaleEndpoints = scaleViews.flat().map(view => view.endpoint.endpointId);
+  assert.equal(new Set(scaleEndpoints).size, 32);
+  assert.ok(owners.every(instance => instance.endpoints().length === 4));
+  const scaleSnapshots = await Promise.all(scaleViews.flat().map(view => view.query('collab.snapshot', null)));
+  assert.ok(scaleSnapshots.every(value => value.value.tasks.some(task => task.taskId === 'board-request')));
+  report.topology.attachments = 32;
+  observed('scaleProfile', { signingParticipants: sessions.length, simultaneousAttachments: scaleEndpoints.length,
+    owners: owners.map(instance => instance.ownerInstanceId), attachmentsPerOwner: owners.map(instance => instance.endpoints().length),
+    successfulViews: scaleSnapshots.length });
+
+  const noisy = scaleViews[1][1], sibling = scaleViews[1][2];
+  const saturated = ['load-a', 'load-b'].map(topic => noisy.signals.subscribe({ topics: [topic], signal: signal() })[Symbol.asyncIterator]());
+  const warming = saturated.map(iterator => iterator.next());
+  // A round trip on the same port follows both stream.open requests.
+  await noisy.query('collab.snapshot', null);
+  await sessions[1].signals.send('load-a', { live: true }, { stream: { streamId: 'noisy-a' } });
+  await sessions[1].signals.send('load-b', { live: true }, { stream: { streamId: 'noisy-b' } });
+  await Promise.all(warming);
+  const held = saturated.map(iterator => iterator.next());
+  for (const waiting of held) void waiting.catch(() => undefined);
+  const overflowing = noisy.signals.subscribe({ topics: ['overflow'], signal: signal() })[Symbol.asyncIterator]();
+  await assert.rejects(overflowing.next(), /APPLICATION_WORKER_STREAM_LIMIT/u);
+  const siblingResult = await sibling.query('collab.snapshot', null);
+  assert.ok(siblingResult.value.tasks.some(task => task.taskId === 'discussion-request'));
+  assert.equal(sibling.signal.aborted, false); assert.equal(noisy.signal.aborted, false);
+  await Promise.all(saturated.map(iterator => iterator.return())); await Promise.allSettled(held);
+  observed('noisyEndpointIsolation', { perEndpointStreamLimit: 2, rejected: 'APPLICATION_WORKER_STREAM_LIMIT',
+    siblingQuerySucceeded: true, ownerClosed: sessions[1].signal.aborted });
+
+  const progress = scaleViews[6][0].signals.subscribe({ topics: ['progress'], mode: 'latest',
     streams: [{ authorId: sessions[3].deviceId, streamId: 'run-a' }, { authorId: sessions[3].deviceId, streamId: 'run-b' }], signal: signal() })[Symbol.asyncIterator]();
   const firstProgress = progress.next();
+  // The facade opens a stream asynchronously. Two round trips on its ordered
+  // port fence stream.open and the subsequent stream.next registration. Signals
+  // sent before a subscriber exists are correctly disposable, not buffered.
+  await scaleViews[6][0].query('collab.snapshot', null);
+  await scaleViews[6][0].query('collab.snapshot', null);
   await sessions[3].signals.send('progress', { completed: 1, total: 2 }, { stream: { streamId: 'run-a' } });
   await sessions[3].signals.send('progress', { completed: 2, total: 2 }, { stream: { streamId: 'run-b' } });
-  const received = [await firstProgress, await progress.next()].map(value => value.value);
+  const received = [await firstProgress, await progress.next()].map(value => {
+    assert.equal(value.done, false, 'Both independent signed streams must reach the registered observer'); return value.value;
+  });
   assert.deepEqual(received.map(value => value.stream.streamId).sort(), ['run-a', 'run-b']);
   await progress.return();
-  observed('signalRunIsolation', { streams: received.map(value => ({ streamId: value.stream.streamId, author: value.authorId })) });
+  observed('signalRunIsolation', { observer: scaleViews[6][0].deviceId,
+    streams: received.map(value => ({ streamId: value.stream.streamId, author: value.authorId })) });
 
   await accepted(clients[0], 'request', request('exclusive', [sessions[3].deviceId, sessions[4].deviceId]), 'exclusive-op');
   await synchronize();
@@ -174,8 +234,15 @@ try {
   const raw = await sessions[loser].command('fixture.raw', "DELETE FROM collab_journal", { operationId: 'raw-delete-claims' });
   const rawOutcome = await raw.applied({ signal: signal() });
   assert.equal(rawOutcome.outcome, 'rejected');
+  assert.equal(rawOutcome.rejectionCode, 'assert:collab_immutable');
   assert.deepEqual((await clients[0].inspect('exclusive')).value.claims[0], originalClaim);
-  observed('rawProgramGuard', { outcome: rawOutcome.outcome, operationId: raw.operationId, attempted: 'DELETE FROM collab_journal' });
+  observed('rawProgramGuard', { outcome: rawOutcome.outcome, rejectionCode: rawOutcome.rejectionCode,
+    operationId: raw.operationId, attempted: 'DELETE FROM collab_journal' });
+  const drop = await sessions[loser].command('fixture.raw', 'DROP TRIGGER collab_result', { operationId: 'raw-drop-result-guard' });
+  const dropOutcome = await drop.applied({ signal: signal() });
+  assert.equal(dropOutcome.outcome, 'rejected'); assert.equal(dropOutcome.rejectionCode, 'denied');
+  observed('schemaDdlGuard', { outcome: dropOutcome.outcome, rejectionCode: dropOutcome.rejectionCode,
+    attempted: 'DROP TRIGGER collab_result', author: sessions[loser].deviceId });
   await accepted(clients[0], 'handoff', { taskId: 'exclusive', slotId: 'review', actionId: 'handoff-review',
     expectedEpoch: originalClaim.claimEpoch, assignee: sessions[loser].deviceId, reason: 'Use the other specialist' }, 'handoff-review-op');
   const offered = (await clients[0].inspect('exclusive')).value.claims[0];
@@ -183,6 +250,18 @@ try {
   const resultInput = (taskId, slotId, claim, resultId, content = { decision: 'reviewed' }) => ({ taskId, slotId, resultId,
     claimEpoch: claim.claimEpoch, taskVersion: 1, generation: claim.generation, runId: claim.runId,
     endpointIncarnation: claim.endpointIncarnation, outcome: 'succeeded', content });
+  const forgedBody = JSON.stringify({ ...resultInput('exclusive', 'review', originalClaim, 'forged-current-result'),
+    content: JSON.stringify({ decision: 'Force stale work into the current aggregate' }), disposition: 'accepted' });
+  const quoted = value => `'${value.replaceAll("'", "''")}'`;
+  const forgedSql = `INSERT INTO collab_journal (id,sequence,type,task_id,slot_id,author,generation,body)
+    SELECT 'forged-current-result',COALESCE(MAX(sequence),0)+1,'result','exclusive','review',
+      lower(hex(chronolog_actor())),${quoted(initial.id)},${quoted(forgedBody)} FROM collab_journal`;
+  const forged = await sessions[winner].command('fixture.raw', forgedSql, { operationId: 'raw-forged-result' });
+  const forgedOutcome = await forged.applied({ signal: signal() });
+  assert.equal(forgedOutcome.outcome, 'rejected'); assert.equal(forgedOutcome.rejectionCode, 'assert:collab_result_disposition');
+  assert.equal((await clients[0].inspect('exclusive')).value.results.some(value => value.resultId === 'forged-current-result'), false);
+  observed('rawForgedResultGuard', { outcome: forgedOutcome.outcome, rejectionCode: forgedOutcome.rejectionCode,
+    actualSigner: sessions[winner].deviceId, assertedDisposition: 'accepted', retainedForgedResult: false });
   await accepted(clients[winner], 'result', resultInput('exclusive', 'review', originalClaim, 'late-result'), 'late-result-op');
   let inspection = (await clients[0].inspect('exclusive')).value;
   const lateResult = inspection.results.find(value => value.resultId === 'late-result');

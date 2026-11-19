@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 export const requiredChecks = Object.freeze([
   'sixIndependentSigners', 'twoAttachmentsOneOwner', 'sourceEndpointIsolation',
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
-  'exclusiveClaimRace', 'rawProgramGuard', 'staleClaimRejected',
+  'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
+  'rawForgedResultGuard', 'schemaDdlGuard', 'staleClaimRejected',
   'resultIdentityConflict', 'frozenContributionSlots', 'aggregateProvenance',
   'cancellationAcknowledgment', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
@@ -32,10 +33,12 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.ok(report.publicBoundary.imports.includes('@tendriller/core/collaboration'));
   assert.ok(report.publicBoundary.imports.includes('@chronolog/peer-session/sql-native'));
   assert.equal(report.topology.transport, 'direct-authenticated');
-  assert.equal(report.topology.signers.length, 6);
-  assert.equal(new Set(report.topology.signers).size, 6);
+  assert.equal(report.topology.signers.length, 8);
+  assert.equal(new Set(report.topology.signers).size, 8);
   for (const signer of report.topology.signers) hex(signer, 64);
-  assert.ok(report.topology.attachments >= 2);
+  assert.equal(new Set(report.topology.journeySigners).size, 6);
+  assert.ok(report.topology.journeySigners.every(signer => report.topology.signers.includes(signer)));
+  assert.equal(report.topology.attachments, 32);
   assert.equal(report.topology.independentAgents, 2);
   const names = report.checks.map(value => value.name);
   assert.equal(new Set(names).size, names.length, 'Duplicate observations cannot stand for missing gates');
@@ -47,6 +50,19 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   const observation = name => report.checks.find(value => value.name === name).observation;
   assert.deepEqual(observation('exclusiveClaimRace').outcomes.slice().sort(), ['accepted', 'rejected']);
   assert.equal(observation('rawProgramGuard').outcome, 'rejected');
+  assert.equal(observation('rawProgramGuard').rejectionCode, 'assert:collab_immutable');
+  assert.equal(observation('rawForgedResultGuard').outcome, 'rejected');
+  assert.equal(observation('rawForgedResultGuard').rejectionCode, 'assert:collab_result_disposition');
+  assert.equal(observation('rawForgedResultGuard').retainedForgedResult, false);
+  assert.equal(observation('schemaDdlGuard').outcome, 'rejected');
+  assert.equal(observation('schemaDdlGuard').rejectionCode, 'denied');
+  const scale = observation('scaleProfile');
+  assert.equal(scale.signingParticipants, 8); assert.equal(scale.simultaneousAttachments, 32);
+  assert.equal(scale.successfulViews, 32); assert.equal(new Set(scale.owners).size, 8);
+  assert.deepEqual(scale.attachmentsPerOwner, Array(8).fill(4));
+  assert.equal(observation('noisyEndpointIsolation').siblingQuerySucceeded, true);
+  assert.equal(observation('noisyEndpointIsolation').ownerClosed, false);
+  assert.equal(observation('noisyEndpointIsolation').rejected, 'APPLICATION_WORKER_STREAM_LIMIT');
   assert.equal(observation('staleClaimRejected').acceptedAsCurrent, false);
   assert.ok(['superseded', 'cancelled', 'needsReview'].includes(observation('staleClaimRejected').disposition));
   assert.equal(observation('resultIdentityConflict').conflict, 'rejected');
