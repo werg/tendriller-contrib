@@ -4,6 +4,30 @@ Find an approach for what you want to build, understand the consequential choice
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
 
+## Build and reuse the native first app
+
+For an app request, start with core's [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
+and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md).
+**This route depends on [core PR #60](https://github.com/werg/tendriller/pull/60)
+and a release containing its onboarding and starter additions.** An open PR or
+source link does not establish that a running host has them; check the requested
+origin's service descriptor and use that guide's exact compatible artifacts.
+
+Import or adapt the actual [first-app source](https://github.com/werg/tendriller/tree/master/docs/tutorial)
+from the host's `/downloads/tendriller-first-app.tgz`. Keep its session/Worker
+composition and use the [live-view, operation and review helpers](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
+For camera/file, voice or optional inference, follow the [reviewed media flow](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
+and adapt its supplied `media/` modules. These are editable application files,
+not new contrib exports. Reading a cookbook alone does not integrate them.
+
+Deliver the hosted page with its authorized session connected, a command observed
+by the other participant, retained work after reopening, and the signed publication
+receipt. State which process remains running and how to resume it. Then use the
+relevant cookbook to refine the task's choices and failure checks. Historical
+specimens below keep their recorded scope; this pointer does not revive them.
+
+## Browse the cookbooks
+
 Start with the [hosted cookbook gallery](https://cookbooks.tendriller.dev/),
 [browsable source index](index.html), [agent reading index](agent.md), or
 [plain reading catalog](catalog.json). The canonical guide is

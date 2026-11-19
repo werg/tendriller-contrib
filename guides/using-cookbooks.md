@@ -10,6 +10,29 @@ If the task is easier to name than the technical decision, start with the
 useful extensions, and a failure rehearsal. Select its relevant guides; a route
 does not require reading or installing every linked approach.
 
+## Reuse working source before adapting the interaction
+
+Follow core's [first-app guide](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
+and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md)
+for the native session, browser Worker, setup and signed publication. The new
+onboarding/source route requires [core PR #60](https://github.com/werg/tendriller/pull/60)
+in the selected release; do not assume an unupdated host serves its guides or archive.
+
+From that starter, actually import or adapt `helpers/live-view.mjs`,
+`helpers/operation-view.mjs` and, when needed, `helpers/reviewed-input.mjs` as
+described in [Application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
+The [media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
+supplies the camera/voice controllers and explicit native inference example.
+Record the modules used and the behavior changed for the task. Keep the real
+session as their state owner; a new REST/SSE service or persistence layer needs
+its own concrete requirement.
+
+The result is the working hosted application and connected participant, with
+verified cross-device work, reopening and a publication receipt. Source files
+and cookbook reading support that result; neither establishes it on its own.
+
+## Adapt and verify
+
 1. Inspect the person's task, existing files, service capabilities, and constraints.
 2. Browse the generated summaries and read only relevant guides. Follow related
    links when they resolve a decision; they are not executable dependencies.
