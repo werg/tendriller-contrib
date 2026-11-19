@@ -16,7 +16,7 @@ assert.deepEqual(identify(native), identify(browser), 'Both gates must use the s
 const hash = value => createHash('sha256').update(value).digest('hex');
 const result = { format: 'tendriller-collaboration-composition/v1', qualification: 'clean-local-native-and-browser',
   source: native.source, artifacts: identify(native), reports: { native: hash(nativeBytes), browser: hash(browserBytes) },
-  native: { topology: native.topology, checks: native.checks.map(value => value.name), runtime: native.runtime },
+  native: { topology: native.topology, checks: native.checks.map(value => value.name), runtime: native.runtime, measurements: native.measurements },
   browser: { scenarios: browser.scenarios, runtime: browser.runtime, wasm: browser.wasm }, claims: browser.claims };
 await writeFile(values.output, `${JSON.stringify(result, null, 2)}\n`, { flag: 'wx' });
 console.log(`Exact collaboration composition recorded: ${values.output}`);

@@ -110,6 +110,20 @@ offers explicit handoff and cancellation acknowledgment; it never takes a second
 claim on behalf of an observer. Follow the build instructions above to supply the
 real authenticated owner/bootstrap graph and browser SQL engine.
 
+The supplied [native reviewers](snippets/reviewer-cli.mjs) attach to separately
+enrolled supervisors and run the [evidence and clarity policies](snippets/reviewer.mjs).
+They claim only work addressed through an eligible fixed slot. Their deliberately
+small local checks exercise independent agents without implying provider or model
+verification. The page shows their current run identities and expiring progress
+separately from accepted contributions. A reload restores an unsent contribution
+draft but requires explicit transfer before a new endpoint continues the claim.
+
+The executable local scale profile has eight distinct retained signers and 32
+simultaneous views, with endpoint quotas that leave a sibling usable. Its report
+includes timing distributions, memory, CPU and exact grants. Treat those measured
+local results as a bounded composition profile; physical browsers, Internet routes
+and provider quotas require their own observations and limits.
+
 ## Rehearse interruption before claiming completion
 
 | Starting condition and action | Required observation |

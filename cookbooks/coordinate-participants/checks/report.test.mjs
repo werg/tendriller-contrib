@@ -11,6 +11,7 @@ function example() {
     scaleProfile: { signingParticipants: 8, simultaneousAttachments: 32, successfulViews: 32,
       owners: Array.from({ length: 8 }, (_, index) => `owner-${index}`), attachmentsPerOwner: Array(8).fill(4) },
     noisyEndpointIsolation: { rejected: 'APPLICATION_WORKER_STREAM_LIMIT', siblingQuerySucceeded: true, ownerClosed: false },
+    independentReviewPolicies: { policies: ['evidence', 'clarity'], signers: ['reviewer-a', 'reviewer-b'], externalEffects: false },
     staleClaimRejected: { acceptedAsCurrent: false, disposition: 'superseded' }, resultIdentityConflict: { conflict: 'rejected' },
     generationFence: { before: 'generation-1', after: 'generation-2', oldFenceAcceptedAsCurrent: false },
     explicitRebind: { outcome: 'accepted' }, operationIdentityAfterReopen: {
@@ -26,8 +27,12 @@ function example() {
     publicBoundary: { siblingSourceImports: 0, applicationRetryQueues: 0,
       imports: ['@tendriller/core/collaboration', '@chronolog/peer-session/sql-native'] },
     topology: { transport: 'direct-authenticated', signers: ['1', '2', '3', '4', '5', '6', '7', '8'].map(value => value.repeat(64)),
-      journeySigners: ['1', '2', '3', '4', '5', '6'].map(value => value.repeat(64)), attachments: 32, independentAgents: 2 },
+      journeySigners: ['1', '2', '3', '4', '5', '6'].map(value => value.repeat(64)), attachments: 32, independentAgents: 2, processes: 1, physicalDevices: 0, grants: Array(8).fill({ dataRole: 'member' }) },
     checks: requiredChecks.map(name => ({ name, passed: true, observation: observations[name] ?? { observed: true } })),
+    measurements: { elapsedMs: 20, performanceBudget: null, distributions: Object.fromEntries(
+      Object.entries({ commandAppliedMs: 15, convergenceMs: 2, viewQueryMs: 32, reopenedMs: 1 }).map(([name, samples]) =>
+        [name, { samples, values: Array(samples).fill(1), p50: 1, p95: 1, maximum: 1 }])),
+      memory: { maxRssBytes: 1024, sampledHeapUsedBytes: 512 }, counters: { observedEndpointStreamLimitRejections: 1, signalTransportDrops: null } },
     claims: { browserQualified: false, physicalDeviceQualified: false, deployedHostQualified: false,
       conversationalResumeQualified: false, exactlyOnceExternalEffects: false }, runtime: { node: 'synthetic' },
   };

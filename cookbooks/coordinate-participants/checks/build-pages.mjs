@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({ options: { session: { type: 'string' }, core: { type: 'string' },
-  deployment: { type: 'string' }, output: { type: 'string' } } });
+  deployment: { type: 'string' }, wasm: { type: 'string' }, output: { type: 'string' } } });
 for (const name of ['session', 'core', 'deployment', 'output']) assert.ok(values[name], `Required: --${name} /exact/path`);
 const here = dirname(fileURLToPath(import.meta.url)), session = resolve(values.session), core = resolve(values.core),
   deployment = resolve(values.deployment), output = resolve(values.output);
@@ -15,6 +15,7 @@ const sessionMetadata = JSON.parse(readFileSync(join(session, 'package.json'), '
 const coreMetadata = JSON.parse(readFileSync(join(core, 'package.json'), 'utf8'));
 assert.equal(sessionMetadata.name, '@chronolog/peer-session'); assert.equal(coreMetadata.name, '@tendriller/core');
 assert.ok(coreMetadata.exports['./collaboration'], 'The public SDK must export collaboration');
+assert.ok(coreMetadata.exports['./collaboration/browser'] && coreMetadata.exports['./collaboration/worker'], 'Use the matching maintained browser owner SDK');
 assert.ok(sessionMetadata.exports['./sql-browser'], 'Use a public browser SQL archive for the guarded collaboration definition');
 const proof = JSON.parse(readFileSync(join(session, 'provenance.json'), 'utf8'));
 assert.equal(proof.dirty, false, 'Published graphs require clean public session artifacts');
@@ -23,8 +24,28 @@ for (const [name, digest] of Object.entries(proof.sha256)) {
   assert.ok(scoped && !isAbsolute(scoped) && scoped !== '..' && !scoped.startsWith(`..${sep}`));
   assert.equal(hash(readFileSync(file)), digest, `Session artifact changed: ${name}`);
 }
-assert.ok(existsSync(join(deployment, 'bootstrap.mjs')), 'Supply the real authenticated deployment bootstrap');
-for (const source of [here, session, core, deployment]) {
+const customBootstrap = existsSync(join(deployment, 'bootstrap.mjs'));
+if (!customBootstrap) {
+  assert.ok(values.wasm, 'The supplied bootstrap templates require --wasm /exact/browser-engine');
+  const config = JSON.parse(readFileSync(join(deployment, 'configuration.json'), 'utf8'));
+  assert.match(config.applicationId, /^[a-f0-9]{64}$/u);
+  assert.equal(config.descriptor?.payload?.applicationId, config.applicationId);
+  assert.equal(config.schema?.payload?.applicationId, config.applicationId);
+  assert.ok(Array.isArray(config.administrators) && config.administrators.length > 0);
+  for (const signer of config.administrators) assert.match(signer, /^[a-f0-9]{64}$/u);
+  assert.match(config.profileId, /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u);
+  assert.equal(config.engineBaseUrl, '../engine/', 'Use the exact engine graph supplied to this builder');
+  assert.ok(['https:', 'http:'].includes(new URL(config.page_url).protocol));
+}
+let engine;
+if (values.wasm) {
+  const wasm = resolve(values.wasm), manifest = JSON.parse(readFileSync(join(wasm, 'manifest.json'), 'utf8'));
+  assert.equal(manifest.toolchain, 'emscripten-4.0.20');
+  assert.equal(hash(readFileSync(join(wasm, 'sqlite3.wasm'))), manifest.wasmSha256);
+  if (proof.nativeEngine) assert.deepEqual(manifest.nativeManifest, proof.nativeEngine.manifest);
+  engine = { manifest, directory: wasm };
+}
+for (const source of [here, session, core, deployment, ...(engine ? [engine.directory] : [])]) {
   const scoped = relative(source, output);
   assert.ok(scoped === '..' || scoped.startsWith(`..${sep}`) || isAbsolute(scoped), 'Output must be outside its source trees');
 }
@@ -34,6 +55,13 @@ cpSync(join(here, '../page'), output, { recursive: true, dereference: false });
 cpSync(session, join(output, 'peer-session'), { recursive: true, dereference: false });
 cpSync(core, join(output, 'core'), { recursive: true, dereference: false });
 cpSync(deployment, join(output, 'deployment'), { recursive: true, dereference: false });
+if (!customBootstrap) for (const name of ['bootstrap.mjs', 'worker.mjs', 'review-workspace.mjs'])
+  cpSync(join(here, '../snippets', name), join(output, 'deployment', name));
+if (engine) {
+  mkdirSync(join(output, 'engine'));
+  for (const name of ['manifest.json', 'sqlite3.mjs', 'sqlite3.wasm', 'sqlite3-opfs-async-proxy.js'])
+    cpSync(join(engine.directory, name), join(output, 'engine', name), { dereference: false });
+}
 mkdirSync(join(output, 'domain'));
 writeFileSync(join(output, 'domain/review-workspace.mjs'), readFileSync(join(here, '../snippets/review-workspace.mjs')));
 writeFileSync(join(output, 'domain/live-run.mjs'), readFileSync(join(here, '../../share-live-signals/snippets/live-run.mjs')));
@@ -57,6 +85,8 @@ const files = walk(output).map(path => ({ path: relative(output, path).split(sep
 writeFileSync(join(output, 'specimen-manifest.json'), `${JSON.stringify({ format: 'collaboration-pages/v1',
   entries: ['board.html', 'discussion.html'], session: { version: sessionMetadata.version, source: proof.source, sourceTree: proof.sourceTree },
   core: { version: coreMetadata.version, sourceEvidence: 'provided-public-package-directory' },
+  ...(engine ? { wasm: { sha256: engine.manifest.wasmSha256, toolchain: engine.manifest.toolchain } } : {}),
+  bootstrap: customBootstrap ? 'supplied deployment module' : 'reference authenticated host bootstrap',
   authority: 'explicit deployment bootstrap; no fixtures or embedded credentials', files }, null, 2)}\n`);
 console.log(`Built ${files.length} immutable graph assets with two independently attached views.`);
 

@@ -39,6 +39,7 @@ try {
   const fixtures = await Promise.all([
     ['consumer.mjs', join(here, 'consumer.mjs')],
     ['review-workspace.mjs', join(here, '../snippets/review-workspace.mjs')],
+    ['reviewer.mjs', join(here, '../snippets/reviewer.mjs')],
     ['live-run.mjs', join(here, '../../share-live-signals/snippets/live-run.mjs')],
   ].map(async ([name, path]) => {
     const bytes = await readFile(path), sourcePath = relative(root, path).split(sep).join('/');
@@ -73,7 +74,7 @@ try {
   const imports = new Set();
   const allowed = new Set(['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql',
     '@chronolog/peer-session/sql-native', '@chronolog/peer-session/worker', '@chronolog/peer-session/browser',
-    '@tendriller/core/collaboration', './review-workspace.mjs', './live-run.mjs']);
+    '@tendriller/core/collaboration', './review-workspace.mjs', './reviewer.mjs', './live-run.mjs']);
   for (const { name, sourcePath, bytes } of fixtures) {
     for (const match of bytes.toString('utf8').matchAll(/(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)['"]([^'"]+)['"]/gu)) {
       const specifier = match[1];

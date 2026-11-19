@@ -5,7 +5,7 @@ export const requiredChecks = Object.freeze([
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
   'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
   'rawForgedResultGuard', 'schemaDdlGuard', 'staleClaimRejected',
-  'resultIdentityConflict', 'frozenContributionSlots', 'aggregateProvenance',
+  'resultIdentityConflict', 'independentReviewPolicies', 'frozenContributionSlots', 'aggregateProvenance',
   'cancellationAcknowledgment', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
 ]);
@@ -40,6 +40,8 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.ok(report.topology.journeySigners.every(signer => report.topology.signers.includes(signer)));
   assert.equal(report.topology.attachments, 32);
   assert.equal(report.topology.independentAgents, 2);
+  assert.equal(report.topology.processes, 1); assert.equal(report.topology.physicalDevices, 0);
+  assert.equal(report.topology.grants.length, 8);
   const names = report.checks.map(value => value.name);
   assert.equal(new Set(names).size, names.length, 'Duplicate observations cannot stand for missing gates');
   assert.deepEqual([...names].sort(), [...requiredChecks].sort());
@@ -63,6 +65,9 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(observation('noisyEndpointIsolation').siblingQuerySucceeded, true);
   assert.equal(observation('noisyEndpointIsolation').ownerClosed, false);
   assert.equal(observation('noisyEndpointIsolation').rejected, 'APPLICATION_WORKER_STREAM_LIMIT');
+  const policies = observation('independentReviewPolicies');
+  assert.deepEqual(policies.policies.slice().sort(), ['clarity', 'evidence']);
+  assert.equal(new Set(policies.signers).size, 2); assert.equal(policies.externalEffects, false);
   assert.equal(observation('staleClaimRejected').acceptedAsCurrent, false);
   assert.ok(['superseded', 'cancelled', 'needsReview'].includes(observation('staleClaimRejected').disposition));
   assert.equal(observation('resultIdentityConflict').conflict, 'rejected');
@@ -79,7 +84,18 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(report.claims.deployedHostQualified, false);
   assert.equal(report.claims.conversationalResumeQualified, false);
   assert.equal(report.claims.exactlyOnceExternalEffects, false);
+  const metrics = report.measurements;
+  assert.ok(metrics.elapsedMs > 0); assert.equal(metrics.performanceBudget, null);
+  for (const [name, minimum] of Object.entries({ commandAppliedMs: 15, convergenceMs: 2, viewQueryMs: 32, reopenedMs: 1 })) {
+    const value = metrics.distributions[name]; assert.ok(value.samples >= minimum); assert.equal(value.samples, value.values.length);
+    assert.ok(value.values.every(sample => Number.isFinite(sample) && sample >= 0));
+    const sorted = value.values.slice().sort((a, b) => a - b);
+    assert.equal(value.p50, sorted[Math.ceil(sorted.length * 0.5) - 1]);
+    assert.equal(value.p95, sorted[Math.ceil(sorted.length * 0.95) - 1]); assert.equal(value.maximum, sorted.at(-1));
+  }
+  assert.ok(metrics.memory.maxRssBytes > 0); assert.ok(metrics.memory.sampledHeapUsedBytes > 0);
+  assert.equal(metrics.counters.observedEndpointStreamLimitRejections, 1); assert.equal(metrics.counters.signalTransportDrops, null);
   return { format: 'tendriller-collaboration-summary/v1', source: report.source,
     artifacts: report.artifacts, topology: report.topology, checks: report.checks,
-    claims: report.claims, runtime: report.runtime };
+    claims: report.claims, runtime: report.runtime, measurements: metrics };
 }

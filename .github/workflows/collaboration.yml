@@ -21,7 +21,7 @@ on:
         description: Exact immutable core collaboration commit
         required: false
         type: string
-        default: '419baa3b3132f97c4ce7c5ecbff612d3e118be84'
+        default: '7f57e1256174cac3e4de005a86c01406f2b9226d'
 permissions:
   contents: read
 concurrency:
@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 45
     env:
       CHRONOLOG_REF: ${{ inputs.chronolog_ref || '0bc002753c6f5a1e2d3cb57505dd4405945ded1b' }}
-      CORE_REF: ${{ inputs.tendriller_ref || '419baa3b3132f97c4ce7c5ecbff612d3e118be84' }}
+      CORE_REF: ${{ inputs.tendriller_ref || '7f57e1256174cac3e4de005a86c01406f2b9226d' }}
     steps:
       - name: Require exact companion source
         shell: bash
@@ -41,6 +41,8 @@ jobs:
           [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
           [[ "$CORE_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -73,6 +75,9 @@ jobs:
       - name: Build the exact public core SDK
         working-directory: .tendriller-build
         run: npm ci && npm run build
+      - name: Inspect core build cleanliness
+        working-directory: .tendriller-build
+        run: git status --short
       - name: Install the pinned WASM toolchain
         run: |
           git clone --depth 1 --branch 4.0.20 https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/collaboration-emsdk"
@@ -85,6 +90,7 @@ jobs:
       - name: Install the pinned browser
         run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
       - name: Exercise eight signers and 32 attached views
+        id: native
         shell: bash
         run: |
           sessions=(.chronolog-build/artifacts/collaboration/chronolog-peer-session-*.tgz)
@@ -92,6 +98,7 @@ jobs:
           test "${#sessions[@]}" -eq 1 && test "${#cores[@]}" -eq 1
           node cookbooks/coordinate-participants/checks/run.mjs --session-artifact "${sessions[0]}" --core-artifact "${cores[0]}" --core-provenance .tendriller-build/dist/provenance.json --output test-results/collaboration/native
       - name: Exercise actual authored browser views and OPFS recovery
+        if: ${{ !cancelled() && steps.native.outcome != 'skipped' }}
         shell: bash
         run: |
           sessions=(.chronolog-build/artifacts/collaboration/chronolog-peer-session-*.tgz)

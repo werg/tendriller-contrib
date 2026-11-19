@@ -13,20 +13,26 @@ import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-sessi
 import { createNativeSqlEngine } from '@chronolog/peer-session/sql-native';
 import { createViewStore, prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { reviewWorkspace, reviewClient } from './review-workspace.mjs';
+import { reviewAssignedTask } from './reviewer.mjs';
 
 const reportPath = resolve(process.argv[2]), report = JSON.parse(await readFile(reportPath, 'utf8'));
 const directory = join(dirname(reportPath), 'stores'), resources = [], channels = [], links = [];
+const startedAt = performance.now(), samples = { commandAppliedMs: [], convergenceMs: [], viewQueryMs: [], reopenedMs: [] }, memory = [];
+const measure = async (name, operation) => {
+  const start = performance.now(); try { return await operation(); } finally { samples[name].push(performance.now() - start); }
+};
 const signal = () => AbortSignal.timeout(15_000);
-const applied = async (client, method, input, operationId) => {
+const applied = async (client, method, input, operationId) => measure('commandAppliedMs', async () => {
   const operation = await client[method](input, { operationId });
   return operation.applied({ signal: signal() });
-};
+});
 const accepted = async (...args) => {
   const result = await applied(...args); assert.equal(result.outcome, 'accepted', JSON.stringify(result)); return result;
 };
 const observed = (name, observation) => {
   assert.ok(!report.checks.some(value => value.name === name), `Duplicate check ${name}`);
   report.checks.push({ name, passed: true, observation });
+  memory.push(process.memoryUsage());
   console.log(`✓ ${name}`);
 };
 const stores = [];
@@ -79,13 +85,16 @@ try {
     }
     await synchronize();
   };
-  const synchronize = async () => { for (const link of links) await link.synchronize(); };
+  const synchronize = async () => measure('convergenceMs', async () => { for (const link of links) await link.synchronize(); });
   const disconnect = async () => { await Promise.all(links.splice(0).map(link => link.close())); };
   await connect(0);
   report.executionManifestDigest = descriptor.payload.executionManifestDigest;
   report.topology = { transport: 'direct-authenticated', signers: sessions.map(session => session.deviceId),
     journeySigners: sessions.slice(0, 6).map(session => session.deviceId),
-    roles, independentAgents: 2, attachments: 2, liveDelivery: 'application' };
+    roles, independentAgents: 2, attachments: 2, liveDelivery: 'application', processes: 1, physicalDevices: 0,
+    network: 'in-process authenticated direct links; local filesystem stores; real MessagePorts',
+    grants: devices.map((device, index) => ({ signer: device.identity.publicKey, dataRole: 'member',
+      controlAdministrator: true, schemaAdministrator: index === 0, collaborationAdministrator: index === 0 })) };
   assert.equal(new Set(report.topology.signers).size, 8);
   observed('sixIndependentSigners', { signers: report.topology.journeySigners, coordinator: sessions[0].deviceId });
 
@@ -175,7 +184,7 @@ try {
   const scaleEndpoints = scaleViews.flat().map(view => view.endpoint.endpointId);
   assert.equal(new Set(scaleEndpoints).size, 32);
   assert.ok(owners.every(instance => instance.endpoints().length === 4));
-  const scaleSnapshots = await Promise.all(scaleViews.flat().map(view => view.query('collab.snapshot', null)));
+  const scaleSnapshots = await Promise.all(scaleViews.flat().map(view => measure('viewQueryMs', () => view.query('collab.snapshot', null))));
   assert.ok(scaleSnapshots.every(value => value.value.tasks.some(task => task.taskId === 'board-request')));
   report.topology.attachments = 32;
   observed('scaleProfile', { signingParticipants: sessions.length, simultaneousAttachments: scaleEndpoints.length,
@@ -279,13 +288,16 @@ try {
   observed('resultIdentityConflict', { conflict: conflict.outcome, acceptedResults: inspection.results.filter(value => value.disposition === 'accepted').length });
 
   await accepted(clients[0], 'request', request('round', [sessions[3].deviceId, sessions[4].deviceId], 'allSlots'), 'round-request');
-  for (const [offset, index] of [3, 4].entries()) {
-    const slotId = `review-${offset + 1}`;
-    await accepted(clients[index], 'claim', claimInput('round', slotId, index), `round-claim-${index}`);
-    const claim = (await clients[0].inspect('round')).value.claims.find(value => value.slotId === slotId);
-    await accepted(clients[index], 'result', resultInput('round', slotId, claim, `round-result-${index}`,
-      { review: index === 3 ? 'Evidence is complete' : 'Recommendation is consistent', evidenceId: 'evidence-12' }), `round-complete-${index}`);
-  }
+  await synchronize();
+  const independentReviews = await Promise.all([3, 4].map((index, offset) => reviewAssignedTask({ session: sessions[index],
+    endpoint: endpoint(index), runId: `run-${roles[index]}`, taskId: 'round', slotId: `review-${offset + 1}`,
+    policy: index === 3 ? 'evidence' : 'clarity', signal: signal() })));
+  assert.deepEqual(independentReviews.map(value => value.status), ['accepted', 'accepted']);
+  assert.deepEqual(independentReviews.map(value => value.result.content.policy).sort(), ['clarity', 'evidence']);
+  assert.equal(new Set(independentReviews.map(value => value.result.author)).size, 2);
+  observed('independentReviewPolicies', { policies: independentReviews.map(value => value.result.content.policy),
+    signers: independentReviews.map(value => value.result.author), results: independentReviews.map(value => value.result.resultId),
+    externalEffects: false });
   const round = (await clients[0].inspect('round')).value;
   assert.equal(round.task.slots.length, 2);
   const unauthorizedClaim = await applied(clients[5], 'claim', claimInput('round', 'review-1', 5), 'unassigned-provider-claim');
@@ -344,8 +356,10 @@ try {
   const signerBefore = sessions[3].deviceId, storageBefore = sessions[3].storageId;
   const operationBefore = await sessions[3].operations.get(retainedOperation.operationId);
   await sessions[3].close();
-  const reopenedDevice = await openNativeDevice({ path: stores[3] }); resources.push(reopenedDevice);
-  const reopened = await open(reopenedDevice, 3);
+  const reopened = await measure('reopenedMs', async () => {
+    const reopenedDevice = await openNativeDevice({ path: stores[3] }); resources.push(reopenedDevice);
+    return open(reopenedDevice, 3);
+  });
   const operationAfter = await reopened.operations.get(retainedOperation.operationId);
   assert.equal(reopened.deviceId, signerBefore); assert.equal(reopened.storageId, storageBefore);
   assert.deepEqual(operationAfter, operationBefore);
@@ -368,10 +382,31 @@ try {
 } catch (error) {
   report.passed = false; report.error = error instanceof Error ? error.stack ?? error.message : String(error); throw error;
 } finally {
+  memory.push(process.memoryUsage());
+  const usage = process.resourceUsage();
+  report.measurements = { scope: 'one local Node process; eight retained signers; 32 real MessagePort attachments; no Internet latency claim',
+    elapsedMs: performance.now() - startedAt,
+    definitions: { commandAppliedMs: 'client command start through selected-history applied result, including rejected commands',
+      convergenceMs: 'all authenticated direct links synchronized, after an explicit fixture boundary',
+      viewQueryMs: '32 simultaneous facade snapshot queries; one measured sample per view',
+      reopenedMs: 'existing device store reopen and session bootstrap; no replacement identity or epoch key supplied' },
+    distributions: Object.fromEntries(Object.entries(samples).map(([name, values]) => [name, distribution(values)])),
+    memory: { maxRssBytes: usage.maxRSS * 1024, sampledHeapUsedBytes: Math.max(...memory.map(value => value.heapUsed)),
+      sampledExternalBytes: Math.max(...memory.map(value => value.external)), samples: memory.length },
+    cpu: { userMicroseconds: usage.userCPUTime, systemMicroseconds: usage.systemCPUTime },
+    counters: { observedEndpointStreamLimitRejections: report.checks.some(value => value.name === 'noisyEndpointIsolation') ? 1 : 0,
+      signalTransportDrops: null, signalDropCounterAvailability: 'not exposed by this public API' },
+    performanceBudget: null };
   for (const link of links.reverse()) await link.close().catch(() => undefined);
   for (const resource of resources.reverse()) await resource.close().catch(() => undefined);
   for (const channel of channels) channel.close();
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+}
+
+function distribution(values) {
+  const sorted = values.slice().sort((a, b) => a - b);
+  const percentile = p => sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * p) - 1)] : null;
+  return { samples: sorted.length, p50: percentile(0.5), p95: percentile(0.95), maximum: sorted.at(-1) ?? null, values };
 }
 
 function memoryStorage() {
