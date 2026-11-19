@@ -207,9 +207,22 @@ const observing = observeLiveRun(tendril.signals, {
 });
 
 // The authorized producer sends independent live observations.
-await signals.send('progress', { runId, completed: 300, total: 500 }, { ttlMs: 3000 });
-await signals.send('preview', { runId, text: completeCurrentPreview }, { ttlMs: 3000 });
+await signals.send('progress', { runId, completed: 300, total: 500 }, {
+  stream: { streamId: runId }, ttlMs: 3000,
+});
+await signals.send('preview', { runId, text: completeCurrentPreview }, {
+  stream: { streamId: runId }, ttlMs: 3000,
+});
 ```
+
+The run is a signed stream scope, not only a payload label. The helper selects
+`streams: [{ authorId: publisher, streamId: runId }]` before coalescing. Two runs
+from the same signing device can then use the same progress topic independently.
+An attached session owner supplies its endpoint ID and incarnation; applications
+must not claim another endpoint by filling those fields themselves. Optional
+endpoint selection prevents stale output from a previous attachment appearing in
+the current view. This specimen requires the stream-aware public signal contract;
+use the exact compatible package from the qualification manifest.
 
 Complete preview snapshots use `latest`; losing an intermediate snapshot does
 not create a hidden gap in concatenated text. The specimen bounds text to 8,192
