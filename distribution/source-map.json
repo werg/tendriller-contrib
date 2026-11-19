@@ -110,6 +110,15 @@
       ]
     },
     {
+      "id": "connect-chatgpt",
+      "sources": [
+        "https://github.com/werg/tendriller/tree/0d9eff5d4e196313996c8c6cc77a130d2de1cf81/integrations/chatgpt/examples/kitchen",
+        "https://github.com/werg/tendriller/tree/0876ac445e47ded9a73df54515925ed1fdbe4e60/integrations/chatgpt/widget",
+        "https://github.com/werg/tendriller/blob/d9f05c91581095e845452bceca3af8873d5857de/docs/SESSION_BOOTSTRAP.md",
+        "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"
+      ]
+    },
+    {
       "id": "connect-instrument",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/serial.js",
