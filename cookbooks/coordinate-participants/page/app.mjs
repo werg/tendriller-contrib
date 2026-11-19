@@ -13,7 +13,7 @@ const action = (label, callback, disabled = false) => {
 const freshId = () => crypto.randomUUID();
 let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, messageSubmitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
-let observation = new AbortController(), dirty = false, refreshing = false;
+let observation = new AbortController(), dirty = false, refreshing = false, conversationReady = false;
 let reader, newerChanges = false, forceRefresh = false;
 const taskPages = { cursors: [undefined] }, threadPages = { cursors: [undefined] }, resultPages = { cursors: [undefined] };
 const browsingHistory = () => [taskPages, threadPages, resultPages].some(pager => pager.cursors.length > 1);
@@ -98,20 +98,20 @@ function paintOperations() {
   $('#operations-empty').hidden = references.length > 0;
 }
 
-function paintTasks(value) {
+function paintTasks(value, taskId = selectedTask) {
   // A remote update may replace a card but must not interrupt a local edit.
   const focused = document.activeElement;
   const retainedFocus = focused?.dataset.localDraft ? { draft: focused.dataset.localDraft,
     start: focused.selectionStart, end: focused.selectionEnd, direction: focused.selectionDirection } : null;
   $('#tasks').replaceChildren(...value.tasks.map(task => {
-    const card = node('article', '', `task${task.taskId === selectedTask ? ' selected' : ''}`);
+    const card = node('article', '', `task${task.taskId === taskId ? ' selected' : ''}`);
     card.dataset.taskId = task.taskId;
     card.append(node('p', `${task.status === 'needsReview' ? 'Review required' : task.status} · ${task.responsePolicy}`, 'eyebrow'));
     card.append(node('h3', task.title), node('p', typeof task.input?.text === 'string' ? task.input.text : JSON.stringify(task.input)));
     card.append(node('p', `${label(task.creator)} · ${originLabel(task.source)}`, 'muted'));
     card.append(diagnostics('Request origin and operation', { taskId: task.taskId, author: task.creator,
       source: task.source, operation: task.operation ?? null, context: task.context }));
-    const open = action(task.taskId === selectedTask ? 'Selected conversation' : 'Open conversation', async () => {
+    const open = action(task.taskId === taskId ? 'Selected conversation' : 'Open conversation', async () => {
       await selectTask(task.taskId); $('#message').focus();
     }); open.dataset.selectTask = task.taskId; card.append(open);
     const slots = node('ul', '', 'slots');
@@ -125,7 +125,7 @@ function paintTasks(value) {
         row.append(node('p', acceptedResult.outcome === 'failed' ? 'Contributor reported a failure' : 'Contribution accepted', 'receipt'));
         const loaded = results.find(item => item.resultId === acceptedResult.resultId);
         if (loaded) row.append(node('p', loaded.content?.text ?? JSON.stringify(loaded.content)));
-        else row.append(node('p', task.taskId === selectedTask
+        else row.append(node('p', task.taskId === taskId
           ? 'This accepted contribution is retained. Browse the evidence pages below to read its content.'
           : 'Open this conversation to read its accepted contributions.', 'muted'));
         row.append(diagnostics('Contribution origin', { resultId: acceptedResult.resultId, author: acceptedResult.author,
@@ -203,7 +203,7 @@ function paintTasks(value) {
       slots.append(row);
     }
     card.append(slots);
-    if (task.taskId === selectedTask) {
+    if (task.taskId === taskId) {
       const evidence = node('div', '', 'evidence-pages');
       evidence.append(node('h4', 'Contribution evidence'), node('p', pageLabel(value.pages.results, resultPages, 'results'), 'muted'));
       for (const result of value.results) evidence.append(diagnostics(
@@ -275,8 +275,8 @@ function paintRuns() {
   $('#runs-empty').hidden = liveRuns.size > 0;
   if (expiresAt < Infinity && !observation.signal.aborted) runTimer = setTimeout(paintRuns, Math.max(0, expiresAt - Date.now()));
 }
-function observeRuns(value) {
-  const claims = value.claims.filter(claim => claim.taskId === selectedTask && ['active', 'cancelRequested'].includes(claim.status));
+function observeRuns(value, taskId = selectedTask) {
+  const claims = value.claims.filter(claim => claim.taskId === taskId && ['active', 'cancelRequested'].includes(claim.status));
   const key = JSON.stringify(claims.map(claim => [claim.claimant, claim.runId, claim.endpointIncarnation, claim.claimEpoch, claim.status]));
   if (key === runScopeKey && !runSubscription?.signal.aborted) return;
   runScopeKey = key; runSubscription?.abort(); clearTimeout(runTimer); runSubscription = new AbortController();
@@ -321,7 +321,7 @@ async function refreshParticipants() {
     $('#request-submit').disabled = true; $('#message-submit').disabled = true;
     throw Error('This signing profile no longer has workspace access. Shared content has been cleared.');
   }
-  $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized || messageSubmitting;
+  $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized || messageSubmitting || !conversationReady;
 }
 
 const eligibilityKey = () => JSON.stringify(entries.map(entry => [entry.deviceId, entry.authorized, entry.revoked,
@@ -339,11 +339,11 @@ function scheduleParticipants() {
   }, 10_000);
 }
 
-function paint(value) {
-  paintTasks(value);
-  const task = value.tasks.find(item => item.taskId === selectedTask);
+function paint(value, taskId = selectedTask) {
+  paintTasks(value, taskId);
+  const task = value.tasks.find(item => item.taskId === taskId);
   $('#thread-title').textContent = task ? task.title : 'Workspace conversation';
-  const threadId = selectedTask ?? 'workspace';
+  const threadId = taskId ?? 'workspace';
   $('#messages').replaceChildren(...value.messages.filter(item => item.threadId === threadId).map(message => {
     const row = node('li', ''); row.append(node('p', message.text), node('small', `${label(message.author)} · ${originLabel(message.source)}`),
       diagnostics('Message origin and operation', { messageId: message.messageId, source: message.source, operation: message.operation })); return row;
@@ -353,7 +353,7 @@ function paint(value) {
   syncPagingControls();
   $('#shared-updates').hidden = !newerChanges;
   $('#recovery').hidden = !value.tasks.some(item => item.status === 'needsReview');
-  observeRuns(value);
+  observeRuns(value, taskId);
   paintOperations();
 }
 function pageLabel(page, pager, noun) {
@@ -393,12 +393,24 @@ async function renderCaptured(taskId = selectedTask) {
   // A newly created operation may be saved before its conversation exists.
   // Do not enable posting into a conversation that the current view cannot show.
   if (taskId !== selectedTask && taskId && !current.value.tasks.some(task => task.taskId === taskId)) return false;
-  // Selection is committed at the same time as the new captured view. A
-  // failed or cancelled read leaves the message target and heading unchanged.
-  selectedTask = taskId;
+  // Paint against the candidate without changing the post target. A paint
+  // failure (including local draft storage errors) must not retarget a message.
+  const previous = snapshot;
   snapshot = current;
-  $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`;
-  paint(current.value);
+  try {
+    $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`;
+    paint(current.value, taskId);
+  } catch (error) {
+    snapshot = previous;
+    conversationReady = false;
+    $('#message-submit').disabled = true;
+    throw error;
+  }
+  // Synchronous rendering succeeded, so the displayed heading and message
+  // destination become authoritative together.
+  selectedTask = taskId;
+  conversationReady = true;
+  $('#message-submit').disabled = !canWrite() || messageSubmitting;
   return true;
 }
 async function selectTask(taskId) {
@@ -499,7 +511,7 @@ $('#request-form').onsubmit = async event => {
 $('#message-form').onsubmit = async event => {
   event.preventDefault();
   const submittedMessage = $('#message').value, text = submittedMessage.trim();
-  if (!client || !text || messageSubmitting) return;
+  if (!client || !text || messageSubmitting || !conversationReady) return;
   const threadId = selectedTask ?? 'workspace';
   messageSubmitting = true; $('#message-submit').disabled = true;
   try {
@@ -507,7 +519,7 @@ $('#message-form').onsubmit = async event => {
     if ($('#message').value === submittedMessage) $('#message').value = '';
     retainDraft();
   } catch (error) { report(error); }
-  finally { messageSubmitting = false; $('#message-submit').disabled = !canWrite(); }
+  finally { messageSubmitting = false; $('#message-submit').disabled = !canWrite() || !conversationReady; }
 };
 for (const id of ['request-title', 'request-input', 'message', 'recipient', 'response-policy']) $( `#${id}`).addEventListener('input', () => {
   try { if (store) retainDraft(); } catch (error) { report(error); }
