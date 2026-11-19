@@ -416,7 +416,7 @@
     {
       "id": "connect-chatgpt",
       "title": "Connect an application to an assistant and choose a fallback",
-      "summary": "Keep application state in Chronolog while combining authorized tools, subscribed events, an explicit widget action, and resumable local-agent routes.",
+      "summary": "Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.",
       "group": "Coordinate people and tools",
       "tags": [
         "assistant",
@@ -424,7 +424,8 @@
         "mcp",
         "events",
         "consent",
-        "recovery"
+        "recovery",
+        "deployment"
       ],
       "choices": [
         "On-demand tools or subscribed background help",
@@ -450,7 +451,7 @@
         "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"
       ],
       "path": "cookbooks/connect-chatgpt/COOKBOOK.md",
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-chatgpt/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep application state in Chronolog while combining authorized tools, subscribed events, an explicit widget action, and resumable local-agent routes. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-chatgpt/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "connect-instrument",

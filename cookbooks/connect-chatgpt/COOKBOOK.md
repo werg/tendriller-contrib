@@ -1,9 +1,9 @@
 ---
 id: "connect-chatgpt"
 title: "Connect an application to an assistant and choose a fallback"
-summary: "Keep application state in Chronolog while combining authorized tools, subscribed events, an explicit widget action, and resumable local-agent routes."
+summary: "Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes."
 group: "Coordinate people and tools"
-tags: ["assistant", "chatgpt", "mcp", "events", "consent", "recovery"]
+tags: ["assistant", "chatgpt", "mcp", "events", "consent", "recovery", "deployment"]
 choices: ["On-demand tools or subscribed background help", "Enrolled remote reader or local participant", "Explicit widget handoff or separate workspace agent"]
 capabilities: []
 evidence: "explained"
@@ -68,7 +68,10 @@ becomes available through `trigger_workspace_agent` and
 checks current account access, selected source and event consent, persists the
 caller-owned operation before sending, and sends static instructions with
 identifiers rather than the question. The conversation key is scoped to the
-configured channel, exact issuer/subject and application. Exact retries retain
+configured channel, exact issuer/subject and application. After asynchronous
+authorization, it rereads the selected source and checks the same selected
+generation synchronously immediately before provider egress. Already-started
+external I/O cannot be retracted by a later recovery. Exact retries retain
 the original body and idempotency key. The bounded journal preserves accepted
 receipts, including late receipts after recovery, without treating them as a
 current request or a signed application answer. Test this route with a real
@@ -99,20 +102,59 @@ history to the reader; a filtered event projection is not a notification-only
 cryptographic grant. Explain the reader's actual access before enrollment and
 minimize what leaves it.
 
-Use an OAuth authorization provider that meets the deployed MCP resource's
-requirements, including authorization code, PKCE S256, issuer and resource
-binding. Verify every request and recheck consent/grants before queries,
-commands and outbound delivery. Existing upstream account-login tokens are not
-automatically MCP access tokens. Follow [OpenAI authentication guidance](https://developers.openai.com/plugins/build/auth)
+Use the included Tendriller host account mode when the existing account host is
+also the intended authorization server. `hostAccount` installs the supplied
+OAuth verifier, exact-grant introspection, current page/account checks and the
+browser `/connections` handoff. It uses the existing GitHub/Google sign-in;
+operators supply the actual page/application mapping and explicit client/bridge
+registration. A different issuer remains possible through the external-provider
+interface, which needs trusted current-account and owner adapters.
+
+Both routes require authorization code, PKCE S256, issuer/resource binding and
+current authorization checks. Existing upstream account-login tokens are not
+automatically MCP access tokens. The supplied host supports predefined public
+clients (`none`) and confidential clients (`client_secret_basic`); the exact
+callback must come from the intended ChatGPT client. It does not provide dynamic
+client registration or OIDC. If the chosen client requires those capabilities,
+use a compatible issuer instead of loosening redirects or token checks. Follow
+[OpenAI authentication guidance](https://developers.openai.com/plugins/build/auth)
 and the integration's configuration documentation for the exact resource.
+
+## Retain and deploy the two participants
+
+The [deployment and readiness note](notes/deployment.md) describes the concrete
+Linux systemd/Caddy route and the evidence each step supplies. Keep a separate
+coordinating participant and a dedicated assistant reader/writer. The service's
+encrypted delivery journal does not replace either native device store.
+
+The release builder uses exact source revisions and public package archives,
+runs native and packed-host qualification gates, and emits a file-hash manifest.
+Preparation generates private host/client/bridge configuration, distinct service
+users and a reviewable handoff. Staging snapshots only the verified dedicated
+bridge identity and copies the pinned minimal runtime. It excludes the creator
+signer and bootstrap secrets. A client secret, when required, has a separate
+private registration file; only its hash enters host configuration, and it never
+enters the bridge's environment.
+
+Treat readiness as several observations. `/health` means process liveness.
+Local preflight checks code hashes, exact scope, private storage and configuration.
+Online preflight additionally checks the authenticated host configuration and
+current signed native grants; it briefly owns the bridge store and requires the
+service to be stopped. Neither check signs in the owner, grants consent,
+subscribes a chat or observes an assistant answer. Record those live actions
+separately.
 
 ## Adapt the connected kitchen specimen
 
 The [core kitchen source](https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/examples/kitchen)
 includes a real public-session bootstrap, browser Worker, page, signed release
 build, dedicated bridge-device setup, declared commands and deterministic
-queries. It is a new application definition. Republishing a UI does not change
-an already configured immutable domain.
+queries. Its current definition is version 2 and binds each request to the
+original `cookingStepEventId`. Copy that event ID and the step ID from the same
+`kitchenContext` snapshot; never substitute whichever step is current when the
+request is ordered. Republishing version 2 UI does not upgrade an already
+configured version 1 immutable domain. Provision a new application or use a
+separately supported evolution procedure.
 
 Provision early: create the page, give the person the actual claim URL, wait for
 their own sign-in, configure the definition/authority and initial generation,
@@ -120,12 +162,18 @@ publish the signed UI, enroll the verified browser key, and retain the native
 process. Enroll the separate bridge reader/writer after explicit consent. The
 bridge is not a coordinator or publisher by default, so retain an authorized
 coordinating peer too. Do not run two processes against one native device store.
+If a saved enrollment never committed and its expected generation is obsolete,
+`enroll:review` prepares a new signed request and `enroll:approve` requires its
+exact reviewed digest. A committed enrollment keeps exact replay; replay cannot
+restore a later revoked grant. Keep the original immutable records.
 
 The specimen follows this user-visible sequence:
 
 1. The person selects a cooking step and writes a question. Typed input works
-   without sensors. The browser retains the operation reference before its first
-   command call, then submits `requestAssistance` using that original ID.
+   without sensors. Validation happens before retention. The browser reserves
+   one durable pending slot under an exclusive Web Lock, then submits
+   `requestAssistance` using that original operation ID. Another tab cannot
+   overwrite the retained command.
 2. A coherent selected-history read produces the request event. The allowlisted
    projection emits a small `assistant.help_requested` notification containing
    the request identifier and category. It omits the question and media.
@@ -143,6 +191,14 @@ The specimen follows this user-visible sequence:
    copy its reference into a tool-capable chat. A later response uses the same
    query and signed-command route.
 
+The page reads the latest 20 compact request summaries and exposes a separate
+`assistanceStatus` read for the full question and canonical answer, including an
+older request entered by ID. Bounded reply/conflict lists retain counts and
+truncation flags; omitted history is not silently resolved. For an abandoned or
+`needsReapply` operation, an explicit review can release its pending slot while
+retaining the original reference. It never automatically submits replacement
+work. A stale acknowledgment only clears the exact operation it inspected.
+
 The events-only specimen keeps append-only request and response facts. Its
 query chooses a canonical matching response and reports additional or stale
 facts; it does not claim an atomic mutable-state guard. Author timestamps are
@@ -157,11 +213,16 @@ and real transaction guards. A read followed by a command can race.
 | The agent sandbox cannot resolve the page host | Original host handle and selected service origin | Use the connected remote MCP route; otherwise resume the participant in an environment that can reach the host |
 | Native RTC is unavailable | Chronolog authentication and participant transport | Use the maintained encrypted relay fallback; do not invent another data endpoint |
 | OAuth is unlinked or expired | Existing app state and device identity | Relink that account; use an already authorized local participant if appropriate |
+| The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Use the compatible external-provider mode; do not turn a public callback into a wildcard or treat an upstream login token as MCP authorization |
+| Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check additive host migration, bridge registration, current enrollment and coordinator availability; local readiness does not prove remote readiness |
 | The bridge is not enrolled, or its grant was revoked | The explicit owner decision | Obtain verified enrollment or restore permitted access; do not borrow a browser signer |
 | No retained authorized peer has the selected history | The pending request and original operation ID | Restore a retained participant; show offline/unavailable rather than claiming delivery |
 | No active Events subscription, or unsupported client | The application request | Use on-demand tools, the mounted card, or the manual reference handoff |
 | A webhook was accepted but no answer appeared | Delivery ID and application request | Inspect callback receipt and current request; an asynchronous assistant run may still be pending |
 | A command timed out | Exact saved input, operation ID and signed attempt | Inspect the original operation, then retry it exactly; do not generate a new domain attempt |
+| Web Locks or durable browser storage are unavailable | The unsent question and any retained operation | Use a compatible browser or authorized native participant; do not bypass durable reservation before sending |
+| An abandoned operation blocks the next request | Its signed attempt and original input | Explicitly review and release that terminal reference, then deliberately start new work if still needed |
+| Enrollment became obsolete before it ever committed | The original signed request and current verified authority | Review a replacement with the exact key/grants/prefix, then approve its digest; do not silently replace a historical request |
 | Recovery excluded the source request or reply | Delivery journal and loss/recovery evidence | Reread selected history, display the loss, and require deliberate reapplication if still wanted |
 | An answer refers to an earlier cooking step | Original request and response provenance | Keep the response labeled stale; ask again only as a new deliberate task |
 | The card is unmounted or message outcome is uncertain | Existing conversation and request | Use normal tool calls or inspect the chat before sending another message |
@@ -178,9 +239,12 @@ requirements. A tool listing is a capability description, not a grant.
 
 For the remote service, the implementation's entry point is
 `node integrations/chatgpt/run.mjs --config /private/integration.config.mjs`.
-The private module supplies its HTTPS resource and trusted OAuth issuer/JWKS,
-encrypted delivery-store configuration, allowed application session factories,
-and verified account/owner authorization adapters. Consult
+The private module supplies the HTTPS resource, encrypted delivery-store
+configuration and allowed application session factories. In host account mode,
+use `config.host-account.example.mjs` and the generated exact host registration;
+the included adapter supplies trusted issuer/JWKS and current account/owner
+checks. External-provider mode instead imports the deployment's verified
+account/owner adapters. Consult
 [the pinned integration guide](https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/CHATGPT_INTEGRATION.md)
 and [service configuration](https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/README.md)
 for setup, retained storage and process lifetime. Do not replace a missing owner
@@ -189,7 +253,7 @@ always-true function or put private handles, store keys or signers in the page.
 
 ## Verify the whole journey and its failures
 
-The pinned core source passed **112 integration tests, with no skips**, using
+The earlier pinned baseline passed **112 integration tests, with no skips**, using
 the actual public native package. Its aggregate test covers a native request,
 authenticated MCP, owner consent, signed callback delivery to a test receiver,
 an authorized signed reply across two native peers, exact retry and reopen.

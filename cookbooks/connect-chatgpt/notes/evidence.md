@@ -7,9 +7,9 @@ round trip, and the alternate Workspace Agent adapter has synthetic-provider
 tests. Those results do not establish live account linking or a deployed
 OpenAI conversation.
 
-## Tested core source and artifact
+## Tested baseline core source and artifact
 
-The aggregate implementation is pinned to Tendriller
+The previously qualified baseline is pinned to Tendriller
 [`61682a11f341449252e78b36443985c0583b5a9b`](https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt),
 the source proposed in [core PR #61](https://github.com/werg/tendriller/pull/61).
 With `CHRONOLOG_SESSION_PACKAGE` set to the extracted public package,
@@ -98,3 +98,20 @@ Current platform references checked on 19 November 2026:
 
 These references establish the documented routes. Deployment availability and
 client behavior need their own live evidence.
+
+## Deployment follow-up awaiting aggregate qualification
+
+The cookbook now also describes the included host account/OAuth route, the
+version 2 kitchen fixes and the retained systemd/Caddy deployment tools. The
+source links and 112-test record above deliberately remain the earlier tested
+baseline while the combined follow-up release is being qualified. They do not
+attribute those new changes to the earlier source. The final aggregate revision,
+release manifest and qualification reports will replace this temporary note
+once that exact build finishes.
+
+The [deployment note](deployment.md) separates local configuration, actual
+host/native readiness, human account consent and a live assistant turn. The
+preparation/staging tooling and injected readiness tests do not establish a
+running systemd service, public HTTPS, a human OAuth login or a deployed OpenAI
+conversation. A packed-host test can establish the actual Worker/Node protocol
+without establishing an external identity provider login or public deployment.
