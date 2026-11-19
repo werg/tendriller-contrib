@@ -390,6 +390,9 @@ async function readPages(captured, taskId = selectedTask) {
 async function renderCaptured(taskId = selectedTask) {
   const current = await readPages(reader, taskId);
   if (observation.signal.aborted) return false;
+  // A newly created operation may be saved before its conversation exists.
+  // Do not enable posting into a conversation that the current view cannot show.
+  if (taskId !== selectedTask && taskId && !current.value.tasks.some(task => task.taskId === taskId)) return false;
   // Selection is committed at the same time as the new captured view. A
   // failed or cancelled read leaves the message target and heading unchanged.
   selectedTask = taskId;
@@ -486,8 +489,9 @@ $('#request-form').onsubmit = async event => {
     // An operation can be saved before its request is visible in the captured
     // history. Switch the message target only after that view renders.
     await selectTask(interactionId);
-    if ($('#request-title').value === submittedTitle) $('#request-title').value = '';
-    if ($('#request-input').value === submittedInput) $('#request-input').value = '';
+    if ($('#request-title').value === submittedTitle && $('#request-input').value === submittedInput) {
+      $('#request-title').value = ''; $('#request-input').value = '';
+    }
     retainDraft();
   } catch (error) { report(error); }
   finally { submitting = false; $('#request-submit').disabled = !canWrite(); }
