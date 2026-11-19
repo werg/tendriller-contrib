@@ -62,6 +62,7 @@ try {
     assert.equal(a.deviceId, b.deviceId); assert.equal(a.endpoint.ownerInstanceId, b.endpoint.ownerInstanceId);
     assert.notEqual(a.endpoint.endpointIncarnation, b.endpoint.endpointIncarnation);
     assert.notEqual(a.endpoint.context.viewId, b.endpoint.context.viewId);
+    await board.locator('#recipient').selectOption(a.deviceId);
     await board.locator('#request-title').fill('Review this evidence'); await board.locator('#request-input').fill('The reviewed observation has a specific source.');
     await discussion.locator('#request-title').fill('Independent discussion draft');
     await board.locator('#request-submit').click();

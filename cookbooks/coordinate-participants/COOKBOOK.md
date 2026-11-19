@@ -77,7 +77,7 @@ external effect because a recovered suffix no longer includes its receipt.
 
 The shared application holds requests, claims, contributions and final decisions.
 The view store holds an unsent draft and indexed references to journaled work.
-Each pending reference includes the application, signer and operation identity;
+Each pending reference includes the application, history, signer and operation identity;
 one view removing a reviewed reference cannot remove another view's reference.
 The operation journal remains the source of signed attempts.
 

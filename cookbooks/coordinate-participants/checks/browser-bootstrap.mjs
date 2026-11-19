@@ -18,7 +18,7 @@ export const applicationReady = ready.then(attachment => {
   const session = attachment.session;
   sessionStorage.setItem(key, session.endpoint.context.viewId);
   globalThis.fixtureOwner = attachment; globalThis.fixtureSession = session;
-  globalThis.fixtureStore = createViewStore({ storage: localStorage, applicationId: session.applicationId,
+  globalThis.fixtureStore = createViewStore({ storage: localStorage, applicationId: session.applicationId, historyId: session.historyId,
     profileId: session.deviceId, viewId: session.endpoint.context.viewId });
   return session;
 });

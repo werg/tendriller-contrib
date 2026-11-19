@@ -1,6 +1,6 @@
 // Editable application UI. The maintained owner and collaboration module own
 // session lifetime, operation persistence and guarded state transitions.
-import { createCollaborationClient, createViewStore, mountParticipantPanel, receiptModel } from '@tendriller/core/collaboration';
+import { createCollaborationClient, createViewStore, mountParticipantPanel, operationReference, receiptModel } from '@tendriller/core/collaboration';
 import { createLiveRun } from './domain/live-run.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -14,7 +14,7 @@ const freshId = () => crypto.randomUUID();
 let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
 let observation = new AbortController(), dirty = false, refreshing = false;
-let runSubscription, runScopeKey = '', runTimer, liveRuns = new Map();
+let runSubscription, runScopeKey = '', runTimer, participantTimer, liveRuns = new Map();
 const statuses = new Map();
 const waiters = new Map();
 const report = error => { $('#status').textContent = error.message ?? String(error); $('#status').dataset.state = 'error'; };
@@ -44,7 +44,7 @@ function restoreDraft() {
 async function submit(method, input, title, options = {}) {
   if (!canWrite()) throw Error('This participant currently has read-only access.');
   const operationId = options.operationId ?? freshId();
-  const reference = { applicationId: session.applicationId, author: session.deviceId, operationId };
+  const reference = operationReference(session, operationId);
   // Retain identity and original intent before the first uncertain call. This
   // local record is a pointer; it never resubmits or replaces the session journal.
   store.retainOperation(reference, { method, input, title });
@@ -76,7 +76,7 @@ function paintOperations() {
       waiters.get(reference.operationId)?.abort(); waiters.delete(reference.operationId); paintOperations();
       say('Stopped waiting in this view. The original operation remains inspectable; shared work was not cancelled.');
     }));
-    if (state?.status === 'saved') row.append(action('Retry same signed attempt', async () => { await session.retry(reference.operationId); await refresh(); }));
+    if (state?.status === 'saved') row.append(action('Retry same signed attempt', async () => { await client.retry(reference); await refresh(); }));
     if (['abandoned', 'needsReapply'].includes(state?.status)) {
       row.append(node('p', 'This attempt is outside the selected history. Review the current request and create a new explicit action if still needed.', 'review-note'));
       if (context.method === 'request') row.append(action('Copy request into draft', async () => {
@@ -135,7 +135,8 @@ function paintTasks(value) {
       }, `Claim ${slot.label ?? slot.slotId}`)));
       if (claim?.claimant === session.deviceId && canWrite()) {
         const currentEndpoint = claim.endpointIncarnation === session.endpoint.endpointIncarnation && claim.runId === runId;
-        if (claim.status === 'needsReview') row.append(action('Revalidate this claim', () => submit('rebind', {
+        const staleGeneration = claim.generation !== session.status.generation;
+        if (claim.status === 'needsReview' || claim.status === 'cancelRequested' && staleGeneration) row.append(action('Revalidate this claim', () => submit('rebind', {
           taskId: task.taskId, slotId: slot.slotId, claimId: freshId(), expectedEpoch: claim.claimEpoch, taskVersion: 1,
         }, `Revalidate ${slot.label ?? slot.slotId}`)));
         if (claim.status === 'active' && !currentEndpoint) {
@@ -164,25 +165,44 @@ function paintTasks(value) {
           };
           row.append(form);
         }
-        if (claim.status === 'cancelRequested' && currentEndpoint) row.append(action('Acknowledge stopped work', () => submit('acknowledgeCancel', {
+        const oldEndpointPresent = entries.some(entry => entry.endpoint?.endpointIncarnation === claim.endpointIncarnation);
+        if (claim.status === 'cancelRequested' && !staleGeneration && (currentEndpoint || !oldEndpointPresent)) {
+          if (!currentEndpoint) row.append(node('p', 'The original local endpoint is gone. Acknowledge only after confirming its work has stopped.', 'review-note'));
+          row.append(action('Acknowledge stopped work', () => submit('acknowledgeCancel', {
           taskId: task.taskId, slotId: slot.slotId, actionId: freshId(), claimEpoch: claim.claimEpoch,
           generation: claim.generation, runId: claim.runId, endpointIncarnation: claim.endpointIncarnation,
         }, 'Acknowledge cancellation')));
+        }
       }
-      if (claim && !['completed', 'cancelled'].includes(claim.status) && task.status === 'open' && canWrite() && (canManage(task) || claim.claimant === session.deviceId)) {
-        const target = node('select', ''); target.setAttribute('aria-label', `Transfer ${slot.label ?? slot.slotId} to`);
-        for (const entry of entries.filter(item => item.authorized && !item.revoked && item.deviceId !== claim.claimant)) {
+      if (claim && !['completed', 'cancelled'].includes(claim.status) && ['open', 'needsReview'].includes(task.status) && canWrite() && (canManage(task) || claim.claimant === session.deviceId)) {
+        const form = node('form', '', 'transfer-form'), target = node('select', '');
+        const draftId = `transfer:${task.taskId}:${slot.slotId}`;
+        target.required = true; target.dataset.localDraft = draftId;
+        target.setAttribute('aria-label', `Transfer ${slot.label ?? slot.slotId} to`);
+        const prompt = node('option', 'Choose the next responsible participant'); prompt.value = ''; target.append(prompt);
+        const eligible = [...new Map(entries.filter(item => item.authorized && !item.revoked && item.deviceId !== claim.claimant)
+          .map(item => [item.deviceId, item])).values()];
+        for (const entry of eligible) {
           const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; target.append(option);
         }
-        row.append(target, action('Transfer responsibility', () => submit('handoff', { taskId: task.taskId, slotId: slot.slotId,
-          actionId: freshId(), expectedEpoch: claim.claimEpoch, assignee: target.value, reason: 'Explicit transfer from this view' }, 'Transfer responsibility'), !target.options.length));
+        const retained = store.readDraft(draftId)?.assignee;
+        target.value = eligible.some(entry => entry.deviceId === retained) ? retained : '';
+        target.onchange = () => { try { store.writeDraft({ assignee: target.value }, draftId); } catch (error) { report(error); } };
+        const button = node('button', 'Transfer responsibility'); button.type = 'submit'; form.append(target, button);
+        form.onsubmit = event => {
+          event.preventDefault(); if (!target.value) return; button.disabled = true;
+          void submit('handoff', { taskId: task.taskId, slotId: slot.slotId, actionId: freshId(),
+            expectedEpoch: claim.claimEpoch, assignee: target.value, reason: 'Explicit transfer from this view' }, 'Transfer responsibility')
+            .catch(report).finally(() => { button.disabled = false; });
+        };
+        row.append(form);
       }
       slots.append(row);
     }
     card.append(slots);
     if (task.aggregate) card.append(node('p', `${task.aggregate.disposition === 'partial' ? 'Partial synthesis' : 'Accepted synthesis'} · ${label(task.aggregate.author)}`, 'receipt'),
       node('p', task.aggregate.content?.text ?? JSON.stringify(task.aggregate.content)));
-    else if (canManage(task) && task.status === 'open') {
+    else if (canManage(task) && ['open', 'needsReview'].includes(task.status)) {
       card.append(action('Request cancellation', () => submit('cancel', { taskId: task.taskId, actionId: freshId(),
         expectedVersion: task.version, reason: 'Cancelled by the task owner' }, `Cancel ${task.title}`)));
       const acceptedResults = value.results.filter(item => item.taskId === task.taskId && item.disposition === 'accepted');
@@ -212,9 +232,9 @@ function paintTasks(value) {
   }));
   $('#tasks-empty').hidden = value.tasks.length > 0;
   if (retainedFocus) {
-    const replacement = [...$('#tasks').querySelectorAll('textarea[data-local-draft]')]
+    const replacement = [...$('#tasks').querySelectorAll('[data-local-draft]')]
       .find(element => element.dataset.localDraft === retainedFocus.draft);
-    if (replacement) { replacement.focus({ preventScroll: true }); replacement.setSelectionRange(retainedFocus.start, retainedFocus.end, retainedFocus.direction); }
+    if (replacement) { replacement.focus({ preventScroll: true }); if (typeof replacement.setSelectionRange === 'function') replacement.setSelectionRange(retainedFocus.start, retainedFocus.end, retainedFocus.direction); }
   }
 }
 
@@ -261,15 +281,21 @@ function observeRuns(value) {
 
 async function refreshParticipants() {
   const current = await deployment.readParticipants(session);
+  if (observation.signal.aborted) return;
   if (!Array.isArray(current)) throw Error('The deployment must provide authenticated participant bindings.');
   entries = current;
   participantPanel?.update(entries);
   const selected = $('#recipient').value;
   const eligible = [...new Map(entries.filter(entry => entry.authorized && !entry.revoked).map(entry => [entry.deviceId, entry])).values()];
-  $('#recipient').replaceChildren(...eligible.map(entry => {
-    const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; return option;
-  }));
-  if (eligible.some(entry => entry.deviceId === selected)) $('#recipient').value = selected;
+  const optionsKey = JSON.stringify(eligible.map(entry => [entry.deviceId, entry.label]));
+  if ($('#recipient').dataset.optionsKey !== optionsKey) {
+    const prompt = node('option', 'Choose an authorized recipient'); prompt.value = '';
+    $('#recipient').replaceChildren(prompt, ...eligible.map(entry => {
+      const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; return option;
+    }));
+    $('#recipient').dataset.optionsKey = optionsKey;
+  }
+  $('#recipient').value = eligible.some(entry => entry.deviceId === selected) ? selected : '';
   const self = entries.find(entry => entry.deviceId === session.deviceId && !entry.revoked);
   if (!self || !(self.canRead || self.authorized)) {
     snapshot = undefined; $('#tasks').replaceChildren(); $('#messages').replaceChildren(); runSubscription?.abort();
@@ -277,6 +303,21 @@ async function refreshParticipants() {
     throw Error('This signing profile no longer has workspace access. Shared content has been cleared.');
   }
   $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized;
+}
+
+const eligibilityKey = () => JSON.stringify(entries.map(entry => [entry.deviceId, entry.authorized, entry.revoked,
+  entry.applicationAdministrator, entry.label, entry.endpoint?.endpointIncarnation, entry.endpoint?.state]));
+function scheduleParticipants() {
+  clearTimeout(participantTimer);
+  if (observation.signal.aborted) return;
+  participantTimer = setTimeout(() => {
+    const previous = eligibilityKey();
+    void refreshParticipants().then(() => {
+      if (!observation.signal.aborted && snapshot && previous !== eligibilityKey()) paintTasks(snapshot.value);
+    }).catch(error => {
+      if (!observation.signal.aborted) { participantPanel?.update(entries); report(error); }
+    }).finally(scheduleParticipants);
+  }, 10_000);
 }
 
 function paint(value) {
@@ -297,8 +338,13 @@ async function refresh() {
   try {
     while (dirty && !observation.signal.aborted) {
       dirty = false; await refreshParticipants(); const current = await client.snapshot();
-      const pending = await Promise.all(store.pending().map(async ({ reference }) => [reference.operationId,
-        await session.operations.get(reference.operationId, { author: reference.author })]));
+      const pending = await Promise.all(store.pending().map(async ({ reference, context }) => {
+        const state = await session.operations.get(reference.operationId, { author: reference.author });
+        // An uncertain submission may have retained only its semantic identity.
+        // Reopening enriches that same reference with the original signed attempt.
+        if (state) store.retainOperation(operationReference(session, reference.operationId, state), context);
+        return [reference.operationId, state];
+      }));
       if (observation.signal.aborted) return;
       snapshot = current; for (const [id, state] of pending) statuses.set(id, state);
       $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`; paint(current.value);
@@ -339,13 +385,13 @@ for (const id of ['request-title', 'request-input', 'message', 'recipient', 'res
 });
 
 window.addEventListener('pagehide', event => {
-  observation.abort(); runSubscription?.abort(); clearTimeout(runTimer);
+  observation.abort(); runSubscription?.abort(); clearTimeout(runTimer); clearTimeout(participantTimer);
   if (event.persisted) void suspendView().catch(report);
   else { participantPanel?.close?.(); void detachView().catch(() => undefined); }
 });
 window.addEventListener('pageshow', event => {
   if (!event.persisted || !session) return;
-  void resumeView().then(() => { observation = new AbortController(); void observe(); return refresh(); },
+  void resumeView().then(() => { observation = new AbortController(); void observe(); scheduleParticipants(); return refresh(); },
     () => say('This view’s owner was replaced. Reload to reattach, then inspect original operations.'));
 });
 $('#refresh-participants').onclick = () => { if (session) void refreshParticipants().catch(report); };
@@ -357,7 +403,7 @@ try {
   if (!session.endpoint) throw Error('This reference needs a shared session-owner attachment. Open the matching deployment bootstrap.');
   const viewId = session.endpoint.context.viewId;
   if (!viewId) throw Error('The owner did not allocate an independent view.');
-  store = createViewStore({ storage: localStorage, applicationId: session.applicationId, profileId: session.deviceId, viewId });
+  store = createViewStore({ storage: localStorage, applicationId: session.applicationId, historyId: session.historyId, profileId: session.deviceId, viewId });
   runId = `view-${session.endpoint.endpointIncarnation}`;
   client = createCollaborationClient({ session, endpoint: session.endpoint, runId });
   await refreshParticipants();
@@ -365,7 +411,7 @@ try {
     selfEndpoint: { ...session.endpoint, deviceId: session.deviceId }, onSelect: entry => { $('#recipient').value = entry.deviceId; retainDraft(); } });
   restoreDraft();
   $('#view-label').textContent = `This ${document.body.classList.contains('discussion') ? 'discussion' : 'board'} view · independent draft`;
-  await refresh(); void observe(); say('Ready. Choose a recipient and create shared work.');
+  await refresh(); void observe(); scheduleParticipants(); say('Ready. Choose a recipient and create shared work.');
 } catch (error) {
   report(error);
   if (error.code === 'APPLICATION_DEVICE_NOT_FOUND' && typeof deployment?.createProfile === 'function') {

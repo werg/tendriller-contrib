@@ -37,7 +37,7 @@ const observed = (name, observation) => {
 };
 const stores = [], verifiedReferences = [];
 const assertReference = (reference, outcome, author, generation) => {
-  assert.deepEqual(reference, { applicationId: report.applicationId, author, operationId: outcome.operationId, attemptId: outcome.attemptId, generation });
+  assert.deepEqual(reference, { applicationId: report.applicationId, historyId: report.historyId, author, operationId: outcome.operationId, attemptId: outcome.attemptId, generation });
   verifiedReferences.push(reference);
 };
 
@@ -64,6 +64,7 @@ try {
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'independent-collaboration-v1',
     profile: 'peer-generation-v1', policy: 'eligible-members-v1', controlPublicKey: authorityDevice.identity.publicKey,
     ...prepared.binding }, authorityDevice.identity);
+  report.historyId = descriptor.payload.historyId;
   const control = await signControlRevision({ applicationId, profile: descriptor.payload.profile, policy: descriptor.payload.policy,
     revision: 0, previous: null, epoch: 0, keyDigest: await bytesDigest(epochKey), recoveryFloor: null,
     grants: [controlParticipantGrant(authorityDevice.identity.publicKey), ...devices.map(device => participantGrant(device.identity.publicKey,
@@ -306,7 +307,7 @@ try {
 
   // A raw writer can provide misleading descriptive fields, but cannot assign
   // another attempt or author to the selected record's authenticated reference.
-  const falseReference = { applicationId, author: sessions[0].deviceId, operationId: 'forged-body-operation',
+  const falseReference = { applicationId, historyId: 'forged-body-history', author: sessions[0].deviceId, operationId: 'forged-body-operation',
     attemptId: boardRequest.attemptId, generation: initial.id };
   const untrustedMessage = JSON.stringify({ messageId: 'untrusted-reference', text: 'The signed transaction owns this message.',
     source: JSON.stringify({ deviceId: sessions[0].deviceId, evidence: 'owner-bound' }), operation: falseReference });
@@ -411,17 +412,20 @@ try {
     storageBefore, storageAfter: reopened.storageId, operationBefore, operationAfter, epochKeysProvided: false });
 
   const local = memoryStorage();
-  const a = createViewStore({ storage: local, applicationId, profileId: signerBefore, viewId: 'view-a' });
-  const b = createViewStore({ storage: local, applicationId, profileId: signerBefore, viewId: 'view-b' });
+  const a = createViewStore({ storage: local, applicationId, historyId: report.historyId, profileId: signerBefore, viewId: 'view-a' });
+  const b = createViewStore({ storage: local, applicationId, historyId: report.historyId, profileId: signerBefore, viewId: 'view-b' });
   a.writeDraft({ text: 'Unsent board draft' }); b.writeDraft({ text: 'Unsent discussion draft' });
   assert.equal(a.readDraft().text, 'Unsent board draft'); assert.equal(b.readDraft().text, 'Unsent discussion draft');
   observed('independentDrafts', { views: ['view-a', 'view-b'], draftsPreserved: true });
-  const reference = { applicationId, author: signerBefore, operationId: retainedOperation.operationId, attemptId: retainedOperation.attemptId };
+  const reference = { applicationId, historyId: report.historyId, author: signerBefore, operationId: retainedOperation.operationId, attemptId: retainedOperation.attemptId };
   a.retainOperation(reference); b.retainOperation(reference); a.removeOperation(reference);
   assert.equal(a.pending().length, 0); assert.equal(b.pending().length, 1);
   assert.deepEqual(b.pending()[0].reference, reference);
+  assert.throws(() => b.retainOperation({ ...reference, historyId: 'another-history' }), /OPERATION_SCOPE_MISMATCH/u);
+  await assert.rejects(clients[0].inspectOperation({ ...reference, historyId: 'another-history' }), /OPERATION_SCOPE_MISMATCH/u);
+  await assert.rejects(clients[0].retry(reference), /ORIGINAL_SIGNER_REQUIRED/u);
   observed('independentPendingReferences', { firstViewReferences: a.pending().length, secondViewReferences: b.pending().length,
-    originalOperationId: reference.operationId, journalChanged: false });
+    originalOperationId: reference.operationId, foreignHistoryRejected: true, foreignSignerRetryRejected: true, journalChanged: false });
   report.passed = true;
 } catch (error) {
   report.passed = false; report.error = error instanceof Error ? error.stack ?? error.message : String(error); throw error;

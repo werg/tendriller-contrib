@@ -5,13 +5,14 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 // Synthetic values test the validator; they are never emitted as qualification.
 function example() {
   const observations = {
+    independentPendingReferences: { foreignHistoryRejected: true, foreignSignerRetryRejected: true },
     exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_immutable' },
     rawForgedResultGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_result_disposition', retainedForgedResult: false },
     schemaDdlGuard: { outcome: 'rejected', rejectionCode: 'denied' },
     ownerVerifiedAuthority: { verifiedSignature: true, mutatedReturnDidNotMutateOwner: true, hostTransportConfigured: false },
     rawForgedAttemptGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_attempt' },
     signedOperationLineage: { bodyReferenceIgnored: true, sourceSignerForced: true, lateClaimGeneration: 'old', lateOperationGeneration: 'new',
-      references: Array(6).fill({ applicationId: '1'.repeat(64), author: '2'.repeat(64), attemptId: '3'.repeat(64), generation: '4'.repeat(64), operationId: 'signed-op' }) },
+      references: Array(6).fill({ applicationId: '1'.repeat(64), historyId: 'fixture-history', author: '2'.repeat(64), attemptId: '3'.repeat(64), generation: '4'.repeat(64), operationId: 'signed-op' }) },
     scaleProfile: { signingParticipants: 8, simultaneousAttachments: 32, successfulViews: 32,
       owners: Array.from({ length: 8 }, (_, index) => `owner-${index}`), attachmentsPerOwner: Array(8).fill(4) },
     noisyEndpointIsolation: { rejected: 'APPLICATION_WORKER_STREAM_LIMIT', siblingQuerySucceeded: true, ownerClosed: false },
@@ -23,7 +24,7 @@ function example() {
       operationBefore: { operationId: 'stable', status: 'applied' }, operationAfter: { operationId: 'stable', status: 'applied' },
     },
   };
-  return { format: 'tendriller-collaboration-consumer/v1', mode: 'native-public-artifacts', passed: true, error: null,
+  return { format: 'tendriller-collaboration-consumer/v1', mode: 'native-public-artifacts', historyId: 'fixture-history', passed: true, error: null,
     source: { commit: 'a'.repeat(40), tree: 'b'.repeat(40), dirty: false },
     artifacts: ['@chronolog/peer-session', '@tendriller/core'].map(name => ({ name, sha256: 'c'.repeat(64),
       sourceCommit: 'd'.repeat(40), sourceTree: 'e'.repeat(40), sourceDirty: false })),

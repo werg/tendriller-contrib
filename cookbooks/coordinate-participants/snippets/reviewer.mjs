@@ -1,6 +1,6 @@
 // Application policy for two deliberately small, deterministic specialist agents.
 // The maintained module owns claims/results; this file owns only review choices.
-import { createCollaborationClient } from '@tendriller/core/collaboration';
+import { createCollaborationClient, operationReference } from '@tendriller/core/collaboration';
 
 const policies = {
   evidence(task) {
@@ -33,7 +33,7 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
   if (!endpoint?.endpointId || !endpoint.endpointIncarnation || !runId) throw Error('A retained signer, allocated endpoint and run are required');
   const client = createCollaborationClient({ session, endpoint, runId });
   const submit = async (method, input, operationId) => {
-    onOperation({ method, reference: { applicationId: session.applicationId, author: session.deviceId, operationId } });
+    onOperation({ method, reference: operationReference(session, operationId) });
     const operation = await client[method](input, { operationId }); return operation.applied({ signal });
   };
   signal?.throwIfAborted();

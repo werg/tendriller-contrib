@@ -66,7 +66,8 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.notEqual(lineage.lateClaimGeneration, lineage.lateOperationGeneration);
   assert.ok(lineage.references.length >= 6);
   for (const reference of lineage.references) {
-    hex(reference.applicationId, 64); hex(reference.author, 64); hex(reference.attemptId, 64); hex(reference.generation, 64);
+    hex(reference.applicationId, 64); assert.equal(reference.historyId, report.historyId);
+    assert.ok(typeof reference.historyId === 'string' && reference.historyId.length > 0); hex(reference.author, 64); hex(reference.attemptId, 64); hex(reference.generation, 64);
     assert.ok(typeof reference.operationId === 'string' && reference.operationId.length > 0);
   }
   assert.equal(observation('schemaDdlGuard').outcome, 'rejected');
@@ -92,6 +93,8 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(reopen.storageBefore, reopen.storageAfter);
   assert.deepEqual(reopen.operationBefore, reopen.operationAfter);
   assert.equal(reopen.operationAfter.status, 'applied');
+  const references = observation('independentPendingReferences');
+  assert.equal(references.foreignHistoryRejected, true); assert.equal(references.foreignSignerRetryRejected, true);
   assert.equal(report.claims.browserQualified, false);
   assert.equal(report.claims.physicalDeviceQualified, false);
   assert.equal(report.claims.deployedHostQualified, false);
