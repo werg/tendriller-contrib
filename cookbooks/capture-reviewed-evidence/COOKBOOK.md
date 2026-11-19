@@ -15,6 +15,29 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use this when a camera, microphone, file, sketch, or location adds evidence to a task. First ask what the agent needs to know and whether typed input or a file is enough. Opening a sensor, capturing a candidate, uploading bytes, and sending a command are separate decisions. A single button may coordinate them, but the person still needs an intelligible opportunity to review or discard sensitive material.
 
+## Adapt the current application source
+
+Core's [reviewed media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
+provides the concrete camera/file → optional inference → editable review →
+declared command flow in its [first-app source](https://github.com/werg/tendriller/tree/master/docs/tutorial).
+This route depends on [core PR #60](https://github.com/werg/tendriller/pull/60)
+and a matching released host/package composition; its source is not a claim of
+deployed availability or an extension of this cookbook's historical test evidence.
+
+Use the supplied `media/panel.mjs` composition and import or adapt
+`media/camera.mjs`, `media/voice.mjs` and `helpers/reviewed-input.mjs` for the task.
+The [application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md)
+keep coherent views and uncertain operation identity attached to the same session.
+Optional inference uses `media/inference-client.mjs` and a deliberately enabled
+native peer with provider disclosure, device allowlisting and a request budget;
+provider credentials stay in that process and its result is only a suggestion.
+The person separately reviews and submits the declared command.
+
+Follow [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
+to deliver and verify the connected hosted flow, then exercise the task-specific
+failure cases below. The retired specimens later in this guide remain historical
+interaction evidence, not the implementation to install.
+
 ## Choose the capture flow
 
 | Choice | Start here | Change it when |
