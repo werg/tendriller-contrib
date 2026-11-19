@@ -102,6 +102,14 @@ Adapt the domain inputs, recipient selection and synthesis policy to the task.
 Keep the owner, signed operation journal, guarded command boundary and current
 generation checks in the maintained public modules.
 
+The editable [board](page/board.html) and [discussion](page/discussion.html) layouts
+share [one page module](page/app.mjs). Each view keeps its request, conversation,
+contribution and synthesis drafts under its owner-allocated view ID. Saved-operation
+references remain individually inspectable after an uncertain response. The UI
+offers explicit handoff and cancellation acknowledgment; it never takes a second
+claim on behalf of an observer. Follow the build instructions above to supply the
+real authenticated owner/bootstrap graph and browser SQL engine.
+
 ## Rehearse interruption before claiming completion
 
 | Starting condition and action | Required observation |

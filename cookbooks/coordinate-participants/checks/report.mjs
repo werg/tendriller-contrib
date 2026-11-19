@@ -47,9 +47,10 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   const observation = name => report.checks.find(value => value.name === name).observation;
   assert.deepEqual(observation('exclusiveClaimRace').outcomes.slice().sort(), ['accepted', 'rejected']);
   assert.equal(observation('rawProgramGuard').outcome, 'rejected');
-  assert.equal(observation('staleClaimRejected').outcome, 'rejected');
+  assert.equal(observation('staleClaimRejected').acceptedAsCurrent, false);
+  assert.ok(['superseded', 'cancelled', 'needsReview'].includes(observation('staleClaimRejected').disposition));
   assert.equal(observation('resultIdentityConflict').conflict, 'rejected');
-  assert.equal(observation('generationFence').oldFenceOutcome, 'rejected');
+  assert.equal(observation('generationFence').oldFenceAcceptedAsCurrent, false);
   assert.notEqual(observation('generationFence').before, observation('generationFence').after);
   assert.equal(observation('explicitRebind').outcome, 'accepted');
   const reopen = observation('operationIdentityAfterReopen');

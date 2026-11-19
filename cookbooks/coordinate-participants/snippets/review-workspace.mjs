@@ -3,7 +3,7 @@ import { createCollaborationDefinition, createCollaborationClient } from '@tendr
 
 export function reviewWorkspace({ administrators }) {
   return createCollaborationDefinition({ id: 'independent-review-workspace', version: '1', administrators,
-    limits: { maxSlots: 8, maxActiveClaims: 4, maxResultBytes: 65536 } });
+    limits: { slots: 8, activeClaimsPerSigner: 4, payloadBytes: 8192 } });
 }
 
 export function reviewClient({ session, endpoint, runId }) {

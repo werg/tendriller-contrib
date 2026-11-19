@@ -28,3 +28,39 @@ qualify browser SharedWorker/storage combinations, physical phone suspension,
 deployed relay quotas or a real conversational provider. Their report flags remain
 false. The companion repository browser and gateway tests exercise their own
 boundaries; link exact results when publishing a release tuple.
+
+## Build the two authored views
+
+`page/board.html` and `page/discussion.html` offer the same guarded operations in
+different layouts. Both attach to the deployment's maintained owner and use its
+allocated `endpoint.context.viewId` for independent drafts. The UI supports
+addressed requests, frozen review slots, claims, handoff, contributions, late
+evidence, cancellation acknowledgment and version-guarded final synthesis.
+
+The deployment directory must provide a real `bootstrap.mjs` exporting:
+
+- `applicationReady`: a promise for an authenticated `connectApplicationOwner`
+  facade with the collaboration definition and an allocated view ID.
+- `readParticipants(session)`: current authenticated membership/binding records
+  for permitted recipients. Each record supplies `deviceId`, `label`, `kind`,
+  `authorized`, `revoked`, actual route/availability evidence and optional
+  `applicationAdministrator`. Presence alone cannot grant these fields.
+
+Use the same signed immutable owner bundle for both documents. The deployment
+owns browser storage, engine/WASM loading, profile enrollment and relay/RTC
+composition; the cookbook neither invents a key nor retries a saved command.
+The native SQL archive used for conformance is not the browser engine capability.
+
+```sh
+node cookbooks/coordinate-participants/checks/build-pages.mjs \
+  --session /exact/extracted/browser-sql-peer-session \
+  --core /exact/extracted/tendriller-sdk \
+  --deployment /reviewed/authenticated/bootstrap-assets \
+  --output /new/signed-page-graph
+```
+
+The builder resolves only public package exports, checks session content hashes,
+rejects symbolic links and writes a manifest for every final file. Supply the
+resulting graph to the normal signed publication workflow. An entry-specific UI
+publication cannot replace the immutable application definition. Use fresh test
+applications or a separately reviewed data migration.

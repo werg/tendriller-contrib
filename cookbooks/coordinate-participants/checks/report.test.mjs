@@ -6,8 +6,8 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 function example() {
   const observations = {
     exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected' },
-    staleClaimRejected: { outcome: 'rejected' }, resultIdentityConflict: { conflict: 'rejected' },
-    generationFence: { before: 'generation-1', after: 'generation-2', oldFenceOutcome: 'rejected' },
+    staleClaimRejected: { acceptedAsCurrent: false, disposition: 'superseded' }, resultIdentityConflict: { conflict: 'rejected' },
+    generationFence: { before: 'generation-1', after: 'generation-2', oldFenceAcceptedAsCurrent: false },
     explicitRebind: { outcome: 'accepted' }, operationIdentityAfterReopen: {
       signerBefore: 'same-signer', signerAfter: 'same-signer', storageBefore: 'same-store', storageAfter: 'same-store',
       operationBefore: { operationId: 'stable', status: 'applied' }, operationAfter: { operationId: 'stable', status: 'applied' },
@@ -50,7 +50,7 @@ test('optimistic claim, recovery, replay and provider conclusions are refused', 
   for (const mutate of [
     report => { report.checks.find(value => value.name === 'exclusiveClaimRace').observation.outcomes = ['accepted', 'accepted']; },
     report => { report.checks.find(value => value.name === 'rawProgramGuard').observation.outcome = 'accepted'; },
-    report => { report.checks.find(value => value.name === 'generationFence').observation.oldFenceOutcome = 'accepted'; },
+    report => { report.checks.find(value => value.name === 'generationFence').observation.oldFenceAcceptedAsCurrent = true; },
     report => { report.checks.find(value => value.name === 'operationIdentityAfterReopen').observation.operationAfter.operationId = 'new'; },
     report => { report.claims.browserQualified = true; },
     report => { report.claims.conversationalResumeQualified = true; },
