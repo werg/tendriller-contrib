@@ -94,8 +94,10 @@ nineteen messages. It browses bounded continuations, writes from the companion
 document, keeps the captured pages coherent, explicitly refreshes, and checks
 that independent unsent drafts survive. This qualifies the authored paging flow;
 larger retained-history tests live with the maintained domain implementation.
-The expanded two-mode workload has a twelve-minute process deadline. Individual
-browser interactions and seed commands retain their thirty-second deadlines.
+The expanded two-mode workload has a twenty-minute process deadline for both
+sequential journeys. Individual browser interactions and seed commands retain
+their thirty-second deadlines; the aggregate allowance is not a runtime
+performance promise.
 When a process deadline fails, the report preserves both its underlying browser
 failure and the runner timeout rather than overwriting either diagnosis.
 

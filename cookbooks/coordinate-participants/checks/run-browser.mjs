@@ -85,8 +85,9 @@ try {
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0, applicationOwnerProtocols: 0 };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   // Each of the two real-SQL journeys now includes 11 requests and 19 messages.
-  // Per-action deadlines remain 30s; this bounds their complete combined work.
-  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 720_000,
+  // A completed mode has taken 410s in CI (333s in the earlier passing run).
+  // Bound both sequential journeys without changing their 30s action deadlines.
+  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 1_200_000,
     env: { ...process.env, ...(values.chromium ? { COLLABORATION_CHROMIUM: resolve(values.chromium) } : {}) } });
   if (result.error) throw result.error;
   assert.equal(result.signal, null); assert.equal(result.status, 0, 'Authored browser consumer failed');
