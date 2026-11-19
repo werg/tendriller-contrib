@@ -4,7 +4,7 @@ export const requiredChecks = Object.freeze([
   'sixIndependentSigners', 'twoAttachmentsOneOwner', 'ownerVerifiedAuthority', 'capturedReadScope', 'sourceEndpointIsolation',
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
   'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
-  'rawForgedResultGuard', 'rawForgedAttemptGuard', 'rawProjectionShapeGuard', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
+  'rawForgedResultGuard', 'rawForgedAttemptGuard', 'rawProjectionShapeGuard', 'compositeDomainIdentities', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
   'resultIdentityConflict', 'independentReviewPolicies', 'frozenContributionSlots', 'aggregateProvenance',
   'cancellationAcknowledgment', 'boundedCapturedPages', 'reviewerCapacityRecovery', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
@@ -67,6 +67,10 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
     assert.equal(probe.rejectionCode, ['objectInput', 'objectContent', 'objectSource'].includes(probe.name) ? 'assert:collab_json_fields'
       : probe.name === 'invalidEnvelope' ? 'assert:collab_envelope' : 'assert:collab_json_structure');
   }
+  const composite = observation('compositeDomainIdentities');
+  assert.deepEqual(composite.threads, ['collision:a', 'collision']); assert.deepEqual(composite.messageIds, ['b', 'a:b']);
+  assert.deepEqual(composite.retainedPerThread, [1, 1]); assert.equal(composite.exactRetryIdempotent, true);
+  assert.equal(composite.changedContentRejected, true); assert.equal(composite.originalSignedReferences, true);
   const authority = observation('ownerVerifiedAuthority');
   assert.equal(authority.verifiedSignature, true); assert.equal(authority.mutatedReturnDidNotMutateOwner, true);
   assert.equal(authority.hostTransportConfigured, false);

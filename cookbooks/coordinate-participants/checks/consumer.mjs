@@ -406,6 +406,28 @@ try {
   assert.ok(safePreview.value.messages.every(message => !message.messageId.startsWith('poison-')));
   observed('rawProjectionShapeGuard', { probes: shapeObservations, retainedEvidenceQueryable: true, malformedRecordsRetained: false });
 
+  const scopedMessages = [
+    { threadId: 'collision:a', messageId: 'b', text: 'First independently addressed conversation' },
+    { threadId: 'collision', messageId: 'a:b', text: 'Second independently addressed conversation' },
+  ];
+  const scopedFirst = await accepted(clients[0], 'message', scopedMessages[0], 'scope-message-first');
+  const scopedSecond = await accepted(clients[0], 'message', scopedMessages[1], 'scope-message-second');
+  await accepted(clients[0], 'message', scopedMessages[0], 'scope-message-identical');
+  const scopedConflict = await applied(clients[0], 'message', { ...scopedMessages[0], text: 'Changed content under the original scoped identity' }, 'scope-message-conflict');
+  assert.equal(scopedConflict.outcome, 'rejected');
+  const scopedReader = await captureCollaborationReader(sessions[0]);
+  try {
+    const first = (await scopedReader.thread({ threadId: scopedMessages[0].threadId })).value.messages;
+    const second = (await scopedReader.thread({ threadId: scopedMessages[1].threadId })).value.messages;
+    assert.equal(first.length, 1); assert.equal(second.length, 1);
+    assert.equal(first[0].text, scopedMessages[0].text); assert.equal(second[0].text, scopedMessages[1].text);
+    assertReference(first[0].operation, scopedFirst, sessions[0].deviceId, initial.id);
+    assertReference(second[0].operation, scopedSecond, sessions[0].deviceId, initial.id);
+    observed('compositeDomainIdentities', { threads: scopedMessages.map(value => value.threadId),
+      messageIds: scopedMessages.map(value => value.messageId), retainedPerThread: [first.length, second.length],
+      exactRetryIdempotent: true, changedContentRejected: true, originalSignedReferences: true });
+  } finally { await scopedReader.close(); }
+
   await accepted(clients[0], 'request', request('round', [sessions[3].deviceId, sessions[4].deviceId], 'allSlots'), 'round-request');
   await synchronize();
   const independentReviews = await Promise.all([3, 4].map((index, offset) => reviewAssignedTask({ session: sessions[index],

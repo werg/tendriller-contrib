@@ -5,6 +5,8 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 // Synthetic values test the validator; they are never emitted as qualification.
 function example() {
   const observations = {
+    compositeDomainIdentities: { threads: ['collision:a', 'collision'], messageIds: ['b', 'a:b'], retainedPerThread: [1, 1],
+      exactRetryIdempotent: true, changedContentRejected: true, originalSignedReferences: true },
     rawProjectionShapeGuard: { retainedEvidenceQueryable: true, malformedRecordsRetained: false,
       probes: ['objectInput', 'objectContent', 'objectSource', 'deepInput', 'duplicateInput', 'duplicateDisposition', 'nonfiniteInput', 'invalidEnvelope'].map(name => ({
         name, outcome: 'rejected', rejectionCode: ['objectInput', 'objectContent', 'objectSource'].includes(name) ? 'assert:collab_json_fields'
@@ -84,6 +86,7 @@ test('optimistic claim, recovery, replay and provider conclusions are refused', 
     report => { report.checks.find(value => value.name === 'signedOperationLineage').observation.bodyReferenceIgnored = false; },
     report => { report.checks.find(value => value.name === 'rawForgedAttemptGuard').observation.outcome = 'accepted'; },
     report => { report.checks.find(value => value.name === 'rawProjectionShapeGuard').observation.probes.pop(); },
+    report => { report.checks.find(value => value.name === 'compositeDomainIdentities').observation.retainedPerThread = [1, 0]; },
     report => { report.checks.find(value => value.name === 'ownerVerifiedAuthority').observation.verifiedSignature = false; },
     report => { report.checks.find(value => value.name === 'capturedReadScope').observation.deniedCaptureReleasedReservation = false; },
     report => { report.checks.find(value => value.name === 'boundedCapturedPages').observation.noDuplicatesOrOmissions = false; },
