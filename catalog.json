@@ -442,9 +442,11 @@
         "share-live-signals"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/tree/0d9eff5d4e196313996c8c6cc77a130d2de1cf81/integrations/chatgpt/examples/kitchen",
-        "https://github.com/werg/tendriller/tree/0876ac445e47ded9a73df54515925ed1fdbe4e60/integrations/chatgpt/widget",
-        "https://github.com/werg/tendriller/blob/d9f05c91581095e845452bceca3af8873d5857de/docs/SESSION_BOOTSTRAP.md",
+        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/CHATGPT_INTEGRATION.md",
+        "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/examples/kitchen",
+        "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/widget",
+        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/WORKSPACE_AGENT.md",
+        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/SESSION_BOOTSTRAP.md",
         "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"
       ],
       "path": "cookbooks/connect-chatgpt/COOKBOOK.md",
