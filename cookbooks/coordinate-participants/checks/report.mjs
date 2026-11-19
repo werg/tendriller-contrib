@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 
 export const requiredChecks = Object.freeze([
-  'sixIndependentSigners', 'twoAttachmentsOneOwner', 'sourceEndpointIsolation',
+  'sixIndependentSigners', 'twoAttachmentsOneOwner', 'ownerVerifiedAuthority', 'sourceEndpointIsolation',
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
   'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
-  'rawForgedResultGuard', 'schemaDdlGuard', 'staleClaimRejected',
+  'rawForgedResultGuard', 'rawForgedAttemptGuard', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
   'resultIdentityConflict', 'independentReviewPolicies', 'frozenContributionSlots', 'aggregateProvenance',
   'cancellationAcknowledgment', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
@@ -56,6 +56,19 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(observation('rawForgedResultGuard').outcome, 'rejected');
   assert.equal(observation('rawForgedResultGuard').rejectionCode, 'assert:collab_result_disposition');
   assert.equal(observation('rawForgedResultGuard').retainedForgedResult, false);
+  assert.equal(observation('rawForgedAttemptGuard').outcome, 'rejected');
+  assert.equal(observation('rawForgedAttemptGuard').rejectionCode, 'assert:collab_attempt');
+  const authority = observation('ownerVerifiedAuthority');
+  assert.equal(authority.verifiedSignature, true); assert.equal(authority.mutatedReturnDidNotMutateOwner, true);
+  assert.equal(authority.hostTransportConfigured, false);
+  const lineage = observation('signedOperationLineage');
+  assert.equal(lineage.bodyReferenceIgnored, true); assert.equal(lineage.sourceSignerForced, true);
+  assert.notEqual(lineage.lateClaimGeneration, lineage.lateOperationGeneration);
+  assert.ok(lineage.references.length >= 6);
+  for (const reference of lineage.references) {
+    hex(reference.applicationId, 64); hex(reference.author, 64); hex(reference.attemptId, 64); hex(reference.generation, 64);
+    assert.ok(typeof reference.operationId === 'string' && reference.operationId.length > 0);
+  }
   assert.equal(observation('schemaDdlGuard').outcome, 'rejected');
   assert.equal(observation('schemaDdlGuard').rejectionCode, 'denied');
   const scale = observation('scaleProfile');

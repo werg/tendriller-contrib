@@ -1,7 +1,6 @@
 // Copy beside configuration.json and worker.mjs in the signed deployment graph.
 // This composes the maintained owner; it does not implement owner election.
 import { openBrowserOwner, createBrowserIdentity } from '@tendriller/core/collaboration/browser';
-import { createPeersClient } from '@tendriller/core/peers';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 
 const configuration = await fetch(new URL('./configuration.json', import.meta.url), { cache: 'no-store' }).then(async response => {
@@ -29,20 +28,10 @@ export const resumeView = async () => (await ownerReady).resume();
 // Call only after an explicit setup choice. No automatic catch/recreate fallback.
 export const createProfile = () => createBrowserIdentity(ownerOptions);
 
-const base = new URL('_tendril/', configuration.page_url);
-const peers = createPeersClient({ base: base.href, applicationId: configuration.applicationId,
-  async request(path, { method = 'GET', body, signal } = {}) {
-    const response = await fetch(new URL(path, base), { method, signal, credentials: 'same-origin', cache: 'no-store',
-      ...(body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }) });
-    const value = await response.json();
-    if (!response.ok) throw Object.assign(Error(value.error?.message ?? `Host request failed (${response.status})`), { code: value.error?.code });
-    return value;
-  },
-});
-
-/** Actual signing grants establish eligibility; publication labels remain descriptive. */
+/** The owner supplies its currently verified local authority. Roster refresh does
+ * not call the control host; publication labels remain descriptive. */
 export async function readParticipants(session) {
-  const authority = await verifyAuthorityBundle(await peers.application(), configuration.descriptor);
+  const authority = await verifyAuthorityBundle(await session.authority(), configuration.descriptor);
   const endpoints = await session.endpoints();
   return authority.control.payload.grants.filter(grant => grant.reader).flatMap(grant => {
     const label = configuration.participants?.[grant.publicKey] ?? {};

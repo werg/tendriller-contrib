@@ -7,13 +7,15 @@ import { openSqlApplication } from '@chronolog/peer-session/sql';
 import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 import { reviewWorkspace } from './review-workspace.mjs';
 
-const configuration = await fetch(new URL('./configuration.json', import.meta.url), { cache: 'no-store' }).then(async response => {
+// Register attachment listeners before waiting for deployment configuration.
+serveBrowserOwner({ scope: self, async load({ signal }) {
+const configuration = await fetch(new URL('./configuration.json', import.meta.url), { signal, cache: 'no-store' }).then(async response => {
   if (!response.ok) throw Error('The signed application configuration is unavailable.');
   return response.json();
 });
 if (new URL(configuration.page_url).origin !== self.location.origin) throw Error('Open the Worker from its enrolled publication origin.');
 const definition = reviewWorkspace({ administrators: configuration.administrators });
-serveBrowserOwner({ profileId: configuration.profileId, scope: self,
+return { profileId: configuration.profileId,
   async createIdentity() {
     const device = await openBrowserDevice({ name: configuration.profileId, create: true });
     try { return device.identity.publicKey; } finally { await device.close(); }
@@ -63,4 +65,5 @@ serveBrowserOwner({ profileId: configuration.profileId, scope: self,
       throw error;
     }
   },
-});
+};
+}});

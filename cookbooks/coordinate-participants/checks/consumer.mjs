@@ -4,9 +4,9 @@ import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { MessageChannel } from 'node:worker_threads';
-import { bytesDigest, connectApplications, controlParticipantGrant, createApplicationOwner,
+import { APPLICATION_COLLECTIVE_ID, bytesDigest, bytesToHex, connectApplications, controlParticipantGrant, createApplicationOwner,
   createGenerationRegistry, defineApplication, defineCommand, participantGrant, program,
-  signApplicationDescriptor, signControlRevision, signTransitionRequest, sqlStatement } from '@chronolog/peer-session';
+  signApplicationDescriptor, signControlRevision, signTransitionRequest, sqlStatement, verifyAuthorityBundle } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectApplicationOwner } from '@chronolog/peer-session/browser';
 import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-session/sql';
@@ -35,7 +35,11 @@ const observed = (name, observation) => {
   memory.push(process.memoryUsage());
   console.log(`✓ ${name}`);
 };
-const stores = [];
+const stores = [], verifiedReferences = [];
+const assertReference = (reference, outcome, author, generation) => {
+  assert.deepEqual(reference, { applicationId: report.applicationId, author, operationId: outcome.operationId, attemptId: outcome.attemptId, generation });
+  verifiedReferences.push(reference);
+};
 
 try {
   const authorityDevice = await openNativeDevice({ path: join(directory, 'authority.sqlite'), create: true });
@@ -54,6 +58,7 @@ try {
       input: { type: 'string', minLength: 1, maxLength: 4096 }, prepare: sql => program(sqlStatement(sql)) }),
   } });
   const applicationId = randomBytes(32).toString('hex'), epochKey = new Uint8Array(randomBytes(32));
+  report.applicationId = applicationId;
   const engine = createNativeSqlEngine();
   const prepared = await prepareSqlApplication({ engine, applicationId, definition, schemaAdministrator: devices[0].identity });
   const descriptor = await signApplicationDescriptor({ applicationId, historyId: 'independent-collaboration-v1',
@@ -116,6 +121,14 @@ try {
   assert.notEqual(board.endpoint.endpointIncarnation, discussion.endpoint.endpointIncarnation);
   observed('twoAttachmentsOneOwner', { signer: board.deviceId, owner: board.endpoint.ownerInstanceId,
     endpoints: [board.endpoint.endpointId, discussion.endpoint.endpointId] });
+  const localAuthority = await board.authority();
+  assert.deepEqual(localAuthority, await sessions[1].authority());
+  const verifiedAuthority = await verifyAuthorityBundle(localAuthority, descriptor);
+  assert.equal(verifiedAuthority.control.payload.revision, 0);
+  localAuthority.controls.at(-1).payload.grants = [];
+  assert.notDeepEqual(await board.authority(), localAuthority);
+  observed('ownerVerifiedAuthority', { revision: verifiedAuthority.control.payload.revision, hostTransportConfigured: false,
+    ownerSigner: sessions[1].deviceId, mutatedReturnDidNotMutateOwner: true, verifiedSignature: true });
   const boardClient = reviewClient({ session: board, endpoint: board.endpoint, runId: 'board-run' });
   const discussionClient = reviewClient({ session: discussion, endpoint: discussion.endpoint, runId: 'discussion-run' });
   const request = (interactionId, signers, policy = 'one') => ({ interactionId, kind: 'reviewEvidence', title: `Review ${interactionId}`,
@@ -125,13 +138,15 @@ try {
     slots: policy === 'one' ? [{ slotId: 'review', eligibleSigners: signers, label: 'Review' }]
       : signers.map((signer, index) => ({ slotId: `review-${index + 1}`, eligibleSigners: [signer], label: `Specialist ${index + 1}` })),
   });
-  await Promise.all([
+  const [boardRequest, discussionRequest] = await Promise.all([
     accepted(boardClient, 'request', request('board-request', [sessions[3].deviceId]), 'board-request-op'),
     accepted(discussionClient, 'request', request('discussion-request', [sessions[4].deviceId]), 'discussion-request-op'),
   ]);
   await synchronize();
   const boardTask = (await boardClient.inspect('board-request')).value.task;
   const discussionTask = (await discussionClient.inspect('discussion-request')).value.task;
+  assertReference(boardTask.operation, boardRequest, board.deviceId, initial.id);
+  assertReference(discussionTask.operation, discussionRequest, discussion.deviceId, initial.id);
   assert.equal(boardTask.source.endpointId, board.endpoint.endpointId);
   assert.equal(discussionTask.source.endpointId, discussion.endpoint.endpointId);
   assert.equal(boardTask.source.documentPath, '/board.html');
@@ -240,6 +255,7 @@ try {
     operations: race.map(value => ({ operationId: value.operationId, attemptId: value.attemptId })) });
   await synchronize();
   const originalClaim = (await clients[0].inspect('exclusive')).value.claims[0];
+  assertReference(originalClaim.operation, race[winner === 3 ? 0 : 1], sessions[winner].deviceId, initial.id);
   const raw = await sessions[loser].command('fixture.raw', "DELETE FROM collab_journal", { operationId: 'raw-delete-claims' });
   const rawOutcome = await raw.applied({ signal: signal() });
   assert.equal(rawOutcome.outcome, 'rejected');
@@ -262,9 +278,9 @@ try {
   const forgedBody = JSON.stringify({ ...resultInput('exclusive', 'review', originalClaim, 'forged-current-result'),
     content: JSON.stringify({ decision: 'Force stale work into the current aggregate' }), disposition: 'accepted' });
   const quoted = value => `'${value.replaceAll("'", "''")}'`;
-  const forgedSql = `INSERT INTO collab_journal (id,sequence,type,task_id,slot_id,author,generation,body)
+  const forgedSql = `INSERT INTO collab_journal (id,sequence,type,task_id,slot_id,author,generation,attempt_id,body)
     SELECT 'forged-current-result',COALESCE(MAX(sequence),0)+1,'result','exclusive','review',
-      lower(hex(chronolog_actor())),${quoted(initial.id)},${quoted(forgedBody)} FROM collab_journal`;
+      lower(hex(chronolog_actor())),${quoted(initial.id)},chronolog_transaction_id(),${quoted(forgedBody)} FROM collab_journal`;
   const forged = await sessions[winner].command('fixture.raw', forgedSql, { operationId: 'raw-forged-result' });
   const forgedOutcome = await forged.applied({ signal: signal() });
   assert.equal(forgedOutcome.outcome, 'rejected'); assert.equal(forgedOutcome.rejectionCode, 'assert:collab_result_disposition');
@@ -279,13 +295,36 @@ try {
   observed('staleClaimRejected', { acceptedAsCurrent: false, disposition: lateResult.disposition,
     currentClaimant: inspection.claims[0].claimant, oldClaimant: originalClaim.claimant });
   const replacementClaim = inspection.claims[0], canonicalResult = resultInput('exclusive', 'review', replacementClaim, 'canonical-result');
-  await accepted(clients[loser], 'result', canonicalResult, 'canonical-result-op');
+  const canonicalResultOutcome = await accepted(clients[loser], 'result', canonicalResult, 'canonical-result-op');
   await accepted(clients[loser], 'result', canonicalResult, 'canonical-result-repeat');
   const conflict = await applied(clients[loser], 'result', { ...canonicalResult, content: { decision: 'different' } }, 'canonical-result-conflict');
   assert.equal(conflict.outcome, 'rejected');
   inspection = (await clients[0].inspect('exclusive')).value;
   assert.equal(inspection.results.filter(value => value.resultId === 'canonical-result').length, 1);
+  assertReference(inspection.results.find(value => value.resultId === 'canonical-result').operation, canonicalResultOutcome, sessions[loser].deviceId, initial.id);
   observed('resultIdentityConflict', { conflict: conflict.outcome, acceptedResults: inspection.results.filter(value => value.disposition === 'accepted').length });
+
+  // A raw writer can provide misleading descriptive fields, but cannot assign
+  // another attempt or author to the selected record's authenticated reference.
+  const falseReference = { applicationId, author: sessions[0].deviceId, operationId: 'forged-body-operation',
+    attemptId: boardRequest.attemptId, generation: initial.id };
+  const untrustedMessage = JSON.stringify({ messageId: 'untrusted-reference', text: 'The signed transaction owns this message.',
+    source: JSON.stringify({ deviceId: sessions[0].deviceId, evidence: 'owner-bound' }), operation: falseReference });
+  const rawMessageSql = attempt => `INSERT INTO collab_journal (id,sequence,type,task_id,slot_id,author,generation,attempt_id,body,chronolog_owner)
+    SELECT 'untrusted-reference',COALESCE(MAX(sequence),0)+1,'message','workspace','',lower(hex(chronolog_actor())),
+      ${quoted(initial.id)},${attempt},${quoted(untrustedMessage)},
+      (SELECT id FROM chronolog_principals WHERE key=X'${bytesToHex(APPLICATION_COLLECTIVE_ID)}') FROM collab_journal`;
+  const spoofedAttempt = await sessions[loser].command('fixture.raw', rawMessageSql(`X'${boardRequest.attemptId}'`), { operationId: 'raw-forged-attempt' });
+  const spoofedAttemptOutcome = await spoofedAttempt.applied({ signal: signal() });
+  assert.equal(spoofedAttemptOutcome.outcome, 'rejected'); assert.equal(spoofedAttemptOutcome.rejectionCode, 'assert:collab_attempt');
+  observed('rawForgedAttemptGuard', { outcome: spoofedAttemptOutcome.outcome, rejectionCode: spoofedAttemptOutcome.rejectionCode,
+    attemptedBorrowedAttempt: boardRequest.attemptId, actualAuthor: sessions[loser].deviceId });
+  const signedMessage = await sessions[loser].command('fixture.raw', rawMessageSql('chronolog_transaction_id()'), { operationId: 'raw-authenticated-message' });
+  const messageOutcome = await signedMessage.applied({ signal: signal() }); assert.equal(messageOutcome.outcome, 'accepted');
+  const message = (await clients[loser].snapshot()).value.messages.find(value => value.messageId === 'untrusted-reference');
+  assertReference(message.operation, messageOutcome, sessions[loser].deviceId, initial.id);
+  assert.equal(message.source.deviceId, sessions[loser].deviceId); assert.equal(message.source.evidence, 'signer-asserted');
+  assert.equal(message.source.assertedDeviceId, sessions[0].deviceId);
 
   await accepted(clients[0], 'request', request('round', [sessions[3].deviceId, sessions[4].deviceId], 'allSlots'), 'round-request');
   await synchronize();
@@ -339,10 +378,15 @@ try {
   const newAuthority = await registry.read();
   for (const session of sessions) await session.adopt(newAuthority);
   await connect(2);
-  await accepted(clients[3], 'result', resultInput('surviving-claim', 'review', survivingClaim, 'old-generation-result'), 'old-generation-result-op');
+  const lateGenerationOutcome = await accepted(clients[3], 'result', resultInput('surviving-claim', 'review', survivingClaim, 'old-generation-result'), 'old-generation-result-op');
   const recovered = (await clients[2].inspect('surviving-claim')).value;
   const oldResult = recovered.results.find(value => value.resultId === 'old-generation-result');
   assert.equal(oldResult.disposition, 'needsReview');
+  assertReference(oldResult.operation, lateGenerationOutcome, sessions[3].deviceId, successor.id);
+  assert.equal(oldResult.generation, initial.id);
+  assert.equal((await board.authority()).generations.at(-1).id, successor.id);
+  observed('signedOperationLineage', { references: verifiedReferences, bodyReferenceIgnored: true,
+    sourceSignerForced: true, lateClaimGeneration: oldResult.generation, lateOperationGeneration: oldResult.operation.generation });
   observed('generationFence', { before: initial.id, after: successor.id, oldFenceAcceptedAsCurrent: false,
     disposition: oldResult.disposition, retainedClaim: recovered.claims[0] });
   const rebind = await accepted(clients[3], 'rebind', claimInput('surviving-claim', 'review', 3, survivingClaim.claimEpoch), 'rebind-claim-op');

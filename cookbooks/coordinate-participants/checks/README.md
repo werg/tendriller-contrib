@@ -21,7 +21,11 @@ digests, source commits/trees, runtime and engine identity, the complete six-rol
 journey and an eight-signer scale profile with 32 simultaneous real MessagePort
 attachments. It includes guarded work/result races, raw SQL and DDL bypass
 attempts, independently executed evidence/clarity policies, generation recovery
-and retained operation evidence. Existing output directories are refused.
+and retained operation evidence. The lineage gates reject a borrowed attempt ID,
+ignore body-supplied operation references and trace actual signed request, claim,
+result and message attempts. The authority gate reads verified current grants
+through the owner without a host transport and checks that returned objects cannot
+mutate owner state. Existing output directories are refused.
 `--allow-dirty` is useful during implementation; such output is development
 evidence and cannot qualify a clean release.
 
@@ -98,6 +102,10 @@ identity. Enrollment remains an owner action against the displayed public key.
 Busy storage, unavailable keys and incompatible definitions never recreate a
 signer. The Worker uses public authenticated control and relay introductions and
 keeps its transport alive independently of either page's RPC attachment.
+`serveBrowserOwner({ load })` installs its attachment listeners before waiting for
+configuration, so an early Worker boot event cannot disappear during a fetch.
+The page refreshes eligibility from `session.authority()`, the owner's verified
+local signed control bundle; refreshing the roster does not call the host.
 
 An alternative deployment directory may supply a real `bootstrap.mjs` exporting:
 

@@ -42,7 +42,12 @@ display needs a separately authorized projection or history.
 The owner supplies endpoint identity from the attached port. The originating
 document and publication are useful context with a declared evidence level. A
 reply references its original interaction and contribution slot; it cannot become
-a fresh request merely because an observer received it.
+a fresh request merely because an observer received it. The public task, claim,
+result and message records expose their authenticated `operation` reference from
+Chronolog's reserved transaction evidence. Application JSON cannot substitute
+another attempt or signer. A late result can retain an old claim generation while
+its actual submission belongs to a newer generation; show both when investigating
+recovery. Historical document labels remain signer assertions.
 
 ## Keep the first complete journey small
 
