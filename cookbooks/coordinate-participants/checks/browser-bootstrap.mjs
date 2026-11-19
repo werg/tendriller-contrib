@@ -16,6 +16,7 @@ export const applicationReady = ready.then(attachment => {
   return session;
 });
 globalThis.fixtureReady = applicationReady.then(session => ({ deviceId: session.deviceId, endpoint: session.endpoint }));
+void globalThis.fixtureReady.catch(() => undefined);
 export const detachView = async () => (await ready).detach();
 export const suspendView = async () => (await ready).suspend();
 export const resumeView = async () => (await ready).resume();

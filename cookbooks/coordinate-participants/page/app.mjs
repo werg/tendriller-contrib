@@ -16,11 +16,19 @@ let detachView = async () => session?.detach(), suspendView = async () => sessio
 let observation = new AbortController(), dirty = false, refreshing = false;
 let runSubscription, runScopeKey = '', runTimer, liveRuns = new Map();
 const statuses = new Map();
+const waiters = new Map();
 const report = error => { $('#status').textContent = error.message ?? String(error); $('#status').dataset.state = 'error'; };
 const say = text => { $('#status').textContent = text; $('#status').dataset.state = 'ready'; };
-const canManage = task => task.creator === session.deviceId || entries.some(entry => entry.deviceId === session.deviceId && entry.applicationAdministrator === true);
+const canWrite = () => entries.some(entry => entry.deviceId === session.deviceId && entry.authorized && !entry.revoked);
+const canManage = task => canWrite() && (task.creator === session.deviceId || entries.some(entry => entry.deviceId === session.deviceId && entry.applicationAdministrator === true));
 const label = signer => entries.find(entry => entry.deviceId === signer)?.label ?? `Participant ${signer.slice(0, 8)}`;
-const originLabel = source => [source.documentPath?.endsWith('discussion.html') ? 'Discussion view' : 'Board view', source.contextEvidence === 'owner-validated' ? 'verified view context' : 'view-reported context'].join(' · ');
+const originLabel = source => {
+  const path = typeof source?.documentPath === 'string' ? source.documentPath : '';
+  const view = path.endsWith('discussion.html') ? 'Discussion view' : path.endsWith('board.html') ? 'Board view'
+    : path.startsWith('native:') ? 'Native participant' : path || 'Participant endpoint';
+  return `${view} · ${source?.contextEvidence === 'owner-validated' ? 'verified live view context' : 'signer-reported context'}`;
+};
+const diagnostics = (title, value) => { const details = node('details', ''); details.append(node('summary', title), node('pre', JSON.stringify(value, null, 2))); return details; };
 
 function retainDraft() {
   store.writeDraft({ title: $('#request-title').value, input: $('#request-input').value, message: $('#message').value,
@@ -34,6 +42,7 @@ function restoreDraft() {
   $('#response-policy').value = draft.policy ?? 'one'; selectedTask = draft.selectedTask;
 }
 async function submit(method, input, title, options = {}) {
+  if (!canWrite()) throw Error('This participant currently has read-only access.');
   const operationId = options.operationId ?? freshId();
   const reference = { applicationId: session.applicationId, author: session.deviceId, operationId };
   // Retain identity and original intent before the first uncertain call. This
@@ -41,12 +50,15 @@ async function submit(method, input, title, options = {}) {
   store.retainOperation(reference, { method, input, title });
   paintOperations();
   const operation = await client[method](input, { operationId, ...(snapshot ? { basedOn: snapshot.revision } : {}) });
+  store.retainOperation(operation.reference ?? reference, { method, input, title });
+  const waiter = new AbortController(); waiters.set(operationId, waiter);
   statuses.set(operationId, await operation.get()); paintOperations();
-  void operation.applied({ signal: observation.signal }).then(async value => {
+  void operation.applied({ signal: AbortSignal.any([observation.signal, waiter.signal]) }).then(async value => {
     statuses.set(operationId, value); paintOperations();
     say(value.outcome === 'rejected' ? `${title} was rejected. Review its original operation.` : `${title} applied to the shared workspace.`);
     await refresh();
-  }, error => { if (!observation.signal.aborted) report(error); });
+  }).catch(error => { if (!observation.signal.aborted && !waiter.signal.aborted) report(error); })
+    .finally(() => { if (waiters.get(operationId) === waiter) waiters.delete(operationId); paintOperations(); });
   return operation;
 }
 
@@ -59,6 +71,10 @@ function paintOperations() {
     row.append(node('p', receipt.label ?? receipt.message ?? (state ? `${state.status}${state.outcome ? ` · ${state.outcome}` : ''}` : 'Checking the original operation…')));
     row.append(action('Inspect original', async () => {
       statuses.set(reference.operationId, await session.operations.get(reference.operationId, { author: reference.author })); paintOperations();
+    }));
+    if (waiters.has(reference.operationId)) row.append(action('Stop waiting here', async () => {
+      waiters.get(reference.operationId)?.abort(); waiters.delete(reference.operationId); paintOperations();
+      say('Stopped waiting in this view. The original operation remains inspectable; shared work was not cancelled.');
     }));
     if (state?.status === 'saved') row.append(action('Retry same signed attempt', async () => { await session.retry(reference.operationId); await refresh(); }));
     if (['abandoned', 'needsReapply'].includes(state?.status)) {
@@ -89,6 +105,8 @@ function paintTasks(value) {
     card.append(node('p', `${task.status === 'needsReview' ? 'Review required' : task.status} · ${task.responsePolicy}`, 'eyebrow'));
     card.append(node('h3', task.title), node('p', typeof task.input?.text === 'string' ? task.input.text : JSON.stringify(task.input)));
     card.append(node('p', `${label(task.creator)} · ${originLabel(task.source)}`, 'muted'));
+    card.append(diagnostics('Request origin and operation', { taskId: task.taskId, author: task.creator,
+      source: task.source, operation: task.operation ?? null, context: task.context }));
     card.append(action(task.taskId === selectedTask ? 'Selected conversation' : 'Open conversation', async () => {
       selectedTask = task.taskId; retainDraft(); paint(snapshot.value); $('#message').focus();
     }));
@@ -102,6 +120,9 @@ function paintTasks(value) {
       if (acceptedResult) {
         row.append(node('p', acceptedResult.outcome === 'failed' ? 'Contributor reported a failure' : 'Contribution accepted', 'receipt'));
         row.append(node('p', acceptedResult.content?.text ?? JSON.stringify(acceptedResult.content)));
+        row.append(diagnostics('Contribution origin', { resultId: acceptedResult.resultId, author: acceptedResult.author,
+          runId: acceptedResult.runId, claimEpoch: acceptedResult.claimEpoch, generation: acceptedResult.generation,
+          operation: acceptedResult.operation ?? null }));
       }
       if (results.some(item => item.disposition !== 'accepted')) {
         const details = node('details', ''); details.append(node('summary', 'Late or superseded evidence'));
@@ -109,10 +130,10 @@ function paintTasks(value) {
         row.append(details);
       }
       const eligible = !claim ? slot.eligibleSigners.includes(session.deviceId) : claim.status === 'offered' && claim.claimant === session.deviceId;
-      if (task.status === 'open' && eligible) row.append(action('Claim this contribution', () => submit('claim', {
+      if (task.status === 'open' && eligible && canWrite()) row.append(action('Claim this contribution', () => submit('claim', {
         taskId: task.taskId, slotId: slot.slotId, claimId: freshId(), expectedEpoch: claim?.claimEpoch ?? 0, taskVersion: 1,
       }, `Claim ${slot.label ?? slot.slotId}`)));
-      if (claim?.claimant === session.deviceId) {
+      if (claim?.claimant === session.deviceId && canWrite()) {
         const currentEndpoint = claim.endpointIncarnation === session.endpoint.endpointIncarnation && claim.runId === runId;
         if (claim.status === 'needsReview') row.append(action('Revalidate this claim', () => submit('rebind', {
           taskId: task.taskId, slotId: slot.slotId, claimId: freshId(), expectedEpoch: claim.claimEpoch, taskVersion: 1,
@@ -148,7 +169,7 @@ function paintTasks(value) {
           generation: claim.generation, runId: claim.runId, endpointIncarnation: claim.endpointIncarnation,
         }, 'Acknowledge cancellation')));
       }
-      if (claim && !['completed', 'cancelled'].includes(claim.status) && task.status === 'open' && (canManage(task) || claim.claimant === session.deviceId)) {
+      if (claim && !['completed', 'cancelled'].includes(claim.status) && task.status === 'open' && canWrite() && (canManage(task) || claim.claimant === session.deviceId)) {
         const target = node('select', ''); target.setAttribute('aria-label', `Transfer ${slot.label ?? slot.slotId} to`);
         for (const entry of entries.filter(item => item.authorized && !item.revoked && item.deviceId !== claim.claimant)) {
           const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; target.append(option);

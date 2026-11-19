@@ -8,6 +8,8 @@ import { chromium } from 'playwright';
 const reportPath = resolve(process.argv[2]), report = JSON.parse(await readFile(reportPath, 'utf8'));
 const here = import.meta.dirname, site = join(here, 'site');
 let browser, server;
+report.diagnostics = { httpErrors: [], browser: [] };
+const diagnostic = (kind, value) => { report.diagnostics[kind].push(value); if (report.diagnostics[kind].length > 80) report.diagnostics[kind].shift(); };
 try {
   await mkdir(site);
   const bundled = await build({ absWorkingDir: here, entryPoints: { app: 'source/page/app.mjs', worker: 'source/page/deployment/worker.mjs' },
@@ -24,7 +26,7 @@ try {
         '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.json': 'application/json' }[extname(path)] ?? 'application/octet-stream';
       response.writeHead(200, { 'content-type': type, 'cache-control': 'no-store',
         'cross-origin-opener-policy': 'same-origin', 'cross-origin-embedder-policy': 'require-corp' }); response.end(bytes);
-    } catch { response.writeHead(404); response.end(); }
+    } catch (error) { diagnostic('httpErrors', { url: request.url, message: error.message }); response.writeHead(404); response.end(); }
   });
   await new Promise((done, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', done); });
   const origin = `http://127.0.0.1:${server.address().port}`;
@@ -32,13 +34,26 @@ try {
   report.runtime.browser = browser.version();
   for (const mode of ['shared', 'elected']) {
     const context = await browser.newContext({ viewport: { width: 1320, height: 1000 } });
+    context.on('console', message => { if (['error', 'warning'].includes(message.type())) diagnostic('browser', { mode, type: message.type(), text: message.text(), location: message.location() }); });
+    context.on('requestfailed', request => diagnostic('browser', { mode, type: 'requestfailed', url: request.url(), error: request.failure() }));
     const board = await context.newPage(), discussion = await context.newPage(), errors = [];
     for (const page of [board, discussion]) { page.setDefaultTimeout(30_000); page.on('pageerror', error => errors.push(error.message)); }
     const profile = `authored-${mode}`, url = document => `${origin}/${document}?profile=${profile}&mode=${mode}`;
     const ready = async (page, entry) => {
       await page.goto(url(entry));
-      await page.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
-      return page.evaluate(() => globalThis.fixtureReady);
+      try {
+        await page.waitForFunction(() => ['ready', 'error'].includes(document.querySelector('#status')?.dataset.state));
+        const status = await page.locator('#status').evaluate(element => ({ state: element.dataset.state, text: element.textContent }));
+        assert.equal(status.state, 'ready', `${mode} ${entry}: ${status.text}`);
+        return await page.evaluate(() => globalThis.fixtureReady);
+      } catch (error) {
+        const details = { mode, entry, message: error.message, pageErrors: errors.slice(),
+          status: await page.locator('#status').textContent().catch(() => null),
+          dom: await page.locator('body').innerText().catch(() => null) };
+        report.diagnostics.bootstrap = details; console.error(JSON.stringify(details, null, 2));
+        await page.screenshot({ path: join(dirname(reportPath), `${mode}-bootstrap-failed.png`), fullPage: true }).catch(() => undefined);
+        throw error;
+      }
     };
     const a = await ready(board, 'board.html'), b = await ready(discussion, 'discussion.html');
     assert.equal(a.deviceId, b.deviceId); assert.equal(a.endpoint.ownerInstanceId, b.endpoint.ownerInstanceId);

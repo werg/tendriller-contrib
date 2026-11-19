@@ -76,6 +76,7 @@ export async function runReviewer({ session, endpoint = session.endpoint, runId,
   if (!Object.hasOwn(policies, policy)) throw Error('Choose the evidence or clarity reference policy');
   const client = createCollaborationClient({ session, endpoint, runId }), changes = session.changes({ signal })[Symbol.asyncIterator]();
   let changed = changes.next();
+  void changed.catch(() => undefined);
   const attempted = new Set();
   const drain = async () => {
     for (;;) {
@@ -98,7 +99,7 @@ export async function runReviewer({ session, endpoint = session.endpoint, runId,
   try {
     await drain();
     while (!signal?.aborted) {
-      const next = await changed; if (next.done) break; changed = changes.next(); await drain();
+      const next = await changed; if (next.done) break; changed = changes.next(); void changed.catch(() => undefined); await drain();
     }
   } finally { await changes.return(); await changed.catch(() => undefined); }
 }
