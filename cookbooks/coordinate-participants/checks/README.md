@@ -5,6 +5,12 @@ an empty directory and imports only their declared public exports. The native SQ
 engine must be included in the Chronolog archive. Source files from a sibling
 checkout are not a substitute for either package.
 
+The [qualified 9df9308 tuple](../notes/qualification-9df9308.md) records the final
+31-observation native run, both 16-observation authored browser journeys and all
+seven peer transport/domain gates. Its retained original reports and composition
+records can be verified independently of expiring Actions downloads. Later source
+changes require their own qualification.
+
 Run the report validator tests with `npm test`. The full runtime entry point is
 `npm run test:collaboration`, with exact archive paths and core provenance:
 

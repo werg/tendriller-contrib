@@ -7,7 +7,7 @@ tags: ["collaboration", "agents", "claims", "recovery", "participants"]
 choices: ["Shared local owner or independently enrolled signer", "One executor or frozen contribution slots", "Durable outcome or disposable progress"]
 capabilities: ["Chronolog application session", "Tendriller collaboration module"]
 related: ["run-a-peer-application", "share-live-signals", "connect-chatgpt", "coordinate-devices", "observe-long-running-process"]
-evidence: explained
+evidence: exercised
 ---
 
 # Coordinate people, views and independent agents
@@ -24,6 +24,12 @@ attempt, materialized view, replica and recovery decision. This cookbook adds th
 review policy and editable example UI; it adds no session owner or retry queue.
 Use the exact compatible public archives identified by the qualification report.
 A current source checkout does not establish what a deployed host supports.
+
+The [qualified source tuple](notes/qualification-9df9308.md) passed 31 native
+observations with eight retained signers and 32 attached views, both actual
+Chromium/SQL/OPFS ownership journeys, and the seven-route peer composition.
+That note retains the raw reports, archive hashes, measured local limits and
+separate deployed-device/provider acceptance boundaries.
 
 ## Choose identities deliberately
 
@@ -145,7 +151,7 @@ an unrelated rejected transport attempt cannot create a hot retry loop.
 The executable local scale profile has eight distinct retained signers and 32
 simultaneous views, with endpoint quotas that leave a sibling usable. Its report
 includes timing distributions, memory, CPU and exact grants. Treat those measured
-local results as a bounded composition profile; physical browsers, Internet routes
+local results as a bounded composition profile; physical devices, public Internet routes
 and provider quotas require their own observations and limits.
 
 ## Rehearse interruption before claiming completion
