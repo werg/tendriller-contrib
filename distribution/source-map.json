@@ -112,15 +112,15 @@
     {
       "id": "connect-chatgpt",
       "sources": [
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/CHATGPT_INTEGRATION.md",
-        "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/examples/kitchen",
-        "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/widget",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/WORKSPACE_AGENT.md",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/SESSION_BOOTSTRAP.md",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/INTEGRATION_OAUTH.md",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/deploy/README.md",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/config.host-account.example.mjs",
-        "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/scripts/test-chatgpt-host.mjs",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CHATGPT_INTEGRATION.md",
+        "https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen",
+        "https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/widget",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/SESSION_BOOTSTRAP.md",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/INTEGRATION_OAUTH.md",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CLOUDFLARE_ASSISTANT.md",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/config.host-account.example.mjs",
+        "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/scripts/test-chatgpt-host.mjs",
         "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"
       ]
     },

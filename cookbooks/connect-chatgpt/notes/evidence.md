@@ -8,7 +8,19 @@ release build. The alternate Workspace Agent adapter has synthetic-provider
 tests. These results do not establish a human upstream login, a public service
 installation or a deployed OpenAI conversation.
 
-## Review follow-up release
+## Same-origin Worker
+
+The [page Worker integration test](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/server/test/integration-oauth.public.test.ts)
+runs on local workerd with the real portable Chronolog peer. It checks an idle
+page with no active subscription, a short-lived relay for an MCP read, duplicate
+wake coalescing, signed metadata delivery, and persisted retry after object
+eviction. The test posts a reply over MCP and reads it from the coordinator's
+selected history. It uses synthetic accounts and a simulated provider. Budget
+measurements and a real subscribed ChatGPT conversation remain live checks.
+
+## Historical standalone release
+
+### Review follow-up release
 
 Core revision [`ee7f1bf`](https://github.com/werg/tendriller/commit/ee7f1bf7c444e04e5712bf63e0bda7240c115820)
 passed [the exact-source release gate](https://github.com/werg/tendriller/actions/runs/44524005124)

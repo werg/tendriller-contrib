@@ -8,7 +8,7 @@ choices: ["On-demand tools or subscribed background help", "Enrolled remote read
 capabilities: []
 evidence: "explained"
 related: ["run-a-peer-application", "manage-sensitive-data", "recover-outdated-work", "resume-across-sessions", "review-exact-proposal", "share-live-signals"]
-sources: ["https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/INTEGRATION_OAUTH.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/deploy/README.md", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/config.host-account.example.mjs", "https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/scripts/test-chatgpt-host.mjs", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
+sources: ["https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/INTEGRATION_OAUTH.md", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CLOUDFLARE_ASSISTANT.md", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/config.host-account.example.mjs", "https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/scripts/test-chatgpt-host.mjs", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
 ---
 
 # Connect an application to an assistant and choose a fallback
@@ -32,7 +32,7 @@ source so implementing agents can inspect the actual contracts.
 
 | Route | What the person can do | What must be available | Limitation to display |
 | --- | --- | --- | --- |
-| Remote MCP tools | Ask the current chat to inspect state and return an authorized response | Account linking, connection consent, a running enrolled reader/writer, declared tool allowlists | A successful tool connection does not provide background chat wake |
+| Remote MCP tools | Ask the current chat to inspect state and return an authorized response | Account linking, connection consent, an enrolled Worker reader/writer and an available coordinator, declared tool allowlists | A successful tool connection does not provide background chat wake |
 | MCP Events subscription | Ask a supported Work chat or dot to watch a selected application's help requests | The tool prerequisites plus an active verified callback, finite lifetime and durable delivery journal | Delivery is asynchronous; webhook acceptance does not prove an answer |
 | Mounted MCP Apps card | Refresh a request and deliberately press **Send this to ChatGPT** | A compatible mounted host, allowed tool calls and message capability | Closing or hiding the card removes any availability assumption |
 | Native CLI / JSON-lines participant | Let an implementing agent query and command the application directly | Public session archive, its own enrolled device, reachable peers and retained local storage | A temporary process stops when its environment ends |
@@ -62,7 +62,7 @@ retrievable through that API. Have the configured agent call the authorized
 write-back tool. Keep this route's credential and conversation identity separate
 from MCP Events subscriptions.
 
-The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/WORKSPACE_AGENT.md)
+The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md)
 becomes available through `trigger_workspace_agent` and
 `get_workspace_agent_run` when the operator configures `workspaceAgent`. It
 checks current account access, selected source and event consent, persists the
@@ -120,33 +120,25 @@ use a compatible issuer instead of loosening redirects or token checks. Follow
 [OpenAI authentication guidance](https://developers.openai.com/plugins/build/auth)
 and the integration's configuration documentation for the exact resource.
 
-## Retain and deploy the two participants
+## Deploy on the Tendriller Worker
 
-The [deployment and readiness note](notes/deployment.md) describes the concrete
-Linux systemd/Caddy route and the evidence each step supplies. Keep a separate
-coordinating participant and a dedicated assistant reader/writer. The service's
-encrypted delivery journal does not replace either native device store.
+Use the [deployment and readiness note](notes/deployment.md) to configure the
+existing service's `/mcp` and `/connections` routes. The page's Durable Object
+owns the dedicated assistant reader/writer and encrypted delivery journal. It
+opens a peer connection for bounded work and closes it when that work finishes.
+Retain the application's original coordinator so the browser and assistant can
+read and write selected history. With no queued assistant work, the integration
+adds no timer or peer connection.
 
-The release builder uses exact source revisions and public package archives,
-runs native and packed-host qualification gates, and emits a file-hash manifest.
-Preparation generates private host/client/bridge configuration, distinct service
-users and a reviewable handoff. Staging snapshots only the verified dedicated
-bridge identity and copies the pinned minimal runtime. It excludes the creator
-signer and bootstrap secrets. A client secret, when required, has a separate
-private registration file; only its hash enters host configuration, and it never
-enters the bridge's environment.
-
-Treat readiness as several observations. `/health` means process liveness.
-Local preflight checks code hashes, exact scope, private storage and configuration.
-Online preflight additionally checks the authenticated host configuration and
-current signed native grants; it briefly owns the bridge store and requires the
-service to be stopped. Neither check signs in the owner, grants consent,
-subscribes a chat or observes an assistant answer. Record those live actions
-separately.
+The bundled adapter supports one configured kitchen version 2 application per
+deployment. It uses the deployment's trusted executable definition and verifies
+it against the application's signed descriptor. When adapting this specimen to
+another domain, add and qualify its trusted Worker adapter first or choose one of
+the fallback routes.
 
 ## Adapt the connected kitchen specimen
 
-The [core kitchen source](https://github.com/werg/tendriller/tree/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/examples/kitchen)
+The [core kitchen source](https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen)
 includes a real public-session bootstrap, browser Worker, page, signed release
 build, dedicated bridge-device setup, declared commands and deterministic
 queries. Its current definition is version 2 and binds each request to the
@@ -159,9 +151,9 @@ separately supported evolution procedure.
 Provision early: create the page, give the person the actual claim URL, wait for
 their own sign-in, configure the definition/authority and initial generation,
 publish the signed UI, enroll the verified browser key, and retain the native
-process. Enroll the separate bridge reader/writer after explicit consent. The
-bridge is not a coordinator or publisher by default, so retain an authorized
-coordinating peer too. Do not run two processes against one native device store.
+process. Provision the Worker’s own device key and enroll it as an assistant
+reader/writer. Keep coordination and publishing on their separately authorized
+devices. Approve the connection permissions in the account before linking.
 If a saved enrollment never committed and its expected generation is obsolete,
 `enroll:review` prepares a new signed request and `enroll:approve` requires its
 exact reviewed digest. A committed enrollment keeps exact replay; replay cannot
@@ -248,28 +240,20 @@ use `config.host-account.example.mjs` and the generated exact host registration;
 the included adapter supplies trusted issuer/JWKS and current account/owner
 checks. External-provider mode instead imports the deployment's verified
 account/owner adapters. Consult
-[the pinned integration guide](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/docs/CHATGPT_INTEGRATION.md)
-and [service configuration](https://github.com/werg/tendriller/blob/ee7f1bf7c444e04e5712bf63e0bda7240c115820/integrations/chatgpt/README.md)
+[the pinned integration guide](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CHATGPT_INTEGRATION.md)
+and [service configuration](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/README.md)
 for setup, retained storage and process lifetime. Do not replace a missing owner
 adapter with an
 always-true function or put private handles, store keys or signers in the page.
 
 ## Verify the whole journey and its failures
 
-The pinned core release passed **175 integration tests, with no skips**, using
-the actual public native package, plus the packed Worker-to-Node account gate.
-The clean release builder sealed 447 files and uploaded the release and
-qualification artifacts. Its aggregate native test covers a request,
-authenticated MCP, owner consent, signed callback delivery to a test receiver,
-an authorized signed reply across two native peers, exact retry and reopen.
-The callback receiver, JWKS hosting and Workspace provider transport are
-injected; the test supplies the reply text. This proves the local integration
-path without claiming that a live ChatGPT model or published Workspace Agent
-ran. The separate host gate exercises the actual packed Worker and Node account
-adapter through fixed-origin injected Miniflare transport; the initial browser
-accounts are synthetic and no upstream GitHub/Google login runs. The
-[evidence record](notes/evidence.md) identifies the exact source, downloadable
-release, artifact digests, passed release job and remaining live checks.
+The Worker integration test exercises the actual page relay and selected
+Chronolog history through a read, an authenticated wake, signed callback
+delivery, object eviction, retry with the original delivery ID, and a signed
+reply observed by the coordinator. The callback receiver supplies a scripted
+response. The [evidence record](notes/evidence.md) carries the revision and
+the remaining checks for an actual subscribed conversation.
 
 Exercise the application with two real devices before claiming a connected
 result. Demonstrate a request, a read on the other device, the reply, reload,
