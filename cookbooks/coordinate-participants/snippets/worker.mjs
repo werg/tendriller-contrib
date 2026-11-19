@@ -1,4 +1,5 @@
-// SharedWorker or fenced elected owner, using one retained browser signing profile.
+// Fenced dedicated owner for the synchronous-OPFS SQL profile.
+// The page declares this engine capability before opening the retained signer.
 import { serveBrowserOwner } from '@tendriller/core/collaboration/worker';
 import { createPeersClient, createPeerIntroductions } from '@tendriller/core/peers';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';

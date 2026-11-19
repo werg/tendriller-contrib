@@ -32,7 +32,7 @@ try {
   const origin = `http://127.0.0.1:${server.address().port}`;
   browser = await chromium.launch({ headless: true, ...(process.env.COLLABORATION_CHROMIUM ? { executablePath: process.env.COLLABORATION_CHROMIUM } : {}) });
   report.runtime.browser = browser.version();
-  for (const mode of ['shared', 'elected']) {
+  for (const mode of ['auto', 'elected']) {
     const context = await browser.newContext({ viewport: { width: 1320, height: 1000 } });
     context.on('console', message => { if (['error', 'warning'].includes(message.type())) diagnostic('browser', { mode, type: message.type(), text: message.text(), location: message.location() }); });
     context.on('requestfailed', request => diagnostic('browser', { mode, type: 'requestfailed', url: request.url(), error: request.failure() }));
@@ -56,6 +56,9 @@ try {
       }
     };
     const a = await ready(board, 'board.html'), b = await ready(discussion, 'discussion.html');
+    assert.equal(a.ownerMode, 'elected'); assert.equal(b.ownerMode, 'elected');
+    assert.equal(await board.evaluate(() => globalThis.fixtureSharedStorageRejection), 'OWNER_STORAGE_UNSUPPORTED');
+    assert.equal(await discussion.evaluate(() => globalThis.fixtureSharedStorageRejection), 'OWNER_STORAGE_UNSUPPORTED');
     assert.equal(a.deviceId, b.deviceId); assert.equal(a.endpoint.ownerInstanceId, b.endpoint.ownerInstanceId);
     assert.notEqual(a.endpoint.endpointIncarnation, b.endpoint.endpointIncarnation);
     assert.notEqual(a.endpoint.context.viewId, b.endpoint.context.viewId);
@@ -82,9 +85,9 @@ try {
     assert.equal(await board.locator('#request-title').inputValue(), 'Independent board draft');
     const retained = await board.evaluate(() => globalThis.fixtureStore.pending().map(value => value.reference));
     assert.ok(retained.length >= 2);
-    // In elected mode the first page hosts the dedicated owner. Reload a
+    // Both supported SQL selections use the fenced dedicated owner. Reload a
     // follower here; owner termination is a separate recovery test below.
-    const reloadedPage = mode === 'shared' ? board : discussion, oldAttachment = mode === 'shared' ? a : b;
+    const reloadedPage = discussion, oldAttachment = b;
     const localReferences = await reloadedPage.evaluate(() => globalThis.fixtureStore.pending().map(value => value.reference));
     await reloadedPage.reload(); await reloadedPage.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
     const reopened = await reloadedPage.evaluate(() => globalThis.fixtureReady);
@@ -113,24 +116,19 @@ try {
     await discussion.screenshot({ path: join(dirname(reportPath), `${mode}-discussion.png`), fullPage: true });
     await discussion.evaluate(() => globalThis.fixtureOwner.suspend()); await discussion.evaluate(() => globalThis.fixtureOwner.resume());
     assert.equal((await discussion.evaluate(() => globalThis.fixtureReady)).endpoint.endpointIncarnation,
-      (mode === 'shared' ? b : reopened).endpoint.endpointIncarnation);
+      reopened.endpoint.endpointIncarnation);
     await discussion.evaluate(() => globalThis.fixtureOwner.detach()); await discussion.close();
     assert.equal(await board.evaluate(async id => (await globalThis.fixtureSession.query('collab.task', { taskId: id })).value.task.status, taskId), 'completed');
     const survivor = await context.newPage(); survivor.setDefaultTimeout(30_000); const c = await ready(survivor, 'discussion.html');
-    if (mode === 'elected') {
-      await board.close(); await survivor.waitForFunction(() => globalThis.fixtureSession.status.phase === 'closed');
-      await survivor.reload(); await survivor.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
-      const successor = await survivor.evaluate(() => globalThis.fixtureReady);
-      assert.equal(successor.deviceId, a.deviceId); assert.notEqual(successor.endpoint.ownerInstanceId, c.endpoint.ownerInstanceId);
-    } else {
-      await board.close();
-      assert.equal((await survivor.evaluate(() => globalThis.fixtureReady)).endpoint.ownerInstanceId, c.endpoint.ownerInstanceId);
-    }
+    await board.close(); await survivor.waitForFunction(() => globalThis.fixtureSession.status.phase === 'closed');
+    await survivor.reload(); await survivor.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
+    const successor = await survivor.evaluate(() => globalThis.fixtureReady);
+    assert.equal(successor.deviceId, a.deviceId); assert.notEqual(successor.endpoint.ownerInstanceId, c.endpoint.ownerInstanceId);
     const after = await survivor.evaluate(async ({ id, reference }) => ({ task: (await globalThis.fixtureSession.query('collab.task', { taskId: id })).value.task,
       operation: await globalThis.fixtureSession.operations.get(reference.operationId, { author: reference.author }) }), { id: taskId, reference: retained[0] });
     assert.equal(after.task.status, 'completed'); assert.equal(after.operation.status, 'applied');
     assert.deepEqual(errors, []);
-    report.scenarios.push({ mode, realSqlWasm: true, twoDocuments: true, independentDrafts: true, remoteRepaintPreservedFocus: true,
+    report.scenarios.push({ mode, ownerMode: a.ownerMode, sharedStorageUnsupported: true, capabilityRouteObserved: true, realSqlWasm: true, twoDocuments: true, independentDrafts: true, remoteRepaintPreservedFocus: true,
       draftAndOperationAfterReload: true, addressedRequest: true, explicitEndpointReassignment: true,
       acceptedContributionAndSynthesis: true, suspendResume: true, detachIsolation: true, retainedAfterOwnerExit: true,
       signer: a.deviceId, sourceEndpoint: a.endpoint.endpointId, acceptedResultIds: outcome.task.aggregate.resultIds });

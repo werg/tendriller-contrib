@@ -5,9 +5,15 @@ import { verifyAuthorityBundle } from '@chronolog/peer-session';
 const query = new URL(location.href).searchParams, profileId = query.get('profile'), mode = query.get('mode');
 const key = `fixture-view:${profileId}:${location.pathname}`;
 const requestedView = sessionStorage.getItem(key) ?? crypto.randomUUID();
-const ready = openBrowserOwner({ workerUrl: new URL(`./worker.mjs?profile=${profileId}`, import.meta.url),
-  profileId, applicationId: '81'.repeat(32), definitionId: 'independent-review-workspace', definitionVersion: '1', mode,
-  context: { viewId: requestedView, documentPath: location.pathname } });
+const options = { workerUrl: new URL(`./worker.mjs?profile=${profileId}`, import.meta.url),
+  profileId, applicationId: '81'.repeat(32), definitionId: 'independent-review-workspace', definitionVersion: '1', mode, requiresDedicatedWorker: true,
+  context: { viewId: requestedView, documentPath: location.pathname } };
+// An unsupported forced route must fail before it opens a competing profile.
+globalThis.fixtureSharedStorageRejection = openBrowserOwner({ ...options, mode: 'shared' }).then(
+  async owner => { await owner.detach(); throw Error('Unsupported SharedWorker SQL route opened'); },
+  error => { if (error.code !== 'OWNER_STORAGE_UNSUPPORTED') throw error; return error.code; });
+void globalThis.fixtureSharedStorageRejection.catch(() => undefined);
+const ready = openBrowserOwner(options);
 export const applicationReady = ready.then(attachment => {
   const session = attachment.session;
   sessionStorage.setItem(key, session.endpoint.context.viewId);
@@ -16,7 +22,7 @@ export const applicationReady = ready.then(attachment => {
     profileId: session.deviceId, viewId: session.endpoint.context.viewId });
   return session;
 });
-globalThis.fixtureReady = applicationReady.then(session => ({ deviceId: session.deviceId, endpoint: session.endpoint }));
+globalThis.fixtureReady = applicationReady.then(session => ({ deviceId: session.deviceId, endpoint: session.endpoint, ownerMode: globalThis.fixtureOwner.mode }));
 void globalThis.fixtureReady.catch(() => undefined);
 export const detachView = async () => (await ready).detach();
 export const suspendView = async () => (await ready).suspend();

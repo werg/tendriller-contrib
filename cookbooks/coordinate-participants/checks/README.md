@@ -60,8 +60,8 @@ npm run test:collaboration:browser -- \
   --output /new/browser-evidence-directory
 ```
 
-Both SharedWorker and elected Worker routes must preserve independent drafts and
-operation references, keep focus and selection through another view's update,
+Both automatic capability selection and the explicitly elected Worker route must
+preserve independent drafts and operation references, keep focus and selection through another view's update,
 complete an addressed request, explicitly reassign an old endpoint's claim,
 accept a contribution and synthesis, and retain the selected history after
 detachment or owner exit. Browser storage uses the actual OPFS SQL/WASM engine.
@@ -73,6 +73,13 @@ gates. `composition.mjs --native .../report.json --browser .../report.json
 --output /new/composition.json` refuses mismatched archives, dirty source,
 missing observations and unobserved physical-device/provider claims. A blocked
 browser launch or skipped test remains a failed gate.
+
+The SQL engine needs synchronous OPFS access. The public
+`requiresDedicatedWorker: true` option makes automatic selection choose the
+fenced elected Worker before opening a profile. A forced SharedWorker request
+must reject with `OWNER_STORAGE_UNSUPPORTED`; this check does not qualify SQL in
+a SharedWorker. Core's independent event-profile fixture exercises SharedWorker
+ownership without synchronous SQL storage.
 
 ## Build the two authored views
 

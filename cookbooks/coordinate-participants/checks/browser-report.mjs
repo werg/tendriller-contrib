@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 
 export const browserGates = Object.freeze(['realSqlWasm', 'twoDocuments', 'independentDrafts', 'remoteRepaintPreservedFocus',
   'draftAndOperationAfterReload', 'addressedRequest', 'explicitEndpointReassignment', 'acceptedContributionAndSynthesis',
-  'suspendResume', 'detachIsolation', 'retainedAfterOwnerExit']);
+  'suspendResume', 'detachIsolation', 'retainedAfterOwnerExit', 'sharedStorageUnsupported', 'capabilityRouteObserved']);
 
 export function validateBrowserReport(report, { allowDirty = false } = {}) {
   const hex = (value, length) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${length}}$`, 'u'));
@@ -24,8 +24,9 @@ export function validateBrowserReport(report, { allowDirty = false } = {}) {
   assert.ok(typeof report.runtime.browser === 'string' && report.runtime.browser.length > 0);
   assert.equal(report.wasm.toolchain, 'emscripten-4.0.20'); hex(report.wasm.sha256, 64);
   assert.equal(report.wasm.manifest.wasmSha256, report.wasm.sha256);
-  assert.deepEqual(report.scenarios.map(value => value.mode).sort(), ['elected', 'shared']);
+  assert.deepEqual(report.scenarios.map(value => value.mode).sort(), ['auto', 'elected']);
   for (const scenario of report.scenarios) {
+    assert.equal(scenario.ownerMode, 'elected', 'The synchronous-OPFS SQL profile needs a dedicated Worker');
     for (const gate of browserGates) assert.equal(scenario[gate], true, `Missing ${scenario.mode} browser observation: ${gate}`);
     hex(scenario.signer, 64); assert.ok(scenario.acceptedResultIds.length > 0);
   }

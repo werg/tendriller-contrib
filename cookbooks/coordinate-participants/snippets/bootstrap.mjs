@@ -16,6 +16,9 @@ const ownerOptions = {
   workerUrl: new URL('./worker.mjs', import.meta.url), profileId: configuration.profileId,
   applicationId: configuration.applicationId, definitionId: 'independent-review-workspace', definitionVersion: '1',
   context: { viewId: requestedView, documentPath: location.pathname }, mode: 'auto',
+  // The selected SQL engine uses synchronous OPFS, unavailable in SharedWorker.
+  // Capability selection happens before any profile or store is opened.
+  requiresDedicatedWorker: true,
 };
 const ownerReady = openBrowserOwner(ownerOptions);
 export const applicationReady = ownerReady.then(({ session }) => {
