@@ -44,9 +44,9 @@ const peers = createPeersClient({ base: base.href, applicationId: configuration.
 export async function readParticipants(session) {
   const authority = await verifyAuthorityBundle(await peers.application(), configuration.descriptor);
   const endpoints = await session.endpoints();
-  return authority.control.payload.grants.filter(grant => grant.reader && grant.writer).flatMap(grant => {
+  return authority.control.payload.grants.filter(grant => grant.reader).flatMap(grant => {
     const label = configuration.participants?.[grant.publicKey] ?? {};
-    const common = { deviceId: grant.publicKey, authorized: true, revoked: false,
+    const common = { deviceId: grant.publicKey, canRead: true, authorized: grant.writer === true, revoked: false,
       kind: label.kind === 'agent' ? 'agent' : 'person', label: label.label ?? `Signer ${grant.publicKey.slice(0, 8)}`,
       deviceLabel: label.deviceLabel ?? 'Enrolled device', route: label.route ?? 'unknown',
       identityEvidence: 'authenticated-signer', labelEvidence: 'publication-description',

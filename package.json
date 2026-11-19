@@ -28,6 +28,8 @@
     "test:collaboration": "node cookbooks/coordinate-participants/checks/run.mjs",
     "test:peer-browser": "node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs",
     "test:peer-host": "node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs",
-    "check:peer-composition": "node cookbooks/run-a-peer-application/checks/peer-composition.mjs"
+    "check:peer-composition": "node cookbooks/run-a-peer-application/checks/peer-composition.mjs",
+    "test:collaboration:browser": "node cookbooks/coordinate-participants/checks/run-browser.mjs",
+    "check:collaboration-composition": "node cookbooks/coordinate-participants/checks/composition.mjs"
   }
 }

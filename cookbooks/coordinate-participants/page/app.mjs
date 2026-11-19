@@ -1,6 +1,7 @@
 // Editable application UI. The maintained owner and collaboration module own
 // session lifetime, operation persistence and guarded state transitions.
 import { createCollaborationClient, createViewStore, mountParticipantPanel, receiptModel } from '@tendriller/core/collaboration';
+import { createLiveRun } from './domain/live-run.mjs';
 
 const $ = selector => document.querySelector(selector);
 const node = (tag, text, className) => { const element = document.createElement(tag); element.textContent = text; if (className) element.className = className; return element; };
@@ -10,9 +11,10 @@ const action = (label, callback, disabled = false) => {
   return button;
 };
 const freshId = () => crypto.randomUUID();
-let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false;
+let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
 let observation = new AbortController(), dirty = false, refreshing = false;
+let runSubscription, runScopeKey = '', runTimer, liveRuns = new Map();
 const statuses = new Map();
 const report = error => { $('#status').textContent = error.message ?? String(error); $('#status').dataset.state = 'error'; };
 const say = text => { $('#status').textContent = text; $('#status').dataset.state = 'ready'; };
@@ -77,6 +79,10 @@ function paintOperations() {
 }
 
 function paintTasks(value) {
+  // A remote update may replace a card but must not interrupt a local edit.
+  const focused = document.activeElement;
+  const retainedFocus = focused?.dataset.localDraft ? { draft: focused.dataset.localDraft,
+    start: focused.selectionStart, end: focused.selectionEnd, direction: focused.selectionDirection } : null;
   $('#tasks').replaceChildren(...value.tasks.map(task => {
     const card = node('article', '', `task${task.taskId === selectedTask ? ' selected' : ''}`);
     card.dataset.taskId = task.taskId;
@@ -107,13 +113,23 @@ function paintTasks(value) {
         taskId: task.taskId, slotId: slot.slotId, claimId: freshId(), expectedEpoch: claim?.claimEpoch ?? 0, taskVersion: 1,
       }, `Claim ${slot.label ?? slot.slotId}`)));
       if (claim?.claimant === session.deviceId) {
+        const currentEndpoint = claim.endpointIncarnation === session.endpoint.endpointIncarnation && claim.runId === runId;
         if (claim.status === 'needsReview') row.append(action('Revalidate this claim', () => submit('rebind', {
           taskId: task.taskId, slotId: slot.slotId, claimId: freshId(), expectedEpoch: claim.claimEpoch, taskVersion: 1,
         }, `Revalidate ${slot.label ?? slot.slotId}`)));
-        if (claim.status === 'active') {
+        if (claim.status === 'active' && !currentEndpoint) {
+          row.append(node('p', 'This claim belongs to another view or an earlier run. Review its draft and explicitly transfer responsibility before continuing.', 'review-note'));
+          row.append(action('Restart this claim on this view', async () => {
+            const operation = await submit('handoff', { taskId: task.taskId, slotId: slot.slotId, actionId: freshId(),
+              expectedEpoch: claim.claimEpoch, assignee: session.deviceId, reason: 'Explicit continuation from another endpoint incarnation' }, 'Transfer to this view');
+            await operation.applied({ signal: observation.signal }); await refresh();
+          }));
+        }
+        if (claim.status === 'active' && currentEndpoint) {
           const form = node('form', '', 'contribution-form'), labelElement = node('label', 'Your contribution');
           const input = node('textarea', ''); input.required = true; input.maxLength = 4000; input.rows = 3;
           const draftId = `result:${task.taskId}:${slot.slotId}`;
+          input.dataset.localDraft = draftId;
           input.value = store.readDraft(draftId)?.text ?? '';
           input.oninput = () => { try { store.writeDraft({ text: input.value }, draftId); } catch (error) { report(error); } };
           labelElement.append(input); form.append(labelElement);
@@ -127,7 +143,7 @@ function paintTasks(value) {
           };
           row.append(form);
         }
-        if (claim.status === 'cancelRequested') row.append(action('Acknowledge stopped work', () => submit('acknowledgeCancel', {
+        if (claim.status === 'cancelRequested' && currentEndpoint) row.append(action('Acknowledge stopped work', () => submit('acknowledgeCancel', {
           taskId: task.taskId, slotId: slot.slotId, actionId: freshId(), claimEpoch: claim.claimEpoch,
           generation: claim.generation, runId: claim.runId, endpointIncarnation: claim.endpointIncarnation,
         }, 'Acknowledge cancellation')));
@@ -155,6 +171,7 @@ function paintTasks(value) {
         const form = node('form', '', 'synthesis-form'), labelElement = node('label', 'Reviewed synthesis');
         const input = node('textarea', ''); input.required = true; input.rows = 3; input.maxLength = 4000;
         const draftId = `synthesis:${task.taskId}`;
+        input.dataset.localDraft = draftId;
         input.value = store.readDraft(draftId)?.text ?? '';
         input.oninput = () => { try { store.writeDraft({ text: input.value }, draftId); } catch (error) { report(error); } };
         labelElement.append(input); form.append(labelElement);
@@ -173,6 +190,72 @@ function paintTasks(value) {
     return card;
   }));
   $('#tasks-empty').hidden = value.tasks.length > 0;
+  if (retainedFocus) {
+    const replacement = [...$('#tasks').querySelectorAll('textarea[data-local-draft]')]
+      .find(element => element.dataset.localDraft === retainedFocus.draft);
+    if (replacement) { replacement.focus({ preventScroll: true }); replacement.setSelectionRange(retainedFocus.start, retainedFocus.end, retainedFocus.direction); }
+  }
+}
+
+function paintRuns() {
+  clearTimeout(runTimer);
+  let expiresAt = Infinity;
+  $('#runs').replaceChildren(...[...liveRuns.values()].map(({ claim, model }) => {
+    const value = model.snapshot(Date.now()), row = node('li', '');
+    row.append(node('strong', label(claim.claimant)), node('p', `${claim.status} · ${claim.slotId}`, 'muted'));
+    if (value.progress) row.append(node('p', value.progress.total === null
+      ? `${value.progress.completed} steps reported` : `${value.progress.completed} of ${value.progress.total} steps reported`));
+    else row.append(node('p', 'No fresh progress report. The claim remains recorded.'));
+    if (value.preview) row.append(node('p', value.preview.text, 'live-preview'));
+    if (value.expiresAtMs !== null) expiresAt = Math.min(expiresAt, value.expiresAtMs);
+    const details = node('details', ''); details.append(node('summary', 'Run identity'), node('pre', JSON.stringify({
+      signer: claim.claimant, runId: claim.runId, endpointIncarnation: claim.endpointIncarnation,
+      claimEpoch: claim.claimEpoch, generation: claim.generation }, null, 2))); row.append(details);
+    return row;
+  }));
+  $('#runs-empty').hidden = liveRuns.size > 0;
+  if (expiresAt < Infinity && !observation.signal.aborted) runTimer = setTimeout(paintRuns, Math.max(0, expiresAt - Date.now()));
+}
+function observeRuns(value) {
+  const claims = value.claims.filter(claim => claim.taskId === selectedTask && ['active', 'cancelRequested'].includes(claim.status));
+  const key = JSON.stringify(claims.map(claim => [claim.claimant, claim.runId, claim.endpointIncarnation, claim.claimEpoch, claim.status]));
+  if (key === runScopeKey && !runSubscription?.signal.aborted) return;
+  runScopeKey = key; runSubscription?.abort(); clearTimeout(runTimer); runSubscription = new AbortController();
+  const controller = runSubscription, lifetime = AbortSignal.any([observation.signal, controller.signal]);
+  liveRuns = new Map(claims.map(claim => [JSON.stringify([claim.claimant, claim.runId, claim.endpointIncarnation]),
+    { claim, model: createLiveRun({ publisher: claim.claimant, runId: claim.runId, endpointIncarnation: claim.endpointIncarnation }) }]));
+  paintRuns(); if (!claims.length) return;
+  void (async () => {
+    try {
+      for await (const event of session.signals.subscribe({ topics: ['progress', 'preview'], mode: 'latest',
+        streams: claims.map(claim => ({ authorId: claim.claimant, streamId: claim.runId, endpointIncarnation: claim.endpointIncarnation })), signal: lifetime })) {
+        if (lifetime.aborted) break;
+        liveRuns.get(JSON.stringify([event.authorId, event.stream?.streamId, event.stream?.endpointIncarnation]))?.model.update(event, Date.now());
+        paintRuns();
+      }
+    } catch (error) { if (!lifetime.aborted) report(error); }
+    finally { if (runSubscription === controller) { for (const value of liveRuns.values()) value.model.clear(); paintRuns(); } }
+  })();
+}
+
+async function refreshParticipants() {
+  const current = await deployment.readParticipants(session);
+  if (!Array.isArray(current)) throw Error('The deployment must provide authenticated participant bindings.');
+  entries = current;
+  participantPanel?.update(entries);
+  const selected = $('#recipient').value;
+  const eligible = [...new Map(entries.filter(entry => entry.authorized && !entry.revoked).map(entry => [entry.deviceId, entry])).values()];
+  $('#recipient').replaceChildren(...eligible.map(entry => {
+    const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; return option;
+  }));
+  if (eligible.some(entry => entry.deviceId === selected)) $('#recipient').value = selected;
+  const self = entries.find(entry => entry.deviceId === session.deviceId && !entry.revoked);
+  if (!self || !(self.canRead || self.authorized)) {
+    snapshot = undefined; $('#tasks').replaceChildren(); $('#messages').replaceChildren(); runSubscription?.abort();
+    $('#request-submit').disabled = true; $('#message-submit').disabled = true;
+    throw Error('This signing profile no longer has workspace access. Shared content has been cleared.');
+  }
+  $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized;
 }
 
 function paint(value) {
@@ -184,6 +267,7 @@ function paint(value) {
     const row = node('li', ''); row.append(node('p', message.text), node('small', `${label(message.author)} · ${originLabel(message.source)}`)); return row;
   }));
   $('#recovery').hidden = !value.tasks.some(item => item.status === 'needsReview');
+  observeRuns(value);
   paintOperations();
 }
 async function refresh() {
@@ -191,7 +275,7 @@ async function refresh() {
   refreshing = true;
   try {
     while (dirty && !observation.signal.aborted) {
-      dirty = false; const current = await client.snapshot();
+      dirty = false; await refreshParticipants(); const current = await client.snapshot();
       const pending = await Promise.all(store.pending().map(async ({ reference }) => [reference.operationId,
         await session.operations.get(reference.operationId, { author: reference.author })]));
       if (observation.signal.aborted) return;
@@ -234,7 +318,7 @@ for (const id of ['request-title', 'request-input', 'message', 'recipient', 'res
 });
 
 window.addEventListener('pagehide', event => {
-  observation.abort();
+  observation.abort(); runSubscription?.abort(); clearTimeout(runTimer);
   if (event.persisted) void suspendView().catch(report);
   else { participantPanel?.close?.(); void detachView().catch(() => undefined); }
 });
@@ -243,6 +327,7 @@ window.addEventListener('pageshow', event => {
   void resumeView().then(() => { observation = new AbortController(); void observe(); return refresh(); },
     () => say('This view’s owner was replaced. Reload to reattach, then inspect original operations.'));
 });
+$('#refresh-participants').onclick = () => { if (session) void refreshParticipants().catch(report); };
 
 try {
   deployment = await import('./deployment/bootstrap.mjs');
@@ -252,18 +337,13 @@ try {
   const viewId = session.endpoint.context.viewId;
   if (!viewId) throw Error('The owner did not allocate an independent view.');
   store = createViewStore({ storage: localStorage, applicationId: session.applicationId, profileId: session.deviceId, viewId });
-  client = createCollaborationClient({ session, endpoint: session.endpoint,
-    runId: `view-${session.endpoint.endpointIncarnation}` });
-  entries = await deployment.readParticipants(session);
-  if (!Array.isArray(entries)) throw Error('The deployment must provide authenticated participant bindings.');
+  runId = `view-${session.endpoint.endpointIncarnation}`;
+  client = createCollaborationClient({ session, endpoint: session.endpoint, runId });
+  await refreshParticipants();
   participantPanel = mountParticipantPanel({ container: $('#participants'), participants: entries,
     selfEndpoint: { ...session.endpoint, deviceId: session.deviceId }, onSelect: entry => { $('#recipient').value = entry.deviceId; retainDraft(); } });
-  $('#recipient').replaceChildren(...entries.filter(entry => entry.authorized && !entry.revoked).map(entry => {
-    const option = node('option', entry.label ?? label(entry.deviceId)); option.value = entry.deviceId; return option;
-  }));
   restoreDraft();
   $('#view-label').textContent = `This ${document.body.classList.contains('discussion') ? 'discussion' : 'board'} view · independent draft`;
-  $('#request-submit').disabled = false; $('#message-submit').disabled = false;
   await refresh(); void observe(); say('Ready. Choose a recipient and create shared work.');
 } catch (error) {
   report(error);

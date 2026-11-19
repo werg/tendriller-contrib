@@ -3,6 +3,8 @@
 > Adaptable reasoning for page-owned applications. No UI package or install graph.
 
 - [Common application session](guides/application-primitives.md)
+- [Multi-participant reference](cookbooks/coordinate-participants/COOKBOOK.md)
+- [Exact-artifact collaboration checks](cookbooks/coordinate-participants/checks/README.md)
 - [Application journeys](guides/use-cases.md)
 - [Agent reading index](agent.md)
 - [Catalog](catalog.json)

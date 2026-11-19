@@ -36,6 +36,7 @@ cpSync(core, join(output, 'core'), { recursive: true, dereference: false });
 cpSync(deployment, join(output, 'deployment'), { recursive: true, dereference: false });
 mkdirSync(join(output, 'domain'));
 writeFileSync(join(output, 'domain/review-workspace.mjs'), readFileSync(join(here, '../snippets/review-workspace.mjs')));
+writeFileSync(join(output, 'domain/live-run.mjs'), readFileSync(join(here, '../../share-live-signals/snippets/live-run.mjs')));
 const packages = new Map([['@chronolog/peer-session', { directory: 'peer-session', metadata: sessionMetadata }],
   ['@tendriller/core', { directory: 'core', metadata: coreMetadata }]]);
 for (const path of walk(output).filter(path => path.endsWith('.mjs'))) {
