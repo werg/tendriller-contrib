@@ -25,6 +25,7 @@
     "test": "node --test test/*.test.mjs cookbooks/*/checks/*.test.mjs",
     "check": "npm run check:generated && npm run check:content && npm test",
     "test:peer-generation": "node cookbooks/run-a-peer-application/checks/run-peer-generation.mjs",
+    "test:collaboration": "node cookbooks/coordinate-participants/checks/run.mjs",
     "test:peer-browser": "node cookbooks/run-a-peer-application/checks/run-peer-generation-browser.mjs",
     "test:peer-host": "node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs",
     "check:peer-composition": "node cookbooks/run-a-peer-application/checks/peer-composition.mjs"

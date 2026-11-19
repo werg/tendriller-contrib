@@ -128,6 +128,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 ### Coordinate people and tools
 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
+- [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
 
 ### Decide and act
 

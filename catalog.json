@@ -549,6 +549,38 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/coordinate-devices/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Assign useful device purposes while keeping authority, freshness, focus, and completion receipts distinct. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "coordinate-participants",
+      "title": "Coordinate people, views and independent agents",
+      "summary": "Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.",
+      "group": "Coordinate people and tools",
+      "tags": [
+        "collaboration",
+        "agents",
+        "claims",
+        "recovery",
+        "participants"
+      ],
+      "choices": [
+        "Shared local owner or independently enrolled signer",
+        "One executor or frozen contribution slots",
+        "Durable outcome or disposable progress"
+      ],
+      "capabilities": [
+        "Chronolog application session",
+        "Tendriller collaboration module"
+      ],
+      "related": [
+        "run-a-peer-application",
+        "share-live-signals",
+        "connect-chatgpt",
+        "coordinate-devices",
+        "observe-long-running-process"
+      ],
+      "evidence": "explained",
+      "path": "cookbooks/coordinate-participants/COOKBOOK.md",
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/coordinate-participants/COOKBOOK.md. Inspect my task and existing page before choosing an approach. Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs. Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "detect-meaningful-changes",
       "title": "Detect meaningful changes cheaply",
       "summary": "Choose baseline, hysteresis, debounce, and cooldown according to the cost of false triggers and missed events.",
