@@ -14,7 +14,7 @@ const freshId = () => crypto.randomUUID();
 let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, messageSubmitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
 let observation = new AbortController(), dirty = false, refreshing = false, conversationReady = false;
-let reader, newerChanges = false, forceRefresh = false;
+let reader, newerChanges = false, forceRefresh = false, pendingTaskSelection;
 const taskPages = { cursors: [undefined] }, threadPages = { cursors: [undefined] }, resultPages = { cursors: [undefined] };
 const browsingHistory = () => [taskPages, threadPages, resultPages].some(pager => pager.cursors.length > 1);
 const resetPages = () => { for (const pager of [taskPages, threadPages, resultPages]) pager.cursors = [undefined]; };
@@ -416,6 +416,8 @@ async function renderCaptured(taskId = selectedTask) {
 async function selectTask(taskId) {
   if (refreshing || !reader) return false;
   refreshing = true; syncPagingControls();
+  // An explicit user navigation supersedes a not-yet-visible new request.
+  pendingTaskSelection = undefined;
   const previousThread = threadPages.cursors.slice(), previousResults = resultPages.cursors.slice();
   retainDraft();
   try {
@@ -455,7 +457,17 @@ async function refresh({ force = false } = {}) {
       dirty = false; forceRefresh = false; await refreshParticipants();
       const previous = reader, captured = await captureCollaborationReader(session, { signal: observation.signal });
       try {
-        resetPages(); reader = captured; await renderCaptured();
+        resetPages(); reader = captured;
+        // A saved request becomes a conversation only once its signed write is
+        // visible in a newly captured history. Retain the intended selection
+        // across intermediate refreshes rather than retargeting an unseen thread.
+        const awaitingTask = pendingTaskSelection;
+        const displayed = await renderCaptured(awaitingTask ?? selectedTask);
+        if (!displayed && awaitingTask) await renderCaptured();
+        else if (displayed && awaitingTask && selectedTask === awaitingTask) {
+          pendingTaskSelection = undefined;
+          retainDraft();
+        }
       } catch (error) { reader = previous; await captured.close(); throw error; }
       await previous?.close();
       newerChanges = false; $('#shared-updates').hidden = true;
@@ -493,14 +505,15 @@ $('#request-form').onsubmit = async event => {
     : [...new Set(entries.filter(entry => entry.authorized && !entry.revoked && entry.kind === 'agent').map(entry => entry.deviceId))];
   if (!signers.length || !signers[0]) { say('Choose an authorized recipient before creating work.'); return; }
   if (signers.length > 8) { say('Choose at most eight specialists for this reference workflow.'); return; }
-  const interactionId = freshId(); submitting = true; $('#request-submit').disabled = true;
+  const interactionId = freshId(); submitting = true; pendingTaskSelection = interactionId;
+  $('#request-submit').disabled = true;
   try {
     await submit('request', { interactionId, kind: 'reviewEvidence', title, input: { text }, context: { source: 'reviewed-text' },
       target: policy === 'one' ? { kind: 'signer', deviceId: signers[0] } : { kind: 'workerGroup', groupId: 'specialists' },
       responsePolicy: policy, slots: signers.map((signer, index) => ({ slotId: `review-${index + 1}`, eligibleSigners: [signer], label: label(signer) })) }, `Request ${title}`);
-    // An operation can be saved before its request is visible in the captured
-    // history. Switch the message target only after that view renders.
-    await selectTask(interactionId);
+    // An admission may precede the signed write. Refresh now if possible;
+    // the retained intent is committed by the next captured applied history.
+    await refresh({ force: true });
     if ($('#request-title').value === submittedTitle && $('#request-input').value === submittedInput) {
       $('#request-title').value = ''; $('#request-input').value = '';
     }
