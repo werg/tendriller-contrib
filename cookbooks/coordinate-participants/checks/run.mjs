@@ -32,7 +32,11 @@ const report = {
   claims: { browserQualified: false, physicalDeviceQualified: false, deployedHostQualified: false,
     conversationalResumeQualified: false, exactlyOnceExternalEffects: false },
 };
-await mkdir(consumer, { recursive: true });
+// Reserve the evidence directory atomically before the failure-report handler.
+// A competing run must fail without touching its reports or package fixtures.
+await mkdir(dirname(output), { recursive: true });
+await mkdir(output);
+await mkdir(consumer);
 const reportPath = join(output, 'report.json');
 try {
   if (!values['allow-dirty']) assert.equal(report.source.dirty, false, 'Commit the consumer before release qualification');

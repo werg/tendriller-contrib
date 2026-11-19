@@ -1,7 +1,7 @@
 // Fenced dedicated owner for the synchronous-OPFS SQL profile.
 // The page declares this engine capability before opening the retained signer.
 import { serveBrowserOwner } from '@tendriller/core/collaboration/worker';
-import { createPeersClient, createPeerIntroductions } from '@tendriller/core/peers';
+import { createPeersClient, createPeerParticipantClient, createPeerIntroductions } from '@tendriller/core/peers';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 import { openBrowserDevice } from '@chronolog/peer-session/worker';
 import { openSqlApplication } from '@chronolog/peer-session/sql';
@@ -27,16 +27,24 @@ return { profileId: configuration.profileId,
       device = await openBrowserDevice({ name: configuration.profileId });
       signal.throwIfAborted();
       const base = new URL('_tendril/', configuration.page_url);
-      const peers = createPeersClient({ base: base.href, applicationId: configuration.applicationId,
-        async request(path, { method = 'GET', body, signal } = {}) {
+      const hostRequest = async (path, { method = 'GET', body, signal } = {}) => {
           const response = await fetch(new URL(path, base), { method, signal, credentials: 'same-origin', cache: 'no-store',
             ...(body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }) });
           const value = await response.json();
           if (!response.ok) throw Object.assign(Error(value.error?.message ?? `Host request failed (${response.status})`), { code: value.error?.code });
           return value;
-        },
-      });
-      const authority = await peers.application(), verified = await verifyAuthorityBundle(authority, configuration.descriptor);
+        };
+      const peers = createPeersClient({ base: base.href, applicationId: configuration.applicationId, request: hostRequest });
+      // This public participant API supports signal-aware control reads.
+      // The higher-level peers.application() in the currently pinned core SDK
+      // does not forward options, so use the same authenticated host request
+      // directly for this cancellation-sensitive startup boundary.
+      const authority = await createPeerParticipantClient({
+        applicationId: configuration.applicationId, request: hostRequest,
+      }).request('control', 'read', {}, { signal });
+      signal.throwIfAborted();
+      const verified = await verifyAuthorityBundle(authority, configuration.descriptor);
+      signal.throwIfAborted();
       if (!verified.grant(device.identity.publicKey)?.reader) throw Error(`This profile is not enrolled: ${device.identity.publicKey}. Enroll this exact signer before opening the workspace.`);
       session = await openSqlApplication({ device, definition, authority, schema: configuration.schema,
         databasePath: '/review-workspace.sqlite', signals: { delivery: 'application', localEcho: true },

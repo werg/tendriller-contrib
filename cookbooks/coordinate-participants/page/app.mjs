@@ -11,7 +11,7 @@ const action = (label, callback, disabled = false) => {
   return button;
 };
 const freshId = () => crypto.randomUUID();
-let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, runId;
+let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, messageSubmitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
 let observation = new AbortController(), dirty = false, refreshing = false;
 let reader, newerChanges = false, forceRefresh = false;
@@ -321,7 +321,7 @@ async function refreshParticipants() {
     $('#request-submit').disabled = true; $('#message-submit').disabled = true;
     throw Error('This signing profile no longer has workspace access. Shared content has been cleared.');
   }
-  $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized;
+  $('#request-submit').disabled = !self.authorized || submitting; $('#message-submit').disabled = !self.authorized || messageSubmitting;
 }
 
 const eligibilityKey = () => JSON.stringify(entries.map(entry => [entry.deviceId, entry.authorized, entry.revoked,
@@ -370,15 +370,15 @@ function syncPagingControls() {
   for (const button of document.querySelectorAll('[data-result-page]')) button.disabled = busy || (button.dataset.resultPage === 'previous'
     ? resultPages.cursors.length === 1 : !snapshot?.value.pages.results?.hasMore);
 }
-async function readPages(captured) {
+async function readPages(captured, taskId = selectedTask) {
   const tasks = await captured.tasks({ limit: 8, cursor: taskPages.cursors.at(-1) });
-  const detail = selectedTask ? (await captured.inspect(selectedTask)).value : null;
-  const results = selectedTask && detail?.task
+  const detail = taskId ? (await captured.inspect(taskId)).value : null;
+  const results = taskId && detail?.task
     ? resultPages.cursors.length === 1 ? { results: detail.results, page: detail.resultsPage }
-      : (await captured.results({ taskId: selectedTask, limit: 16, cursor: resultPages.cursors.at(-1) })).value
+      : (await captured.results({ taskId: taskId, limit: 16, cursor: resultPages.cursors.at(-1) })).value
     : { results: [], page: null };
-  const thread = await captured.thread({ threadId: selectedTask ?? 'workspace', limit: 16, cursor: threadPages.cursors.at(-1) });
-  const selectedOutsidePage = !!detail?.task && !tasks.value.tasks.some(task => task.taskId === selectedTask);
+  const thread = await captured.thread({ threadId: taskId ?? 'workspace', limit: 16, cursor: threadPages.cursors.at(-1) });
+  const selectedOutsidePage = !!detail?.task && !tasks.value.tasks.some(task => task.taskId === taskId);
   return { revision: tasks.revision, value: {
     tasks: selectedOutsidePage ? [detail.task, ...tasks.value.tasks] : tasks.value.tasks,
     claims: selectedOutsidePage ? [...detail.claims, ...tasks.value.claims] : tasks.value.claims,
@@ -387,19 +387,33 @@ async function readPages(captured) {
     pages: { tasks: tasks.value.page, results: results.page, messages: thread.value.page },
   } };
 }
-async function renderCaptured() {
-  const current = await readPages(reader);
-  if (observation.signal.aborted) return;
+async function renderCaptured(taskId = selectedTask) {
+  const current = await readPages(reader, taskId);
+  if (observation.signal.aborted) return false;
+  // Selection is committed at the same time as the new captured view. A
+  // failed or cancelled read leaves the message target and heading unchanged.
+  selectedTask = taskId;
   snapshot = current;
   $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`;
   paint(current.value);
+  return true;
 }
 async function selectTask(taskId) {
-  if (refreshing || !reader) return;
+  if (refreshing || !reader) return false;
   refreshing = true; syncPagingControls();
+  const previousThread = threadPages.cursors.slice(), previousResults = resultPages.cursors.slice();
+  retainDraft();
   try {
-    selectedTask = taskId; threadPages.cursors = [undefined]; resultPages.cursors = [undefined];
-    retainDraft(); await renderCaptured();
+    threadPages.cursors = [undefined]; resultPages.cursors = [undefined];
+    if (!await renderCaptured(taskId)) {
+      threadPages.cursors = previousThread; resultPages.cursors = previousResults;
+      return false;
+    }
+    retainDraft();
+    return true;
+  } catch (error) {
+    threadPages.cursors = previousThread; resultPages.cursors = previousResults;
+    throw error;
   } finally { refreshing = false; syncPagingControls(); if (dirty) await refresh(); }
 }
 async function navigate(pager, direction) {
@@ -446,13 +460,19 @@ async function refresh({ force = false } = {}) {
 async function observe() {
   try { for await (const change of session.changes({ signal: observation.signal })) {
     if (change.kind === 'recovery') say('History changed. Retained attempts and active claims need review.');
-    await refresh({ force: change.kind === 'recovery' });
+    try { await refresh({ force: change.kind === 'recovery' }); }
+    catch (error) {
+      if (observation.signal.aborted) return;
+      // A failed view read must not abandon the live change iterator.
+      report(error);
+    }
   } } catch (error) { if (!observation.signal.aborted) report(error); }
 }
 
 $('#request-form').onsubmit = async event => {
   event.preventDefault(); if (!client || submitting) return;
-  const title = $('#request-title').value.trim(), text = $('#request-input').value.trim(); if (!title || !text) return;
+  const submittedTitle = $('#request-title').value, submittedInput = $('#request-input').value;
+  const title = submittedTitle.trim(), text = submittedInput.trim(); if (!title || !text) return;
   const policy = $('#response-policy').value;
   const signers = policy === 'one' ? [$('#recipient').value]
     : [...new Set(entries.filter(entry => entry.authorized && !entry.revoked && entry.kind === 'agent').map(entry => entry.deviceId))];
@@ -463,14 +483,27 @@ $('#request-form').onsubmit = async event => {
     await submit('request', { interactionId, kind: 'reviewEvidence', title, input: { text }, context: { source: 'reviewed-text' },
       target: policy === 'one' ? { kind: 'signer', deviceId: signers[0] } : { kind: 'workerGroup', groupId: 'specialists' },
       responsePolicy: policy, slots: signers.map((signer, index) => ({ slotId: `review-${index + 1}`, eligibleSigners: [signer], label: label(signer) })) }, `Request ${title}`);
-    selectedTask = interactionId; $('#request-title').value = ''; $('#request-input').value = ''; retainDraft();
+    // An operation can be saved before its request is visible in the captured
+    // history. Switch the message target only after that view renders.
+    await selectTask(interactionId);
+    if ($('#request-title').value === submittedTitle) $('#request-title').value = '';
+    if ($('#request-input').value === submittedInput) $('#request-input').value = '';
+    retainDraft();
   } catch (error) { report(error); }
-  finally { submitting = false; $('#request-submit').disabled = false; }
+  finally { submitting = false; $('#request-submit').disabled = !canWrite(); }
 };
 $('#message-form').onsubmit = async event => {
-  event.preventDefault(); const text = $('#message').value.trim(); if (!client || !text) return;
-  try { await submit('message', { threadId: selectedTask ?? 'workspace', messageId: freshId(), text }, 'Post message');
-    $('#message').value = ''; retainDraft(); } catch (error) { report(error); }
+  event.preventDefault();
+  const submittedMessage = $('#message').value, text = submittedMessage.trim();
+  if (!client || !text || messageSubmitting) return;
+  const threadId = selectedTask ?? 'workspace';
+  messageSubmitting = true; $('#message-submit').disabled = true;
+  try {
+    await submit('message', { threadId, messageId: freshId(), text }, 'Post message');
+    if ($('#message').value === submittedMessage) $('#message').value = '';
+    retainDraft();
+  } catch (error) { report(error); }
+  finally { messageSubmitting = false; $('#message-submit').disabled = !canWrite(); }
 };
 for (const id of ['request-title', 'request-input', 'message', 'recipient', 'response-policy']) $( `#${id}`).addEventListener('input', () => {
   try { if (store) retainDraft(); } catch (error) { report(error); }

@@ -50,7 +50,9 @@ for (const source of [here, session, core, deployment, ...(engine ? [engine.dire
   assert.ok(scoped === '..' || scoped.startsWith(`..${sep}`) || isAbsolute(scoped), 'Output must be outside its source trees');
 }
 assert.equal(existsSync(output), false, 'Use a new output directory');
-mkdirSync(output, { recursive: true });
+mkdirSync(dirname(output), { recursive: true });
+// EEXIST is the lock: concurrent builders cannot write into one mixed graph.
+mkdirSync(output);
 cpSync(join(here, '../page'), output, { recursive: true, dereference: false });
 cpSync(session, join(output, 'peer-session'), { recursive: true, dereference: false });
 cpSync(core, join(output, 'core'), { recursive: true, dereference: false });
