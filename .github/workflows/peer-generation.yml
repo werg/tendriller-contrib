@@ -26,12 +26,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: 'c94192a0f0e7d3c86de5539f08da1e348e4a008f'
+        default: 'd3efeb6d75ac24bb9b44899f27d6940475ab55e9'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '6cf28eb3c04e602e96eb0c59dba9096866611d33'
+        default: '888e05f0fd7c5a51b580396b2aeb7b20ae771d98'
 permissions:
   contents: read
 concurrency:
@@ -42,8 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'c94192a0f0e7d3c86de5539f08da1e348e4a008f' }}
-      HOST_REF: ${{ inputs.tendriller_ref || '6cf28eb3c04e602e96eb0c59dba9096866611d33' }}
+      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'd3efeb6d75ac24bb9b44899f27d6940475ab55e9' }}
+      HOST_REF: ${{ inputs.tendriller_ref || '888e05f0fd7c5a51b580396b2aeb7b20ae771d98' }}
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +55,8 @@ jobs:
           [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
           [[ "$HOST_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -135,6 +137,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
