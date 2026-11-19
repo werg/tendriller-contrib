@@ -102,13 +102,12 @@ history to the reader; a filtered event projection is not a notification-only
 cryptographic grant. Explain the reader's actual access before enrollment and
 minimize what leaves it.
 
-Use the included Tendriller host account mode when the existing account host is
-also the intended authorization server. `hostAccount` installs the supplied
-OAuth verifier, exact-grant introspection, current page/account checks and the
-browser `/connections` handoff. It uses the existing GitHub/Google sign-in;
-operators supply the actual page/application mapping and explicit client/bridge
-registration. A different issuer remains possible through the external-provider
-interface, which needs trusted current-account and owner adapters.
+The Worker uses the existing Tendriller account as the authorization server.
+It checks the exact OAuth grant and current owner, and serves the consent form
+at `/connections` after GitHub or Google sign-in. Operators supply the page
+mapping and register the intended OAuth client. A deployment with a different
+issuer can use the standalone external-provider adapter with trusted
+current-account and owner checks.
 
 Both routes require authorization code, PKCE S256, issuer/resource binding and
 current authorization checks. Existing upstream account-login tokens are not
@@ -232,19 +231,10 @@ Do not copy every local tool into the remote model allowlist: explicit takeover,
 recovery, reapplication, role management and publication have separate trust
 requirements. A tool listing is a capability description, not a grant.
 
-For the remote service, the implementation's entry point is
-`node integrations/chatgpt/run.mjs --config /private/integration.config.mjs`.
-The private module supplies the HTTPS resource, encrypted delivery-store
-configuration and allowed application session factories. In host account mode,
-use `config.host-account.example.mjs` and the generated exact host registration;
-the included adapter supplies trusted issuer/JWKS and current account/owner
-checks. External-provider mode instead imports the deployment's verified
-account/owner adapters. Consult
-[the pinned integration guide](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/docs/CHATGPT_INTEGRATION.md)
-and [service configuration](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/README.md)
-for setup, retained storage and process lifetime. Do not replace a missing owner
-adapter with an
-always-true function or put private handles, store keys or signers in the page.
+For another issuer or a custom application domain, use the pinned
+[standalone adapter configuration](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/README.md)
+when appropriate. It requires its own process and native session factory.
+Keep authorization checks, store keys and device signers on the service side.
 
 ## Verify the whole journey and its failures
 
