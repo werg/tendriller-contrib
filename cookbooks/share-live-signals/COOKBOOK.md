@@ -41,11 +41,20 @@ application backend.
 
 `all` preserves the queued order of distinct received messages until the bounded
 consumer overflows or its channel ends. It is not an offline queue and does not
-promise every sent message arrives. `latest` deliberately coalesces pending
-values from the same author/session/topic and ignores reordered older values,
-even after the newest value has been consumed. Use it only when replacement is meaningful.
-One topic should not mix independent entities that need separate pending values;
-send a small complete snapshot or choose separate topics.
+promise every sent message arrives. In the current public peer-session API,
+`latest` deliberately coalesces pending values only within the same authenticated
+author, session, topic and signed stream scope. The scope includes the stream ID,
+endpoint incarnation and optional target. It ignores reordered older values even
+after the newest value has been consumed. Give independent runs distinct
+`streamId` values and select `streams` in the subscription: selection happens
+before coalescing. A payload's `runId` alone cannot establish this identity.
+
+The default peer signal policy reaches connected neighbors. A bootstrap may
+explicitly select bounded application delivery for multi-hop peers; that policy
+does not change the channel into a durable log. The current
+[multi-participant consumer](../coordinate-participants/checks/README.md) exercises
+two same-topic runs over that authenticated application route. Earlier standalone
+signal evidence retains the scope of its pinned package.
 
 For chunked previews, a missing chunk means the preview is incomplete. Include a
 stream/request ID and chunk index, detect gaps, and replace the preview from the

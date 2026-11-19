@@ -24,6 +24,31 @@ message can be retained by peers yet disappear from the selected application
 history after recovery. A resource reservation needs a guarded transaction.
 External work needs a journal and an explicit policy for recovery and uncertain outcomes.
 
+## Coordinate several participants through public modules
+
+Use the maintained optional `@tendriller/core/collaboration` module and the
+[multi-participant reference](../cookbooks/coordinate-participants/COOKBOOK.md)
+when a workspace needs addressed conversation, exclusive execution or specialist
+contributions. Chronolog owns the retained session, authenticated attempts,
+operation journal and attached endpoints. Core owns reusable interaction,
+claim/result guards, participant and receipt models, and browser owner
+composition. Contrib supplies the review policy, authored views and executable
+consumer; it adds no owner election, retry queue or authority protocol.
+
+One browser profile has one live owner and many independently allocated views.
+The retained signer is distinct from its owner instance, attached endpoint,
+document and run. A view detaches its own observers without closing siblings.
+Per-view drafts and references survive independently, while each saved operation
+keeps its original application, authenticated author and operation ID.
+
+A request names its target, response policy and fixed contribution slots. A
+guarded claim binds a claimant, run, endpoint incarnation, claim epoch, task
+version and selected generation. Handoff and recovery invalidate old execution
+authority; late output remains inspectable evidence. Cancellation requested,
+execution stopped, result accepted and synthesis accepted are distinct states.
+Observed history changes never grant authority to execute a tool. Before an
+irreversible action, apply the separately configured external-action guarantee.
+
 ## Choose the smallest sufficient mechanism
 
 | Need | Use | Recovery meaning |

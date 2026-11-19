@@ -24,6 +24,15 @@ concurrency protocols are signals to reconsider the platform abstraction.
 Application-specific decisions still belong to the application: a shared atomic
 state operation, for example, does not decide a team's approval or access policy.
 
+The [multi-participant reference](../cookbooks/coordinate-participants/COOKBOOK.md)
+is the current composition for shared conversation and guarded agent work. It
+imports the maintained optional core collaboration module and Chronolog's public
+owner facade. Its independent views, review policy and qualification runner stay
+in Contrib. The underlying ownership, identity, routing, claim guards and
+operation-reference primitives stay in the public packages. Earlier narrow
+conversation and task-board specimens retain their exact historical evidence;
+new applications should use the current public primitives for these behaviors.
+
 A core improvement should include its behavior across the relevant browser,
 service, SDK, and tools surfaces, meaningful failure tests, and an exact source
 reference from the affected guides. Revise existing abstractions freely when a

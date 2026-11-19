@@ -13,6 +13,14 @@ sources: ["https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a4
 
 # Build a peer application with explicit recovery
 
+For new shared workspaces, start with the
+[multi-participant reference](../coordinate-participants/COOKBOOK.md). It uses
+maintained public conversation, owner and claim/result primitives, with two
+independent browser views and a six-signer consumer. The small conversation and
+task-board definitions in this older cookbook remain exact-source specimens for
+the recorded recovery tests; they do not implement multi-attachment ownership,
+complete claim fencing or the current collaboration model.
+
 This recipe uses one `@chronolog/peer-session` composition for browser and native
 peers. The session owns encrypted history, exact operation retry, replication,
 discovery and recovery policy. The [qualification note](notes/peer-generation-qualification.md)
@@ -68,8 +76,9 @@ requires a public session package and complete real deployment assets.
 1. **Create or resume a device explicitly.** Enrollment establishes its grants and
    supplies authorized keys. Opening a missing or busy store must not silently
    create a replacement identity. Browser tabs can share the stable protocol
-   identity without opening application storage. The first data request acquires
-   its exclusive storage lock; another durable owner receives an explicit busy error.
+   identity without opening application storage. Current browser views attach to
+   one maintained profile owner; the first data request acquires its exclusive
+   storage lock. An unrelated durable owner receives an explicit busy error.
 2. **Join the selected generation.** The session verifies cached authority and
    authenticates peers. A route advertisement is a discovery hint, not a grant.
    Control, publication and live signals can operate while `status.database` is

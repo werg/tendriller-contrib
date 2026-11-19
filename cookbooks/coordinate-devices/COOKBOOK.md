@@ -17,6 +17,15 @@ Use several devices when they contribute different useful capabilities: a phone 
 
 This guide addresses an ongoing multi-device workspace. Use [joining across devices](../join-across-devices/COOKBOOK.md) for the arrival and transfer experience, and [resuming across sessions](../resume-across-sessions/COOKBOOK.md) for durable task and consumer checkpoints.
 
+For the implementation, use the [maintained multi-participant reference](../coordinate-participants/COOKBOOK.md).
+Each browser profile retains one signer and session owner; each tab or document
+attaches as a distinct endpoint with its own view ID, draft and pending operation
+references. A phone, laptop, logical person, agent and run are different identities.
+Group them only with verified bindings, or show the grouping as descriptive.
+An attention target selects where a suggestion appears; a durable guarded claim
+selects who may perform work. Closing one view changes neither another view's
+draft nor the selected executor's task authority.
+
 ## Design the whole working session
 
 Start with a two-device inspection. On the laptop, the person sees the task brief and outstanding evidence requests. On the phone, they see a short capture queue and a large local stop control. Both refer to the same inspection and exact evidence IDs, but their layouts serve different work.

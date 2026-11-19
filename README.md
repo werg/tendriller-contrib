@@ -4,6 +4,21 @@ Find an approach for what you want to build, understand the consequential choice
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
 
+## Build a workspace with people and independent agents
+
+Start with [Coordinate people, views and agent runs](cookbooks/coordinate-participants/COOKBOOK.md)
+for a shared application with several tabs, devices or agents. Its board and
+discussion views consume the maintained optional `@tendriller/core/collaboration`
+module: one session owner per retained browser profile, independent local drafts,
+addressed requests, exclusive claims, frozen contribution slots, guarded synthesis
+and explicit recovery. The reference includes browser owner/bootstrap templates
+and an independent six-signer [public-artifact conformance runner](cookbooks/coordinate-participants/checks/README.md).
+
+The reference's native evidence and the browser owner's qualification are
+separate records. An agent's label, a connected route and active reasoning are
+separate facts. Choose explicit claim and completion policies before starting
+external work; shared data does not make that work exactly once.
+
 ## Build and reuse the native first app
 
 For an app request, start with core's [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)

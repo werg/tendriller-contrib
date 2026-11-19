@@ -28,6 +28,16 @@ deployment. The companion [core change](https://github.com/werg/tendriller/pull/
 provides the runnable service and adapters; the references below pin its tested
 source so implementing agents can inspect the actual contracts.
 
+For several people, tools or agents in one application, compose the gateway with
+the [multi-participant reference](../coordinate-participants/COOKBOOK.md) and
+core's maintained collaboration module. Keep an observed event, a delivered
+wake, a claimed task, an active run and an accepted result separate. Authenticated
+run bindings supply signer and endpoint identity; a payload's agent label or
+conversation ID cannot grant access. Independent specialist agents need separate
+enrolled signers or explicitly verified delegation, fixed contribution slots and
+fenced claims before external I/O. A configured provider route can be available
+without an active reasoning turn.
+
 ## Choose the route by the desired interaction
 
 | Route | What the person can do | What must be available | Limitation to display |
