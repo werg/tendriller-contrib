@@ -31,6 +31,10 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Import information for review](cookbooks/import-for-review/COOKBOOK.md) — Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.
 - [Keep evidence and interpretation separate](cookbooks/separate-evidence-interpretation/COOKBOOK.md) — Preserve original observations while allowing conclusions, labels, and explanations to evolve.
 
+### Coordinate people and tools
+
+- [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
+
 ### Decide and act
 
 - [Build a comparison and decision workspace](cookbooks/compare-options/COOKBOOK.md) — Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score.
