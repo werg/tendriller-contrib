@@ -5,12 +5,18 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 // Synthetic values test the validator; they are never emitted as qualification.
 function example() {
   const observations = {
+    rawProjectionShapeGuard: { retainedEvidenceQueryable: true, malformedRecordsRetained: false,
+      probes: ['objectInput', 'objectContent', 'objectSource', 'deepInput', 'duplicateInput', 'duplicateDisposition', 'nonfiniteInput', 'invalidEnvelope'].map(name => ({
+        name, outcome: 'rejected', rejectionCode: ['objectInput', 'objectContent', 'objectSource'].includes(name) ? 'assert:collab_json_fields'
+          : name === 'invalidEnvelope' ? 'assert:collab_envelope' : 'assert:collab_json_structure' })) },
+    reviewerCapacityRecovery: { activeClaimsAtStart: 4, rejectedBeforeRelease: true, acceptedAfterRelease: true,
+      targetOutcomes: ['claim-conflict', 'accepted'], resultId: 'capacity-result', externalEffects: false },
     boundedCapturedPages: { heldTaskCount: 5, visibleTaskLimit: 2, completeAcceptedSummaries: 2, capturedMessages: 2, latestMessages: 3,
       stableAcrossWrites: true, noDuplicatesOrOmissions: true, acceptedSummaryContentOmitted: true, staleCursorRejected: true,
       wrongThreadRejected: true, wrongTaskRejected: true, acceptedAndLateEvidenceRetained: true, releasedReaderRejected: true },
     capturedReadScope: { eventsOnlyRawDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN', namedQueryRawDenied: 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN',
       queryOnlyEventsDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN', allowedNamedQuery: true, allowedRawQuery: true,
-      deniedCaptureReleasedReservation: true, siblingUsable: true },
+      deniedCaptureReleasedReservation: true, reviewerReadFailureRetiredObserver: true, siblingUsable: true },
     independentPendingReferences: { foreignHistoryRejected: true, foreignSignerRetryRejected: true },
     exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_immutable' },
     rawForgedResultGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_result_disposition', retainedForgedResult: false },
@@ -77,9 +83,11 @@ test('optimistic claim, recovery, replay and provider conclusions are refused', 
     report => { report.checks.find(value => value.name === 'operationIdentityAfterReopen').observation.operationAfter.operationId = 'new'; },
     report => { report.checks.find(value => value.name === 'signedOperationLineage').observation.bodyReferenceIgnored = false; },
     report => { report.checks.find(value => value.name === 'rawForgedAttemptGuard').observation.outcome = 'accepted'; },
+    report => { report.checks.find(value => value.name === 'rawProjectionShapeGuard').observation.probes.pop(); },
     report => { report.checks.find(value => value.name === 'ownerVerifiedAuthority').observation.verifiedSignature = false; },
     report => { report.checks.find(value => value.name === 'capturedReadScope').observation.deniedCaptureReleasedReservation = false; },
     report => { report.checks.find(value => value.name === 'boundedCapturedPages').observation.noDuplicatesOrOmissions = false; },
+    report => { report.checks.find(value => value.name === 'reviewerCapacityRecovery').observation.targetOutcomes = ['claim-conflict']; },
     report => { report.claims.browserQualified = true; },
     report => { report.claims.conversationalResumeQualified = true; },
     report => { report.claims.exactlyOnceExternalEffects = true; },

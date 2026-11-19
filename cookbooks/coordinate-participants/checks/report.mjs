@@ -4,9 +4,9 @@ export const requiredChecks = Object.freeze([
   'sixIndependentSigners', 'twoAttachmentsOneOwner', 'ownerVerifiedAuthority', 'capturedReadScope', 'sourceEndpointIsolation',
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
   'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
-  'rawForgedResultGuard', 'rawForgedAttemptGuard', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
+  'rawForgedResultGuard', 'rawForgedAttemptGuard', 'rawProjectionShapeGuard', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
   'resultIdentityConflict', 'independentReviewPolicies', 'frozenContributionSlots', 'aggregateProvenance',
-  'cancellationAcknowledgment', 'boundedCapturedPages', 'generationFence', 'explicitRebind',
+  'cancellationAcknowledgment', 'boundedCapturedPages', 'reviewerCapacityRecovery', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
 ]);
 
@@ -58,6 +58,15 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(observation('rawForgedResultGuard').retainedForgedResult, false);
   assert.equal(observation('rawForgedAttemptGuard').outcome, 'rejected');
   assert.equal(observation('rawForgedAttemptGuard').rejectionCode, 'assert:collab_attempt');
+  const shape = observation('rawProjectionShapeGuard');
+  assert.equal(shape.retainedEvidenceQueryable, true); assert.equal(shape.malformedRecordsRetained, false);
+  assert.deepEqual(shape.probes.map(value => value.name).sort(), ['objectInput', 'objectContent', 'objectSource', 'deepInput',
+    'duplicateInput', 'duplicateDisposition', 'nonfiniteInput', 'invalidEnvelope'].sort());
+  for (const probe of shape.probes) {
+    assert.equal(probe.outcome, 'rejected');
+    assert.equal(probe.rejectionCode, ['objectInput', 'objectContent', 'objectSource'].includes(probe.name) ? 'assert:collab_json_fields'
+      : probe.name === 'invalidEnvelope' ? 'assert:collab_envelope' : 'assert:collab_json_structure');
+  }
   const authority = observation('ownerVerifiedAuthority');
   assert.equal(authority.verifiedSignature, true); assert.equal(authority.mutatedReturnDidNotMutateOwner, true);
   assert.equal(authority.hostTransportConfigured, false);
@@ -65,12 +74,16 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(readScope.eventsOnlyRawDenied, 'APPLICATION_ATTACHMENT_FORBIDDEN');
   assert.equal(readScope.namedQueryRawDenied, 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
   assert.equal(readScope.queryOnlyEventsDenied, 'APPLICATION_ATTACHMENT_FORBIDDEN');
-  for (const field of ['allowedNamedQuery', 'allowedRawQuery', 'deniedCaptureReleasedReservation', 'siblingUsable']) assert.equal(readScope[field], true);
+  for (const field of ['allowedNamedQuery', 'allowedRawQuery', 'deniedCaptureReleasedReservation', 'reviewerReadFailureRetiredObserver', 'siblingUsable']) assert.equal(readScope[field], true);
   const pages = observation('boundedCapturedPages');
   assert.ok(pages.heldTaskCount > pages.visibleTaskLimit); assert.equal(pages.visibleTaskLimit, 2);
   assert.equal(pages.completeAcceptedSummaries, 2); assert.equal(pages.capturedMessages, 2); assert.equal(pages.latestMessages, 3);
   for (const field of ['stableAcrossWrites', 'noDuplicatesOrOmissions', 'acceptedSummaryContentOmitted', 'staleCursorRejected',
     'wrongThreadRejected', 'wrongTaskRejected', 'acceptedAndLateEvidenceRetained', 'releasedReaderRejected']) assert.equal(pages[field], true);
+  const capacity = observation('reviewerCapacityRecovery');
+  assert.equal(capacity.activeClaimsAtStart, 4); assert.equal(capacity.rejectedBeforeRelease, true);
+  assert.equal(capacity.acceptedAfterRelease, true); assert.equal(capacity.externalEffects, false);
+  assert.deepEqual(capacity.targetOutcomes, ['claim-conflict', 'accepted']); assert.ok(capacity.resultId);
   const lineage = observation('signedOperationLineage');
   assert.equal(lineage.bodyReferenceIgnored, true); assert.equal(lineage.sourceSignerForced, true);
   assert.notEqual(lineage.lateClaimGeneration, lineage.lateOperationGeneration);

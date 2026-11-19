@@ -82,14 +82,16 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
  * This loop holds no retry queue and never adopts an old run's active claim. */
 export async function runReviewer({ session, endpoint = session.endpoint, runId, policy, signal, onOperation, onResult = () => undefined }) {
   if (!Object.hasOwn(policies, policy)) throw Error('Choose the evidence or clarity reference policy');
-  const changes = session.changes({ signal })[Symbol.asyncIterator]();
+  const observation = new AbortController();
+  const lifetime = AbortSignal.any([observation.signal, ...[signal, session.signal].filter(Boolean)]);
+  const changes = session.changes({ signal: lifetime })[Symbol.asyncIterator]();
   let changed = changes.next();
   void changed.catch(() => undefined);
   const attempted = new Map();
   const drain = async () => {
     for (;;) {
-      signal?.throwIfAborted();
-      const captured = await captureCollaborationReader(session, { signal }), candidates = [], versions = [];
+      lifetime.throwIfAborted();
+      const captured = await captureCollaborationReader(session, { signal: lifetime }), candidates = [], versions = [];
       const eligible = new Set(); let generation;
       try {
         let cursor;
@@ -119,14 +121,23 @@ export async function runReviewer({ session, endpoint = session.endpoint, runId,
       const selected = candidates.find(candidate => attempted.get(candidate.key) !== projection);
       if (!selected) return;
       attempted.set(selected.key, projection);
-      const result = await reviewAssignedTask({ session, endpoint, runId, policy, taskId: selected.taskId, slotId: selected.slotId, signal, onOperation });
+      const result = await reviewAssignedTask({ session, endpoint, runId, policy, taskId: selected.taskId, slotId: selected.slotId, signal: lifetime, onOperation });
       onResult({ taskId: selected.taskId, slotId: selected.slotId, ...result });
     }
   };
+  let failed = false;
   try {
     await drain();
-    while (!signal?.aborted) {
+    while (!lifetime.aborted) {
       const next = await changed; if (next.done) break; changed = changes.next(); void changed.catch(() => undefined); await drain();
     }
-  } finally { await changes.return(); await changed.catch(() => undefined); }
+  } catch (error) { failed = true; throw error; }
+  finally {
+    // End the outstanding next() before awaiting iterator.return(). A separate
+    // read failure must not leave cleanup waiting for a shared change forever.
+    observation.abort();
+    try { await changes.return(); }
+    catch (error) { if (!failed && error !== lifetime.reason) throw error; }
+    finally { await changed.catch(() => undefined); }
+  }
 }

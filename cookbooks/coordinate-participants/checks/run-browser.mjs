@@ -84,7 +84,9 @@ try {
   }
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0, applicationOwnerProtocols: 0 };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 420_000,
+  // Each of the two real-SQL journeys now includes 11 requests and 19 messages.
+  // Per-action deadlines remain 30s; this bounds their complete combined work.
+  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 720_000,
     env: { ...process.env, ...(values.chromium ? { COLLABORATION_CHROMIUM: resolve(values.chromium) } : {}) } });
   if (result.error) throw result.error;
   assert.equal(result.signal, null); assert.equal(result.status, 0, 'Authored browser consumer failed');
@@ -95,6 +97,9 @@ try {
 } catch (error) {
   let observed = report;
   try { observed = JSON.parse(await readFile(reportPath, 'utf8')); } catch { /* Installation did not finish. */ }
-  observed.passed = false; observed.error ??= error.stack ?? String(error);
+  observed.passed = false;
+  const failure = error.stack ?? String(error);
+  if (observed.error) observed.runnerError = failure;
+  else observed.error = failure;
   await writeFile(reportPath, `${JSON.stringify(observed, null, 2)}\n`); throw error;
 }

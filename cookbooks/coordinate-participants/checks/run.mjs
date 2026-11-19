@@ -100,7 +100,10 @@ try {
 } catch (error) {
   let observed = report;
   try { observed = JSON.parse(await readFile(reportPath, 'utf8')); } catch { /* Bootstrap did not finish. */ }
-  observed.passed = false; observed.error = error instanceof Error ? error.stack ?? error.message : String(error);
+  observed.passed = false;
+  const failure = error instanceof Error ? error.stack ?? error.message : String(error);
+  if (observed.error) observed.runnerError = failure;
+  else observed.error = failure;
   await writeFile(reportPath, `${JSON.stringify(observed, null, 2)}\n`);
   throw error;
 }

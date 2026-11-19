@@ -13,7 +13,7 @@ import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-sessi
 import { createNativeSqlEngine } from '@chronolog/peer-session/sql-native';
 import { captureCollaborationReader, createViewStore, prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { reviewWorkspace, reviewClient } from './review-workspace.mjs';
-import { reviewAssignedTask } from './reviewer.mjs';
+import { reviewAssignedTask, runReviewer } from './reviewer.mjs';
 
 const reportPath = resolve(process.argv[2]), report = JSON.parse(await readFile(reportPath, 'utf8'));
 const directory = join(dirname(reportPath), 'stores'), resources = [], channels = [], links = [];
@@ -146,6 +146,15 @@ try {
   await denied(captureCollaborationReader(eventsOnly), 'APPLICATION_ATTACHMENT_FORBIDDEN');
   await denied(captureCollaborationReader(namedOnly), 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
   assert.deepEqual((await namedOnly.query('collab.snapshot', null)).value.tasks, []);
+  // With no caller abort, an independent raw-read denial must retire the
+  // reviewer's pending change observer and preserve that original failure.
+  let failureTimer;
+  try {
+    await denied(Promise.race([
+      runReviewer({ session: namedOnly, endpoint: namedOnly.endpoint, runId: 'denied-reviewer', policy: 'clarity' }),
+      new Promise((_, reject) => { failureTimer = setTimeout(() => reject(Error('Reviewer cleanup did not finish after its independent read failure')), 5000); }),
+    ]), 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
+  } finally { clearTimeout(failureTimer); }
   const queryCapture = await captureCollaborationReader(queryOnly);
   assert.deepEqual((await queryCapture.tasks()).value.tasks, []); await queryCapture.close();
   // A denied capture must release the single allowed view reservation.
@@ -153,7 +162,8 @@ try {
   assert.equal(sessions[1].signal.aborted, false); assert.equal(owner.endpoints().length, 2);
   observed('capturedReadScope', { eventsOnlyRawDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN',
     namedQueryRawDenied: 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN', queryOnlyEventsDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN',
-    allowedNamedQuery: true, allowedRawQuery: true, deniedCaptureReleasedReservation: true, siblingUsable: true });
+    allowedNamedQuery: true, allowedRawQuery: true, deniedCaptureReleasedReservation: true,
+    reviewerReadFailureRetiredObserver: true, siblingUsable: true });
   const boardClient = reviewClient({ session: board, endpoint: board.endpoint, runId: 'board-run' });
   const discussionClient = reviewClient({ session: discussion, endpoint: discussion.endpoint, runId: 'discussion-run' });
   const request = (interactionId, signers, policy = 'one') => ({ interactionId, kind: 'reviewEvidence', title: `Review ${interactionId}`,
@@ -234,15 +244,19 @@ try {
   const noisy = scaleViews[1][1], sibling = scaleViews[1][2];
   const saturated = ['load-a', 'load-b'].map(topic => noisy.signals.subscribe({ topics: [topic], signal: signal() })[Symbol.asyncIterator]());
   const warming = saturated.map(iterator => iterator.next());
-  // A round trip on the same port follows both stream.open requests.
+  // The first reply admits stream.open; a second ordered round trip also
+  // follows the deferred stream.next registration before disposable sends.
+  await noisy.query('collab.snapshot', null);
   await noisy.query('collab.snapshot', null);
   await sessions[1].signals.send('load-a', { live: true }, { stream: { streamId: 'noisy-a' } });
   await sessions[1].signals.send('load-b', { live: true }, { stream: { streamId: 'noisy-b' } });
-  await Promise.all(warming);
+  const warmed = await Promise.all(warming);
+  assert.ok(warmed.every(value => !value.done), 'Both quota-holding subscriptions must observe a real signal before overflow is tested');
+  assert.deepEqual(warmed.map(value => value.value.topic).sort(), ['load-a', 'load-b']);
   const held = saturated.map(iterator => iterator.next());
   for (const waiting of held) void waiting.catch(() => undefined);
   const overflowing = noisy.signals.subscribe({ topics: ['overflow'], signal: signal() })[Symbol.asyncIterator]();
-  await assert.rejects(overflowing.next(), /APPLICATION_WORKER_STREAM_LIMIT/u);
+  await denied(overflowing.next(), 'APPLICATION_WORKER_STREAM_LIMIT');
   const siblingResult = await sibling.query('collab.snapshot', null);
   assert.ok(siblingResult.value.tasks.some(task => task.taskId === 'discussion-request'));
   assert.equal(sibling.signal.aborted, false); assert.equal(noisy.signal.aborted, false);
@@ -351,6 +365,47 @@ try {
   assert.equal(message.source.deviceId, sessions[loser].deviceId); assert.equal(message.source.evidence, 'signer-asserted');
   assert.equal(message.source.assertedDeviceId, sessions[0].deviceId);
 
+  // Raw writers must not admit a row that the public projection cannot decode
+  // or safely send to another attachment. These use real signed programs, not
+  // the SDK's input validator, and leave ordinary retained records queryable.
+  const poisonRequest = name => {
+    const value = request(`poison-${name}`, [sessions[4].deviceId]);
+    return { ...value, input: JSON.stringify(value.input), target: JSON.stringify(value.target),
+      context: JSON.stringify(value.context), source: JSON.stringify({ deviceId: sessions[loser].deviceId }) };
+  };
+  let deepInput = 1; for (let depth = 0; depth < 26; depth++) deepInput = { nested: deepInput };
+  const poisonedResult = name => ({ ...resultInput('exclusive', 'review', originalClaim, `poison-${name}`),
+    content: JSON.stringify({ decision: 'Superseded evidence' }), disposition: 'superseded' });
+  const shapes = [
+    { name: 'objectInput', type: 'request', body: JSON.stringify({ ...poisonRequest('objectInput'), input: { raw: 'object' } }), code: 'assert:collab_json_fields' },
+    { name: 'objectContent', type: 'result', signer: winner, taskId: 'exclusive', slotId: 'review',
+      body: JSON.stringify({ ...poisonedResult('objectContent'), content: { raw: 'object' } }), code: 'assert:collab_json_fields' },
+    { name: 'objectSource', type: 'message', body: JSON.stringify({ messageId: 'poison-objectSource', text: 'Malformed source', source: { raw: 'object' } }), code: 'assert:collab_json_fields' },
+    { name: 'deepInput', type: 'request', body: JSON.stringify({ ...poisonRequest('deepInput'), input: JSON.stringify(deepInput) }), code: 'assert:collab_json_structure' },
+    { name: 'duplicateInput', type: 'request', body: JSON.stringify({ ...poisonRequest('duplicateInput'), input: '{"choice":1,"choice":2}' }), code: 'assert:collab_json_structure' },
+    { name: 'duplicateDisposition', type: 'result', signer: winner, taskId: 'exclusive', slotId: 'review',
+      body: `${JSON.stringify(poisonedResult('duplicateDisposition')).slice(0, -1)},"disposition":"accepted"}`, code: 'assert:collab_json_structure' },
+    { name: 'nonfiniteInput', type: 'request', body: JSON.stringify({ ...poisonRequest('nonfiniteInput'), input: '{"unbounded":1e400}' }), code: 'assert:collab_json_structure' },
+    { name: 'invalidEnvelope', type: 'request', body: JSON.stringify({ ...poisonRequest('invalidEnvelope'), kind: 42 }), code: 'assert:collab_envelope' },
+  ];
+  const shapeObservations = [];
+  for (const probe of shapes) {
+    const id = `poison-${probe.name}`;
+    const sql = `INSERT INTO collab_journal (id,sequence,type,task_id,slot_id,author,generation,attempt_id,body,chronolog_owner)
+      SELECT ${quoted(id)},COALESCE(MAX(sequence),0)+1,${quoted(probe.type)},${quoted(probe.taskId ?? id)},${quoted(probe.slotId ?? '')},
+        lower(hex(chronolog_actor())),${quoted(initial.id)},chronolog_transaction_id(),${quoted(probe.body)},
+        (SELECT id FROM chronolog_principals WHERE key=X'${bytesToHex(APPLICATION_COLLECTIVE_ID)}') FROM collab_journal`;
+    const operation = await sessions[probe.signer ?? loser].command('fixture.raw', sql, { operationId: `${id}-operation` });
+    const outcome = await operation.applied({ signal: signal() });
+    assert.equal(outcome.outcome, 'rejected', probe.name); assert.equal(outcome.rejectionCode, probe.code, probe.name);
+    shapeObservations.push({ name: probe.name, outcome: outcome.outcome, rejectionCode: outcome.rejectionCode });
+  }
+  assert.equal((await clients[0].inspect('exclusive')).value.results.length, 2);
+  const safePreview = await boardClient.snapshot();
+  assert.ok(safePreview.value.tasks.every(task => !task.taskId.startsWith('poison-')));
+  assert.ok(safePreview.value.messages.every(message => !message.messageId.startsWith('poison-')));
+  observed('rawProjectionShapeGuard', { probes: shapeObservations, retainedEvidenceQueryable: true, malformedRecordsRetained: false });
+
   await accepted(clients[0], 'request', request('round', [sessions[3].deviceId, sessions[4].deviceId], 'allSlots'), 'round-request');
   await synchronize();
   const independentReviews = await Promise.all([3, 4].map((index, offset) => reviewAssignedTask({ session: sessions[index],
@@ -433,6 +488,43 @@ try {
   } finally { await heldReader.close(); }
   await assert.rejects(heldReader.tasks(), { code: 'COLLABORATION_READER_CLOSED' });
   observed('boundedCapturedPages', { ...heldObservation, releasedReaderRejected: true });
+
+  // Exercise the observing reviewer, including an admission failure that becomes
+  // eligible later. A failed attempt must neither hot-loop nor permanently hide
+  // work after another completed claim frees this signer's bounded capacity.
+  const quotaTasks = Array.from({ length: 4 }, (_, index) => `held-capacity-${index}`);
+  for (const taskId of quotaTasks) {
+    await accepted(clients[0], 'request', request(taskId, [sessions[4].deviceId]), `${taskId}-request`);
+    await accepted(clients[4], 'claim', claimInput(taskId, 'review', 4), `${taskId}-claim`);
+  }
+  await accepted(clients[0], 'request', request('waiting-capacity', [sessions[4].deviceId]), 'waiting-capacity-request');
+  const stopped = new AbortController(), lifetime = AbortSignal.any([stopped.signal, AbortSignal.timeout(45_000)]);
+  const blocked = Promise.withResolvers(), completed = Promise.withResolvers();
+  void completed.promise.catch(() => undefined);
+  const outcomes = [];
+  const reviewer = runReviewer({ session: sessions[4], endpoint: endpoint(4), runId: 'observing-reviewer-b', policy: 'clarity', signal: lifetime,
+    onResult(value) {
+      if (value.taskId !== 'waiting-capacity') return;
+      outcomes.push(value.status);
+      if (value.status === 'claim-conflict') blocked.resolve(value);
+      if (value.status === 'accepted') completed.resolve(value);
+    } });
+  void reviewer.catch(error => { blocked.reject(error); completed.reject(error); });
+  try {
+    const refused = await blocked.promise;
+    assert.equal(refused.operation.outcome, 'rejected');
+    assert.equal((await clients[0].inspect('waiting-capacity')).value.claims.length, 0);
+    const occupied = (await clients[4].inspect(quotaTasks[0])).value.claims[0];
+    await accepted(clients[4], 'result', resultInput(quotaTasks[0], 'review', occupied, 'released-capacity-result'), 'released-capacity-result-operation');
+    const finished = await completed.promise;
+    assert.equal(finished.result.disposition, 'accepted'); assert.equal(finished.result.content.policy, 'clarity');
+    assert.deepEqual(outcomes, ['claim-conflict', 'accepted']);
+    observed('reviewerCapacityRecovery', { activeClaimsAtStart: 4, rejectedBeforeRelease: true,
+      acceptedAfterRelease: true, targetOutcomes: outcomes, resultId: finished.result.resultId, externalEffects: false });
+  } finally {
+    stopped.abort();
+    await reviewer.catch(error => { if (error !== lifetime.reason && error.name !== 'AbortError') throw error; });
+  }
 
   await accepted(clients[0], 'request', request('surviving-claim', [sessions[3].deviceId]), 'survive-request');
   await accepted(clients[3], 'claim', claimInput('surviving-claim', 'review', 3), 'survive-claim');

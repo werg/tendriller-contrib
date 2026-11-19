@@ -29,6 +29,15 @@ mutate owner state. Captured-read scope probes use real owner attachments:
 events-only and named-query-only consumers cannot read raw SQL, while an
 unrestricted query-only consumer can query without gaining event access. Denied
 captures release their single-view reservation and leave siblings usable.
+An independently denied reviewer read must also settle its pending change
+observer without relying on a caller abort. The observing reviewer is exercised
+at its four-claim capacity: waiting work conflicts once, another result releases
+capacity, and that same eligible work is then discovered and completed.
+
+Raw projection-shape probes send signed SQL that bypasses helper normalization.
+Object-valued encoded fields, excessive nesting, duplicate decoded keys,
+nonfinite numbers and malformed scalar envelopes must be rejected by the shared
+schema. Valid retained requests, messages and result evidence remain readable.
 
 The native paging gate finishes task, conversation and accepted/late-result pages
 against one held read view across newer writes. It checks complete accepted
@@ -79,6 +88,10 @@ nineteen messages. It browses bounded continuations, writes from the companion
 document, keeps the captured pages coherent, explicitly refreshes, and checks
 that independent unsent drafts survive. This qualifies the authored paging flow;
 larger retained-history tests live with the maintained domain implementation.
+The expanded two-mode workload has a twelve-minute process deadline. Individual
+browser interactions and seed commands retain their thirty-second deadlines.
+When a process deadline fails, the report preserves both its underlying browser
+failure and the runner timeout rather than overwriting either diagnosis.
 
 The [composition workflow](../../../.github/workflows/collaboration.yml) builds
 immutable companion commits and the pinned Emscripten engine, then runs both

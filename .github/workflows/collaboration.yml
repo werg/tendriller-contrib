@@ -21,7 +21,7 @@ on:
         description: Exact immutable core collaboration commit
         required: false
         type: string
-        default: 'cfb24397d2545119e8cddcc1ad40fe508401be65'
+        default: 'aee45cb7ba3f03bcd8a0620ffa92a194b50da014'
 permissions:
   contents: read
 concurrency:
@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 45
     env:
       CHRONOLOG_REF: ${{ inputs.chronolog_ref || '6ca258c46cc9bb059446bacf4ffe287a543d0ed5' }}
-      CORE_REF: ${{ inputs.tendriller_ref || 'cfb24397d2545119e8cddcc1ad40fe508401be65' }}
+      CORE_REF: ${{ inputs.tendriller_ref || 'aee45cb7ba3f03bcd8a0620ffa92a194b50da014' }}
     steps:
       - name: Require exact companion source
         shell: bash
