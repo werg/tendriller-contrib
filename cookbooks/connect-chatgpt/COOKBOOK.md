@@ -8,7 +8,7 @@ choices: ["On-demand tools or subscribed background help", "Enrolled remote read
 capabilities: []
 evidence: "explained"
 related: ["run-a-peer-application", "manage-sensitive-data", "recover-outdated-work", "resume-across-sessions", "review-exact-proposal", "share-live-signals"]
-sources: ["https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
+sources: ["https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/CHATGPT_INTEGRATION.md", "https://github.com/werg/tendriller/tree/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/examples/kitchen", "https://github.com/werg/tendriller/tree/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/widget", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/WORKSPACE_AGENT.md", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/SESSION_BOOTSTRAP.md", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/INTEGRATION_OAUTH.md", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/deploy/README.md", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/config.host-account.example.mjs", "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/scripts/test-chatgpt-host.mjs", "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"]
 ---
 
 # Connect an application to an assistant and choose a fallback
@@ -62,7 +62,7 @@ retrievable through that API. Have the configured agent call the authorized
 write-back tool. Keep this route's credential and conversation identity separate
 from MCP Events subscriptions.
 
-The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/WORKSPACE_AGENT.md)
+The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/WORKSPACE_AGENT.md)
 becomes available through `trigger_workspace_agent` and
 `get_workspace_agent_run` when the operator configures `workspaceAgent`. It
 checks current account access, selected source and event consent, persists the
@@ -146,7 +146,7 @@ separately.
 
 ## Adapt the connected kitchen specimen
 
-The [core kitchen source](https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/examples/kitchen)
+The [core kitchen source](https://github.com/werg/tendriller/tree/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/examples/kitchen)
 includes a real public-session bootstrap, browser Worker, page, signed release
 build, dedicated bridge-device setup, declared commands and deterministic
 queries. Its current definition is version 2 and binds each request to the
@@ -245,23 +245,28 @@ use `config.host-account.example.mjs` and the generated exact host registration;
 the included adapter supplies trusted issuer/JWKS and current account/owner
 checks. External-provider mode instead imports the deployment's verified
 account/owner adapters. Consult
-[the pinned integration guide](https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/CHATGPT_INTEGRATION.md)
-and [service configuration](https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/README.md)
+[the pinned integration guide](https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/CHATGPT_INTEGRATION.md)
+and [service configuration](https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/README.md)
 for setup, retained storage and process lifetime. Do not replace a missing owner
 adapter with an
 always-true function or put private handles, store keys or signers in the page.
 
 ## Verify the whole journey and its failures
 
-The earlier pinned baseline passed **112 integration tests, with no skips**, using
-the actual public native package. Its aggregate test covers a native request,
+The pinned core release passed **175 integration tests, with no skips**, using
+the actual public native package, plus the packed Worker-to-Node account gate.
+The clean release builder sealed 447 files and uploaded the release and
+qualification artifacts. Its aggregate native test covers a request,
 authenticated MCP, owner consent, signed callback delivery to a test receiver,
 an authorized signed reply across two native peers, exact retry and reopen.
 The callback receiver, JWKS hosting and Workspace provider transport are
 injected; the test supplies the reply text. This proves the local integration
 path without claiming that a live ChatGPT model or published Workspace Agent
-ran. The [evidence record](notes/evidence.md) identifies the source, archive,
-passing hosted integration run and remaining live checks.
+ran. The separate host gate exercises the actual packed Worker and Node account
+adapter through fixed-origin injected Miniflare transport; the initial browser
+accounts are synthetic and no upstream GitHub/Google login runs. The
+[evidence record](notes/evidence.md) identifies the exact source, downloadable
+release, artifact digests, passed release job and remaining live checks.
 
 Exercise the application with two real devices before claiming a connected
 result. Demonstrate a request, a read on the other device, the reply, reload,

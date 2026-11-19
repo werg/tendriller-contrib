@@ -443,11 +443,15 @@
         "share-live-signals"
       ],
       "sources": [
-        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/CHATGPT_INTEGRATION.md",
-        "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/examples/kitchen",
-        "https://github.com/werg/tendriller/tree/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/widget",
-        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/integrations/chatgpt/WORKSPACE_AGENT.md",
-        "https://github.com/werg/tendriller/blob/61682a11f341449252e78b36443985c0583b5a9b/docs/SESSION_BOOTSTRAP.md",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/CHATGPT_INTEGRATION.md",
+        "https://github.com/werg/tendriller/tree/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/examples/kitchen",
+        "https://github.com/werg/tendriller/tree/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/widget",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/WORKSPACE_AGENT.md",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/SESSION_BOOTSTRAP.md",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/docs/INTEGRATION_OAUTH.md",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/deploy/README.md",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/integrations/chatgpt/config.host-account.example.mjs",
+        "https://github.com/werg/tendriller/blob/9d62a7ffadf7b9b64ffb6615a2d2647377ff737f/scripts/test-chatgpt-host.mjs",
         "https://github.com/werg/chronolog-db/blob/d014879ecb29714e80311d6101cfa8973953d5c4/packages/peer-session/src/tools.ts"
       ],
       "path": "cookbooks/connect-chatgpt/COOKBOOK.md",
