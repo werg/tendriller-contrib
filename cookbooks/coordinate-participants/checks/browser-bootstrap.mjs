@@ -1,6 +1,6 @@
 // Qualification deployment only: this fresh origin enrolls exactly one signer.
 import { openBrowserOwner } from '@tendriller/core/collaboration/browser';
-import { createViewStore } from '@tendriller/core/collaboration';
+import { createCollaborationClient, createViewStore } from '@tendriller/core/collaboration';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 const query = new URL(location.href).searchParams, profileId = query.get('profile'), mode = query.get('mode');
 const key = `fixture-view:${profileId}:${location.pathname}`;
@@ -18,6 +18,7 @@ export const applicationReady = ready.then(attachment => {
   const session = attachment.session;
   sessionStorage.setItem(key, session.endpoint.context.viewId);
   globalThis.fixtureOwner = attachment; globalThis.fixtureSession = session;
+  globalThis.fixtureClient = createCollaborationClient({ session, endpoint: session.endpoint, runId: `fixture-${session.endpoint.endpointIncarnation}` });
   globalThis.fixtureStore = createViewStore({ storage: localStorage, applicationId: session.applicationId, historyId: session.historyId,
     profileId: session.deviceId, viewId: session.endpoint.context.viewId });
   return session;

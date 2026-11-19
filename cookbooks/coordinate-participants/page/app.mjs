@@ -1,19 +1,23 @@
 // Editable application UI. The maintained owner and collaboration module own
 // session lifetime, operation persistence and guarded state transitions.
-import { createCollaborationClient, createViewStore, mountParticipantPanel, operationReference, receiptModel } from '@tendriller/core/collaboration';
+import { captureCollaborationReader, createCollaborationClient, createViewStore, mountParticipantPanel, operationReference, receiptModel } from '@tendriller/core/collaboration';
 import { createLiveRun } from './domain/live-run.mjs';
 
 const $ = selector => document.querySelector(selector);
 const node = (tag, text, className) => { const element = document.createElement(tag); element.textContent = text; if (className) element.className = className; return element; };
 const action = (label, callback, disabled = false) => {
   const button = node('button', label); button.type = 'button'; button.disabled = disabled;
-  button.addEventListener('click', () => { button.disabled = true; void callback().catch(report).finally(() => { button.disabled = disabled; }); });
+  button.addEventListener('click', () => { button.disabled = true; void callback().catch(report).finally(() => { button.disabled = disabled; syncPagingControls(); }); });
   return button;
 };
 const freshId = () => crypto.randomUUID();
 let session, client, store, snapshot, participantPanel, deployment, entries = [], selectedTask, submitting = false, runId;
 let detachView = async () => session?.detach(), suspendView = async () => session?.suspend(), resumeView = async () => session?.resumeAttachment();
 let observation = new AbortController(), dirty = false, refreshing = false;
+let reader, newerChanges = false, forceRefresh = false;
+const taskPages = { cursors: [undefined] }, threadPages = { cursors: [undefined] }, resultPages = { cursors: [undefined] };
+const browsingHistory = () => [taskPages, threadPages, resultPages].some(pager => pager.cursors.length > 1);
+const resetPages = () => { for (const pager of [taskPages, threadPages, resultPages]) pager.cursors = [undefined]; };
 let runSubscription, runScopeKey = '', runTimer, participantTimer, liveRuns = new Map();
 const statuses = new Map();
 const waiters = new Map();
@@ -56,7 +60,7 @@ async function submit(method, input, title, options = {}) {
   void operation.applied({ signal: AbortSignal.any([observation.signal, waiter.signal]) }).then(async value => {
     statuses.set(operationId, value); paintOperations();
     say(value.outcome === 'rejected' ? `${title} was rejected. Review its original operation.` : `${title} applied to the shared workspace.`);
-    await refresh();
+    await refresh({ force: true });
   }).catch(error => { if (!observation.signal.aborted && !waiter.signal.aborted) report(error); })
     .finally(() => { if (waiters.get(operationId) === waiter) waiters.delete(operationId); paintOperations(); });
   return operation;
@@ -107,27 +111,26 @@ function paintTasks(value) {
     card.append(node('p', `${label(task.creator)} · ${originLabel(task.source)}`, 'muted'));
     card.append(diagnostics('Request origin and operation', { taskId: task.taskId, author: task.creator,
       source: task.source, operation: task.operation ?? null, context: task.context }));
-    card.append(action(task.taskId === selectedTask ? 'Selected conversation' : 'Open conversation', async () => {
-      selectedTask = task.taskId; retainDraft(); paint(snapshot.value); $('#message').focus();
-    }));
+    const open = action(task.taskId === selectedTask ? 'Selected conversation' : 'Open conversation', async () => {
+      await selectTask(task.taskId); $('#message').focus();
+    }); open.dataset.selectTask = task.taskId; card.append(open);
     const slots = node('ul', '', 'slots');
     for (const slot of task.slots) {
       const claim = value.claims.find(item => item.taskId === task.taskId && item.slotId === slot.slotId);
       const results = value.results.filter(item => item.taskId === task.taskId && item.slotId === slot.slotId);
-      const acceptedResult = results.find(item => item.disposition === 'accepted');
+      const acceptedResult = value.acceptedResults.find(item => item.taskId === task.taskId && item.slotId === slot.slotId);
       const row = node('li', ''); row.append(node('strong', slot.label ?? slot.slotId));
       row.append(node('p', claim ? `${label(claim.claimant)} · ${claim.status}${claim.runId ? ` · ${claim.runId}` : ''}` : 'Awaiting an eligible participant'));
       if (acceptedResult) {
         row.append(node('p', acceptedResult.outcome === 'failed' ? 'Contributor reported a failure' : 'Contribution accepted', 'receipt'));
-        row.append(node('p', acceptedResult.content?.text ?? JSON.stringify(acceptedResult.content)));
+        const loaded = results.find(item => item.resultId === acceptedResult.resultId);
+        if (loaded) row.append(node('p', loaded.content?.text ?? JSON.stringify(loaded.content)));
+        else row.append(node('p', task.taskId === selectedTask
+          ? 'This accepted contribution is retained. Browse the evidence pages below to read its content.'
+          : 'Open this conversation to read its accepted contributions.', 'muted'));
         row.append(diagnostics('Contribution origin', { resultId: acceptedResult.resultId, author: acceptedResult.author,
           runId: acceptedResult.runId, claimEpoch: acceptedResult.claimEpoch, generation: acceptedResult.generation,
           operation: acceptedResult.operation ?? null }));
-      }
-      if (results.some(item => item.disposition !== 'accepted')) {
-        const details = node('details', ''); details.append(node('summary', 'Late or superseded evidence'));
-        for (const result of results.filter(item => item.disposition !== 'accepted')) details.append(node('p', `${label(result.author)} · ${result.disposition} · ${result.content?.text ?? JSON.stringify(result.content)}`));
-        row.append(details);
       }
       const eligible = !claim ? slot.eligibleSigners.includes(session.deviceId) : claim.status === 'offered' && claim.claimant === session.deviceId;
       if (task.status === 'open' && eligible && canWrite()) row.append(action('Claim this contribution', () => submit('claim', {
@@ -200,12 +203,26 @@ function paintTasks(value) {
       slots.append(row);
     }
     card.append(slots);
+    if (task.taskId === selectedTask) {
+      const evidence = node('div', '', 'evidence-pages');
+      evidence.append(node('h4', 'Contribution evidence'), node('p', pageLabel(value.pages.results, resultPages, 'results'), 'muted'));
+      for (const result of value.results) evidence.append(diagnostics(
+        `${label(result.author)} · ${result.slotId} · ${result.disposition}`,
+        { resultId: result.resultId, content: result.content, disposition: result.disposition,
+          author: result.author, operation: result.operation, claimEpoch: result.claimEpoch, generation: result.generation }));
+      const previous = action('Previous evidence page', () => navigate(resultPages, 'previous'));
+      const next = action('Next evidence page', () => navigate(resultPages, 'next'));
+      previous.dataset.resultPage = 'previous'; next.dataset.resultPage = 'next'; evidence.append(previous, next);
+      card.append(evidence);
+    }
     if (task.aggregate) card.append(node('p', `${task.aggregate.disposition === 'partial' ? 'Partial synthesis' : 'Accepted synthesis'} · ${label(task.aggregate.author)}`, 'receipt'),
       node('p', task.aggregate.content?.text ?? JSON.stringify(task.aggregate.content)));
     else if (canManage(task) && ['open', 'needsReview'].includes(task.status)) {
       card.append(action('Request cancellation', () => submit('cancel', { taskId: task.taskId, actionId: freshId(),
         expectedVersion: task.version, reason: 'Cancelled by the task owner' }, `Cancel ${task.title}`)));
-      const acceptedResults = value.results.filter(item => item.taskId === task.taskId && item.disposition === 'accepted');
+      // The maintained projection includes all accepted slots even when only one
+      // evidence page is visible. Paging must never shrink the synthesis inputs.
+      const acceptedResults = value.acceptedResults.filter(item => item.taskId === task.taskId);
       const ready = ['one', 'firstAccepted'].includes(task.responsePolicy) ? acceptedResults.length > 0
         : task.responsePolicy === 'manual' ? acceptedResults.length > 0 : acceptedResults.length === task.slots.length;
       if (ready) {
@@ -236,6 +253,7 @@ function paintTasks(value) {
       .find(element => element.dataset.localDraft === retainedFocus.draft);
     if (replacement) { replacement.focus({ preventScroll: true }); if (typeof replacement.setSelectionRange === 'function') replacement.setSelectionRange(retainedFocus.start, retainedFocus.end, retainedFocus.direction); }
   }
+  syncPagingControls();
 }
 
 function paintRuns() {
@@ -299,6 +317,7 @@ async function refreshParticipants() {
   const self = entries.find(entry => entry.deviceId === session.deviceId && !entry.revoked);
   if (!self || !(self.canRead || self.authorized)) {
     snapshot = undefined; $('#tasks').replaceChildren(); $('#messages').replaceChildren(); runSubscription?.abort();
+    await reader?.close(); reader = undefined;
     $('#request-submit').disabled = true; $('#message-submit').disabled = true;
     throw Error('This signing profile no longer has workspace access. Shared content has been cleared.');
   }
@@ -326,18 +345,91 @@ function paint(value) {
   $('#thread-title').textContent = task ? task.title : 'Workspace conversation';
   const threadId = selectedTask ?? 'workspace';
   $('#messages').replaceChildren(...value.messages.filter(item => item.threadId === threadId).map(message => {
-    const row = node('li', ''); row.append(node('p', message.text), node('small', `${label(message.author)} · ${originLabel(message.source)}`)); return row;
+    const row = node('li', ''); row.append(node('p', message.text), node('small', `${label(message.author)} · ${originLabel(message.source)}`),
+      diagnostics('Message origin and operation', { messageId: message.messageId, source: message.source, operation: message.operation })); return row;
   }));
+  $('#task-page').textContent = `${pageLabel(value.pages.tasks, taskPages, 'requests')}${value.selectedOutsidePage ? ' · Selected request shown separately.' : ''}`;
+  $('#thread-page').textContent = pageLabel(value.pages.messages, threadPages, 'messages');
+  syncPagingControls();
+  $('#shared-updates').hidden = !newerChanges;
   $('#recovery').hidden = !value.tasks.some(item => item.status === 'needsReview');
   observeRuns(value);
   paintOperations();
 }
-async function refresh() {
+function pageLabel(page, pager, noun) {
+  return page ? `Page ${pager.cursors.length} · ${page.returned} of ${page.total} ${noun} in this captured history${page.hasMore ? ' · More available' : ''}` : `No ${noun} yet`;
+}
+function syncPagingControls() {
+  const busy = refreshing || !reader || observation.signal.aborted;
+  $('#refresh-workspace').disabled = busy; $('#workspace-conversation').disabled = busy;
+  for (const [name, pager, page] of [['tasks', taskPages, snapshot?.value.pages.tasks], ['thread', threadPages, snapshot?.value.pages.messages]]) {
+    $(`#${name}-previous`).disabled = busy || pager.cursors.length === 1;
+    $(`#${name}-next`).disabled = busy || !page?.hasMore;
+  }
+  for (const button of document.querySelectorAll('[data-select-task]')) button.disabled = busy;
+  for (const button of document.querySelectorAll('[data-result-page]')) button.disabled = busy || (button.dataset.resultPage === 'previous'
+    ? resultPages.cursors.length === 1 : !snapshot?.value.pages.results?.hasMore);
+}
+async function readPages(captured) {
+  const tasks = await captured.tasks({ limit: 8, cursor: taskPages.cursors.at(-1) });
+  const detail = selectedTask ? (await captured.inspect(selectedTask)).value : null;
+  const results = selectedTask && detail?.task
+    ? resultPages.cursors.length === 1 ? { results: detail.results, page: detail.resultsPage }
+      : (await captured.results({ taskId: selectedTask, limit: 16, cursor: resultPages.cursors.at(-1) })).value
+    : { results: [], page: null };
+  const thread = await captured.thread({ threadId: selectedTask ?? 'workspace', limit: 16, cursor: threadPages.cursors.at(-1) });
+  const selectedOutsidePage = !!detail?.task && !tasks.value.tasks.some(task => task.taskId === selectedTask);
+  return { revision: tasks.revision, value: {
+    tasks: selectedOutsidePage ? [detail.task, ...tasks.value.tasks] : tasks.value.tasks,
+    claims: selectedOutsidePage ? [...detail.claims, ...tasks.value.claims] : tasks.value.claims,
+    acceptedResults: selectedOutsidePage ? [...detail.acceptedResults, ...tasks.value.acceptedResults] : tasks.value.acceptedResults,
+    results: results.results, messages: thread.value.messages, selectedOutsidePage,
+    pages: { tasks: tasks.value.page, results: results.page, messages: thread.value.page },
+  } };
+}
+async function renderCaptured() {
+  const current = await readPages(reader);
+  if (observation.signal.aborted) return;
+  snapshot = current;
+  $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`;
+  paint(current.value);
+}
+async function selectTask(taskId) {
+  if (refreshing || !reader) return;
+  refreshing = true; syncPagingControls();
+  try {
+    selectedTask = taskId; threadPages.cursors = [undefined]; resultPages.cursors = [undefined];
+    retainDraft(); await renderCaptured();
+  } finally { refreshing = false; syncPagingControls(); if (dirty) await refresh(); }
+}
+async function navigate(pager, direction) {
+  if (refreshing || !reader || !snapshot) return;
+  const page = pager === taskPages ? snapshot.value.pages.tasks : pager === threadPages ? snapshot.value.pages.messages : snapshot.value.pages.results;
+  if (direction === 'next' && !page?.nextCursor || direction === 'previous' && pager.cursors.length === 1) return;
+  refreshing = true; syncPagingControls();
+  const previous = pager.cursors.slice();
+  try {
+    if (direction === 'next') pager.cursors.push(page.nextCursor); else pager.cursors.pop();
+    await renderCaptured();
+  } catch (error) { pager.cursors = previous; throw error; }
+  finally { refreshing = false; syncPagingControls(); if (dirty) await refresh(); }
+}
+async function refresh({ force = false } = {}) {
+  forceRefresh ||= force;
   dirty = true; if (refreshing || observation.signal.aborted) return;
-  refreshing = true;
+  if (!forceRefresh && reader && browsingHistory()) {
+    newerChanges = true; $('#shared-updates').hidden = false; return;
+  }
+  refreshing = true; syncPagingControls();
   try {
     while (dirty && !observation.signal.aborted) {
-      dirty = false; await refreshParticipants(); const current = await client.snapshot();
+      dirty = false; forceRefresh = false; await refreshParticipants();
+      const previous = reader, captured = await captureCollaborationReader(session, { signal: observation.signal });
+      try {
+        resetPages(); reader = captured; await renderCaptured();
+      } catch (error) { reader = previous; await captured.close(); throw error; }
+      await previous?.close();
+      newerChanges = false; $('#shared-updates').hidden = true;
       const pending = await Promise.all(store.pending().map(async ({ reference, context }) => {
         const state = await session.operations.get(reference.operationId, { author: reference.author });
         // An uncertain submission may have retained only its semantic identity.
@@ -346,15 +438,15 @@ async function refresh() {
         return [reference.operationId, state];
       }));
       if (observation.signal.aborted) return;
-      snapshot = current; for (const [id, state] of pending) statuses.set(id, state);
-      $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`; paint(current.value);
+      for (const [id, state] of pending) statuses.set(id, state);
+      paintOperations();
     }
-  } finally { refreshing = false; }
+  } finally { refreshing = false; syncPagingControls(); }
 }
 async function observe() {
   try { for await (const change of session.changes({ signal: observation.signal })) {
     if (change.kind === 'recovery') say('History changed. Retained attempts and active claims need review.');
-    await refresh();
+    await refresh({ force: change.kind === 'recovery' });
   } } catch (error) { if (!observation.signal.aborted) report(error); }
 }
 
@@ -386,6 +478,7 @@ for (const id of ['request-title', 'request-input', 'message', 'recipient', 'res
 
 window.addEventListener('pagehide', event => {
   observation.abort(); runSubscription?.abort(); clearTimeout(runTimer); clearTimeout(participantTimer);
+  void reader?.close().catch(() => undefined); reader = undefined;
   if (event.persisted) void suspendView().catch(report);
   else { participantPanel?.close?.(); void detachView().catch(() => undefined); }
 });
@@ -395,6 +488,11 @@ window.addEventListener('pageshow', event => {
     () => say('This view’s owner was replaced. Reload to reattach, then inspect original operations.'));
 });
 $('#refresh-participants').onclick = () => { if (session) void refreshParticipants().catch(report); };
+$('#refresh-workspace').onclick = () => { if (session) void refresh({ force: true }).catch(report); };
+$('#workspace-conversation').onclick = () => { if (session) void selectTask(null).catch(report); };
+for (const [name, pager] of [['tasks', taskPages], ['thread', threadPages]]) {
+  for (const direction of ['previous', 'next']) $(`#${name}-${direction}`).onclick = () => { void navigate(pager, direction).catch(report); };
+}
 
 try {
   deployment = await import('./deployment/bootstrap.mjs');

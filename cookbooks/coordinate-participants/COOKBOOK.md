@@ -81,6 +81,21 @@ Each pending reference includes the application, history, signer and operation i
 one view removing a reviewed reference cannot remove another view's reference.
 The operation journal remains the source of signed attempts.
 
+Keep retained history usable as it grows. The maintained
+`captureCollaborationReader(session)` holds one coherent public read view. Read
+task cards, conversation messages and result evidence through its bounded pages;
+close the reader when refreshing, suspending or detaching. A continuation belongs
+to that exact history, revision and query scope. Reusing it with different filters
+or a newer capture raises `CURSOR_RESET_REQUIRED`, so offer an explicit refresh.
+
+The reference shows eight task cards and sixteen messages or results per page.
+The first page follows shared updates. While someone browses a continuation,
+the view holds that revision and shows a refresh notice when new work arrives.
+The selected task remains visible even when it is outside the task page. Local
+drafts and the focused contribution control survive refresh. Complete accepted
+result summaries keep every slot's identity available for synthesis; visible
+evidence pages never redefine the accepted set or the frozen denominator.
+
 The participant surface groups people, signing devices, endpoints and agent runs.
 Use labels such as “This view”, “Awaiting a claim” and “Saved on this device”. Show
 the actual agent route: native loop, on-demand tool caller, event subscriber or
@@ -122,6 +137,10 @@ small local checks exercise independent agents without implying provider or mode
 verification. The page shows their current run identities and expiring progress
 separately from accepted contributions. A reload restores an unsent contribution
 draft but requires explicit transfer before a new endpoint continues the claim.
+The reviewer discovers eligible open work across captured task pages, releases
+its read view before claiming, and suppresses duplicate failed claims until the
+shared task projection changes. A newly freed claim quota can then admit work;
+an unrelated rejected transport attempt cannot create a hot retry loop.
 
 The executable local scale profile has eight distinct retained signers and 32
 simultaneous views, with endpoint quotas that leave a sibling usable. Its report
@@ -143,6 +162,8 @@ and provider quotas require their own observations and limits.
 | A request is cancelled while an effect is in flight | Request, acknowledgment and uncertain external outcome stay distinct |
 | Recovery adopts an active claim | Old fence is rejected until guarded rebind or reassignment |
 | A tab reloads after a timeout | Its original full operation reference can be inspected; no automatic resubmission |
+| Another view writes while someone browses a continuation | Existing pages remain coherent; explicit refresh shows the newer revision without changing local drafts |
+| A named-query-only or events-only attachment requests raw SQL | The maintained owner rejects the request and releases the denied capture without closing siblings |
 | One agent binding is revoked | That binding stops; unrelated consumers and signing grants remain intact |
 
 Record exact source commits, archive hashes, engine identity, actual topology and

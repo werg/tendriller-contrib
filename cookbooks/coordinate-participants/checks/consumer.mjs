@@ -11,7 +11,7 @@ import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectApplicationOwner } from '@chronolog/peer-session/browser';
 import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-session/sql';
 import { createNativeSqlEngine } from '@chronolog/peer-session/sql-native';
-import { createViewStore, prepareCollaborationCommand } from '@tendriller/core/collaboration';
+import { captureCollaborationReader, createViewStore, prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { reviewWorkspace, reviewClient } from './review-workspace.mjs';
 import { reviewAssignedTask } from './reviewer.mjs';
 
@@ -108,9 +108,9 @@ try {
     prepareCommand: (binding, name, input) => prepareCollaborationCommand(binding, name, input, sessions[1].deviceId),
   });
   resources.push(owner);
-  const attach = async (viewId, documentPath) => {
+  const attach = async (viewId, documentPath, grant) => {
     const channel = new MessageChannel(); channels.push(channel.port1, channel.port2);
-    owner.attach(channel.port1);
+    owner.attach(channel.port1, grant);
     const facade = await connectApplicationOwner(channel.port2, { applicationId, definitionId: definition.id,
       definitionVersion: definition.version, context: { viewId, documentPath, publicationId: 'publication-1' } });
     resources.push(facade); return facade;
@@ -130,6 +130,30 @@ try {
   assert.notDeepEqual(await board.authority(), localAuthority);
   observed('ownerVerifiedAuthority', { revision: verifiedAuthority.control.payload.revision, hostTransportConfigured: false,
     ownerSigner: sessions[1].deviceId, mutatedReturnDidNotMutateOwner: true, verifiedSignature: true });
+  const denied = async (promise, code) => assert.rejects(promise, error => {
+    assert.equal(error.code ?? error.message, code); return true;
+  });
+  const eventsOnly = await attach('events-only', '/scope/events.html', { capabilities: ['events'], maxViews: 1 });
+  const namedOnly = await attach('named-only', '/scope/named.html', { capabilities: ['queries', 'events'], queries: ['collab.snapshot'], maxViews: 1 });
+  const queryOnly = await attach('query-only', '/scope/query.html', { capabilities: ['queries'], maxViews: 1 });
+  const eventsView = await eventsOnly.readView(), namedView = await namedOnly.readView(), queryView = await queryOnly.readView();
+  await denied(eventsView.query('SELECT id FROM collab_journal'), 'APPLICATION_ATTACHMENT_FORBIDDEN');
+  await denied(namedView.query('SELECT id FROM collab_journal'), 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
+  assert.ok(Array.isArray((await eventsView.readEvents()).events));
+  await denied(queryView.readEvents(), 'APPLICATION_ATTACHMENT_FORBIDDEN');
+  assert.deepEqual((await queryView.query('SELECT 7 AS value')).rows, [[7]]);
+  await Promise.all([eventsView.release(), namedView.release(), queryView.release()]);
+  await denied(captureCollaborationReader(eventsOnly), 'APPLICATION_ATTACHMENT_FORBIDDEN');
+  await denied(captureCollaborationReader(namedOnly), 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
+  assert.deepEqual((await namedOnly.query('collab.snapshot', null)).value.tasks, []);
+  const queryCapture = await captureCollaborationReader(queryOnly);
+  assert.deepEqual((await queryCapture.tasks()).value.tasks, []); await queryCapture.close();
+  // A denied capture must release the single allowed view reservation.
+  for (const facade of [eventsOnly, namedOnly, queryOnly]) { const again = await facade.readView(); await again.release(); await facade.detach(); }
+  assert.equal(sessions[1].signal.aborted, false); assert.equal(owner.endpoints().length, 2);
+  observed('capturedReadScope', { eventsOnlyRawDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN',
+    namedQueryRawDenied: 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN', queryOnlyEventsDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN',
+    allowedNamedQuery: true, allowedRawQuery: true, deniedCaptureReleasedReservation: true, siblingUsable: true });
   const boardClient = reviewClient({ session: board, endpoint: board.endpoint, runId: 'board-run' });
   const discussionClient = reviewClient({ session: discussion, endpoint: discussion.endpoint, runId: 'discussion-run' });
   const request = (interactionId, signers, policy = 'one') => ({ interactionId, kind: 'reviewEvidence', title: `Review ${interactionId}`,
@@ -365,6 +389,50 @@ try {
     endpointIncarnation: cancelClaim.endpointIncarnation }, 'cancel-ack-operation');
   assert.equal((await clients[0].inspect('cancel-me')).value.task.status, 'cancelled');
   observed('cancellationAcknowledgment', { requested: 'cancelRequested', acknowledged: 'cancelled', effectsRecalled: false });
+
+  for (const suffix of ['a', 'b']) await accepted(boardClient, 'message', {
+    threadId: 'paged-conversation', messageId: `paged-${suffix}`, text: `Captured message ${suffix}`,
+  }, `paged-message-${suffix}`);
+  const heldReader = await captureCollaborationReader(board);
+  let heldObservation;
+  try {
+    const first = await heldReader.tasks({ limit: 2 }); assert.equal(first.value.page.hasMore, true);
+    const firstThread = await heldReader.thread({ threadId: 'paged-conversation', limit: 1 });
+    const firstEvidence = await heldReader.results({ taskId: 'exclusive', limit: 1 });
+    assert.equal(firstThread.value.page.hasMore, true); assert.equal(firstEvidence.value.page.hasMore, true);
+    const acceptedSummary = (await heldReader.inspect('round')).value.acceptedResults;
+    assert.deepEqual(acceptedSummary.map(result => result.resultId).sort(), resultIds.slice().sort());
+    assert.ok(acceptedSummary.every(result => !Object.hasOwn(result, 'content') && result.operation.historyId === report.historyId));
+    await accepted(clients[0], 'request', request('after-capture', [sessions[4].deviceId]), 'after-capture-request');
+    await accepted(clients[0], 'message', { threadId: 'paged-conversation', messageId: 'paged-later', text: 'Written after capture' }, 'paged-message-later');
+    await synchronize();
+    const tasks = first.value.tasks.map(task => task.taskId); let taskCursor = first.value.page.nextCursor;
+    while (taskCursor) {
+      const page = await heldReader.tasks({ limit: 2, cursor: taskCursor });
+      assert.deepEqual(page.revision, first.revision); assert.equal(page.value.page.total, first.value.page.total);
+      tasks.push(...page.value.tasks.map(task => task.taskId)); taskCursor = page.value.page.nextCursor;
+    }
+    assert.equal(tasks.length, first.value.page.total); assert.equal(new Set(tasks).size, tasks.length);
+    assert.equal(tasks.includes('after-capture'), false);
+    const secondThread = (await heldReader.thread({ threadId: 'paged-conversation', limit: 1, cursor: firstThread.value.page.nextCursor })).value;
+    assert.deepEqual([...firstThread.value.messages, ...secondThread.messages].map(message => message.messageId), ['paged-a', 'paged-b']);
+    const secondEvidence = (await heldReader.results({ taskId: 'exclusive', limit: 1, cursor: firstEvidence.value.page.nextCursor })).value;
+    assert.deepEqual([...firstEvidence.value.results, ...secondEvidence.results].map(result => result.disposition).sort(), ['accepted', 'superseded']);
+    await assert.rejects(heldReader.thread({ threadId: 'different-thread', cursor: firstThread.value.page.nextCursor }), { code: 'CURSOR_RESET_REQUIRED' });
+    await assert.rejects(heldReader.results({ taskId: 'round', cursor: firstEvidence.value.page.nextCursor }), { code: 'CURSOR_RESET_REQUIRED' });
+    const latest = await captureCollaborationReader(board);
+    try {
+      await assert.rejects(latest.tasks({ limit: 2, cursor: first.value.page.nextCursor }), { code: 'CURSOR_RESET_REQUIRED' });
+      assert.equal((await latest.tasks({ limit: 2 })).value.page.total, tasks.length + 1);
+      assert.equal((await latest.thread({ threadId: 'paged-conversation' })).value.messages.length, 3);
+    } finally { await latest.close(); }
+    heldObservation = { heldTaskCount: tasks.length, visibleTaskLimit: 2, stableAcrossWrites: true,
+      noDuplicatesOrOmissions: true, completeAcceptedSummaries: acceptedSummary.length,
+      acceptedSummaryContentOmitted: true, staleCursorRejected: true, wrongThreadRejected: true, wrongTaskRejected: true,
+      capturedMessages: 2, latestMessages: 3, acceptedAndLateEvidenceRetained: true };
+  } finally { await heldReader.close(); }
+  await assert.rejects(heldReader.tasks(), { code: 'COLLABORATION_READER_CLOSED' });
+  observed('boundedCapturedPages', { ...heldObservation, releasedReaderRejected: true });
 
   await accepted(clients[0], 'request', request('surviving-claim', [sessions[3].deviceId]), 'survive-request');
   await accepted(clients[3], 'claim', claimInput('surviving-claim', 'review', 3), 'survive-claim');

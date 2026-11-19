@@ -24,6 +24,7 @@ test('browser evidence needs supported SQL capability selection and every author
     report => { report.scenarios[1].mode = 'shared'; },
     report => { report.scenarios[0].ownerMode = 'shared'; },
     report => { report.scenarios[0].sharedStorageUnsupported = false; },
+    report => { report.scenarios[0].stableThreadPages = false; },
     report => { report.scenarios[0].acceptedResultIds = []; },
     report => { report.wasm.manifest.wasmSha256 = '3'.repeat(64); },
     report => { report.source.dirty = true; },

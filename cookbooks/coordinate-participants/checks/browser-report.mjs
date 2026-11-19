@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 
 export const browserGates = Object.freeze(['realSqlWasm', 'twoDocuments', 'independentDrafts', 'remoteRepaintPreservedFocus',
   'draftAndOperationAfterReload', 'addressedRequest', 'explicitEndpointReassignment', 'acceptedContributionAndSynthesis',
-  'suspendResume', 'detachIsolation', 'retainedAfterOwnerExit', 'sharedStorageUnsupported', 'capabilityRouteObserved']);
+  'suspendResume', 'detachIsolation', 'retainedAfterOwnerExit', 'sharedStorageUnsupported', 'capabilityRouteObserved',
+  'boundedTaskPages', 'stableThreadPages', 'paginationPreservedDrafts']);
 
 export function validateBrowserReport(report, { allowDirty = false } = {}) {
   const hex = (value, length) => assert.match(value ?? '', new RegExp(`^[a-f0-9]{${length}}$`, 'u'));

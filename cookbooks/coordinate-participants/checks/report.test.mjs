@@ -5,6 +5,12 @@ import { requiredChecks, validateCollaborationReport } from './report.mjs';
 // Synthetic values test the validator; they are never emitted as qualification.
 function example() {
   const observations = {
+    boundedCapturedPages: { heldTaskCount: 5, visibleTaskLimit: 2, completeAcceptedSummaries: 2, capturedMessages: 2, latestMessages: 3,
+      stableAcrossWrites: true, noDuplicatesOrOmissions: true, acceptedSummaryContentOmitted: true, staleCursorRejected: true,
+      wrongThreadRejected: true, wrongTaskRejected: true, acceptedAndLateEvidenceRetained: true, releasedReaderRejected: true },
+    capturedReadScope: { eventsOnlyRawDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN', namedQueryRawDenied: 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN',
+      queryOnlyEventsDenied: 'APPLICATION_ATTACHMENT_FORBIDDEN', allowedNamedQuery: true, allowedRawQuery: true,
+      deniedCaptureReleasedReservation: true, siblingUsable: true },
     independentPendingReferences: { foreignHistoryRejected: true, foreignSignerRetryRejected: true },
     exclusiveClaimRace: { outcomes: ['accepted', 'rejected'] }, rawProgramGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_immutable' },
     rawForgedResultGuard: { outcome: 'rejected', rejectionCode: 'assert:collab_result_disposition', retainedForgedResult: false },
@@ -72,6 +78,8 @@ test('optimistic claim, recovery, replay and provider conclusions are refused', 
     report => { report.checks.find(value => value.name === 'signedOperationLineage').observation.bodyReferenceIgnored = false; },
     report => { report.checks.find(value => value.name === 'rawForgedAttemptGuard').observation.outcome = 'accepted'; },
     report => { report.checks.find(value => value.name === 'ownerVerifiedAuthority').observation.verifiedSignature = false; },
+    report => { report.checks.find(value => value.name === 'capturedReadScope').observation.deniedCaptureReleasedReservation = false; },
+    report => { report.checks.find(value => value.name === 'boundedCapturedPages').observation.noDuplicatesOrOmissions = false; },
     report => { report.claims.browserQualified = true; },
     report => { report.claims.conversationalResumeQualified = true; },
     report => { report.claims.exactlyOnceExternalEffects = true; },

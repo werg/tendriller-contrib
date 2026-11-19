@@ -113,6 +113,55 @@ try {
     assert.equal(outcome.task.status, 'completed'); assert.equal(outcome.results.filter(value => value.disposition === 'accepted').length, 1);
     assert.equal(outcome.task.source.endpointId, a.endpoint.endpointId);
     assert.equal(outcome.claims[0].endpointIncarnation, reopened.endpoint.endpointIncarnation);
+    // Grow the actual authored workspace through public commands. A continuation
+    // stays on its captured revision while another document writes new work.
+    const createRequests = async (page, ids) => page.evaluate(async ids => {
+      for (const id of ids) {
+        const signer = globalThis.fixtureSession.deviceId;
+        const operation = await globalThis.fixtureClient.request({ interactionId: id, kind: 'reviewEvidence', title: `Paged ${id}`,
+          input: { text: 'Evidence for paging.' }, context: { source: 'browser-qualification' },
+          target: { kind: 'signer', deviceId: signer }, responsePolicy: 'one',
+          slots: [{ slotId: 'review', eligibleSigners: [signer], label: 'Review' }] });
+        const result = await operation.applied({ signal: AbortSignal.timeout(30_000) });
+        if (result.outcome !== 'accepted') throw Error(JSON.stringify(result));
+      }
+    }, ids);
+    await createRequests(discussion, Array.from({ length: 9 }, (_, index) => `page-task-${index}`));
+    await board.waitForFunction(() => document.querySelector('#task-page').textContent.includes('8 of 10 requests'));
+    await board.locator('#tasks-next').click();
+    await board.waitForFunction(() => document.querySelector('#task-page').textContent.startsWith('Page 2'));
+    const heldTaskPage = await board.locator('#task-page').textContent();
+    const heldTaskIds = await board.locator('.task').evaluateAll(cards => cards.map(card => card.dataset.taskId));
+    await createRequests(discussion, ['page-task-after-capture']);
+    await board.locator('#shared-updates').waitFor({ state: 'visible' });
+    assert.equal(await board.locator('#task-page').textContent(), heldTaskPage);
+    assert.deepEqual(await board.locator('.task').evaluateAll(cards => cards.map(card => card.dataset.taskId)), heldTaskIds);
+    assert.ok(heldTaskIds.includes(taskId), 'The selected request stays available outside the current task page');
+    await board.locator('#refresh-workspace').click();
+    await board.waitForFunction(() => document.querySelector('#task-page').textContent.includes('8 of 11 requests'));
+    assert.equal(await board.locator('#request-title').inputValue(), 'Independent board draft');
+    await board.locator('#message').fill('Unsent message while browsing retained conversation.');
+    const postMessages = async (page, messages) => page.evaluate(async ({ taskId, messages }) => {
+      for (const text of messages) {
+        const operation = await globalThis.fixtureClient.message({ threadId: taskId, messageId: crypto.randomUUID(), text });
+        const result = await operation.applied({ signal: AbortSignal.timeout(30_000) });
+        if (result.outcome !== 'accepted') throw Error(JSON.stringify(result));
+      }
+    }, { taskId, messages });
+    await postMessages(discussion, Array.from({ length: 17 }, (_, index) => `Retained conversation ${index}`));
+    await board.waitForFunction(() => document.querySelector('#thread-page').textContent.includes('16 of 18 messages'));
+    await board.locator('#thread-next').click();
+    await board.waitForFunction(() => document.querySelector('#thread-page').textContent.startsWith('Page 2'));
+    const heldThreadPage = await board.locator('#thread-page').textContent();
+    await postMessages(discussion, ['Message after captured conversation']);
+    await board.locator('#shared-updates').waitFor({ state: 'visible' });
+    assert.equal(await board.locator('#thread-page').textContent(), heldThreadPage);
+    assert.equal(await board.locator('#messages').getByText('Message after captured conversation', { exact: true }).count(), 0);
+    await board.locator('#refresh-workspace').click();
+    await board.waitForFunction(() => document.querySelector('#thread-page').textContent.includes('16 of 19 messages'));
+    await board.locator('#thread-next').click();
+    await board.locator('#messages').getByText('Message after captured conversation', { exact: true }).waitFor();
+    assert.equal(await board.locator('#message').inputValue(), 'Unsent message while browsing retained conversation.');
     await board.screenshot({ path: join(dirname(reportPath), `${mode}-board.png`), fullPage: true });
     await discussion.screenshot({ path: join(dirname(reportPath), `${mode}-discussion.png`), fullPage: true });
     await discussion.evaluate(() => globalThis.fixtureOwner.suspend()); await discussion.evaluate(() => globalThis.fixtureOwner.resume());
@@ -132,6 +181,7 @@ try {
     report.scenarios.push({ mode, ownerMode: a.ownerMode, sharedStorageUnsupported: true, capabilityRouteObserved: true, realSqlWasm: true, twoDocuments: true, independentDrafts: true, remoteRepaintPreservedFocus: true,
       draftAndOperationAfterReload: true, addressedRequest: true, explicitEndpointReassignment: true,
       acceptedContributionAndSynthesis: true, suspendResume: true, detachIsolation: true, retainedAfterOwnerExit: true,
+      boundedTaskPages: true, stableThreadPages: true, paginationPreservedDrafts: true,
       signer: a.deviceId, sourceEndpoint: a.endpoint.endpointId, acceptedResultIds: outcome.task.aggregate.resultIds });
     await context.close(); console.log(`✓ authored ${mode} SQL views`);
   }

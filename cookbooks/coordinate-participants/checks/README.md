@@ -25,7 +25,15 @@ and retained operation evidence. The lineage gates reject a borrowed attempt ID,
 ignore body-supplied operation references and trace actual signed request, claim,
 result and message attempts. The authority gate reads verified current grants
 through the owner without a host transport and checks that returned objects cannot
-mutate owner state. Existing output directories are refused.
+mutate owner state. Captured-read scope probes use real owner attachments:
+events-only and named-query-only consumers cannot read raw SQL, while an
+unrestricted query-only consumer can query without gaining event access. Denied
+captures release their single-view reservation and leave siblings usable.
+
+The native paging gate finishes task, conversation and accepted/late-result pages
+against one held read view across newer writes. It checks complete accepted
+summaries, no duplicates or omissions, explicit cursor rejection after a scope or
+revision change, and release cleanup. Existing output directories are refused.
 `--allow-dirty` is useful during implementation; such output is development
 evidence and cannot qualify a clean release.
 
@@ -66,6 +74,11 @@ complete an addressed request, explicitly reassign an old endpoint's claim,
 accept a contribution and synthesis, and retain the selected history after
 detachment or owner exit. Browser storage uses the actual OPFS SQL/WASM engine.
 Screenshots and exact test dependency locks accompany the observations.
+Each browser journey also grows the real workspace to eleven requests and
+nineteen messages. It browses bounded continuations, writes from the companion
+document, keeps the captured pages coherent, explicitly refreshes, and checks
+that independent unsent drafts survive. This qualifies the authored paging flow;
+larger retained-history tests live with the maintained domain implementation.
 
 The [composition workflow](../../../.github/workflows/collaboration.yml) builds
 immutable companion commits and the pinned Emscripten engine, then runs both
@@ -88,6 +101,12 @@ different layouts. Both attach to the deployment's maintained owner and use its
 allocated `endpoint.context.viewId` for independent drafts. The UI supports
 addressed requests, frozen review slots, claims, handoff, contributions, late
 evidence, cancellation acknowledgment and version-guarded final synthesis.
+Task, result and conversation pages use `captureCollaborationReader`, with one
+owned public read view per displayed revision. First pages follow updates;
+continuations show an explicit refresh notice. Accepted result summaries preserve
+the complete synthesis input set while full result content remains paginated.
+These unrestricted captures require query authority. A consumer with a named-query
+allowlist must use its approved named queries, never a raw-query bypass.
 
 The normal deployment directory contains `configuration.json` with the following
 public values. The builder supplies the [page bootstrap](../snippets/bootstrap.mjs),

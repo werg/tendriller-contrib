@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 
 export const requiredChecks = Object.freeze([
-  'sixIndependentSigners', 'twoAttachmentsOneOwner', 'ownerVerifiedAuthority', 'sourceEndpointIsolation',
+  'sixIndependentSigners', 'twoAttachmentsOneOwner', 'ownerVerifiedAuthority', 'capturedReadScope', 'sourceEndpointIsolation',
   'detachIsolation', 'malformedPortIsolation', 'signalRunIsolation',
   'scaleProfile', 'noisyEndpointIsolation', 'exclusiveClaimRace', 'rawProgramGuard',
   'rawForgedResultGuard', 'rawForgedAttemptGuard', 'signedOperationLineage', 'schemaDdlGuard', 'staleClaimRejected',
   'resultIdentityConflict', 'independentReviewPolicies', 'frozenContributionSlots', 'aggregateProvenance',
-  'cancellationAcknowledgment', 'generationFence', 'explicitRebind',
+  'cancellationAcknowledgment', 'boundedCapturedPages', 'generationFence', 'explicitRebind',
   'operationIdentityAfterReopen', 'independentDrafts', 'independentPendingReferences',
 ]);
 
@@ -61,6 +61,16 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   const authority = observation('ownerVerifiedAuthority');
   assert.equal(authority.verifiedSignature, true); assert.equal(authority.mutatedReturnDidNotMutateOwner, true);
   assert.equal(authority.hostTransportConfigured, false);
+  const readScope = observation('capturedReadScope');
+  assert.equal(readScope.eventsOnlyRawDenied, 'APPLICATION_ATTACHMENT_FORBIDDEN');
+  assert.equal(readScope.namedQueryRawDenied, 'APPLICATION_ATTACHMENT_QUERY_FORBIDDEN');
+  assert.equal(readScope.queryOnlyEventsDenied, 'APPLICATION_ATTACHMENT_FORBIDDEN');
+  for (const field of ['allowedNamedQuery', 'allowedRawQuery', 'deniedCaptureReleasedReservation', 'siblingUsable']) assert.equal(readScope[field], true);
+  const pages = observation('boundedCapturedPages');
+  assert.ok(pages.heldTaskCount > pages.visibleTaskLimit); assert.equal(pages.visibleTaskLimit, 2);
+  assert.equal(pages.completeAcceptedSummaries, 2); assert.equal(pages.capturedMessages, 2); assert.equal(pages.latestMessages, 3);
+  for (const field of ['stableAcrossWrites', 'noDuplicatesOrOmissions', 'acceptedSummaryContentOmitted', 'staleCursorRejected',
+    'wrongThreadRejected', 'wrongTaskRejected', 'acceptedAndLateEvidenceRetained', 'releasedReaderRejected']) assert.equal(pages[field], true);
   const lineage = observation('signedOperationLineage');
   assert.equal(lineage.bodyReferenceIgnored, true); assert.equal(lineage.sourceSignerForced, true);
   assert.notEqual(lineage.lateClaimGeneration, lineage.lateOperationGeneration);

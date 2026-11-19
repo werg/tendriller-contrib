@@ -1,6 +1,6 @@
 // Application policy for two deliberately small, deterministic specialist agents.
 // The maintained module owns claims/results; this file owns only review choices.
-import { createCollaborationClient, operationReference } from '@tendriller/core/collaboration';
+import { captureCollaborationReader, createCollaborationClient, operationReference } from '@tendriller/core/collaboration';
 
 const policies = {
   evidence(task) {
@@ -65,7 +65,15 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
   const resultId = `${claimId}:result`;
   const operation = await submit('result', { taskId, slotId, resultId, claimEpoch: fence.claimEpoch, taskVersion: 1,
     generation: fence.generation, runId: fence.runId, endpointIncarnation: fence.endpointIncarnation, outcome: 'succeeded', content }, `${claimId}:result`);
-  const result = (await client.inspect(taskId)).value.results.find(value => value.resultId === resultId);
+  const captured = await captureCollaborationReader(session, { signal });
+  let result;
+  try {
+    let cursor;
+    do {
+      const page = (await captured.results({ taskId, slotId, limit: 16, cursor })).value;
+      result = page.results.find(value => value.resultId === resultId); cursor = page.page.nextCursor;
+    } while (!result && cursor);
+  } finally { await captured.close(); }
   await session.signals.send('progress', { runId, completed: 1, total: 1 }, { stream, ttlMs: 5000, signal }).catch(() => undefined);
   return { status: result?.disposition ?? 'needs-review', result, operation };
 }
@@ -74,24 +82,43 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
  * This loop holds no retry queue and never adopts an old run's active claim. */
 export async function runReviewer({ session, endpoint = session.endpoint, runId, policy, signal, onOperation, onResult = () => undefined }) {
   if (!Object.hasOwn(policies, policy)) throw Error('Choose the evidence or clarity reference policy');
-  const client = createCollaborationClient({ session, endpoint, runId }), changes = session.changes({ signal })[Symbol.asyncIterator]();
+  const changes = session.changes({ signal })[Symbol.asyncIterator]();
   let changed = changes.next();
   void changed.catch(() => undefined);
-  const attempted = new Set();
+  const attempted = new Map();
   const drain = async () => {
     for (;;) {
       signal?.throwIfAborted();
-      const current = await client.snapshot(); let selected;
-      const eligible = new Set();
-      for (const task of current.value.tasks.filter(value => value.status === 'open')) for (const slot of task.slots) {
-        const claim = current.value.claims.find(value => value.taskId === task.taskId && value.slotId === slot.slotId);
-        if (!(!claim && slot.eligibleSigners.includes(session.deviceId) || claim?.status === 'offered' && claim.claimant === session.deviceId)) continue;
-        const key = JSON.stringify([task.taskId, slot.slotId, claim?.claimEpoch ?? 0, current.revision.generation]);
-        eligible.add(key); if (!selected && !attempted.has(key)) selected = { taskId: task.taskId, slotId: slot.slotId, key };
-      }
-      for (const key of attempted) if (!eligible.has(key)) attempted.delete(key);
+      const captured = await captureCollaborationReader(session, { signal }), candidates = [], versions = [];
+      const eligible = new Set(); let generation;
+      try {
+        let cursor;
+        do {
+          const current = await captured.tasks({ state: 'open', eligibleSigner: session.deviceId, limit: 16, cursor });
+          generation = current.revision.generation;
+          for (const task of current.value.tasks) {
+            // Retain only small identifiers while scanning. Task payloads and
+            // historical evidence leave memory after each bounded page.
+            versions.push([task.taskId, task.version]);
+            for (const slot of task.slots) {
+              const claim = current.value.claims.find(value => value.taskId === task.taskId && value.slotId === slot.slotId);
+              if (!(!claim && slot.eligibleSigners.includes(session.deviceId) || claim?.status === 'offered' && claim.claimant === session.deviceId)) continue;
+              const key = JSON.stringify([task.taskId, slot.slotId, claim?.claimEpoch ?? 0, generation]);
+              eligible.add(key); candidates.push({ taskId: task.taskId, slotId: slot.slotId, key });
+            }
+          }
+          cursor = current.value.page.nextCursor;
+        } while (cursor);
+      } finally { await captured.close(); }
+      // A rejected attempt alone changes the transport revision, but not this
+      // projection. Retry eligibility only after meaningful shared work changes;
+      // completion of another active claim can free this signer's quota.
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify([generation, versions])));
+      const projection = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
+      for (const key of attempted.keys()) if (!eligible.has(key)) attempted.delete(key);
+      const selected = candidates.find(candidate => attempted.get(candidate.key) !== projection);
       if (!selected) return;
-      attempted.add(selected.key);
+      attempted.set(selected.key, projection);
       const result = await reviewAssignedTask({ session, endpoint, runId, policy, taskId: selected.taskId, slotId: selected.slotId, signal, onOperation });
       onResult({ taskId: selected.taskId, slotId: selected.slotId, ...result });
     }
