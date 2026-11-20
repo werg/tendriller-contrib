@@ -249,7 +249,8 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     stage = 'automatic-recovery-after-grace';
     const disconnectedAt = performance.now();
     await coordinator.close();
-    const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration);
+    const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration,
+      AbortSignal.timeout(graceMs + 30_000));
     const recoveredAt = performance.now();
     const automaticAuthority = await followerControl.application();
     assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);

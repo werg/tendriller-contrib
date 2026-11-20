@@ -55,7 +55,10 @@ const connectSessions = async (a, b) => {
 
 try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions, createControl: host.createControl,
-    qualifyParticipation: options => qualifyParticipation({ ...options, ports, copyPrefix: connectSessions, graceMs: 3000,
+    qualifyParticipation: options => qualifyParticipation({ ...options, ports, copyPrefix: connectSessions,
+      // Discovery opening and authenticated connection opening each allow 15s.
+      // Startup must get that declared opportunity before selecting a successor.
+      graceMs: 30_000,
       async qualifyTransport({ coordinator, follower, primary, secondary }) {
         const generation = follower.status.generation, before = rawConnections.length;
         const signal = AbortSignal.timeout(15_000);
