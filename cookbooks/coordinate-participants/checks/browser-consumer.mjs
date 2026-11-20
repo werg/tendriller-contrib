@@ -99,6 +99,10 @@ try {
     await board.waitForFunction(() => !document.querySelector('#message-submit').disabled);
     await card(board).getByRole('button', { name: /^(Open conversation|Selected conversation)$/ }).click();
     await board.waitForFunction(title => document.querySelector('#thread-title').textContent === title, previousThread);
+    // Selecting an already selected conversation keeps its title throughout the
+    // asynchronous read. Wait for the handler's final, visible focus action
+    // before starting the independent remote-update preservation measurement.
+    await board.waitForFunction(() => document.activeElement === document.querySelector('#message'));
     await contribution.evaluate(element => { element.focus(); element.setSelectionRange(7, 19); });
     await card(discussion).getByRole('button', { name: 'Open conversation', exact: true }).click();
     await discussion.locator('#message').fill('A remote discussion update.'); await discussion.locator('#message-submit').click();
