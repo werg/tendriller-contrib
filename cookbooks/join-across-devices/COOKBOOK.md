@@ -66,8 +66,10 @@ owner review. That review binds the fingerprint, account, application, origins,
 rights and retained history. A copied link or successful sign-in grants none of
 those device rights by itself.
 
-The starter's native processing window is finite, and closing it preserves any
-uncertain ordering pause. Resume a lost reply with the same request, native
+The starter's native processing window lasts at most ten minutes, with idle
+checks backing off to thirty seconds. Restart the same retained native owner if
+that window ends; closing it preserves any uncertain ordering pause. Resume a
+lost reply with the same request, native
 checkpoint and browser key; reconcile the original signed outcome before writes
 resume. Expired or stale requests require an explicit new review for that device.
 Do not silently grant rights, replace an identity, choose another prefix or

@@ -136,8 +136,8 @@ rights, generation, retained prefix and proposal digest. The normal selector
 rechecks current authority and account access before committing that exact
 proposal. Neither the host nor the browser receives the native signer.
 
-The starter's native pairing window is at most ten minutes with bounded idle
-backoff. Browser checks are explicit, including a single check on returning from
+The starter's native pairing window is at most ten minutes, with idle checks
+backing off to thirty seconds. Browser checks are explicit, including a single check on returning from
 review; requests are not automatically renewed. Closing a window or process
 does not clear a durable ordering pause. Reopen the same participant and inspect
 the original request after an uncertain reply. Exact receipt reconciliation or
@@ -145,12 +145,28 @@ a verified terminal request with no committed transition can release the pause;
 deleting local records or silently rebasing the proposal cannot. Keep `pending`, `approved`, `committing` and `committed` distinct; a later revoked grant stays revoked on retry. Pairing status
 alone is not a successful application connection.
 
+Keep the native peer or assistant running through preparation, owner review,
+commitment and independent receipt verification. The single-pass `npm run pair`
+command is a deliberate inspection/retry step while that resident owner is
+stopped; it does not wait for human approval or the later verification pass.
+If it prepares or submits a proposal, restart the same retained native owner to
+finish or reconcile that request before application ordering can resume.
+
 If a setup reference is lost, the current core owner view at `/dashboard/setups`
 lists bounded retained operations, and its page-specific view inspects the
 original allocation. These views require the active owner's service session and
 remain read-only after connector revocation. They expose no replacement secret.
 Preserve the original private checkpoint and use an actually available reviewed
 recovery route when authority is missing.
+
+For a claimed page whose setup credential expires or is lost, the core guide's
+[same-app continuation](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md#continue-the-same-app-after-setup-credential-expiry-or-loss)
+uses an owner-approved **Add agent** binding and the starter's `host:adopt`
+command. Confirm that the selected host supports this route before submitting
+the private one-use code. Keep the original application identity, descriptor,
+device store and setup operation; host delegation grants no new device membership
+or assistant consent. An uncertain redemption needs inspection of that named
+binding and renewed owner approval, never an automatic second submission.
 
 ## Verify the connected result and state its lifetime
 
