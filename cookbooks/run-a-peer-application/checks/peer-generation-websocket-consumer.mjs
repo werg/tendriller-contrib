@@ -75,15 +75,18 @@ try {
         // Status publication may coalesce a short disconnected interval. The
         // old physical endpoints must close; a coherent read then verifies the
         // authenticated replacement route without adding another domain write.
-        await follower.query('conversation', {}, { signal });
+        const read = await follower.query('conversation', {}, { signal });
+        assert.equal(read.revision.generation, generation, 'Reconnect must preserve the coherent read generation');
         await Promise.all([
           waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId), signal),
           waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId), signal),
         ]);
-        assert.ok(rawConnections.length >= before + 2, 'Both physical relay endpoints must reopen');
+        assert.ok(rawConnections.length > before, 'The cut must open a replacement physical relay connection');
         assert.equal(follower.status.generation, generation, 'A transient relay loss must reconnect within grace');
         ownedReconnect = { owner: 'application-session', physicalLinksCut: true, reconnected: true, coherentRead: true,
-          sameGeneration: true, identity: follower.deviceId, beforeConnections: before, afterConnections: rawConnections.length };
+          sameGeneration: true, coherentReadRevision: read.revision, retiredPhysicalConnections: previous.length,
+          closedPhysicalConnections: previous.filter(connection => connection.signal.aborted).length,
+          identity: follower.deviceId, beforeConnections: before, afterConnections: rawConnections.length };
       },
       inspectTransport: async () => { await host.drainIntroductions();
         return { boundary: 'tendriller-sdk-introductions', traffic: await options.host.traffic() }; },

@@ -77,20 +77,9 @@ jobs:
       - name: Build clean public session archive
         working-directory: .chronolog-build
         run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native' || matrix.transport == 'hosted') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
-      - uses: actions/checkout@v4
+      - name: Download the exact promoted public host graph
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
-        with:
-          repository: werg/tendriller
-          ref: ${{ env.HOST_REF }}
-          path: .tendriller-build
-          persist-credentials: false
-      - name: Verify hosted source
-        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
-        run: test "$(git -C .tendriller-build rev-parse HEAD)" = "$HOST_REF"
-      - name: Build the actual public hosted participant
-        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
-        working-directory: .tendriller-build
-        run: npm ci && npm run build
+        run: node distribution/download-core-release.mjs --source "$HOST_REF" --chronolog-source "$CHRONOLOG_REF" --output .tendriller-build/dist
       - name: Install pinned Chromium and browser system dependencies
         if: ${{ matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
         run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
@@ -127,6 +116,8 @@ jobs:
             test-results/peer-generation/peers/assets/*
             test-results/peer-generation/host-artifacts.json
             test-results/peer-generation/host/package-lock.json
+            .tendriller-build/dist/manifest.json
+            .tendriller-build/dist/composition.json
             .tendriller-build/dist/provenance.json
             .tendriller-build/dist/*.tgz
             .chronolog-build/artifacts/peer-session/*.tgz

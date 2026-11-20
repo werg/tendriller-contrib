@@ -14,3 +14,14 @@ for (const name of ['peer-generation', 'collaboration']) {
     assert.deepEqual(ordinary, defaults);
   });
 }
+
+test('companion consumers reuse the published core graph without checking out or rebuilding core', () => {
+  for (const name of ['peer-generation', 'collaboration']) {
+    const workflow = readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8');
+    assert.match(workflow, /node distribution\/download-core-release.mjs/);
+    assert.match(workflow, /--chronolog-source "\$CHRONOLOG_REF"/);
+    assert.match(workflow, /\.tendriller-build\/dist\/manifest.json/);
+    assert.match(workflow, /\.tendriller-build\/dist\/composition.json/);
+    assert.doesNotMatch(workflow, /repository: werg\/tendriller\n|working-directory: \.tendriller-build|npm run build\n/);
+  }
+});

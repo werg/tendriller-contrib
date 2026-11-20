@@ -56,28 +56,16 @@ jobs:
           ref: ${{ env.CHRONOLOG_REF }}
           path: .chronolog-build
           persist-credentials: false
-      - uses: actions/checkout@v4
-        with:
-          repository: werg/tendriller
-          ref: ${{ env.CORE_REF }}
-          path: .tendriller-build
-          persist-credentials: false
-      - name: Verify the checked-out tuple
-        run: |
-          test "$(git -C .chronolog-build rev-parse HEAD)" = "$CHRONOLOG_REF"
-          test "$(git -C .tendriller-build rev-parse HEAD)" = "$CORE_REF"
+      - name: Verify the checked-out Chronolog source
+        run: test "$(git -C .chronolog-build rev-parse HEAD)" = "$CHRONOLOG_REF"
+      - name: Download the exact promoted public core graph
+        run: node distribution/download-core-release.mjs --source "$CORE_REF" --chronolog-source "$CHRONOLOG_REF" --output .tendriller-build/dist
       - name: Install and build the native engine
         working-directory: .chronolog-build
         run: pnpm install --frozen-lockfile
       - name: Build the exact public session archive
         working-directory: .chronolog-build
         run: node tools/package-peer-session.mjs --sql-native --sql-browser --output artifacts/collaboration
-      - name: Build the exact public core SDK
-        working-directory: .tendriller-build
-        run: npm ci && npm run build
-      - name: Inspect core build cleanliness
-        working-directory: .tendriller-build
-        run: git status --short
       - name: Install the pinned WASM toolchain
         run: |
           git clone --depth 1 --branch 4.0.20 https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/collaboration-emsdk"
@@ -117,6 +105,8 @@ jobs:
             test-results/collaboration/composition.json
             test-results/collaboration/**/consumer/package-lock.json
             test-results/collaboration/browser/*.png
+            .tendriller-build/dist/manifest.json
+            .tendriller-build/dist/composition.json
             .tendriller-build/dist/provenance.json
             .tendriller-build/dist/tendriller-sdk-*.tgz
             .chronolog-build/artifacts/collaboration/*.tgz
