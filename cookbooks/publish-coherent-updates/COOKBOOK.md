@@ -24,8 +24,9 @@ Review the visible changes, full asset snapshot, entry HTML, current signed pred
 | Stage | Honest meaning | Recovery |
 | --- | --- | --- |
 | Prepared locally | The exact signed manifest is saved under its operation ID. | Reuse that identity and complete byte snapshot. |
-| Transfer in progress | The host is receiving and verifying the named assets. | Retry the same signed publication and exact assets. |
-| Selected | The host committed this publication after its declared predecessor. | Inspect the returned signed identity and served version. |
+| Transfer in progress or outcome unknown | No verified acceptance receipt has reached this participant. The host may already have committed. | Inspect the saved operation, then retry its exact signed publication and assets if needed. |
+| Committed receipt retained | The host acknowledged this exact publication and version. A later local write or selection read may still fail. | Preserve the receipt and inspect the current selected head separately. |
+| Selected | A verified head read identifies the publication currently selected by the host. | Inspect its signed identity and served version; an older retained receipt does not replace this observation. |
 | Predecessor conflict | Another publication changed the reviewed head. | Inspect the new head and prepare a newly reviewed operation. |
 | Old tab still open | The tab retains its original coherent graph. | Preserve work and navigate to the chosen new publication deliberately. |
 | Asset or capability failure | Actual loading or execution failed. | Diagnose the specific dependency; publishing alone is not proof of a useful page. |
@@ -49,12 +50,43 @@ const publication = await control.preparePublication({
   entry: 'index.html',
   files, // complete { path, type, size, hash } manifest of reviewed authored bytes
 });
-const selected = await control.publish(publication, assets);
+const receipt = await control.publish(publication, assets);
+const selected = await control.publication();
 ```
 
 `assets` carries each distinct hash and its exact base64 bytes. The public tools' packer enumerates the complete authored directory, validates the entry and paths, preserves bytes and enforces limits. The manifest binds application, definition, execution manifest, author, control revision, operation ID, revision and predecessor. The session journals the signed publication; the host verifies its authority, hashes and compare-and-set predecessor before selecting the graph.
 
-After a lost reply, pass the same intent to `preparePublication` and retry the exact saved signed publication. The host returns its existing receipt rather than making another release. Do not invent a new operation ID to recover a timeout. Changing a file or accepting a different predecessor is a new review and operation.
+After a lost reply, inspect `control.publicationOperation(operationId)` to recover
+the saved signed intent and any retained receipt. Reopen the same signing profile
+first if the previous session closed. Pass the same intent to `preparePublication`
+and retry the exact saved signed publication when reconciliation requires it.
+The host returns its original receipt without making another release. An old
+exact retry can succeed after a newer release was selected; use
+`control.publication()` for the current verified head. Do not invent a new
+operation ID to recover a timeout. Changing a file or accepting a different
+predecessor is a new review and operation.
+
+The receipt-aware contract distinguishes a rejected call from a rejected
+publication. `ApplicationPublicationError` carries `outcome` (`unknown` or
+`committed`), `operationId`, `publicationId`, `phase` and `receipt`. A verified
+receipt means the host acknowledged the publication even if the call failed
+during local retention or selection refresh. A retention failure can expose the
+receipt in the error without saving it locally; report those two facts
+separately. With no receipt, preserve the uncertainty. Inspect these typed fields
+instead of inferring acceptance from the exception's message.
+
+Cancellation or a closed session stops local waiting; it does not retract a host
+commit. Let the owned session close finish so any already-verified receipt write
+can settle before its private store changes owners. Preserve the exact intent
+and reconcile from the same retained profile after reopening. Do not turn a
+timeout into a second publication or promise rollback from a client abort.
+
+These public outcome and cancellation changes are coordinated in
+[Chronolog PR #12](https://github.com/werg/chronolog-db/pull/12) and
+[core PR #68](https://github.com/werg/tendriller/pull/68). Use a qualified release
+composition containing the APIs before adapting this flow. The historical
+source pins and hosted evidence below retain their original scope; an open
+pull request does not qualify a deployment.
 
 The host transport accepts control, discovery, invitation and publication messages according to its policy. It rejects database submissions, application content chunks and live UI signals. Code publication does not make the host an application replica or an alternate command executor. Application data and immutable evidence content continue through the common session's peer transport.
 
@@ -84,7 +116,7 @@ Importing domain data is a separate guarded application command. Cross-applicati
 
 ## Verify
 
-Race two publishers from the same signed predecessor. Lose a persisted reply and recover the exact signed identity. Tamper with one asset and require rejection without a head change. Publish a second graph, navigate both canonical and prior immutable URLs, and verify the actual module bytes. Restart the actual host and verify the selected code and unchanged application authority. Publish while a user types, fail one authored import, and exercise offline readiness with fresh storage.
+Race two publishers from the same signed predecessor. Lose a persisted reply and recover the exact signed identity. Fail a selection read after a valid acknowledgement and preserve the committed receipt. Close during receipt retention, reopen the same profile, and inspect the original operation. Retry an older acknowledged release after a newer one and keep the newer selected head. Tamper with one asset and require rejection without a head change. Publish a second graph, navigate both canonical and prior immutable URLs, and verify the actual module bytes. Restart the actual host and verify the selected code and unchanged application authority. Publish while a user types, fail one authored import, and exercise offline readiness with fresh storage.
 
 Verify the authorization boundary with a publisher that has no administrator
 grant and an administrator that has no publisher grant. The former can publish
