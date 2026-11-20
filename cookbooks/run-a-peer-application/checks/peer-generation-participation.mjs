@@ -32,7 +32,8 @@ export async function waitRevision(session, revision) {
 
 /** Bounded in-process discovery/SDP delivery for portable and loopback RTC gates. */
 export function createParticipationFixture({ openConnection } = {}) {
-  const directory = new Map(), inboxes = new Map(), pending = new Map(), opened = [];
+  const directory = new Map(), inboxes = new Map(), pending = new Map(), opened = [], listeners = new Set();
+  const changed = () => { for (const notify of listeners) notify(); };
   const offer = (value, signal) => {
     assert.ok(pending.size < 16, 'Fixture introduction tokens are bounded');
     const token = crypto.randomUUID();
@@ -51,13 +52,16 @@ export function createParticipationFixture({ openConnection } = {}) {
     const inbox = mailbox(); inboxes.set(session.deviceId, inbox);
     return {
       discovery: {
+        notifications({ signal }) { return discoveryNotifications(listeners, signal); },
         async read({ signal }) { signal.throwIfAborted(); return [...directory.keys()].filter(id => id !== session.deviceId)
           .map(identity => ({ identity, route: identity })); },
         async advertise(value, { signal }) {
           signal.throwIfAborted(); assert.equal(value.identity, session.deviceId);
+          const previous = directory.get(value.identity);
           directory.set(value.identity, { storageId: value.storageId });
+          if (!previous || previous.storageId !== value.storageId) changed();
         },
-        async withdraw() { directory.delete(session.deviceId); },
+        async withdraw() { if (directory.delete(session.deviceId)) changed(); },
         invitations({ signal }) { return inbox.messages(signal); },
       },
       transport: {
@@ -129,6 +133,35 @@ export function signalingPair() {
     closed: () => lanes.every(lane => lane.closed),
     snapshot: () => ({ sentMessages, sentBytes, closed: lanes.every(lane => lane.closed) }) };
 }
+// Notifications are snapshot invalidations, not a per-mutation event journal.
+// Subscribe before ready; retain at most ready plus one changed hint while the
+// consumer is busy. There is no scan, heartbeat, lease renewal or polling timer.
+function discoveryNotifications(listeners, signal) {
+  return { [Symbol.asyncIterator]() {
+    const notices = mailbox(2), iterator = notices.messages()[Symbol.asyncIterator]();
+    let pending = false;
+    const notify = () => {
+      if (notices.closed || pending) return;
+      pending = true; notices.send({ type: 'changed' });
+    };
+    const close = () => {
+      listeners.delete(notify); signal.removeEventListener('abort', close); notices.close();
+    };
+    signal.addEventListener('abort', close, { once: true });
+    if (signal.aborted) close();
+    else { listeners.add(notify); notices.send({ type: 'ready' }); }
+    return {
+      async next() {
+        const result = await iterator.next();
+        if (notices.closed) return { done: true };
+        if (!result.done && result.value.type === 'changed') pending = false;
+        return result;
+      },
+      async return() { close(); return iterator.return(); },
+    };
+  } };
+}
+
 function mailbox(limit = 8) {
   const queue = []; let waiting, closed = false;
   const close = () => { if (closed) return; closed = true; queue.length = 0; waiting?.({ done: true }); waiting = undefined; };
@@ -163,7 +196,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
   let stage = 'establishing-owned-connections';
   const start = (session, control) => {
     const participation = session.participate({ control, ...ports(session), recovery: { graceMs, freshnessMs: 300_000 },
-      connections: { retryInitialMs: 100, retryMaxMs: 500, advertiseMs: 300_000, timeoutMs: 15_000 } });
+      connections: { retryInitialMs: 100, retryMaxMs: 500, timeoutMs: 15_000 } });
     controllers.push(participation);
     participation.onStatus(status => statuses.push({ device: session.deviceId, ...status }));
     return participation;

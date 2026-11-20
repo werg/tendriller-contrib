@@ -35,7 +35,7 @@ source identities; they do not require maintaining the obsolete implementation.
 | Plan work | Owner | Required behavior and evidence |
 | --- | --- | --- |
 | T-BOOTSTRAP | Tendriller | Authenticated descriptor, definition and assets independent of creator/device lifetime; explicit enrollment; no mandatory native authority URL. |
-| T-DISCOVERY | Tendriller/Chronolog | Bounded authenticated expiring route hints; coalesced updates and one-off introductions; no per-command poll. Advertisements never confer authority. |
+| T-DISCOVERY | Tendriller/Chronolog | Bounded authenticated route hints with explicit withdrawal; `discovery.notifications({ signal })` emits `ready` before advertising and `changed` to invalidate a peer snapshot. Coalesced updates and one-off introductions require no advertisement lease, renewal timer or discovery polling. Advertisements never confer authority. |
 | T-GENERATIONS | Tendriller using Chronolog verification | Durable authenticated CAS; exact transition retry; candidate/requester authorization; selected-ancestry and floor enforcement; persistence before reply and continuity through host restart. |
 | T-RUNTIME | Tendriller using the common session | Honest saved/applied/shared/recovering/abandoned status; the same application API through native/browser adapters; no fabricated finality or synchronization. |
 | T-OPTIONAL | Explicit service owners | Archive, relay and protected-action capabilities enabled deliberately and qualified separately; ordinary collaboration has no hidden dependency on them. |

@@ -59,7 +59,7 @@ try {
     const port = session.connectControlParticipant({ exchange: transport.exchange });
     const participation = session.participate({ control: port, ...network.ports(session),
       recovery: { graceMs: 100, freshnessMs: 300_000 },
-      connections: { retryInitialMs: 100, retryMaxMs: 500, advertiseMs: 300_000 } });
+      connections: { retryInitialMs: 100, retryMaxMs: 500 } });
     controllers.push(participation); return { port, participation };
   };
   coordinator = await open(a, 'coordinator', true); member = await open(b, 'member', true);

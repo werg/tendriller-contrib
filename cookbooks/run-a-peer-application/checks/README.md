@@ -61,6 +61,15 @@ grace before an eligible takeover, and requires the exact displayed approval
 when a cold observer has no verified freshness. The fixture supplies only bounded
 byte delivery or SDP introduction; it has no recovery or retry policy.
 
+The portable fixture exposes `discovery.notifications({ signal })` as an async iterable of
+`{ type: 'ready' }` and `{ type: 'changed' }`. Each subscriber gets `ready` first;
+peer-map advertisements, storage-identity changes and withdrawals invalidate its
+snapshot. Unconsumed changes coalesce, identical advertisements stay quiet, and
+aborting its signal or returning the iterator retires the listener and unblocks a pending read. There is no advertisement interval,
+TTL expiry or fallback scan. The fixture unit checks qualify this delivery
+contract only; the next kernel/composition run awaits its final pinned archives.
+Historical qualification reports below keep their original source identities.
+
 The direct run uses an in-process implementation of the public framed transport
 interface. The RTC run uses the public raw native connection composition and
 real ICE/DTLS/SCTP. Its explicit
