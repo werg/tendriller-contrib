@@ -31,5 +31,8 @@
     "check:peer-composition": "node cookbooks/run-a-peer-application/checks/peer-composition.mjs",
     "test:collaboration:browser": "node cookbooks/coordinate-participants/checks/run-browser.mjs",
     "check:collaboration-composition": "node cookbooks/coordinate-participants/checks/composition.mjs"
+  },
+  "devDependencies": {
+    "es-module-lexer": "3.0.5"
   }
 }
