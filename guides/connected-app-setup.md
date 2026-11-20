@@ -78,28 +78,21 @@ does not prove an application is connected.
 ## Prepare the ready page before the owner's review
 
 Check that the execution environment can run the required native participant
-and retain its private store. After a successful creation preflight, use the
-selected host's account-bound setup when the connected client has the currently
-granted `tendrils:create` scope. Core's `prepare_tendril_setup` and
-`inspect_tendril_setup` tools, `/api/setup` operations and `@tendriller/core/setup`
-SDK derive the intended owner from the authenticated account and its verified
-identity. No owner email or account ID is supplied by the implementing agent.
-Existing grants do not acquire a new scope automatically.
+and retain its private store. After a successful creation preflight, follow the
+selected host's implemented setup route. Current core supplies account-bound
+setup through `prepare_tendril_setup`, `inspect_tendril_setup` and bounded
+`list_tendril_setups`, using the connector's existing configured and granted `tendrils:create` scope. The same public `/api/setup` boundary is available through `@tendriller/core/setup`; existing grants gain no implicit rights.
+The starter's `setup:prepare` saves one private credential and operation before
+printing public arguments; the host derives the verified owner and accepts only
+the credential commitment. `setup:finish` combines the exact ready receipt with
+that original private credential. Inspect the original operation after a lost
+reply; do not create another intent or switch routes as a retry.
 
-Before calling prepare, use the starter's setup-intent command or the SDK's
-`createSetupIntent` with private durable storage. Retain the operation ID,
-complete request and generated setup credential locally; send only the public
-request and credential commitment. After a lost response, inspect that same
-operation. Combine its ready metadata with the original local credential to
-reconstruct the same handle. A full ledger, lost credential or
-`reconciliation_required` result needs its stated recovery action; do not create
-another page, mint another secret or discard an uncertain operation.
-
-The existing email-based route remains available when it is explicitly selected
-or account-bound setup is unavailable at the host. It needs the actual owner's
-verified email. An opaque connector profile ID does not reveal that email or
-grant authority to claim the page. Report a missing API or scope precisely;
-do not expand consent or switch hosts to bypass that boundary.
+When the selected host supports only the explicit email route, or that route is deliberately chosen for a new application, it needs the
+actual owner's verified email. An opaque connector profile ID does not reveal
+that email, grant ownership or substitute for a missing configured/granted
+scope. Source changes do not upgrade an installed tool catalog. Report that
+specific boundary rather than silently broadening consent.
 
 Create once and retain its private setup handle. Configure the application,
 initialize its native session, build and publish the first signed UI, prepare
@@ -120,7 +113,7 @@ permissions or replace them with payload labels.
 | --- | --- | --- |
 | Owner sign-in and claim | The intended account owns the already-prepared page. | The browser device has its own retained signer and an approved application grant. |
 | Assistant permission review | The account approves the displayed queries, commands and optional events. | The native participant is running, its adapter is online and a requested tool round trip succeeds. |
-| Browser device enrollment | The browser proves possession, the owner reviews its exact key and rights, and the retained native administrator commits the signed transition. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
+| Browser device enrollment | The browser proves possession; the native owner stages the exact signed proposal; the owner reviews its key, rights and retained history before normal control commitment. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
 
 A successful sign-in in the person's browser does not authenticate an agent's
 separate browser session. Inspect the actual session being used; when it needs
@@ -128,33 +121,36 @@ login, let the owner complete that sign-in there. Reuse the saved application,
 device store and operation references after each checkpoint instead of creating
 a second page or signer when a review is delayed.
 
-Core's [account-bound setup and reviewed pairing implementation](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
-records the APIs and acceptance evidence added in
-[core PR #68](https://github.com/werg/tendriller/pull/68). Source implementation
-does not establish that a selected host has deployed that composition. Follow
-its verified release and report an unavailable interface as an upgrade boundary.
+Core's [account-bound setup and reviewed pairing protocol](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
+describes implemented candidate interfaces and their remaining qualification
+gates. Use them only through the selected host's matching guide and complete
+release. A missing endpoint, incompatible storage or absent release remains an
+explicit upgrade boundary; this guide does not establish deployment.
 
-With the matching first-app starter, **Set up this browser** opens the retained
-device in a fenced Worker and saves a request ID before networking. The
-`@tendriller/core/pairing` client obtains an authenticated challenge and submits
-the device's proof. The challenge binds the exact service and page origins,
-application, account, key, read/write rights, selected generation and ten-minute
-expiry. The private key remains in the browser's retained device storage.
+For ordinary browser pairing, start the retained native peer before review.
+The browser saves one public request and proves possession using its own key.
+The same native owner saves the intent, durably pauses command ordering and
+stages the complete signed control proposal before approval. On the service
+origin, the owner reviews its fingerprint, account, application, origins, narrow
+rights, generation, retained prefix and proposal digest. The normal selector
+rechecks current authority and account access before committing that exact
+proposal. Neither the host nor the browser receives the native signer.
 
-The returned review URL opens on the service origin. The owner reviews the
-displayed fingerprint and rights there, using a one-use session-bound form.
-Approval waits for the existing native coordinator/administrator; it does not
-itself enroll the browser. Keep `npm run peer` running, or use the starter's
-one-shot `npm run pair` while that native owner is stopped. The participant saves
-the exact signed attempt before submitting it through the existing control
-transition. It adds only the reviewed reader/writer grant and account binding.
+The starter's native pairing window is at most ten minutes with bounded idle
+backoff. Browser checks are explicit, including a single check on returning from
+review; requests are not automatically renewed. Closing a window or process
+does not clear a durable ordering pause. Reopen the same participant and inspect
+the original request after an uncertain reply. Exact receipt reconciliation or
+a verified terminal request with no committed transition can release the pause;
+deleting local records or silently rebasing the proposal cannot. Keep `pending`, `approved`, `committing` and `committed` distinct; a later revoked grant stays revoked on retry. Pairing status
+alone is not a successful application connection.
 
-Keep the same request, browser key and signed attempt through delayed review,
-reload or a lost response. Refresh its status to distinguish `pending`,
-`approved`, `committing` and `committed`. An expired, denied or stale request
-requires an explicit new request and review for the same device. Revocation and
-`reconciliation_required` never trigger automatic re-enrollment. Show connected
-only after the committed device performs a real application query or command.
+If a setup reference is lost, the current core owner view at `/dashboard/setups`
+lists bounded retained operations, and its page-specific view inspects the
+original allocation. These views require the active owner's service session and
+remain read-only after connector revocation. They expose no replacement secret.
+Preserve the original private checkpoint and use an actually available reviewed
+recovery route when authority is missing.
 
 ## Verify the connected result and state its lifetime
 

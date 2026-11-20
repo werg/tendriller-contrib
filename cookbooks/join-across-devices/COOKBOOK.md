@@ -58,23 +58,22 @@ sign-in, an approved assistant connection and a copied page link do not enroll
 that browser's signer. Check the session in the browser actually being used;
 sign-in elsewhere does not authenticate an agent-controlled browser.
 
-Core's reviewed pairing implementation uses a retained browser device and an
-authenticated, ten-minute request. Its device proof binds the service and page
-origins, account, application, exact key, selected generation and requested
-reader/writer rights. The owner reviews the fingerprint and rights on the
-service-origin page. A running authorized native participant then commits that
-exact approval through the ordinary signed control transition. The current
-starter's **Set up this browser**, review link and refresh action implement this
-flow; verify that the selected host and its advertised package composition
-include it before using those interfaces.
+Current core source implements reviewed pairing; confirm that the selected
+host and its exact release support it before using that route. The browser
+proves possession with its own retained key. The existing native owner durably
+pauses ordering and stages the exact signed proposal before the service-origin
+owner review. That review binds the fingerprint, account, application, origins,
+rights and retained history. A copied link or successful sign-in grants none of
+those device rights by itself.
 
-Keep `pending`, `approved`, `committing` and `committed` distinct from a working
-application connection. Resume a lost reply with the same request and retained
-browser key. The native participant retains its signed attempt before sending
-it. Expiry or changed authority requires a new explicit review; a later revoked
-grant stays revoked on replay. Do not silently grant rights, replace an identity
-or present a proposed pairing as connected. Account sign-in and assistant
-permission review remain independent of this device grant.
+The starter's native processing window is finite, and closing it preserves any
+uncertain ordering pause. Resume a lost reply with the same request, native
+checkpoint and browser key; reconcile the original signed outcome before writes
+resume. Expired or stale requests require an explicit new review for that device.
+Do not silently grant rights, replace an identity, choose another prefix or
+present a reviewed proposal as a connected application. Verify the actual peer
+session and same-key reopen separately; this cookbook's historical evidence does
+not certify the newer protocol or a deployed service.
 
 Authoritative accepted progress can be reloaded through an authorized read. An unsent local draft has different ownership and durability. Let the person choose whether to keep it local, transfer it through an authorized application mechanism, or export it for their own recovery. Do not imply that copying the page URL copied the draft.
 
