@@ -79,9 +79,27 @@ does not prove an application is connected.
 
 Check that the execution environment can run the required native participant
 and retain its private store. After a successful creation preflight, use the
-owner identity required by the deployed creation API. The current email-based
-route needs the actual owner's verified email; an opaque connector profile ID
-does not reveal that email or grant authority to claim the page.
+selected host's account-bound setup when the connected client has the currently
+granted `tendrils:create` scope. Core's `prepare_tendril_setup` and
+`inspect_tendril_setup` tools, `/api/setup` operations and `@tendriller/core/setup`
+SDK derive the intended owner from the authenticated account and its verified
+identity. No owner email or account ID is supplied by the implementing agent.
+Existing grants do not acquire a new scope automatically.
+
+Before calling prepare, use the starter's setup-intent command or the SDK's
+`createSetupIntent` with private durable storage. Retain the operation ID,
+complete request and generated setup credential locally; send only the public
+request and credential commitment. After a lost response, inspect that same
+operation. Combine its ready metadata with the original local credential to
+reconstruct the same handle. A full ledger, lost credential or
+`reconciliation_required` result needs its stated recovery action; do not create
+another page, mint another secret or discard an uncertain operation.
+
+The existing email-based route remains available when it is explicitly selected
+or account-bound setup is unavailable at the host. It needs the actual owner's
+verified email. An opaque connector profile ID does not reveal that email or
+grant authority to claim the page. Report a missing API or scope precisely;
+do not expand consent or switch hosts to bypass that boundary.
 
 Create once and retain its private setup handle. Configure the application,
 initialize its native session, build and publish the first signed UI, prepare
@@ -102,7 +120,7 @@ permissions or replace them with payload labels.
 | --- | --- | --- |
 | Owner sign-in and claim | The intended account owns the already-prepared page. | The browser device has its own retained signer and an approved application grant. |
 | Assistant permission review | The account approves the displayed queries, commands and optional events. | The native participant is running, its adapter is online and a requested tool round trip succeeds. |
-| Browser device enrollment | An authorized administrator commits the exact reviewed public key and rights. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
+| Browser device enrollment | The browser proves possession, the owner reviews its exact key and rights, and the retained native administrator commits the signed transition. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
 
 A successful sign-in in the person's browser does not authenticate an agent's
 separate browser session. Inspect the actual session being used; when it needs
@@ -110,16 +128,33 @@ login, let the owner complete that sign-in there. Reuse the saved application,
 device store and operation references after each checkpoint instead of creating
 a second page or signer when a review is delayed.
 
-Core's [account-bound setup and reviewed pairing assessment](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
-tracks possible improvements to email-based creation and copied-key enrollment.
-Those interfaces remain **design work**, not deployed capabilities. Account-bound
-creation needs a scoped, durable operation record that can recover one page and
-its setup authority after a lost response. Reviewed pairing needs a bounded
-request with proof of key possession, exact account/origin/application/rights
-binding, owner review and a retained signed-control outcome. Neither an OAuth
-profile ID nor an owner-looking payload grants these authorities. Continue using
-the current host's supported route until implemented interfaces and their
-failure/reload tests are qualified; do not call proposed tools or widen consent.
+Core's [account-bound setup and reviewed pairing implementation](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
+records the APIs and acceptance evidence added in
+[core PR #68](https://github.com/werg/tendriller/pull/68). Source implementation
+does not establish that a selected host has deployed that composition. Follow
+its verified release and report an unavailable interface as an upgrade boundary.
+
+With the matching first-app starter, **Set up this browser** opens the retained
+device in a fenced Worker and saves a request ID before networking. The
+`@tendriller/core/pairing` client obtains an authenticated challenge and submits
+the device's proof. The challenge binds the exact service and page origins,
+application, account, key, read/write rights, selected generation and ten-minute
+expiry. The private key remains in the browser's retained device storage.
+
+The returned review URL opens on the service origin. The owner reviews the
+displayed fingerprint and rights there, using a one-use session-bound form.
+Approval waits for the existing native coordinator/administrator; it does not
+itself enroll the browser. Keep `npm run peer` running, or use the starter's
+one-shot `npm run pair` while that native owner is stopped. The participant saves
+the exact signed attempt before submitting it through the existing control
+transition. It adds only the reviewed reader/writer grant and account binding.
+
+Keep the same request, browser key and signed attempt through delayed review,
+reload or a lost response. Refresh its status to distinguish `pending`,
+`approved`, `committing` and `committed`. An expired, denied or stale request
+requires an explicit new request and review for the same device. Revocation and
+`reconciliation_required` never trigger automatic re-enrollment. Show connected
+only after the committed device performs a real application query or command.
 
 ## Verify the connected result and state its lifetime
 

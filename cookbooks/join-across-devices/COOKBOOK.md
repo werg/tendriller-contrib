@@ -15,7 +15,7 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 Use a join link or QR code when someone moves a task from a laptop to a phone, joins a workshop, or opens a reviewed display on another screen. The goal is a recognizable, authorized arrival with a useful next action. Scanning a code is only transport for a URL; it is not proof of identity, successful handoff, or permission to access private work.
 
-For a person already signed in on both devices, opening the same page may be enough. A short typed link can work better when a camera is unavailable, scanning is awkward, or showing a code would disclose the page location to bystanders. Use a separately designed invitation mechanism only when the service and task actually require one.
+For a person already signed in with retained, enrolled devices, opening the same page may be enough. A new device still needs its own reviewed grant. A short typed link can work better when a camera is unavailable, scanning is awkward, or showing a code would disclose the page location to bystanders. Use a separately designed invitation mechanism only when the service and task actually require one.
 
 ## Choose what the new device is joining
 
@@ -58,12 +58,23 @@ sign-in, an approved assistant connection and a copied page link do not enroll
 that browser's signer. Check the session in the browser actually being used;
 sign-in elsewhere does not authenticate an agent-controlled browser.
 
-A smoother reviewed-pairing screen remains separate protocol work until the
-host implements it. It would need proof of possession of the proposed device
-key, a bounded request tied to the exact account, application, origin and rights,
-and an observed signed-control commitment. Resume a lost reply with the same
-request and retained browser key; do not silently grant rights, replace an
-identity or present a proposed pairing as connected.
+Core's reviewed pairing implementation uses a retained browser device and an
+authenticated, ten-minute request. Its device proof binds the service and page
+origins, account, application, exact key, selected generation and requested
+reader/writer rights. The owner reviews the fingerprint and rights on the
+service-origin page. A running authorized native participant then commits that
+exact approval through the ordinary signed control transition. The current
+starter's **Set up this browser**, review link and refresh action implement this
+flow; verify that the selected host and its advertised package composition
+include it before using those interfaces.
+
+Keep `pending`, `approved`, `committing` and `committed` distinct from a working
+application connection. Resume a lost reply with the same request and retained
+browser key. The native participant retains its signed attempt before sending
+it. Expiry or changed authority requires a new explicit review; a later revoked
+grant stays revoked on replay. Do not silently grant rights, replace an identity
+or present a proposed pairing as connected. Account sign-in and assistant
+permission review remain independent of this device grant.
 
 Authoritative accepted progress can be reloaded through an authorized read. An unsent local draft has different ownership and durability. Let the person choose whether to keep it local, transfer it through an authorized application mechanism, or export it for their own recovery. Do not imply that copying the page URL copied the draft.
 
@@ -85,6 +96,8 @@ The sender's progress indicator should be calm and precise: waiting for an autho
 | Scan from a real display at the expected distance. | The code works at usable size and a text/copy alternative remains available. |
 | Use a device with no camera or denied camera permission. | Joining remains possible through the link; scanning failure does not block the task. |
 | Change the purpose or role-looking URL parameter. | Permissions do not change with presentation hints. |
+| Reload after requesting pairing or lose the enrollment response. | The same request, browser key and signed attempt resume; no second grant or page is created. |
+| Leave the native coordinator offline, let a review expire, or revoke an enrolled key. | The UI names the actual pending, expired or revoked state; refresh never silently restores authority. |
 | Disconnect during draft transfer, then edit the source. | The original snapshot, receipt, and newer draft remain distinguishable. |
 | Open a stale task or publication link. | The person sees an accurate stale/expired explanation and a deliberate continuation path. |
 | Inspect QR contents, logs, and copied instructions. | They contain the intended user-facing URL and no agent secret or private draft. |
