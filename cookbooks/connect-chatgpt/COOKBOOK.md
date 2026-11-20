@@ -40,20 +40,24 @@ without an active reasoning turn.
 
 ## Start with the current service guidance
 
-For the service's account-linked MCP, call `tendril_guide` with `topic: "start"`.
-It supplies the maintained [MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md)
-without a browsing tool. Use its returned service origin throughout, including
-staging. For a new app, request `topic: "build"` and check the agent's native
-runtime and retained-process capabilities before following the starter and HTTP
-creation route. Prepare authority, the first signed UI and any assistant-access
-proposal before asking the owner to sign in; do not stop to request a “claimed”
-reply. The ready page and permission-review URL can be given together. Owner
-sign-in retains the prepared keys and code; browser enrollment and assistant
-consent remain explicit. For an existing app, request `topic: "connect"` and use that
+Start with [connected-app setup](../../guides/connected-app-setup.md). For the
+service's account-linked MCP, call `tendril_guide` with `topic: "start"` when it is
+available. A stale installed catalog can omit the tool; use the returned
+same-origin setup links or `/.well-known/tendriller.json` instead. Keep the
+selected connector's `serviceOrigin` throughout, including staging.
+
+For a new app, check `/api/readiness` before downloads or installation, then use
+the host's build guide and immutable first-app release. Stop on paused or
+unverified creation. Check native runtime and retained-process capabilities,
+then prepare authority, the first signed UI and any assistant-access proposal
+before asking the owner to sign in; do not stop to request a “claimed” reply.
+The ready page and permission-review URL can be given together. Owner sign-in
+retains the prepared keys and code; browser enrollment and assistant consent
+remain explicit. For an existing app, request `topic: "connect"` and use that
 participant's real permission-review URL. An empty `list_tendrils` lists no
-assistant-connected apps; it does not imply a missing plugin or prevent creation.
-The core CLI's `guide --server ORIGIN` and public discovery share the same
-navigation. Keep setup procedures there rather than copying them into cookbooks.
+assistant-connected apps; it does not imply a missing plugin or establish
+creation availability. The core CLI's `guide --server ORIGIN` and public
+discovery share the same navigation. Keep runnable setup procedures there.
 
 The source-pinned Node integration examples and qualification notes below are
 records of that optional harness, not an instruction to deploy a second server
@@ -64,7 +68,7 @@ registering another independent agent binding.
 
 | Route | What the person can do | What must be available | Limitation to display |
 | --- | --- | --- | --- |
-| Remote MCP tools | Ask the current chat to inspect state and return an authorized response | Account linking, connection consent, an enrolled Worker reader/writer and an available coordinator, declared tool allowlists | A successful tool connection does not provide background chat wake |
+| Remote MCP tools | Ask the current chat to inspect state and return an authorized response | Account linking, connection consent, the configured integration's enrolled application participant and available retained history, declared tool allowlists | A successful tool connection does not provide background chat wake |
 | MCP Events subscription | Ask a supported Work chat or dot to watch a selected application's help requests | The tool prerequisites plus an active verified callback, finite lifetime and durable delivery journal | Delivery is asynchronous; webhook acceptance does not prove an answer |
 | Mounted MCP Apps card | Refresh a request and deliberately press **Send this to ChatGPT** | A compatible mounted host, allowed tool calls and message capability | Closing or hiding the card removes any availability assumption |
 | Native CLI / JSON-lines participant | Let an implementing agent query and command the application directly | Public session archive, its own enrolled device, reachable peers and retained local storage | A temporary process stops when its environment ends |
@@ -179,12 +183,15 @@ request is ordered. Republishing version 2 UI does not upgrade an already
 configured version 1 immutable domain. Provision a new application or use a
 separately supported evolution procedure.
 
-Provision early: create the page, give the person the actual claim URL, wait for
-their own sign-in, configure the definition/authority and initial generation,
-publish the signed UI, enroll the verified browser key, and retain the native
-process. Provision the Worker’s own device key and enroll it as an assistant
-reader/writer. Keep coordination and publishing on their separately authorized
-devices. Approve the connection permissions in the account before linking.
+When adapting this historical specimen, use the current setup route above:
+preflight the selected host, create the page, configure the definition/authority
+and initial generation, publish the signed UI and retain the native process.
+Prepare any assistant-access proposal, then give the owner the ready page and
+permission-review URLs. Their sign-in adopts the prepared app; it does not gate
+its preparation. Explicitly enroll the verified browser key. If this optional
+Worker adapter is the chosen integration, provision its own device key and
+enroll it as an assistant reader/writer. Keep coordination and publishing on
+their separately authorized devices, and obtain the account's connection consent.
 If a saved enrollment never committed and its expected generation is obsolete,
 `enroll:review` prepares a new signed request and `enroll:approve` requires its
 exact reviewed digest. A committed enrollment keeps exact replay; replay cannot
@@ -236,6 +243,9 @@ and real transaction guards. A read followed by a command can race.
 
 | Observed problem | Keep intact | Useful next route or action |
 | --- | --- | --- |
+| The installed catalog omits `tendril_guide` | The selected connector's service origin | Read its returned setup URL or public discovery on that same origin; refresh the catalog when possible |
+| New creation is paused or readiness is unavailable | The selected service and any saved application handle | Stop new setup before installation and report the host's next action; inspect existing-app access separately |
+| The advertised first-app composition is missing or mismatched | The host identity and exact artifact provenance | Request the matching qualified release; do not combine same-version packages from separate sources |
 | The agent sandbox cannot resolve the page host | Original host handle and selected service origin | Use the connected remote MCP route; otherwise resume the participant in an environment that can reach the host |
 | Native RTC is unavailable | Chronolog authentication and participant transport | Use the maintained encrypted relay fallback; do not invent another data endpoint |
 | OAuth is unlinked or expired | Existing app state and device identity | Relink that account; use an already authorized local participant if appropriate |

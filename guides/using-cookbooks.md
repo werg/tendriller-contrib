@@ -12,11 +12,18 @@ does not require reading or installing every linked approach.
 
 ## Reuse working source before adapting the interaction
 
-Follow core's [first-app guide](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
-and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md)
-for the native session, browser Worker, setup and signed publication. The new
-onboarding/source route requires [core PR #60](https://github.com/werg/tendriller/pull/60)
-in the selected release; do not assume an unupdated host serves its guides or archive.
+Start with [connected-app setup](connected-app-setup.md) to select the exact host,
+check creation readiness before installation, and verify its immutable first-app
+release composition. Follow that host's current core guide for the native session,
+browser Worker, enrollment and signed publication. Source changes do not prove
+that a selected deployment serves the required endpoint or artifact; report the
+specific missing host/release capability instead of rebuilding unrelated sources.
+
+Reuse the starter's account-setup and reviewed-pairing helpers when that exact
+host/release supplies them. Keep the setup credential private, prepare the full
+native pairing proposal before owner review, and preserve its durable ordering
+pause while the result is uncertain. A finite helper window does not promise
+an always-running participant or automatic recovery from lost private storage.
 
 From that starter, actually import or adapt `helpers/live-view.mjs`,
 `helpers/operation-view.mjs` and, when needed, `helpers/reviewed-input.mjs` as

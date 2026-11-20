@@ -21,28 +21,27 @@ external work; shared data does not make that work exactly once.
 
 ## Build and reuse the native first app
 
-For an app request, start with core's [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
-and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md).
-Check the requested origin's service descriptor and use its deployed guide and
-exact compatible artifacts. In an MCP chat, start with `tendril_guide` and the
-[canonical MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md).
-An empty list means no assistant-connected apps, not a missing plugin. New apps
-use the supplied starter and HTTP creation route. Prepare and publish the first
-version before asking for owner sign-in; do not wait for a “claimed” reply.
-Existing apps connect through
-their running participant and owner approval. Follow the same service origin,
-including staging, rather than copying setup instructions from historical evidence.
+For an app request, start with [connected-app setup](guides/connected-app-setup.md).
+Use the origin returned by the selected connector or supplied by the person.
+Call `tendril_guide` when available; if the installed catalog omits it, follow the
+same-origin setup links from discovery. Before new-app downloads or installation,
+check `/api/readiness` and the service descriptor. A paused or unverified host
+stops creation; it does not justify switching to another deployment.
 
-Import or adapt the actual [first-app source](https://github.com/werg/tendriller/tree/master/docs/tutorial)
-from the host's `/downloads/tendriller-first-app.tgz`. Keep its session/Worker
-composition and use the [live-view, operation and review helpers](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
+Use the host's advertised immutable first-app release and verify its complete
+composition. Prepare and publish the first version before asking for owner
+sign-in; do not wait for a “claimed” reply. Existing apps resume their retained
+participant and use the actual permission-review route. Keep the starter's
+session/Worker composition and adapt its
+[live-view, operation and review helpers](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
 For camera/file, voice or optional inference, follow the [reviewed media flow](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
 and adapt its supplied `media/` modules. These are editable application files,
 not new contrib exports. Reading a cookbook alone does not integrate them.
 
 Deliver the hosted page with its authorized session connected, a command observed
 by the other participant, retained work after reopening, and the signed publication
-receipt. State which process remains running and how to resume it. Then use the
+receipt. State which process remains running and how to resume it. On-demand
+tools and automatic future chat turns require separate verification. Then use the
 relevant cookbook to refine the task's choices and failure checks. Historical
 specimens below keep their recorded scope; this pointer does not revive them.
 
