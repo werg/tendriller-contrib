@@ -45,7 +45,11 @@ It supplies the maintained [MCP workflow](https://tendriller.dev/docs/MCP_AGENT_
 without a browsing tool. Use its returned service origin throughout, including
 staging. For a new app, request `topic: "build"` and check the agent's native
 runtime and retained-process capabilities before following the starter and HTTP
-creation route. For an existing app, request `topic: "connect"` and use that
+creation route. Prepare authority, the first signed UI and any assistant-access
+proposal before asking the owner to sign in; do not stop to request a “claimed”
+reply. The ready page and permission-review URL can be given together. Owner
+sign-in retains the prepared keys and code; browser enrollment and assistant
+consent remain explicit. For an existing app, request `topic: "connect"` and use that
 participant's real permission-review URL. An empty `list_tendrils` lists no
 assistant-connected apps; it does not imply a missing plugin or prevent creation.
 The core CLI's `guide --server ORIGIN` and public discovery share the same

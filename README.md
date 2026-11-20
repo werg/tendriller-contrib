@@ -27,7 +27,9 @@ Check the requested origin's service descriptor and use its deployed guide and
 exact compatible artifacts. In an MCP chat, start with `tendril_guide` and the
 [canonical MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md).
 An empty list means no assistant-connected apps, not a missing plugin. New apps
-use the supplied starter and HTTP creation route; existing apps connect through
+use the supplied starter and HTTP creation route. Prepare and publish the first
+version before asking for owner sign-in; do not wait for a “claimed” reply.
+Existing apps connect through
 their running participant and owner approval. Follow the same service origin,
 including staging, rather than copying setup instructions from historical evidence.
 
