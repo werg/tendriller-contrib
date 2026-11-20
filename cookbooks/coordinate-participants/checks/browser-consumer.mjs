@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const reportPath = resolve(process.argv[2]), report = JSON.parse(await readFile(reportPath, 'utf8'));
 const here = import.meta.dirname, site = join(here, 'site');
-let browser, server;
+let browser, server, activePages = [];
 report.diagnostics = { httpErrors: [], browser: [] };
 const diagnostic = (kind, value) => { report.diagnostics[kind].push(value); if (report.diagnostics[kind].length > 80) report.diagnostics[kind].shift(); };
 try {
@@ -37,6 +37,7 @@ try {
     context.on('console', message => { if (['error', 'warning'].includes(message.type())) diagnostic('browser', { mode, type: message.type(), text: message.text(), location: message.location() }); });
     context.on('requestfailed', request => diagnostic('browser', { mode, type: 'requestfailed', url: request.url(), error: request.failure() }));
     const board = await context.newPage(), discussion = await context.newPage(), errors = [];
+    activePages = [board, discussion];
     for (const page of [board, discussion]) { page.setDefaultTimeout(30_000); page.on('pageerror', error => errors.push(error.message)); }
     const profile = `authored-${mode}`, url = document => `${origin}/${document}?profile=${profile}&mode=${mode}`;
     const ready = async (page, entry) => {
@@ -208,7 +209,19 @@ try {
     await context.close(); console.log(`✓ authored ${mode} SQL views`);
   }
   report.passed = true;
-} catch (error) { report.passed = false; report.error = error.stack ?? String(error); throw error; }
+} catch (error) {
+  report.passed = false; report.error = error.stack ?? String(error);
+  report.diagnostics.pages = await Promise.all(activePages.filter(page => !page.isClosed()).map(async page => ({
+    path: new URL(page.url()).pathname,
+    text: await page.locator('body').innerText().catch(() => null),
+    state: await page.evaluate(async () => ({
+      selectedDraft: globalThis.fixtureStore?.readDraft(),
+      snapshot: await globalThis.fixtureClient?.snapshot(),
+    })).catch(cause => ({ error: cause.message })),
+  })));
+  console.error(JSON.stringify(report.diagnostics.pages));
+  throw error;
+}
 finally {
   try {
     await browser?.close();

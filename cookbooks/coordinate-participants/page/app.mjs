@@ -420,6 +420,8 @@ async function renderCaptured(taskId = selectedTask) {
 async function selectTask(taskId) {
   if (refreshing || !reader) return false;
   refreshing = true; syncPagingControls();
+  conversationReady = false;
+  $('#message-submit').disabled = true;
   // An explicit user navigation supersedes a not-yet-visible new request.
   pendingTaskSelection = undefined;
   const previousThread = threadPages.cursors.slice(), previousResults = resultPages.cursors.slice();
