@@ -77,6 +77,27 @@ try {
     const contribution = card(board).locator('.contribution-form textarea');
     await contribution.fill('Unsent contribution survives another view.');
     await contribution.evaluate(element => { element.focus(); element.setSelectionRange(7, 19); });
+    // A failed repaint must not switch the message destination behind the UI.
+    const previousThread = await board.locator('#thread-title').textContent();
+    const beforeFailedPaint = await board.evaluate(() => globalThis.fixtureStore.pending().length);
+    await board.evaluate(() => {
+      globalThis.fixtureOriginalGetItem = Storage.prototype.getItem;
+      Storage.prototype.getItem = function(key) {
+        if (key.includes(':draft:result')) throw Error('Injected draft read failure');
+        return globalThis.fixtureOriginalGetItem.call(this, key);
+      };
+    });
+    await board.locator('#workspace-conversation').click();
+    await board.waitForFunction(() => document.querySelector('#status').textContent.includes('Injected draft read failure'));
+    assert.equal(await board.locator('#message-submit').isDisabled(), true);
+    assert.equal(await board.locator('#thread-title').textContent(), previousThread);
+    await board.evaluate(() => document.querySelector('#message-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+    assert.equal(await board.evaluate(() => globalThis.fixtureStore.pending().length), beforeFailedPaint);
+    await board.evaluate(() => { Storage.prototype.getItem = globalThis.fixtureOriginalGetItem; });
+    await board.locator('#refresh-workspace').click();
+    await board.waitForFunction(() => !document.querySelector('#message-submit').disabled);
+    assert.equal(await board.locator('#thread-title').textContent(), previousThread);
+    await contribution.evaluate(element => { element.focus(); element.setSelectionRange(7, 19); });
     await card(discussion).getByRole('button', { name: 'Open conversation', exact: true }).click();
     await discussion.locator('#message').fill('A remote discussion update.'); await discussion.locator('#message-submit').click();
     await board.locator('#messages').getByText('A remote discussion update.', { exact: true }).waitFor();
@@ -188,7 +209,13 @@ try {
   report.passed = true;
 } catch (error) { report.passed = false; report.error = error.stack ?? String(error); throw error; }
 finally {
-  await browser?.close();
-  if (server?.listening) await new Promise(done => server.close(done));
-  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  try {
+    await browser?.close();
+  } finally {
+    try {
+      if (server?.listening) await new Promise(done => server.close(done));
+    } finally {
+      await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+    }
+  }
 }
