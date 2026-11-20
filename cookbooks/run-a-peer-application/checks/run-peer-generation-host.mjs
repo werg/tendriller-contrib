@@ -173,7 +173,7 @@ async function createBridge(WebSocketServer) {
         return json(res, response.status, response.value);
       }
       if (url.pathname === '/rendezvous/open') return json(res, 200, await enqueue({ kind: 'rendezvous.open', ...body }));
-      const introduced = /^\/introductions\/(rendezvous|invitations)\/(open|ready|next|send|close)$/u.exec(url.pathname);
+      const introduced = /^\/introductions\/(rendezvous|invitations|discovery)\/(open|ready|next|send|close)$/u.exec(url.pathname);
       if (introduced) return json(res, 200, await enqueue({ kind: `introductions.${introduced[1]}.${introduced[2]}`, ...body }));
       const action = /^\/rendezvous\/(\d+)\/(0|1)\/(next|send|close)$/u.exec(url.pathname);
       assert.ok(action, 'Unknown bridge endpoint');

@@ -16,12 +16,12 @@ on:
         description: Exact immutable Chronolog commit
         required: false
         type: string
-        default: 'd3efeb6d75ac24bb9b44899f27d6940475ab55e9'
+        default: '1e4e8406499f3aff0da988046103d0900ca2bd42'
       tendriller_ref:
         description: Exact immutable core collaboration commit
         required: false
         type: string
-        default: '2e027abc57249d48a295b1b395841394e18c82a0'
+        default: '722d6725fc5d659f77f844642f523125f1ef271c'
 permissions:
   contents: read
 concurrency:
@@ -32,8 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'd3efeb6d75ac24bb9b44899f27d6940475ab55e9' }}
-      CORE_REF: ${{ inputs.tendriller_ref || '2e027abc57249d48a295b1b395841394e18c82a0' }}
+      CHRONOLOG_REF: ${{ inputs.chronolog_ref || '1e4e8406499f3aff0da988046103d0900ca2bd42' }}
+      CORE_REF: ${{ inputs.tendriller_ref || '722d6725fc5d659f77f844642f523125f1ef271c' }}
     steps:
       - name: Require exact companion source
         shell: bash

@@ -1,7 +1,7 @@
 // Executes only in Cloudflare's workerd test pool, from installed public packages.
 import assert from 'node:assert/strict';
 import { inject, test } from 'vitest';
-import { createPeerRendezvous, createPeerInvitationListener } from '@tendriller/core/peers';
+import { createPeerRendezvous, createPeerInvitationListener, createPeerDiscoveryWatcher } from '@tendriller/core/peers';
 import { createTestPage, initializeTestService } from '@tendriller/engine/testing';
 
 test('public host participant and peer transports serve independent application peers', async () => {
@@ -40,10 +40,15 @@ test('public host participant and peer transports serve independent application 
       const [, kind, action] = job.kind.split('.');
       if (action === 'open') {
         assert.ok(page);
+        assert.ok(['rendezvous', 'invitations', 'discovery'].includes(kind));
         const session = kind === 'rendezvous' ? createPeerRendezvous(page.rendezvousSocket(job.channel, job.peerId))
+          : kind === 'discovery' ? createPeerDiscoveryWatcher(() => page.discoverySocket(job.peerId))
           : createPeerInvitationListener(page.invitationSocket(job.peerId), job.peerId);
+        const messages = kind === 'rendezvous' ? session.messages : kind === 'discovery' ? session.notifications : session.invitations;
+        const endpoint = { kind, session, iterator: messages[Symbol.asyncIterator](), closed: false };
+        if (kind === 'discovery') void session.closed.then(() => { endpoint.closed = true; });
         const id = `${++nextSession}`;
-        introduced.set(id, { kind, session, iterator: (kind === 'rendezvous' ? session.messages : session.invitations)[Symbol.asyncIterator]() });
+        introduced.set(id, endpoint);
         return { id };
       }
       const endpoint = introduced.get(job.id); assert.ok(endpoint);
@@ -51,7 +56,7 @@ test('public host participant and peer transports serve independent application 
       if (action === 'ready') return await endpoint.session.ready ?? { ready: true };
       if (action === 'next') { const next = await endpoint.iterator.next(); return next.done ? null : next.value; }
       if (action === 'send') { await endpoint.session.send(job.description); return { sent: true }; }
-      if (action === 'close') { endpoint.session.close(); return { closed: true }; }
+      if (action === 'close') { endpoint.session.close(); if (kind === 'discovery') await endpoint.session.closed; return { closed: true }; }
       throw Error(`Unknown introduction action ${action}`);
     }
     switch (job.kind) {
@@ -98,7 +103,7 @@ test('public host participant and peer transports serve independent application 
       case 'stop':
         stopping = true;
         for (const pair of sessions.values()) for (const endpoint of pair) assert.equal(endpoint.session.stats.closed, true);
-        for (const endpoint of introduced.values()) assert.equal(endpoint.session.stats.closed, true);
+        for (const endpoint of introduced.values()) assert.equal(endpoint.kind === 'discovery' ? endpoint.closed : endpoint.session.stats.closed, true);
         for (const endpoint of relays.values()) assert.equal(endpoint.inspect().closed, true);
         return { stopped: true, host: page?.hostTraffic };
       default: throw Error(`Unknown test bridge operation ${job.kind}`);

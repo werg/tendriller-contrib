@@ -49,7 +49,7 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
         }
       } finally { await close(); }
     } };
-    return { ready, messages, invitations: messages,
+    return { ready, messages, invitations: messages, notifications: messages,
       send: description => call('send', { description }, { signal }), close };
   };
   const relay = (channel, peerId, remotePeerId, createPeerRelay, signal) => {
@@ -69,8 +69,9 @@ export function createHostedFixture(base, { createParticipantTransport, createPa
       const participant = createParticipantTransport({ applicationId: session.applicationId,
         exchange: (body, { signal } = {}) => request('/api/peers/participant', { method: 'POST', body, signal }) });
       const peers = {
+        watchDiscovery: (peerId, { signal }) => socket('discovery', { peerId }, signal),
         discover: options => participant.request('discovery', 'read', {}, options),
-        advertise: (advertisement, { ttlMs, signal }) => participant.request('discovery', 'advertise', { advertisement, ttlMs }, { signal }),
+        advertise: (advertisement, { signal }) => participant.request('discovery', 'advertise', { advertisement }, { signal }),
         withdraw: (peerId, options) => participant.request('discovery', 'withdraw', { peerId }, options),
         invite: (peerId, invitation, options) => participant.request('ephemeral', 'invite', { peerId, ...invitation }, options),
         rendezvous: (channel, peerId, { signal }) => socket('rendezvous', { channel, peerId }, signal),

@@ -104,3 +104,69 @@ test('rendezvous preserves host-assigned roles and endpoint identities when the 
   assert.equal(pair.closed(), true);
   assert.deepEqual(pair.types, ['offer', 'answer']);
 });
+
+test('hosted discovery bridges ready and changed through one owned receive-only socket', async t => {
+  const actions = [], values = [{ type: 'ready' }, { type: 'changed' }];
+  let finishPending;
+  t.mock.method(globalThis, 'fetch', async (input, options) => {
+    const path = new URL(input).pathname, body = JSON.parse(options.body);
+    const action = path.split('/').at(-1); actions.push(action);
+    assert.match(path, /^\/introductions\/discovery\//u);
+    if (action === 'open') { assert.deepEqual(body, { peerId: 'local-peer' }); return Response.json({ id: 'discovery-1' }); }
+    assert.equal(body.id, 'discovery-1');
+    if (action === 'ready') return Response.json({ ready: true });
+    if (action === 'next') return values.length ? Response.json(values.shift()) : new Promise(resolve => { finishPending = resolve; });
+    assert.equal(action, 'close'); finishPending?.(Response.json(null)); return Response.json({ closed: true });
+  });
+  const host = createHostedFixture('https://test.invalid', participantApi);
+  const { peers } = host.createParticipationPorts({ applicationId: 'test', deviceId: 'local-peer' }, {
+    createPeerIntroductions: value => value,
+  });
+  const socket = peers.watchDiscovery('local-peer', { signal: new AbortController().signal });
+  assert.equal(socket.notifications, socket.messages);
+  await socket.ready;
+  const iterator = socket.notifications[Symbol.asyncIterator]();
+  assert.deepEqual(await iterator.next(), { done: false, value: { type: 'ready' } });
+  assert.deepEqual(await iterator.next(), { done: false, value: { type: 'changed' } });
+  const pending = iterator.next();
+  await new Promise(resolve => setImmediate(resolve));
+  await socket.close();
+  assert.deepEqual(await pending, { done: true, value: undefined });
+  await iterator.return(); await host.drainIntroductions();
+  assert.deepEqual(actions, ['open', 'ready', 'next', 'next', 'next', 'close']);
+});
+
+test('discovery abort retires a socket even when opening completes after cancellation', async t => {
+  const actions = [];
+  let finishOpen;
+  t.mock.method(globalThis, 'fetch', async (input, options) => {
+    options.signal?.throwIfAborted();
+    const action = new URL(input).pathname.split('/').at(-1); actions.push(action);
+    if (action === 'open') return new Promise(resolve => { finishOpen = resolve; });
+    assert.equal(action, 'close');
+    assert.deepEqual(JSON.parse(options.body), { id: 'late-discovery' });
+    return Response.json({ closed: true });
+  });
+  const host = createHostedFixture('https://test.invalid', participantApi);
+  const { peers } = host.createParticipationPorts({ applicationId: 'test', deviceId: 'peer' }, { createPeerIntroductions: value => value });
+  const stop = new AbortController(), watcher = peers.watchDiscovery('peer', { signal: stop.signal });
+  stop.abort(new Error('discovery owner stopped'));
+  finishOpen(Response.json({ id: 'late-discovery' }));
+  await assert.rejects(watcher.ready, /discovery owner stopped/);
+  await host.drainIntroductions();
+  assert.deepEqual(actions, ['open', 'close']);
+});
+
+test('hosted discovery advertisements contain no TTL or renewal fields', async t => {
+  t.mock.method(globalThis, 'fetch', async (_input, options) => {
+    const envelope = JSON.parse(options.body);
+    assert.equal(envelope.facet, 'discovery'); assert.equal(envelope.action, 'advertise');
+    assert.deepEqual(envelope.payload, { advertisement: { peerId: 'peer', storageId: 'store', routes: [] } });
+    return Response.json({ ...envelope, payload: { accepted: true } });
+  });
+  const host = createHostedFixture('https://test.invalid', participantApi);
+  const { peers } = host.createParticipationPorts({ applicationId: 'test', deviceId: 'peer' }, { createPeerIntroductions: value => value });
+  assert.deepEqual(await peers.advertise({ peerId: 'peer', storageId: 'store', routes: [] }, {
+    signal: new AbortController().signal,
+  }), { accepted: true });
+});
