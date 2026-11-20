@@ -396,12 +396,16 @@ async function renderCaptured(taskId = selectedTask) {
   // Paint against the candidate without changing the post target. A paint
   // failure (including local draft storage errors) must not retarget a message.
   const previous = snapshot;
+  const previousThreadTitle = $('#thread-title').textContent;
+  const previousMessages = [...$('#messages').childNodes];
   snapshot = current;
   try {
     $('#revision').textContent = `Selected history ${current.revision.generation.slice(0, 10)}`;
     paint(current.value, taskId);
   } catch (error) {
     snapshot = previous;
+    $('#thread-title').textContent = previousThreadTitle;
+    $('#messages').replaceChildren(...previousMessages);
     conversationReady = false;
     $('#message-submit').disabled = true;
     throw error;
