@@ -8,7 +8,7 @@ import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
 import { createPeerIntroductions, createPeerRelay } from './peer-generation-host-introductions.mjs';
 import { runPeerGenerationScenario } from './peer-generation-scenario.mjs';
 import { createHostedFixture } from './peer-generation-host-client.mjs';
-import { qualifyParticipation } from './peer-generation-participation.mjs';
+import { qualifyParticipation, waitParticipation } from './peer-generation-participation.mjs';
 
 const host = createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE, participantProtocol);
 const connections = [], rawConnections = [];
@@ -54,14 +54,20 @@ const connectSessions = async (a, b) => {
 try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions, createControl: host.createControl,
     qualifyParticipation: options => qualifyParticipation({ ...options, ports, copyPrefix: connectSessions, graceMs: 3000,
-      async qualifyTransport({ coordinator, follower, secondary }) {
+      async qualifyTransport({ coordinator, follower, primary, secondary }) {
         const generation = follower.status.generation, before = rawConnections.length;
-        await host.cutRelays();
-        const deadline = performance.now() + 15_000;
-        while (rawConnections.length <= before || !secondary.status.connectedPeers.includes(coordinator.deviceId)) {
-          assert.ok(performance.now() < deadline, 'Owned relay reconnection timed out');
-          await new Promise(resolve => setTimeout(resolve, 10));
-        }
+        const signal = AbortSignal.timeout(15_000);
+        const lost = Promise.all([
+          waitParticipation(primary, value => !value.connectedPeers.includes(follower.deviceId), signal),
+          waitParticipation(secondary, value => !value.connectedPeers.includes(coordinator.deviceId), signal),
+        ]);
+        void lost.catch(() => {});
+        await host.cutRelays(); await lost;
+        await Promise.all([
+          waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId), signal),
+          waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId), signal),
+        ]);
+        assert.ok(rawConnections.length > before, 'The relay cut must establish a new physical connection');
         assert.equal(follower.status.generation, generation, 'A transient relay loss must reconnect within grace');
         ownedReconnect = { owner: 'application-session', physicalLinksCut: true, reconnected: true,
           sameGeneration: true, identity: follower.deviceId, beforeConnections: before, afterConnections: rawConnections.length };

@@ -211,7 +211,6 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
       waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId)),
       waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId)),
     ]);
-    await qualifyTransport({ coordinator, follower, primary, secondary });
     stage = 'commands-during-host-outage';
     await post(follower, 'controller-established');
     await waitRevision(coordinator, follower.revision);
@@ -241,6 +240,11 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     const after = await host.traffic();
     assert.deepEqual(after, before, 'Ordinary controller-owned work must not contact the host');
     await host.block(false);
+    // Deliberate link failure has its own discovery/reconnect traffic. Exercise
+    // it after the unchanged-traffic workload, before coordinator removal, so
+    // queued fault recovery is not mislabeled as ordinary command traffic.
+    stage = 'qualifying-transport-reconnection';
+    await qualifyTransport({ coordinator, follower, primary, secondary });
     const previousGeneration = follower.revision.generation, retained = follower.revision.point;
     stage = 'automatic-recovery-after-grace';
     const disconnectedAt = performance.now();
