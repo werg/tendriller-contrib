@@ -52,6 +52,19 @@ Copying a page URL does not necessarily grant access, but URLs can still disclos
 
 ## Transfer drafts deliberately
 
+For a Tendriller browser, follow the current host's explicit device enrollment
+procedure in [connected-app setup](../../guides/connected-app-setup.md). Account
+sign-in, an approved assistant connection and a copied page link do not enroll
+that browser's signer. Check the session in the browser actually being used;
+sign-in elsewhere does not authenticate an agent-controlled browser.
+
+A smoother reviewed-pairing screen remains separate protocol work until the
+host implements it. It would need proof of possession of the proposed device
+key, a bounded request tied to the exact account, application, origin and rights,
+and an observed signed-control commitment. Resume a lost reply with the same
+request and retained browser key; do not silently grant rights, replace an
+identity or present a proposed pairing as connected.
+
 Authoritative accepted progress can be reloaded through an authorized read. An unsent local draft has different ownership and durability. Let the person choose whether to keep it local, transfer it through an authorized application mechanism, or export it for their own recovery. Do not imply that copying the page URL copied the draft.
 
 A transfer record, if implemented, should name the source task and revision, intended recipient context, exact draft snapshot, and transfer state. An accepted transfer receipt should not delete a newer draft subsequently edited on the source. Preserve both when they diverge and offer a comparison. Ordinary shared state is unsuitable for a draft that other page readers must not see; private transfer requires an appropriate authorized storage design.

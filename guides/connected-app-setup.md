@@ -96,6 +96,31 @@ Keep credentials and private stores out of published files. Use the current
 host's actual enrollment and consent procedures; cookbooks cannot grant those
 permissions or replace them with payload labels.
 
+### Keep the three approval checkpoints distinct
+
+| Checkpoint | What it establishes | What still needs evidence |
+| --- | --- | --- |
+| Owner sign-in and claim | The intended account owns the already-prepared page. | The browser device has its own retained signer and an approved application grant. |
+| Assistant permission review | The account approves the displayed queries, commands and optional events. | The native participant is running, its adapter is online and a requested tool round trip succeeds. |
+| Browser device enrollment | An authorized administrator commits the exact reviewed public key and rights. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
+
+A successful sign-in in the person's browser does not authenticate an agent's
+separate browser session. Inspect the actual session being used; when it needs
+login, let the owner complete that sign-in there. Reuse the saved application,
+device store and operation references after each checkpoint instead of creating
+a second page or signer when a review is delayed.
+
+Core's [account-bound setup and reviewed pairing assessment](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
+tracks possible improvements to email-based creation and copied-key enrollment.
+Those interfaces remain **design work**, not deployed capabilities. Account-bound
+creation needs a scoped, durable operation record that can recover one page and
+its setup authority after a lost response. Reviewed pairing needs a bounded
+request with proof of key possession, exact account/origin/application/rights
+binding, owner review and a retained signed-control outcome. Neither an OAuth
+profile ID nor an owner-looking payload grants these authorities. Continue using
+the current host's supported route until implemented interfaces and their
+failure/reload tests are qualified; do not call proposed tools or widen consent.
+
 ## Verify the connected result and state its lifetime
 
 Verify the signed publication receipt, a real browser command observed by the
@@ -112,6 +137,21 @@ turns. Promise unattended replies only after the actual host's supported wake
 path passes the [two-probe rehearsal](../cookbooks/connect-resuming-agent/COOKBOOK.md).
 Otherwise expose the on-demand or manual handoff described in
 [assistant connection choices](../cookbooks/connect-chatgpt/COOKBOOK.md).
+
+Verify a private checkpoint exists and can be read before promising resume. It
+must preserve the setup handle, device store, exact pending operation references
+and installed composition; report the actual storage and process lifetime of
+the execution environment. Keep the checkpoint outside authored UI, public
+archives and version control, and do not copy it into a second simultaneous
+store owner. A preview requires a working preview route in that environment;
+a local URL alone does not make the page reachable by the person.
+
+With the current starter, the assistant adapter runs on the same owned native
+participant. Close the owned supervisor when that process stops; a CLI or page
+attachment detaches from the owner and must not shut down sibling clients.
+Optional event forwarding is an explicit reviewed choice, separate from ordinary
+queries and commands. It creates neither a subscription nor a future chat turn,
+and it does not keep the native process alive after its environment ends.
 
 Historical source pins and evidence labels below retain their original scope.
 They neither certify these newer setup contracts nor substitute for deployment,
