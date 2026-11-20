@@ -2,6 +2,7 @@
 // through the actual hosted relay after every direct introduction is refused.
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
+import { once } from 'node:events';
 import { readFile, writeFile } from 'node:fs/promises';
 import * as participantProtocol from '@chronolog/peer-session';
 import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
@@ -11,12 +12,13 @@ import { createHostedFixture } from './peer-generation-host-client.mjs';
 import { qualifyParticipation, waitParticipation } from './peer-generation-participation.mjs';
 
 const host = createHostedFixture(process.env.PEER_GENERATION_HOST_BRIDGE, participantProtocol);
-const connections = [], rawConnections = [];
+const connections = [], rawConnections = [], openedListeners = new Set();
 let directAttempts = 0, ownedReconnect;
 const openDirectConnection = async () => { directAttempts++; throw Error('QUALIFICATION_DIRECT_UNAVAILABLE'); };
 const openRelayConnection = async ({ relay, signal }) => {
   const connection = await openWebSocketConnection(relay, { ready: relay.ready, signal });
   rawConnections.push(connection);
+  for (const notify of openedListeners) notify();
   return connection;
 };
 const ports = session => host.createParticipationPorts(session,
@@ -57,19 +59,30 @@ try {
       async qualifyTransport({ coordinator, follower, primary, secondary }) {
         const generation = follower.status.generation, before = rawConnections.length;
         const signal = AbortSignal.timeout(15_000);
-        const lost = Promise.all([
-          waitParticipation(primary, value => !value.connectedPeers.includes(follower.deviceId), signal),
-          waitParticipation(secondary, value => !value.connectedPeers.includes(coordinator.deviceId), signal),
-        ]);
-        void lost.catch(() => {});
-        await host.cutRelays(); await lost;
+        const previous = rawConnections.filter(connection => !connection.signal.aborted);
+        assert.ok(previous.length >= 2, 'The fault needs both live relay endpoints');
+        const closed = Promise.all(previous.map(connection => connection.signal.aborted
+          ? Promise.resolve() : once(connection.signal, 'abort', { signal })));
+        void closed.catch(() => {});
+        const opened = new Promise((resolve, reject) => {
+          const cleanup = () => { openedListeners.delete(notify); signal.removeEventListener('abort', abort); };
+          const notify = () => { if (rawConnections.length > before) { cleanup(); resolve(); } };
+          const abort = () => { cleanup(); reject(signal.reason); };
+          openedListeners.add(notify); signal.addEventListener('abort', abort, { once: true });
+        });
+        void opened.catch(() => {});
+        await host.cutRelays(); await closed; await opened;
+        // Status publication may coalesce a short disconnected interval. The
+        // old physical endpoints must close; a coherent read then verifies the
+        // authenticated replacement route without adding another domain write.
+        await follower.query('conversation', {}, { signal });
         await Promise.all([
           waitParticipation(primary, value => value.phase === 'coordinating' && value.connectedPeers.includes(follower.deviceId), signal),
           waitParticipation(secondary, value => value.phase === 'following' && value.connectedPeers.includes(coordinator.deviceId), signal),
         ]);
-        assert.ok(rawConnections.length > before, 'The relay cut must establish a new physical connection');
+        assert.ok(rawConnections.length >= before + 2, 'Both physical relay endpoints must reopen');
         assert.equal(follower.status.generation, generation, 'A transient relay loss must reconnect within grace');
-        ownedReconnect = { owner: 'application-session', physicalLinksCut: true, reconnected: true,
+        ownedReconnect = { owner: 'application-session', physicalLinksCut: true, reconnected: true, coherentRead: true,
           sameGeneration: true, identity: follower.deviceId, beforeConnections: before, afterConnections: rawConnections.length };
       },
       inspectTransport: async () => { await host.drainIntroductions();
