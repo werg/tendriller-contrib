@@ -96,8 +96,8 @@ try {
     await board.evaluate(() => { Storage.prototype.getItem = globalThis.fixtureOriginalGetItem; });
     await board.locator('#refresh-workspace').click();
     await board.waitForFunction(() => !document.querySelector('#message-submit').disabled);
-    await card(board).getByRole('button', { name: 'Open conversation', exact: true }).click();
-    assert.equal(await board.locator('#thread-title').textContent(), previousThread);
+    await card(board).getByRole('button', { name: /^(Open conversation|Selected conversation)$/ }).click();
+    await board.waitForFunction(title => document.querySelector('#thread-title').textContent === title, previousThread);
     await contribution.evaluate(element => { element.focus(); element.setSelectionRange(7, 19); });
     await card(discussion).getByRole('button', { name: 'Open conversation', exact: true }).click();
     await discussion.locator('#message').fill('A remote discussion update.'); await discussion.locator('#message-submit').click();
