@@ -193,6 +193,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
   observerControl, host, ports, copyPrefix, inspectTransport = async () => ({}),
   graceMs = 150, qualifyTransport = async () => {} }) {
   const controllers = [], statuses = [];
+  const recoveryTimeout = () => AbortSignal.timeout(graceMs + 30_000);
   let stage = 'establishing-owned-connections';
   const start = (session, control) => {
     const participation = session.participate({ control, ...ports(session), recovery: { graceMs, freshnessMs: 300_000 },
@@ -250,7 +251,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     const disconnectedAt = performance.now();
     await coordinator.close();
     const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration,
-      AbortSignal.timeout(graceMs + 30_000));
+      recoveryTimeout());
     const recoveredAt = performance.now();
     const automaticAuthority = await followerControl.application();
     assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);
@@ -270,7 +271,7 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     await secondary.close(); await follower.close();
     stage = 'approval-for-unknown-freshness';
     const cold = start(observer, observerControl);
-    const approval = await waitParticipation(cold, value => value.phase === 'approval-required');
+    const approval = await waitParticipation(cold, value => value.phase === 'approval-required', recoveryTimeout());
     assert.equal(approval.recovery.reason, 'freshness-unknown');
     assert.equal(approval.recovery.ageMs, null);
     assert.equal((await observerControl.application()).generations.at(-1).id, observedGeneration,

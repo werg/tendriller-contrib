@@ -57,6 +57,7 @@ const introductions = host ? await import('./peer-generation-host-introductions.
 try {
   await runPeerGenerationScenario({ path: process.argv[2], connectSessions,
     qualifyParticipation: options => qualifyParticipation({ ...options,
+      graceMs: host ? 30_000 : 150,
       ports: host ? session => host.createParticipationPorts(session, { openDirectConnection: openConnection, createPeerIntroductions: introductions.createPeerIntroductions, createPeerRelay: introductions.createPeerRelay,
         openRelayConnection: async () => { throw Error('QUALIFICATION_EXPECTED_DIRECT_ROUTE'); } }) : network.ports,
       copyPrefix: connectSessions, inspectTransport: host ? async () => { await host.drainIntroductions();
