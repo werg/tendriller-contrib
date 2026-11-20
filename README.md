@@ -23,10 +23,13 @@ external work; shared data does not make that work exactly once.
 
 For an app request, start with core's [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
 and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md).
-**This route depends on [core PR #60](https://github.com/werg/tendriller/pull/60)
-and a release containing its onboarding and starter additions.** An open PR or
-source link does not establish that a running host has them; check the requested
-origin's service descriptor and use that guide's exact compatible artifacts.
+Check the requested origin's service descriptor and use its deployed guide and
+exact compatible artifacts. In an MCP chat, start with `tendril_guide` and the
+[canonical MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md).
+An empty list means no assistant-connected apps, not a missing plugin. New apps
+use the supplied starter and HTTP creation route; existing apps connect through
+their running participant and owner approval. Follow the same service origin,
+including staging, rather than copying setup instructions from historical evidence.
 
 Import or adapt the actual [first-app source](https://github.com/werg/tendriller/tree/master/docs/tutorial)
 from the host's `/downloads/tendriller-first-app.tgz`. Keep its session/Worker

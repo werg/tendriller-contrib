@@ -38,6 +38,24 @@ enrolled signers or explicitly verified delegation, fixed contribution slots and
 fenced claims before external I/O. A configured provider route can be available
 without an active reasoning turn.
 
+## Start with the current service guidance
+
+For the service's account-linked MCP, call `tendril_guide` with `topic: "start"`.
+It supplies the maintained [MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md)
+without a browsing tool. Use its returned service origin throughout, including
+staging. For a new app, request `topic: "build"` and check the agent's native
+runtime and retained-process capabilities before following the starter and HTTP
+creation route. For an existing app, request `topic: "connect"` and use that
+participant's real permission-review URL. An empty `list_tendrils` lists no
+assistant-connected apps; it does not imply a missing plugin or prevent creation.
+The core CLI's `guide --server ORIGIN` and public discovery share the same
+navigation. Keep setup procedures there rather than copying them into cookbooks.
+
+The source-pinned Node integration examples and qualification notes below are
+records of that optional harness, not an instruction to deploy a second server
+for the normal Cloudflare endpoint. Ordinary OAuth-client calls do not require
+registering another independent agent binding.
+
 ## Choose the route by the desired interaction
 
 | Route | What the person can do | What must be available | Limitation to display |

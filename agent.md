@@ -1,5 +1,7 @@
 # Tendriller cookbook reading index
 
+For initial setup, follow the target service’s current [build guide](https://tendriller.dev/docs/BUILD_AN_APP.md) and [MCP agent workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md). In MCP, call tendril_guide first. An empty list is not a missing plugin: build through the supplied native starter and HTTP creation route, or connect the existing participant. Keep the requested origin, including staging. These live guides own setup; source-pinned evidence below records only the tested historical composition.
+
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
 Use the [common application session](guides/application-primitives.md): one command/query/event API and one journal across native and browser peers. Storage, transport and engine capabilities define roles. The host is an explicit filtered control/publication participant; ordinary application work travels between peers. applied() reports execution in the selected history; shared() separately observes retained coverage on another peer. Explicit recovery may abandon a recent suffix, including previously applied work. Preserve original identity on exact retry, reread after recovery and deliberately link any new reapplication.
