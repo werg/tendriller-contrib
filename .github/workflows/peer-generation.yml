@@ -2,6 +2,7 @@ name: Independent peer-generation consumer
 on:
   push:
     paths:
+      - 'distribution/download-core-release.mjs'
       - '.github/workflows/peer-generation.yml'
       - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
       - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
@@ -12,6 +13,7 @@ on:
       - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
   pull_request:
     paths:
+      - 'distribution/download-core-release.mjs'
       - '.github/workflows/peer-generation.yml'
       - 'cookbooks/run-a-peer-application/checks/*peer-generation*'
       - 'cookbooks/run-a-peer-application/checks/*peer-composition*'

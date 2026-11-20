@@ -251,6 +251,33 @@ started. This qualifies the actual packed host with WebSocket transport,
 control-only outage/reconnection, recovery and publication checks. Native RTC,
 browser, deployed OAuth and Internet/provider behavior remain separate gates.
 
+The repeated hosted qualification passed twice from clean contrib
+`8217aea57dd706cdfae126e9ca933825612156c7`, consuming SDK/engine bytes downloaded
+from the public `source-722d6725fc5d659f77f844642f523125f1ef271c` release.
+`distribution/download-core-release.mjs` verifies manifest URLs, hashes, source,
+composition, provenance and the Chronolog source before retaining those bytes;
+companion workflows reuse them without a core checkout or rebuild. SQL/RTC
+session variants still require their declared Chronolog capability builds.
+The retained graph's composition is
+`87ba18a4108436a4fdd03b169251430208e852329497ec090fd525c903d0618d`.
+
+The fixture separates deliberate relay failure from the ordinary-command
+measurement. The unchanged-traffic assertion remains exact. Reconnection waits
+on actual old-connection aborts and replacement openings, verifies a coherent
+read in the same generation, and requires both participant roles to be healthy.
+Hosted startup declares a 30-second reconnect grace covering the two 15-second
+discovery/connection opening budgets; both recovery observation deadlines allow
+that grace plus a bounded 30-second response margin. No 3-second recovery SLA is
+claimed by these later runs. Evidence is in
+`/home/werg/.local/share/tendriller/contrib-hosted-8217aea-public-r1` and
+`/home/werg/.local/share/tendriller/contrib-hosted-8217aea-public-r2`, each retaining
+`peers/{report,summary}.json`, `host-artifacts.json` and its dependency lock.
+Both runs applied 33 commands during the control-only outage with unchanged host
+traffic, closed the old physical connections, observed a replacement opening,
+and passed automatic and explicitly approved recovery. These are native
+workerd/WebSocket checks; browser, RTC and deployed-provider evidence retain
+their separate scope.
+
 ## Forced WebSocket relay and browser relay
 
 Run the same application/recovery scenario with direct establishment deliberately

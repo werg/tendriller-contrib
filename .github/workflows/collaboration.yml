@@ -2,11 +2,13 @@ name: Exact multi-participant composition
 on:
   push:
     paths:
+      - 'distribution/download-core-release.mjs'
       - '.github/workflows/collaboration.yml'
       - 'cookbooks/coordinate-participants/**'
       - 'cookbooks/share-live-signals/snippets/live-run.mjs'
   pull_request:
     paths:
+      - 'distribution/download-core-release.mjs'
       - '.github/workflows/collaboration.yml'
       - 'cookbooks/coordinate-participants/**'
       - 'cookbooks/share-live-signals/snippets/live-run.mjs'

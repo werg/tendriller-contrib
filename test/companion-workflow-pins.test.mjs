@@ -18,6 +18,7 @@ for (const name of ['peer-generation', 'collaboration']) {
 test('companion consumers reuse the published core graph without checking out or rebuilding core', () => {
   for (const name of ['peer-generation', 'collaboration']) {
     const workflow = readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8');
+    assert.equal(workflow.split("- 'distribution/download-core-release.mjs'").length - 1, 2, 'Both push and PR qualification must observe downloader changes');
     assert.match(workflow, /node distribution\/download-core-release.mjs/);
     assert.match(workflow, /--chronolog-source "\$CHRONOLOG_REF"/);
     assert.match(workflow, /\.tendriller-build\/dist\/manifest.json/);
