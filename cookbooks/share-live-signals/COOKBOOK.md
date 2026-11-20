@@ -41,11 +41,20 @@ application backend.
 
 `all` preserves the queued order of distinct received messages until the bounded
 consumer overflows or its channel ends. It is not an offline queue and does not
-promise every sent message arrives. `latest` deliberately coalesces pending
-values from the same author/session/topic and ignores reordered older values,
-even after the newest value has been consumed. Use it only when replacement is meaningful.
-One topic should not mix independent entities that need separate pending values;
-send a small complete snapshot or choose separate topics.
+promise every sent message arrives. In the current public peer-session API,
+`latest` deliberately coalesces pending values only within the same authenticated
+author, session, topic and signed stream scope. The scope includes the stream ID,
+endpoint incarnation and optional target. It ignores reordered older values even
+after the newest value has been consumed. Give independent runs distinct
+`streamId` values and select `streams` in the subscription: selection happens
+before coalescing. A payload's `runId` alone cannot establish this identity.
+
+The default peer signal policy reaches connected neighbors. A bootstrap may
+explicitly select bounded application delivery for multi-hop peers; that policy
+does not change the channel into a durable log. The current
+[multi-participant consumer](../coordinate-participants/checks/README.md) exercises
+two same-topic runs over that authenticated application route. Earlier standalone
+signal evidence retains the scope of its pinned package.
 
 For chunked previews, a missing chunk means the preview is incomplete. Include a
 stream/request ID and chunk index, detect gaps, and replace the preview from the
@@ -207,9 +216,22 @@ const observing = observeLiveRun(tendril.signals, {
 });
 
 // The authorized producer sends independent live observations.
-await signals.send('progress', { runId, completed: 300, total: 500 }, { ttlMs: 3000 });
-await signals.send('preview', { runId, text: completeCurrentPreview }, { ttlMs: 3000 });
+await signals.send('progress', { runId, completed: 300, total: 500 }, {
+  stream: { streamId: runId }, ttlMs: 3000,
+});
+await signals.send('preview', { runId, text: completeCurrentPreview }, {
+  stream: { streamId: runId }, ttlMs: 3000,
+});
 ```
+
+The run is a signed stream scope, not only a payload label. The helper selects
+`streams: [{ authorId: publisher, streamId: runId }]` before coalescing. Two runs
+from the same signing device can then use the same progress topic independently.
+An attached session owner supplies its endpoint ID and incarnation; applications
+must not claim another endpoint by filling those fields themselves. Optional
+endpoint selection prevents stale output from a previous attachment appearing in
+the current view. This specimen requires the stream-aware public signal contract;
+use the exact compatible package from the qualification manifest.
 
 Complete preview snapshots use `latest`; losing an intermediate snapshot does
 not create a hidden gap in concatenated text. The specimen bounds text to 8,192

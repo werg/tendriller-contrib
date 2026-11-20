@@ -4,14 +4,32 @@ Find an approach for what you want to build, understand the consequential choice
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
 
+## Build a workspace with people and independent agents
+
+Start with [Coordinate people, views and agent runs](cookbooks/coordinate-participants/COOKBOOK.md)
+for a shared application with several tabs, devices or agents. Its board and
+discussion views consume the maintained optional `@tendriller/core/collaboration`
+module: one session owner per retained browser profile, independent local drafts,
+addressed requests, exclusive claims, frozen contribution slots, guarded synthesis
+and explicit recovery. The reference includes browser owner/bootstrap templates
+and an independent six-signer [public-artifact conformance runner](cookbooks/coordinate-participants/checks/README.md).
+
+The reference's native evidence and the browser owner's qualification are
+separate records. An agent's label, a connected route and active reasoning are
+separate facts. Choose explicit claim and completion policies before starting
+external work; shared data does not make that work exactly once.
+
 ## Build and reuse the native first app
 
 For an app request, start with core's [Build an app](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
 and [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md).
-**This route depends on [core PR #60](https://github.com/werg/tendriller/pull/60)
-and a release containing its onboarding and starter additions.** An open PR or
-source link does not establish that a running host has them; check the requested
-origin's service descriptor and use that guide's exact compatible artifacts.
+Check the requested origin's service descriptor and use its deployed guide and
+exact compatible artifacts. In an MCP chat, start with `tendril_guide` and the
+[canonical MCP workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md).
+An empty list means no assistant-connected apps, not a missing plugin. New apps
+use the supplied starter and HTTP creation route; existing apps connect through
+their running participant and owner approval. Follow the same service origin,
+including staging, rather than copying setup instructions from historical evidence.
 
 Import or adapt the actual [first-app source](https://github.com/werg/tendriller/tree/master/docs/tutorial)
 from the host's `/downloads/tendriller-first-app.tgz`. Keep its session/Worker
@@ -128,6 +146,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 ### Coordinate people and tools
 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
+- [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
 
 ### Decide and act
 

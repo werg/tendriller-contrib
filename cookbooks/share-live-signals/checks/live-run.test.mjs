@@ -4,7 +4,7 @@ import { createLiveRun, observeAttention, observeLiveRun } from '../snippets/liv
 
 const selection = { runId: 'import-1', publisher: 'authorized-worker' };
 const event = (topic, payload, expiresAtMs = 3000, authorId = selection.publisher) => ({
-  topic, payload: { runId: selection.runId, ...payload }, expiresAtMs, authorId,
+  topic, stream: { streamId: selection.runId }, payload: { runId: selection.runId, ...payload }, expiresAtMs, authorId,
 });
 
 test('progress and complete previews have separate expiry and require no durable backend', () => {
@@ -35,6 +35,7 @@ test('a live observer coalesces replaceable values, expires without more traffic
   const values = [];
   const source = { subscribe(options) {
     assert.deepEqual(options.topics, ['progress', 'preview']); assert.equal(options.mode, 'latest');
+    assert.deepEqual(options.streams, [{ authorId: selection.publisher, streamId: selection.runId }]);
     return { async *[Symbol.asyncIterator]() {
       yield event('progress', { completed: 3, total: null }, 2000);
       await new Promise(resolve => { finish = resolve; });
@@ -55,6 +56,7 @@ test('distinct attention suggestions honor sender, target and local follow choic
   let follow = true;
   const source = { subscribe(options) {
     assert.equal(options.mode, 'all');
+    assert.deepEqual(options.streams, [{ authorId: selection.publisher, streamId: selection.runId }]);
     return { async *[Symbol.asyncIterator]() {
       yield event('attention', { targetId: 'summary' });
       yield event('attention', { targetId: 'summary' }, 3000, 'unselected-worker');
@@ -68,4 +70,16 @@ test('distinct attention suggestions honor sender, target and local follow choic
   await observeAttention(source, { ...selection, allowedTargets: new Set(['summary', 'details']),
     following: () => follow, highlight: value => highlighted.push(value) });
   assert.deepEqual(highlighted, ['summary', 'details']);
+});
+
+test('signed stream and endpoint identity cannot be replaced by a matching payload label', () => {
+  const run = createLiveRun({ ...selection, endpointId: 'tool-a', endpointIncarnation: 'incarnation-2' });
+  const valid = { ...event('preview', { text: 'Current' }),
+    stream: { streamId: selection.runId, endpointId: 'tool-a', endpointIncarnation: 'incarnation-2' } };
+  run.update(valid, 1000);
+  for (const stream of [undefined, { ...valid.stream, streamId: 'another-run' },
+    { ...valid.stream, endpointId: 'tool-b' }, { ...valid.stream, endpointIncarnation: 'incarnation-1' }]) {
+    run.update({ ...valid, stream, payload: { ...valid.payload, text: 'Spoofed' } }, 1000);
+  }
+  assert.equal(run.snapshot(1000).preview.text, 'Current');
 });

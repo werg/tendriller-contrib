@@ -1,10 +1,14 @@
 # Tendriller cookbook reading index
 
+For initial setup, follow the target service’s current [build guide](https://tendriller.dev/docs/BUILD_AN_APP.md) and [MCP agent workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md). In MCP, call tendril_guide first. An empty list is not a missing plugin: build through the supplied native starter and HTTP creation route, or connect the existing participant. Keep the requested origin, including staging. These live guides own setup; source-pinned evidence below records only the tested historical composition.
+
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
 Use the [common application session](guides/application-primitives.md): one command/query/event API and one journal across native and browser peers. Storage, transport and engine capabilities define roles. The host is an explicit filtered control/publication participant; ordinary application work travels between peers. applied() reports execution in the selected history; shared() separately observes retained coverage on another peer. Explicit recovery may abandon a recent suffix, including previously applied work. Preserve original identity on exact retry, reread after recovery and deliberately link any new reapplication.
 
 Keep author, sequencing, recovery, data membership, ownership and external-tool authority separate. Preserve verified requester provenance through effect journals; payload roles grant no private credentials. Irreversible work requires an explicitly configured protected checkpoint covering its prerequisites or a durable external-action service. Keep stable effect identities, authorization and reconciliation; reversible computation may follow an explicit rerun policy. Stronger guarantees are declared capabilities of the same application contract, not alternate runtime profiles.
+
+For multi-participant workspaces, start with [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md). Use maintained public owner, collaboration and view-reference primitives; the reference includes two authored layouts and exact-artifact native conformance. Labels and availability do not establish agent execution authority.
 
 The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses the public applied()/shared() contract directly. Executable examples install an explicitly supplied matching @chronolog/peer-session archive. The [qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md) preserves clean native RTC, SQL and hosted runs with exact source and artifact hashes. Browser ownership, SDK recovery orchestration and deployed operating limits require their own evidence. Historical reports retain their source-specific scope and do not define another supported session API.
 
@@ -34,6 +38,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 ### Coordinate people and tools
 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
+- [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
 
 ### Decide and act
 

@@ -149,6 +149,10 @@
       ]
     },
     {
+      "id": "coordinate-participants",
+      "sources": []
+    },
+    {
       "id": "detect-meaningful-changes",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js",

@@ -1,4 +1,7 @@
 // Domain declarations only. The signed schema and shared collective are core contracts.
+// Historical narrow SQL specimen, retained for its exact qualification. Its
+// application-local claims are not the current multi-participant architecture.
+// Use @tendriller/core/collaboration and ../../coordinate-participants/COOKBOOK.md.
 import { APPLICATION_COLLECTIVE_ID, defineApplication, defineCommand, defineQuery,
   emit, program, sqlStatement } from '@chronolog/peer-session';
 import { conversation } from './peer-conversation.mjs';

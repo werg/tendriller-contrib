@@ -1,6 +1,6 @@
 // Page-owned example: one selected producer reports one active run. These
 // functions use only the public Signals port, with no durable backend or log.
-export function createLiveRun({ runId, publisher }) {
+export function createLiveRun({ runId, publisher, endpointId, endpointIncarnation }) {
   if (typeof runId !== 'string' || !runId || typeof publisher !== 'string' || !publisher) {
     throw new TypeError('A run and its authorized publisher identity are required');
   }
@@ -8,7 +8,10 @@ export function createLiveRun({ runId, publisher }) {
   return {
     update(event, now) {
       const payload = event.payload;
-      if (event.authorId !== publisher || !payload || payload.runId !== runId ||
+      if (event.authorId !== publisher || event.stream?.streamId !== runId ||
+          endpointId !== undefined && event.stream.endpointId !== endpointId ||
+          endpointIncarnation !== undefined && event.stream.endpointIncarnation !== endpointIncarnation ||
+          !payload || payload.runId !== runId ||
           !Number.isFinite(event.expiresAtMs) || event.expiresAtMs <= now) return;
       if (event.topic === 'progress' && Number.isSafeInteger(payload.completed) && payload.completed >= 0 &&
           (payload.total === null || Number.isSafeInteger(payload.total) && payload.total > 0 && payload.completed <= payload.total)) {
@@ -42,7 +45,12 @@ export async function observeLiveRun(signals, { onChange, signal, now = Date.now
   };
   try {
     paint();
-    for await (const event of signals.subscribe({ topics: ['progress', 'preview'], mode: 'latest', signal })) {
+    // Select the signed stream before the channel coalesces pending values.
+    // Filtering only payload.runId here lets another run suppress this run.
+    for await (const event of signals.subscribe({ topics: ['progress', 'preview'], mode: 'latest',
+      streams: [{ authorId: selection.publisher, streamId: selection.runId,
+        ...(selection.endpointId === undefined ? {} : { endpointId: selection.endpointId }),
+        ...(selection.endpointIncarnation === undefined ? {} : { endpointIncarnation: selection.endpointIncarnation }) }], signal })) {
       if (signal?.aborted) break;
       run.update(event, now());
       paint();
@@ -54,10 +62,11 @@ export async function observeLiveRun(signals, { onChange, signal, now = Date.now
 
 /** Harmless attention suggestions: the receiving device retains follow control. */
 export async function observeAttention(signals, { runId, publisher, allowedTargets, following, highlight, signal }) {
-  for await (const event of signals.subscribe({ topics: ['attention'], mode: 'all', signal })) {
+  for await (const event of signals.subscribe({ topics: ['attention'], mode: 'all',
+    streams: [{ authorId: publisher, streamId: runId }], signal })) {
     if (signal?.aborted) break;
     const payload = event.payload;
-    if (event.authorId === publisher && payload?.runId === runId &&
+    if (event.authorId === publisher && event.stream?.streamId === runId && payload?.runId === runId &&
         typeof payload.targetId === 'string' && allowedTargets.has(payload.targetId) && following()) {
       highlight(payload.targetId);
     }

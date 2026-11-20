@@ -1,4 +1,7 @@
 // Domain-only events application. The public session owns storage, retry and recovery.
+// Historical narrow event-only specimen, retained for its exact qualification.
+// Multi-participant conversation and tasks use @tendriller/core/collaboration;
+// see ../../coordinate-participants/COOKBOOK.md for the maintained composition.
 import { defineApplication, defineCommand, defineQuery, emit, program } from '@chronolog/peer-session';
 
 function messageOf(event) {
