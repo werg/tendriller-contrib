@@ -232,6 +232,25 @@ checks grants and usable retained history itself. The gate exercises the same
 automatic and explicitly reviewed recoveries as the portable/native lane and
 requires every owned introduction socket to close.
 
+On 2026-11-20, `test:peer-host -- --transport websocket` passed from clean contrib
+source `0f45b4d54794a3c9bd007893df46f32265f57547` against the exact SDK and engine
+archives from clean core `722d6725fc5d659f77f844642f523125f1ef271c` and the clean
+`1e4e8406499f3aff0da988046103d0900ca2bd42` session archive recorded above. The
+bridge used the public `createPeerDiscoveryWatcher` over the actual workerd
+`page.discoverySocket(peerId)`, delivered notification iteration to the SDK,
+and observed three discovery subscriptions; watcher shutdown assertions passed.
+Discovery advertisements carry no TTL or renewal fields. Both companion
+workflows now default to that same immutable source pair.
+
+Evidence is in
+`/home/werg/.local/share/tendriller/contrib-hosted-discovery-722-1e4-npm1121`,
+including `host-artifacts.json`, the host dependency lock, and
+`peers/{report,summary}.json`. The run used Node 24.0.1 and an isolated npm
+11.21.3 installation; npm 11.3 failed during peer resolution before workerd
+started. This qualifies the actual packed host with WebSocket transport,
+control-only outage/reconnection, recovery and publication checks. Native RTC,
+browser, deployed OAuth and Internet/provider behavior remain separate gates.
+
 ## Forced WebSocket relay and browser relay
 
 Run the same application/recovery scenario with direct establishment deliberately
