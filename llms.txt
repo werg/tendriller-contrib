@@ -2,8 +2,7 @@
 
 > Adaptable reasoning for page-owned applications. No UI package or install graph.
 
-- [Current MCP setup workflow](https://tendriller.dev/docs/MCP_AGENT_GUIDE.md)
-- [Current build guide](https://tendriller.dev/docs/BUILD_AN_APP.md)
+- [Connected-app setup on the selected service](guides/connected-app-setup.md)
 - [Common application session](guides/application-primitives.md)
 - [Multi-participant reference](cookbooks/coordinate-participants/COOKBOOK.md)
 - [Exact-artifact collaboration checks](cookbooks/coordinate-participants/checks/README.md)

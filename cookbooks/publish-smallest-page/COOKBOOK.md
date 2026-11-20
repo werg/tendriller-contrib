@@ -49,21 +49,28 @@ and [session CLI](https://github.com/werg/tendriller/blob/master/docs/tools/CLI.
 for the actual operations. Historical `sources` above preserve provenance; they
 are not current executable fixtures.
 
-Inspect the service contract before creating the page. Save the returned
-administrative handle in private host storage and give the person the page URL.
-The intended human owner visibly signs in and claims the page. Explain its
-lifetime and any remaining claim step. The application bootstrap explicitly
-creates or resumes the signing device, establishes authorized membership and
-keys, and opens the same application definition used by other peers. Page
-ownership, a host token and application signing authority are distinct roles.
+Follow [connected-app setup](../../guides/connected-app-setup.md) to check the
+selected host's creation readiness before installation and obtain its matching
+release composition. Save the returned administrative handle privately. The
+application bootstrap creates or resumes the signing device, establishes initial
+authority and keys, and opens the same application definition used by other peers.
+Prepare and publish the first signed UI and start the native participant before
+giving the intended owner the ready page and any permission-review URL. Their
+sign-in adopts the prepared app; do not wait for a “claimed” reply before doing
+that work. Browser enrollment remains a separate reviewed grant. Explain the
+page's lifetime and any remaining owner action. Page ownership, a host token and
+application signing authority are distinct roles.
 
 For a page promising agent responses, connect the agent's own session and test a
-real command through its accepted result and correlated reply. End the agent's
-turn, submit another request, and verify the deployment's actual wake/resume
-mechanism. A published graph, open transport or accepted command does not prove
-that a receiver will run. A dashboard can state its producer freshness without
-claiming conversational readiness. Publication is a signed code operation; it
-does not wait for an agent listener or manufacture a browser-health receipt.
+real command through its accepted result and correlated reply. State whether
+the person invokes the connected chat or the host supports unattended replies.
+For the latter, end the agent's turn, submit another request, and verify the
+actual wake/resume mechanism twice. A published graph, open transport or
+accepted command does not prove that a receiver will run. Offer the explicit
+on-demand handoff if automatic wake is unavailable. A dashboard can state its
+producer freshness without claiming conversational readiness. Publication is a
+signed code operation; it does not wait for an agent listener or manufacture a
+browser-health receipt.
 
 Verify original signer provenance and application permissions before invoking
 private tools. Text such as `role: "owner"` grants no authority. Keep host tokens,
@@ -95,7 +102,7 @@ A draft-aware update should offer a clear choice about applying a new publicatio
 | Keyboard-only completion on a narrow screen | Input, submission, status, and result remain reachable and readable. |
 | Disconnect before or after submission | The request has an honest queued/accepted state and retains original retry identity. |
 | New typing before a delayed result | The new draft is not erased or replaced by the older request's outcome. |
-| Receiver turn ends and another event arrives | The intended conversation resumes again; one-shot readiness is insufficient. |
+| Receiver turn ends and another event arrives | A promised automatic route resumes the intended conversation again; an on-demand route retains the request and clearly asks the person to invoke the connected chat. |
 | One authored dependency is removed | Preview and publication checks reveal the missing file. |
 | New publication arrives during editing | The stated draft-preservation and apply-update policy occurs. |
 | Page is published but never opened | The selected publication is known; browser execution and receiver readiness remain unobserved. |

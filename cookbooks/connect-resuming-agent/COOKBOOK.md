@@ -13,7 +13,13 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Connect an agent that actually resumes
 
-Use this when a page expects an agent to respond after its current turn ends. A running process, HTTP success, or an open WebSocket proves only one transport stage. The person needs the intended conversation to resume, handle their request, and leave a useful outcome. If the host has no dependable wake mechanism, choose scheduled checks and disclose the resulting delay. A dashboard that needs no conversation can avoid this dependency.
+Use this when a page expects an agent to respond after its current turn ends. A running process, HTTP success, or an open WebSocket proves only one transport stage. The person needs the intended conversation to resume, handle their request, and leave a useful outcome. If the host has no dependable wake mechanism, use an explicitly supported schedule with its disclosed delay, or let the person invoke the connected chat. A dashboard that needs no conversation can avoid this dependency.
+
+An ordinary request to connect a page can use on-demand tools without this
+background requirement. Start with [connected-app setup](../../guides/connected-app-setup.md)
+and [assistant route choices](../connect-chatgpt/COOKBOOK.md). This cookbook's
+automatic-delivery checks apply only when that capability is promised; opening
+a native participant does not add a wake API to the surrounding chat host.
 
 ## Design the person's delivery experience first
 
@@ -30,7 +36,8 @@ Offer explicit cancellation or supersession only if the application has a define
 | Session queue or IPC | Persistent WebSocket receiver submits a count-only notice to an exact conversation ID. | Host admission, identity binding, restart, and acknowledgement after effects. |
 | Background task completion | A bounded WebSocket wait task ends when work is available. | Completion resumes the originating conversation and the agent rearms immediately. |
 | Authenticated webhook or routine | Server wake notice routes to a known host session. | Authentication, delivery retries, and whether it starts a new session instead. |
-| No idle wake | Scheduled queue checks. | The schedule remains active and the person knows the expected delay. |
+| No idle wake, but supported scheduled execution | Explicitly configured queue checks. | The schedule remains active and the person knows the expected delay. |
+| Neither idle wake nor scheduled execution | The person invokes on-demand tools or hands off the retained request. | The page shows the pending request and required manual action; it promises no unattended response. |
 
 The agent is an application participant using the same owned session as browsers and other native peers. It reads coherent queries/events and observes session changes. A host adapter may turn a safe pending-work notice into an actual conversation wake, but it does not define another application event log, cursor HTTP service or WebSocket command protocol.
 
