@@ -248,11 +248,11 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
     await qualifyTransport({ coordinator, follower, primary, secondary });
     const previousGeneration = follower.revision.generation, retained = follower.revision.point;
     stage = 'automatic-recovery-after-grace';
-    const disconnectedAt = performance.now();
+    const disconnectedAt = performance.now(), disconnectedWallAt = Date.now();
     await coordinator.close();
     const automatic = await waitParticipation(secondary, value => value.phase === 'coordinating' && follower.revision.generation !== previousGeneration,
       recoveryTimeout());
-    const recoveredAt = performance.now();
+    const recoveredAt = performance.now(), recoveredWallAt = Date.now();
     const automaticAuthority = await followerControl.application();
     assert.deepEqual(automaticAuthority.generations.at(-1).payload.adopted, retained);
     assert.equal(automatic.recovery, null);
@@ -260,7 +260,8 @@ export async function qualifyParticipation({ coordinator, follower, observer, co
       assert.equal((await follower.operations.get(`freshness-${index}`, { author: coordinator.deviceId })).outcome,
         'accepted', 'The original author\'s observed retained workload must survive takeover');
     }
-    assert.ok(recoveredAt - disconnectedAt >= graceMs, 'Takeover must honor reconnect grace');
+    assert.ok(recoveredAt - disconnectedAt >= graceMs,
+      `Takeover must honor reconnect grace: monotonic=${recoveredAt - disconnectedAt}ms wall=${recoveredWallAt - disconnectedWallAt}ms configured=${graceMs}ms`);
 
     // Deliberate cold-observer fault setup: supply verified bytes through a
     // public connection before attaching a controller, so no coordinator-age
