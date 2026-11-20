@@ -65,9 +65,21 @@ The portable fixture exposes `discovery.notifications({ signal })` as an async i
 `{ type: 'ready' }` and `{ type: 'changed' }`. Each subscriber gets `ready` first;
 peer-map advertisements, storage-identity changes and withdrawals invalidate its
 snapshot. Unconsumed changes coalesce, identical advertisements stay quiet, and
-aborting its signal or returning the iterator retires the listener and unblocks a pending read. There is no advertisement interval,
-TTL expiry or fallback scan. The fixture unit checks qualify this delivery
-contract only; the next kernel/composition run awaits its final pinned archives.
+aborting its signal or returning the iterator retires the listener and unblocks a
+pending read. There is no advertisement interval, TTL expiry or fallback scan.
+
+On 2026-11-20, the actual direct portable gate passed from clean contrib source
+`b469d4d329d67abd06e87e6e8ed55c855d42c4ad` against clean Chronolog source
+`1e4e8406499f3aff0da988046103d0900ca2bd42`, using archive SHA-256
+`4a6fa65ca813e29592b63c833ea78536e766c8332c6917207a5be7315f525601`.
+The empty-directory public-package consumer exercised the notification method
+through the real kernel constructor, automatic connections, exact lost-reply
+retry, 33 commands with the control host blocked and unchanged control traffic,
+reconnect grace, protected-floor recovery and explicitly reviewed recovery for
+unknown freshness. The requested evidence directory is
+`/home/werg/.local/share/tendriller/contrib-push-discovery-1e4`, containing
+`report.json` and the validated `summary.json`. This run qualifies native
+in-process delivery; RTC, browser and hosted qualification remain separate.
 Historical qualification reports below keep their original source identities.
 
 The direct run uses an in-process implementation of the public framed transport
