@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseCookbook, agentPrompt, readingCatalog, validateLocalLinks } from '../distribution/catalog.mjs';
 import { gallery } from '../distribution/gallery.mjs';
 const minimal='---\nid: useful-task\ntitle: A useful task\nsummary: Choose an approach.\n---\n\nA free-form guide with no prescribed headings.';
@@ -24,7 +25,7 @@ test('gallery treats author-controlled metadata and prompts as text',()=>{
 });
 test('local links reject missing, escaping, and executable targets',()=>{
  const temporary=new URL('../test-results/',import.meta.url);mkdirSync(temporary,{recursive:true});
- const root=mkdtempSync(join(temporary.pathname,'cookbook-links-'));
+ const root=mkdtempSync(join(fileURLToPath(temporary),'cookbook-links-'));
  try{mkdirSync(join(root,'guide'));writeFileSync(join(root,'guide','COOKBOOK.md'),'[missing](no.md) [escape](../../outside) [code](javascript:alert) [remote](https://example.test/a)');
  const errors=validateLocalLinks(root,[join(root,'guide','COOKBOOK.md')]);assert.equal(errors.length,3);assert.ok(errors.some(e=>e.includes('escapes')));assert.ok(errors.some(e=>e.includes('unsupported')));
  }finally{rmSync(root,{recursive:true,force:true});}
