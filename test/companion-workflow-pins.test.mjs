@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { URL } from 'node:url';
 import { select } from '../distribution/select-companion-release.mjs';
 const tuple = JSON.parse(readFileSync(new URL('../distribution/companion-release.json', import.meta.url)));
 test('peer-generation consumes the canonical tuple and retains exact checkout checks', () => {
@@ -14,7 +15,7 @@ test('peer-generation consumes the canonical tuple and retains exact checkout ch
   assert.equal(text.split("- 'distribution/companion-release.json'").length - 1, 2);
   for (const key of ['CHRONOLOG_REF']) {
     assert.ok(text.includes('ref: \u0024{{ env.' + key + ' }}'));
-    assert.ok(text.includes('= \"\u0024' + key + '\"'));
+    assert.ok(text.includes('= "$' + key + '"'));
   }
 });
 test('collaboration consumes the canonical tuple and retains exact checkout checks', () => {
@@ -27,6 +28,6 @@ test('collaboration consumes the canonical tuple and retains exact checkout chec
   assert.equal(text.split("- 'distribution/companion-release.json'").length - 1, 2);
   for (const key of ['CHRONOLOG_REF']) {
     assert.ok(text.includes('ref: \u0024{{ env.' + key + ' }}'));
-    assert.ok(text.includes('= \"\u0024' + key + '\"'));
+    assert.ok(text.includes('= "$' + key + '"'));
   }
 });
