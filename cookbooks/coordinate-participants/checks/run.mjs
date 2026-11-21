@@ -60,7 +60,7 @@ try {
   assert.ok(declaredCore, 'Core provenance must identify the public SDK archive');
   assert.equal(hash(await readFile(coreArtifact)), declaredCore.sha256, 'Core archive digest mismatch');
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-collaboration-consumer', private: true, type: 'module' }));
-  execFileSync('npm', ['install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', sessionArtifact, coreArtifact], {
+  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', sessionArtifact, coreArtifact], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
   const session = await verifyPeerSessionArtifact({ installed: join(consumer, 'node_modules/@chronolog/peer-session'),
@@ -71,6 +71,8 @@ try {
   assert.ok(core.exports['./collaboration'], 'Core archive must export the maintained collaboration module');
   const installedTree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
   assert.deepEqual(Object.keys(installedTree.dependencies).sort(), ['@chronolog/peer-session', '@tendriller/core']);
+  assert.equal(installedTree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0',
+    'The standard archive must install its declared native RTC dependency automatically');
   report.artifacts = [session.artifact, { name: core.name, version: core.version, sha256: declaredCore.sha256,
     sourceCommit: coreProof.source, sourceTree: coreProof.sourceTree, sourceDirty: coreProof.dirty,
     provenanceSha256: hash(coreProofBytes) }];

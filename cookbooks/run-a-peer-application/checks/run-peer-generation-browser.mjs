@@ -46,18 +46,20 @@ try {
   if (relay) report.host = JSON.parse(await readFile(process.env.PEER_GENERATION_HOST_EVIDENCE, 'utf8'));
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-browser-peer-consumer', private: true, type: 'module' }));
   execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', artifact,
-    ...(relay ? [resolve(hostSdk)] : ['werift@0.27.0']), 'playwright@1.65.0', 'esbuild@0.28.2'], { cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
+    ...(relay ? [resolve(hostSdk)] : []), 'playwright@1.65.0', 'esbuild@0.28.2'], { cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') } });
   const installed = join(consumer, 'node_modules/@chronolog/peer-session');
   const { metadata, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  for (const field of ['dependencies', 'optionalDependencies']) assert.deepEqual(metadata[field] ?? {}, {});
-  assert.deepEqual(metadata.peerDependencies ?? {}, relay ? {} : { werift: '0.27.0' });
+  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' });
+  assert.deepEqual(metadata.optionalDependencies ?? {}, {});
+  assert.deepEqual(metadata.peerDependencies ?? {}, {});
   report.artifacts.push(verifiedArtifact);
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(relay ? ['@tendriller/core'] : []), 'esbuild', 'playwright', ...(relay ? [] : ['werift'])]);
-  for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) assert.equal(tree.dependencies[name].version, version);
+  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(relay ? ['@tendriller/core'] : []), 'esbuild', 'playwright']);
+  for (const [name, version] of Object.entries({ playwright: '1.65.0', esbuild: '0.28.2' })) assert.equal(tree.dependencies[name].version, version);
+  assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0');
   if (relay) {
     const sdk = report.host.artifacts.find(value => value.name === '@tendriller/core');
     assert.equal(hash(await readFile(resolve(hostSdk))), sdk.sha256);

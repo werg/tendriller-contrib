@@ -28,12 +28,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: '3ca38259bcd246b7d990506cd63b4a0aa998baeb'
+        default: 'e802f1658cef71ab12711e0921cdc802bbb8d2d0'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '7fa2bdd7e72b7ad85d2c0bc6edcb4167e96678e8'
+        default: '79b6845df411e3a910b662b31bae789da38d0bf9'
 permissions:
   contents: read
 concurrency:
@@ -44,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      CHRONOLOG_REF: ${{ inputs.chronolog_ref || '3ca38259bcd246b7d990506cd63b4a0aa998baeb' }}
-      HOST_REF: ${{ inputs.tendriller_ref || '7fa2bdd7e72b7ad85d2c0bc6edcb4167e96678e8' }}
+      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'e802f1658cef71ab12711e0921cdc802bbb8d2d0' }}
+      HOST_REF: ${{ inputs.tendriller_ref || '79b6845df411e3a910b662b31bae789da38d0bf9' }}
     strategy:
       fail-fast: false
       matrix:
@@ -78,7 +78,7 @@ jobs:
         run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && '--ignore-scripts' || '' }}
       - name: Build clean public session archive
         working-directory: .chronolog-build
-        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ (matrix.transport == 'native-rtc' || matrix.transport == 'browser-native' || matrix.transport == 'hosted') && '--native-rtc' || '' }} ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
+        run: node tools/package-peer-session.mjs --output artifacts/peer-session ${{ matrix.transport == 'native-sql' && '--sql-native' || '' }}
       - name: Download the exact promoted public host graph
         if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
         run: node distribution/download-core-release.mjs --source "$HOST_REF" --chronolog-source "$CHRONOLOG_REF" --output .tendriller-build/dist

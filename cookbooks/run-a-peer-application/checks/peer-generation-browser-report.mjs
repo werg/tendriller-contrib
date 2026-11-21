@@ -30,7 +30,7 @@ export function validateBrowserPeerReport(report) {
     ['peer-generation-browser-page.mjs', 'peer-generation-browser-worker.mjs', 'peer-generation-definition.mjs',
       'app.mjs', 'typing.mjs', 'recovery-choice.mjs', 'deployment/bootstrap.mjs', 'peer-generation-browser-transport.mjs', 'peer-generation-browser-resources.mjs'].includes(input));
   assert.match(report.runtime.dependencies.lockSha256, /^[a-f0-9]{64}$/u);
-  for (const [name, version] of Object.entries({ ...(relay ? {} : { werift: '0.27.0' }), playwright: '1.65.0', esbuild: '0.28.2' })) {
+  for (const [name, version] of Object.entries({ werift: '0.27.0', playwright: '1.65.0', esbuild: '0.28.2' })) {
     assert.ok(report.runtime.dependencies.packages.some(item => item.path === `node_modules/${name}` && item.version === version && item.integrity));
   }
   const browser = report.browser;

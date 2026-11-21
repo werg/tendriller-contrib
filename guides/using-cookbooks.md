@@ -25,7 +25,9 @@ native pairing proposal before owner review, and preserve its durable ordering
 pause while the result is uncertain. A finite helper window does not promise
 an always-running participant or automatic recovery from lost private storage.
 
-From that starter, actually import or adapt `helpers/live-view.mjs`,
+Import `createLiveView` from `@tendriller/core/collaboration/live-view`; use its
+bounded `ready()` for the first coherent read so ordinary recovery does not
+tear down a healthy connection. Import or adapt the starter's
 `helpers/operation-view.mjs` and, when needed, `helpers/reviewed-input.mjs` as
 described in [Application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
 The [media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
