@@ -95,10 +95,9 @@ worst case below 45 seconds. Passive streams and operation waits do not extend
 silence. The consumer records the public pending-request window, monotonic clock,
 owner-close bracket and actual closed time while UI observers remain active.
 Later caller traffic cannot renew that window. Command/RPC/action deadlines stay
-at 30 seconds; only the physical owner-fence observation uses the 45-second bound
-when the public bounded-request capability exists. Older consumers retain their
-original 30-second observation bound. Retention and same-profile reopen checks
-still run after fencing.
+at 30 seconds; only the physical owner-fence observation uses the 45-second bound.
+The public `boundedRequest` contract is required. Retention and same-profile
+reopen checks still run after fencing.
 Each browser journey also grows the real workspace to eleven requests and
 nineteen messages. It browses bounded continuations, writes from the companion
 document, keeps the captured pages coherent, explicitly refreshes, and checks

@@ -48,10 +48,5 @@ test('physical owner fencing needs measured bounded grace without changing RPC b
     fence => { fence.samples.at(-1).phase = 'ready'; },
     fence => { fence.publicBoundedRequest = false; },
   ]) { const report = fixture(); mutate(report.scenarios[0].ownerExitFence); assert.throws(() => validateBrowserReport(report)); }
-  const report = fixture();
-  for (const scenario of report.scenarios) {
-    const fence = scenario.ownerExitFence; fence.publicBoundedRequest = false; fence.observationTimeoutMs = 30_000;
-    fence.closedAt = 15_101; fence.samples = [{ at: 15_101, phase: 'closed', boundedRequest: null }];
-  }
-  assert.equal(validateBrowserReport(report).scenarios.length, 2);
+  assert.equal(validateBrowserReport(fixture()).scenarios.length, 2);
 });

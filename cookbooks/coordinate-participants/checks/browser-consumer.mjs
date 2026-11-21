@@ -201,22 +201,22 @@ try {
     // call started within the 15s silence window can retain its own 30s budget.
     // UI observers remain active; passive waits never supply this protection.
     const ownerExitFence = await survivor.evaluate(() => {
-      const supported = 'boundedRequest' in globalThis.fixtureSession;
+      if (!('boundedRequest' in globalThis.fixtureSession)) throw Error('CONTRACT_INCOMPATIBLE: boundedRequest is required');
       const sample = () => ({ at: performance.now(), phase: globalThis.fixtureSession.status.phase,
-        boundedRequest: globalThis.fixtureSession.boundedRequest ?? null });
+        boundedRequest: globalThis.fixtureSession.boundedRequest });
       globalThis.fixtureOwnerFence = { samples: [], dropped: 0 };
-      return { publicBoundedRequest: supported, livenessTimeoutMs: 15_000, requestTimeoutMs: 30_000,
-        observationTimeoutMs: supported ? 45_000 : 30_000, clockOrigin: performance.timeOrigin, beforeClose: sample() };
+      return { publicBoundedRequest: true, livenessTimeoutMs: 15_000, requestTimeoutMs: 30_000,
+        observationTimeoutMs: 45_000, clockOrigin: performance.timeOrigin, beforeClose: sample() };
     });
     (report.ownerExitFences ??= []).push(ownerExitFence);
     await board.close();
     ownerExitFence.afterClose = await survivor.evaluate(() => ({ at: performance.now(),
-      phase: globalThis.fixtureSession.status.phase, boundedRequest: globalThis.fixtureSession.boundedRequest ?? null }));
+      phase: globalThis.fixtureSession.status.phase, boundedRequest: globalThis.fixtureSession.boundedRequest }));
     try {
       await survivor.waitForFunction(() => {
         const trace = globalThis.fixtureOwnerFence;
         const sample = { at: performance.now(), phase: globalThis.fixtureSession.status.phase,
-          boundedRequest: globalThis.fixtureSession.boundedRequest ?? null };
+          boundedRequest: globalThis.fixtureSession.boundedRequest };
         const previous = trace.samples.at(-1);
         if (!previous || sample.phase !== previous.phase || sample.at - previous.at >= 1000 ||
             sample.boundedRequest?.startedAt !== previous.boundedRequest?.startedAt) {

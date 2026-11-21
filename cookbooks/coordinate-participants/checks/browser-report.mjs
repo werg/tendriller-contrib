@@ -30,9 +30,9 @@ export function validateBrowserReport(report, { allowDirty = false } = {}) {
     assert.equal(scenario.ownerMode, 'elected', 'The synchronous-OPFS SQL profile needs a dedicated Worker');
     for (const gate of browserGates) assert.equal(scenario[gate], true, `Missing ${scenario.mode} browser observation: ${gate}`);
     const fence = scenario.ownerExitFence;
-    assert.equal(typeof fence?.publicBoundedRequest, 'boolean');
+    assert.equal(fence?.publicBoundedRequest, true, 'The public bounded-request contract is required');
     assert.equal(fence.livenessTimeoutMs, 15_000); assert.equal(fence.requestTimeoutMs, 30_000);
-    assert.equal(fence.observationTimeoutMs, fence.publicBoundedRequest ? 45_000 : 30_000);
+    assert.equal(fence.observationTimeoutMs, 45_000);
     assert.ok(Number.isFinite(fence.clockOrigin));
     assert.ok(Number.isFinite(fence.closedAt) && Number.isFinite(fence.afterClose?.at) && Number.isFinite(fence.beforeClose?.at));
     assert.ok(fence.afterClose.at >= fence.beforeClose.at && fence.closedAt >= fence.afterClose.at);
