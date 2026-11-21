@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 // Selected immutable companion pair; qualification results are recorded separately.
-const chronolog = '3ca38259bcd246b7d990506cd63b4a0aa998baeb';
+const chronolog = 'e90cfc47688327d9419cc639797a697c8c25acb0';
 const core = '7fa2bdd7e72b7ad85d2c0bc6edcb4167e96678e8';
 for (const name of ['peer-generation', 'collaboration']) {
   test(`${name} manual defaults and ordinary CI select the same immutable companion pair`, () => {

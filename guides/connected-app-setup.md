@@ -211,3 +211,7 @@ and it does not keep the native process alive after its environment ends.
 Historical source pins and evidence labels below retain their original scope.
 They neither certify these newer setup contracts nor substitute for deployment,
 account, browser or conversation checks on the selected host.
+
+## Keep application traffic direct when possible
+
+Use the selected host’s `/docs/PEER_CONNECTIONS.md` and the maintained native and browser owner helpers. They share one direct-first policy and automatic encrypted relay fallback. Native RTC is part of the standard session package; browser RTC runs in an attached page with the protocol owner retained in its Worker. Do not add a second discovery/retry loop or silently disable the direct opener. Verify a real command or transfer and actual direct traffic; retain relay fallback for devices or networks that cannot connect directly.

@@ -119,10 +119,7 @@ inputs, a native application uses the public package:
 
 ```js
 import { openNativeDevice, openNativeApplication } from '@chronolog/peer-session/native';
-import { openWebRtcConnection } from '@chronolog/peer-session/webrtc';
-import { openWebSocketConnection } from '@chronolog/peer-session/websocket';
-import { createNativePeerConnection } from '@chronolog/peer-session/webrtc-native';
-import { createPeerIntroductions } from '@tendriller/core/peers';
+import { participateNativeApplication } from '@tendriller/core/collaboration/native-rtc';
 import { conversation } from './peer-conversation.mjs';
 
 // Use { create: true } only for explicit first-time device creation.
@@ -134,14 +131,9 @@ const session = await openNativeApplication({
   epochKeys,  // Keys delivered to this enrolled device.
 });
 const control = session.connectControlParticipant({ exchange: peers.exchange });
-session.participate({
+const participation = participateNativeApplication(session, {
   control,
-  ...createPeerIntroductions({
-    peers, // The deployment's authenticated public Tendriller peer client.
-    identity: session.deviceId,
-    openDirectConnection: options => openWebRtcConnection({ ...options, createPeerConnection: createNativePeerConnection }),
-    openRelayConnection: ({ relay, signal }) => openWebSocketConnection(relay, { ready: relay.ready, signal }),
-  }),
+  peers, // The deployment's authenticated public Tendriller peer client.
 });
 
 try {
@@ -161,9 +153,11 @@ try {
 The application keeps draft text and any operation reference needed by its UI.
 Chronolog owns the attempt journal, exact retry, ordering, peer replication,
 discovery scheduling, coordinator selection and view recovery. The Tendriller
-adapter tries the direct connection, then the host's WebSocket relay within the same owned opening. Both carry the same authenticated encrypted peer channel. It does not create another application or retry owner. A timeout cancels the wait; it does not cancel the command or
+platform helper applies the shared P2P-first policy: try the direct connection, then the host's WebSocket relay within the same owned opening. Both carry the same authenticated encrypted peer channel. It does not create another application or retry owner. A timeout cancels the wait; it does not cancel the command or
 establish a rejection. `session.operations.get(operationId)` recovers its current
 state, and `session.retry(operationId)` resends only the original saved attempt.
+
+The standard session archive includes native RTC and installs its pinned runtime dependency automatically. Browser owners use the maintained `openBrowserOwner` / `serveBrowserOwner` composition, which bridges RTC through an attached page while keeping keys and state in the shared owner. Do not replace their direct opener with a throwing stub or copy a new fallback loop. Follow the selected service’s `/docs/PEER_CONNECTIONS.md` for policy and actual-traffic verification; a selected transport callback alone does not prove application delivery.
 
 The public package is supplied as a source-pinned archive during prerelease
 qualification. The independent consumer below installs it offline in an empty
