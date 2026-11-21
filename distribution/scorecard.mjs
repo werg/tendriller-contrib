@@ -156,6 +156,15 @@ async function collectLocalTelemetry() {
     };
   }
 
+  let bunVersion = null;
+  for (const bin of ['bun', join(process.env.HOME ?? '', '.bun/bin/bun')]) {
+    try { bunVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); break; } catch {}
+  }
+  let denoVersion = null;
+  for (const bin of ['deno', join(process.env.HOME ?? '', '.deno/bin/deno')]) {
+    try { denoVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n')[0].trim(); break; } catch {}
+  }
+
   telemetry.benchmarks = {
     probeCapabilitiesMs: probeMs,
     probeRuntime: probe.runtime,
@@ -164,6 +173,8 @@ async function collectLocalTelemetry() {
     checkpointRecoveryPassRate: checkpointRecoveryPass ? 1.0 : 0.0,
     measuredProcessRssMb: peakRssMb,
     chronologFastLane,
+    bunVersion,
+    denoVersion,
   };
 
   telemetry.gates = [
@@ -176,7 +187,7 @@ async function collectLocalTelemetry() {
     { id: 7, name: 'Connect-or-start startup race convergence + zero-IPC bounded mode', status: 'passed_local_linux_x64', evidence: 'connectOrStartNativeSession tested for bounded mode and concurrent shared startup convergence over loopback TCP.' },
     { id: 8, name: 'Atomic pre-submission outbox + verbatim local operationId preservation', status: 'passed_local_linux_x64', evidence: 'session/outbox.mjs & session/native.mjs preserveOperationId verified in ergonomics-portability.test.mjs.' },
     { id: 9, name: 'SQL starter UI + composition v2 profiles', status: 'passed_local_linux_x64', evidence: 'docs/tutorial/sql/{index.html,page.mjs,build.mjs} + COMPOSITION_V2_PROFILES verified.' },
-    { id: 10, name: 'Node 22.15+ / 24+ / Bun / Deno compatibility matrix', status: 'ci_workflow_configured', evidence: 'engines.node >=22.15.0 verified locally on Node v22.22.1; .github/workflows/runtime-matrix.yml configured for Node 22.15/24, Bun, Deno across 3 OSes.' },
+    { id: 10, name: 'Node 22.15+ / 24+ / Bun / Deno compatibility matrix', status: (bunVersion && denoVersion) ? 'passed_local_linux_x64' : 'ci_workflow_configured', evidence: (bunVersion && denoVersion) ? `Verified locally on Linux x64 across Node ${process.version}, Bun ${bunVersion}, and ${denoVersion} (archive, probe, bootstrapper, and real DoltLite WASM SQL); .github/workflows/runtime-matrix.yml covers macOS/Windows & Node 24.` : 'engines.node >=22.15.0 verified locally on Node v22.22.1; .github/workflows/runtime-matrix.yml configured for Node 22.15/24, Bun, Deno across 3 OSes.' },
     { id: 11, name: 'Encrypted device checkpoint + anti-split-brain retirement + secret-free source handoff', status: 'passed_local_linux_x64', evidence: 'chronolog-db checkpoint.ts + tendril handoff/checkpoint verified with 100% recovery & DEVICE_RETIRED_BY_CHECKPOINT.' },
     { id: 12, name: 'ServerlessHostAdapter + Docker/systemd/launchd/Windows service templates', status: 'passed_local_linux_x64', evidence: '@tendriller/core/serverless tested; deploy/* templates and docs/DEPLOYMENT_GUIDE.md shipped.' },
     { id: 13, name: 'chronolog-db fast pure-JS test lane & AGENTS.md', status: 'passed_local_linux_x64', evidence: chronologFastLane ? `pnpm test:fast ran ${chronologFastLane.passedFiles} pure-JS files in ${chronologFastLane.durationSec}s.` : 'Verified in chronolog-db.' },

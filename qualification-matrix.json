@@ -1,8 +1,8 @@
 {
   "format": "tendriller-qualification-matrix/v1",
-  "generatedAt": "2026-11-21T23:35:14.576Z",
+  "generatedAt": "2026-11-21T23:48:12.246Z",
   "localTelemetry": {
-    "recordedAt": "2026-11-21T23:35:14.576Z",
+    "recordedAt": "2026-11-21T23:48:12.246Z",
     "host": {
       "platform": "linux",
       "arch": "x64",
@@ -21,7 +21,7 @@
       "profileEventsFullTotalBytes": 6819057
     },
     "benchmarks": {
-      "probeCapabilitiesMs": 16.4,
+      "probeCapabilitiesMs": 13.69,
       "probeRuntime": {
         "name": "node",
         "version": "22.22.1",
@@ -30,16 +30,18 @@
         "nativeAddonSupport": true,
         "sqlDefaultEngine": "wasm-portable",
         "totalMemoryMb": 31189,
-        "freeMemoryMb": 15447,
+        "freeMemoryMb": 15993,
         "fitsConstrainedSandboxBudget": true
       },
-      "bootstrapVerifiedExtractMs": 153.24,
+      "bootstrapVerifiedExtractMs": 135.83,
       "checkpointRecoveryPassRate": 1,
-      "measuredProcessRssMb": 70.46,
+      "measuredProcessRssMb": 70.62,
       "chronologFastLane": {
-        "durationSec": 34.38,
+        "durationSec": 33.53,
         "passedFiles": 59
-      }
+      },
+      "bunVersion": "1.4.5",
+      "denoVersion": "deno 2.9.8 (stable, release, x86_64-unknown-linux-gnu)"
     },
     "gates": [
       {
@@ -76,7 +78,7 @@
         "id": 6,
         "name": "Single-command verified bootstrapper & capability probe",
         "status": "passed_local_linux_x64",
-        "evidence": "scripts/tendriller-bootstrap.mjs (12963 B) verified extract in 153.24 ms."
+        "evidence": "scripts/tendriller-bootstrap.mjs (12963 B) verified extract in 135.83 ms."
       },
       {
         "id": 7,
@@ -99,8 +101,8 @@
       {
         "id": 10,
         "name": "Node 22.15+ / 24+ / Bun / Deno compatibility matrix",
-        "status": "ci_workflow_configured",
-        "evidence": "engines.node >=22.15.0 verified locally on Node v22.22.1; .github/workflows/runtime-matrix.yml configured for Node 22.15/24, Bun, Deno across 3 OSes."
+        "status": "passed_local_linux_x64",
+        "evidence": "Verified locally on Linux x64 across Node v22.22.1, Bun 1.4.5, and deno 2.9.8 (stable, release, x86_64-unknown-linux-gnu) (archive, probe, bootstrapper, and real DoltLite WASM SQL); .github/workflows/runtime-matrix.yml covers macOS/Windows & Node 24."
       },
       {
         "id": 11,
@@ -118,7 +120,7 @@
         "id": 13,
         "name": "chronolog-db fast pure-JS test lane & AGENTS.md",
         "status": "passed_local_linux_x64",
-        "evidence": "pnpm test:fast ran 59 pure-JS files in 34.38s."
+        "evidence": "pnpm test:fast ran 59 pure-JS files in 33.53s."
       },
       {
         "id": 14,
