@@ -68,7 +68,15 @@ Source builds and explicitly supplied archives remain useful for deliberate core
 development and the separate qualification runners in this repository.
 
 Reuse the starter's actual session, browser Worker and helpers when adapting the
-interaction. Select the state model before configuring its immutable definition.
+interaction. Keep the starter's `connection.mjs` owner-facing connection component
+and browser pairing helper together. They retain this browser's signer, show the
+normal owner review, resume after approval and bound retries to the page lifetime.
+Do not replace that flow with a collection of setup buttons, invent an identity
+fallback or poll the host while an enrolled app is idle. The low-level ownership
+specimens in this collection assume an already enrolled profile; they do not
+replace first-visit enrollment.
+
+Select the state model before configuring its immutable definition.
 The [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md),
 [application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md)
 and [reviewed media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)

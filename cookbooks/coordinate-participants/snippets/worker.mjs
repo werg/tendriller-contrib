@@ -1,7 +1,7 @@
 // Fenced dedicated owner for the synchronous-OPFS SQL profile.
 // The page declares this engine capability before opening the retained signer.
 import { serveBrowserOwner } from '@tendriller/core/collaboration/worker';
-import { createPeersClient, createPeerParticipantClient, createPeerIntroductions } from '@tendriller/core/peers';
+import { createPeersClient, createPeerIntroductions } from '@tendriller/core/peers';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 import { openBrowserDevice } from '@chronolog/peer-session/worker';
 import { openSqlApplication } from '@chronolog/peer-session/sql';
@@ -35,13 +35,7 @@ return { profileId: configuration.profileId,
           return value;
         };
       const peers = createPeersClient({ base: base.href, applicationId: configuration.applicationId, request: hostRequest });
-      // This public participant API supports signal-aware control reads.
-      // The higher-level peers.application() in the currently pinned core SDK
-      // does not forward options, so use the same authenticated host request
-      // directly for this cancellation-sensitive startup boundary.
-      const authority = await createPeerParticipantClient({
-        applicationId: configuration.applicationId, request: hostRequest,
-      }).request('control', 'read', {}, { signal });
+      const authority = await peers.application({ signal });
       signal.throwIfAborted();
       const verified = await verifyAuthorityBundle(authority, configuration.descriptor);
       signal.throwIfAborted();

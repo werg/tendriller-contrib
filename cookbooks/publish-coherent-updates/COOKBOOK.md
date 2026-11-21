@@ -94,6 +94,15 @@ The host transport accepts control, discovery, invitation and publication messag
 
 Validate canonical relative paths, duplicate entries, byte sizes, digests and the existing HTML entry before transfer. Include every authored dependency the page needs. Nested HTML and lazy modules must resolve against their publication directory; absolute application paths can accidentally escape that graph. A framework router fallback is a serving choice to implement and test explicitly.
 
+For document and fragment links, use the current runtime's
+`tendril.documentUrl('discussion.html')` or `tendril.documentUrl('#evidence')`.
+It constructs a URL without navigating, preserving the page's live application
+context or explicitly pinned publication. Asset and module URLs remain relative
+to their signed graph. Do not construct publication prefixes or use an immutable
+asset base as the application's document-navigation base. Follow the selected
+service's [browser API guide](https://github.com/werg/tendriller/blob/master/docs/BROWSER_API.md)
+and test both live and pinned nested-document navigation.
+
 Cookbook provenance names where an idea came from. A selected executable dependency may have a separate exact version and integrity lock. The publication identifies the final adapted authored bytes. These identities have different purposes: editing a copied snippet does not require pretending its old upstream digest still describes it.
 
 The host supplies the selected runtime and injects its configuration into served HTML. Verify that actual runtime binding and complete graph as well as authored module bytes. Do not compare transformed HTML with the unmodified authored digest and call it the same representation.

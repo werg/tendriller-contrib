@@ -134,7 +134,12 @@ contribution and synthesis drafts under its owner-allocated view ID. Saved-opera
 references remain individually inspectable after an uncertain response. The UI
 offers explicit handoff and cancellation acknowledgment; it never takes a second
 claim on behalf of an observer. Follow the build instructions above to supply the
-real authenticated owner/bootstrap graph and browser SQL engine.
+real authenticated owner/bootstrap graph and browser SQL engine. For a new
+application, adapt the current service starter's owner-facing `connection.mjs`
+and pairing helper around that bootstrap. The reference bootstrap expects a
+retained, enrolled profile; `createProfile()` alone does not grant membership.
+Keep the service review and return flow instead of building another enrollment
+or idle polling loop.
 
 The supplied [native reviewers](snippets/reviewer-cli.mjs) attach to separately
 enrolled supervisors and run the [evidence and clarity policies](snippets/reviewer.mjs).
