@@ -28,12 +28,12 @@ on:
         description: Exact Chronolog source commit containing the public peer-session package
         required: false
         type: string
-        default: 'e90cfc47688327d9419cc639797a697c8c25acb0'
+        default: 'e802f1658cef71ab12711e0921cdc802bbb8d2d0'
       tendriller_ref:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '7fa2bdd7e72b7ad85d2c0bc6edcb4167e96678e8'
+        default: '79b6845df411e3a910b662b31bae789da38d0bf9'
 permissions:
   contents: read
 concurrency:
@@ -44,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'e90cfc47688327d9419cc639797a697c8c25acb0' }}
-      HOST_REF: ${{ inputs.tendriller_ref || '7fa2bdd7e72b7ad85d2c0bc6edcb4167e96678e8' }}
+      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'e802f1658cef71ab12711e0921cdc802bbb8d2d0' }}
+      HOST_REF: ${{ inputs.tendriller_ref || '79b6845df411e3a910b662b31bae789da38d0bf9' }}
     strategy:
       fail-fast: false
       matrix:
