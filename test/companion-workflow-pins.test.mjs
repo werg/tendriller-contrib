@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // Selected immutable companion pair; qualification results are recorded separately.
 const chronolog = '3ca38259bcd246b7d990506cd63b4a0aa998baeb';
-const core = '835b6a2ddb7c46f794d9379ce0ab908ddf6b09ae';
+const core = '069ede9d48e2cd5294707daec4758d1dfde86438';
 for (const name of ['peer-generation', 'collaboration']) {
   test(`${name} manual defaults and ordinary CI select the same immutable companion pair`, () => {
     const workflow = readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8');
