@@ -29,6 +29,26 @@ export function validateBrowserReport(report, { allowDirty = false } = {}) {
   for (const scenario of report.scenarios) {
     assert.equal(scenario.ownerMode, 'elected', 'The synchronous-OPFS SQL profile needs a dedicated Worker');
     for (const gate of browserGates) assert.equal(scenario[gate], true, `Missing ${scenario.mode} browser observation: ${gate}`);
+    const fence = scenario.ownerExitFence;
+    assert.equal(typeof fence?.publicBoundedRequest, 'boolean');
+    assert.equal(fence.livenessTimeoutMs, 15_000); assert.equal(fence.requestTimeoutMs, 30_000);
+    assert.equal(fence.observationTimeoutMs, fence.publicBoundedRequest ? 45_000 : 30_000);
+    assert.ok(Number.isFinite(fence.clockOrigin));
+    assert.ok(Number.isFinite(fence.closedAt) && Number.isFinite(fence.afterClose?.at) && Number.isFinite(fence.beforeClose?.at));
+    assert.ok(fence.afterClose.at >= fence.beforeClose.at && fence.closedAt >= fence.afterClose.at);
+    assert.ok(fence.closedAt - fence.afterClose.at <= fence.observationTimeoutMs, 'Owner fence exceeded its declared bound');
+    assert.ok(Array.isArray(fence.samples) && fence.samples.length > 0 && fence.samples.length <= 64);
+    assert.equal(fence.samples.at(-1).phase, 'closed');
+    assert.ok(Number.isSafeInteger(fence.dropped) && fence.dropped >= 0);
+    for (const sample of [fence.beforeClose, fence.afterClose, ...fence.samples]) {
+      assert.ok(Number.isFinite(sample.at));
+      if (sample.boundedRequest !== null) {
+        assert.equal(fence.publicBoundedRequest, true);
+        const { startedAt, deadline } = sample.boundedRequest;
+        assert.ok(Number.isFinite(startedAt) && Number.isFinite(deadline) && startedAt <= sample.at &&
+          deadline > startedAt && deadline <= startedAt + fence.requestTimeoutMs);
+      }
+    }
     hex(scenario.signer, 64); assert.ok(scenario.acceptedResultIds.length > 0);
   }
   assert.equal(report.claims.physicalDeviceQualified, false);

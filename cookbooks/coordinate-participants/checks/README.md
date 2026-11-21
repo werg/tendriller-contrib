@@ -89,6 +89,16 @@ complete an addressed request, explicitly reassign an old endpoint's claim,
 accept a contribution and synthesis, and retain the selected history after
 detachment or owner exit. Browser storage uses the actual OPFS SQL/WASM engine.
 Screenshots and exact test dependency locks accompany the observations.
+Physical owner fencing has a separate observation bound: 15 seconds of owner
+silence plus at most one nonrenewable finite RPC window of 30 seconds, for a
+worst case below 45 seconds. Passive streams and operation waits do not extend
+silence. The consumer records the public pending-request window, monotonic clock,
+owner-close bracket and actual closed time while UI observers remain active.
+Later caller traffic cannot renew that window. Command/RPC/action deadlines stay
+at 30 seconds; only the physical owner-fence observation uses the 45-second bound
+when the public bounded-request capability exists. Older consumers retain their
+original 30-second observation bound. Retention and same-profile reopen checks
+still run after fencing.
 Each browser journey also grows the real workspace to eleven requests and
 nineteen messages. It browses bounded continuations, writes from the companion
 document, keeps the captured pages coherent, explicitly refreshes, and checks

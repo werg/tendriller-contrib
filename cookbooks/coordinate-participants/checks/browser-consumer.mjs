@@ -197,7 +197,37 @@ try {
     await discussion.evaluate(() => globalThis.fixtureOwner.detach()); await discussion.close();
     assert.equal(await board.evaluate(async id => (await globalThis.fixtureSession.query('collab.task', { taskId: id })).value.task.status, taskId), 'completed');
     const survivor = await context.newPage(); survivor.setDefaultTimeout(30_000); const c = await ready(survivor, 'discussion.html');
-    await board.close(); await survivor.waitForFunction(() => globalThis.fixtureSession.status.phase === 'closed');
+    // Physical owner loss is distinct from an individual RPC deadline. A finite
+    // call started within the 15s silence window can retain its own 30s budget.
+    // UI observers remain active; passive waits never supply this protection.
+    const ownerExitFence = await survivor.evaluate(() => {
+      const supported = 'boundedRequest' in globalThis.fixtureSession;
+      const sample = () => ({ at: performance.now(), phase: globalThis.fixtureSession.status.phase,
+        boundedRequest: globalThis.fixtureSession.boundedRequest ?? null });
+      globalThis.fixtureOwnerFence = { samples: [], dropped: 0 };
+      return { publicBoundedRequest: supported, livenessTimeoutMs: 15_000, requestTimeoutMs: 30_000,
+        observationTimeoutMs: supported ? 45_000 : 30_000, clockOrigin: performance.timeOrigin, beforeClose: sample() };
+    });
+    (report.ownerExitFences ??= []).push(ownerExitFence);
+    await board.close();
+    ownerExitFence.afterClose = await survivor.evaluate(() => ({ at: performance.now(),
+      phase: globalThis.fixtureSession.status.phase, boundedRequest: globalThis.fixtureSession.boundedRequest ?? null }));
+    try {
+      await survivor.waitForFunction(() => {
+        const trace = globalThis.fixtureOwnerFence;
+        const sample = { at: performance.now(), phase: globalThis.fixtureSession.status.phase,
+          boundedRequest: globalThis.fixtureSession.boundedRequest ?? null };
+        const previous = trace.samples.at(-1);
+        if (!previous || sample.phase !== previous.phase || sample.at - previous.at >= 1000 ||
+            sample.boundedRequest?.startedAt !== previous.boundedRequest?.startedAt) {
+          trace.samples.push(sample); if (trace.samples.length > 64) { trace.samples.shift(); trace.dropped++; }
+        }
+        if (sample.phase !== 'closed') return false;
+        trace.closedAt = sample.at; return true;
+      }, undefined, { timeout: ownerExitFence.observationTimeoutMs });
+    } finally {
+      Object.assign(ownerExitFence, await survivor.evaluate(() => globalThis.fixtureOwnerFence));
+    }
     await survivor.reload(); await survivor.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
     const successor = await survivor.evaluate(() => globalThis.fixtureReady);
     assert.equal(successor.deviceId, a.deviceId); assert.notEqual(successor.endpoint.ownerInstanceId, c.endpoint.ownerInstanceId);
@@ -209,7 +239,7 @@ try {
       draftAndOperationAfterReload: true, addressedRequest: true, explicitEndpointReassignment: true,
       acceptedContributionAndSynthesis: true, suspendResume: true, detachIsolation: true, retainedAfterOwnerExit: true,
       boundedTaskPages: true, stableThreadPages: true, paginationPreservedDrafts: true,
-      signer: a.deviceId, sourceEndpoint: a.endpoint.endpointId, acceptedResultIds: outcome.task.aggregate.resultIds });
+      ownerExitFence, signer: a.deviceId, sourceEndpoint: a.endpoint.endpointId, acceptedResultIds: outcome.task.aggregate.resultIds });
     await context.close(); console.log(`✓ authored ${mode} SQL views`);
   }
   report.passed = true;
