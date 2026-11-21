@@ -33,7 +33,7 @@ on:
         description: Exact Tendriller source commit for the hosted participant gate
         required: false
         type: string
-        default: '93fa07dd1015b325b474a6434e997181749e75cc'
+        default: '835b6a2ddb7c46f794d9379ce0ab908ddf6b09ae'
 permissions:
   contents: read
 concurrency:
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 20
     env:
       CHRONOLOG_REF: ${{ inputs.chronolog_ref || '3ca38259bcd246b7d990506cd63b4a0aa998baeb' }}
-      HOST_REF: ${{ inputs.tendriller_ref || '93fa07dd1015b325b474a6434e997181749e75cc' }}
+      HOST_REF: ${{ inputs.tendriller_ref || '835b6a2ddb7c46f794d9379ce0ab908ddf6b09ae' }}
     strategy:
       fail-fast: false
       matrix:
