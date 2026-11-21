@@ -1,14 +1,21 @@
 name: Exact multi-participant composition
+run-name: "Companion core=${{ inputs.tendriller_ref || 'tuple' }} kernel=${{ inputs.chronolog_ref || 'tuple' }}"
 on:
   push:
     paths:
       - 'distribution/download-core-release.mjs'
+      - 'distribution/companion-release.json'
+      - 'distribution/select-companion-release.mjs'
+      - 'test/companion-workflow-pins.test.mjs'
       - '.github/workflows/collaboration.yml'
       - 'cookbooks/coordinate-participants/**'
       - 'cookbooks/share-live-signals/snippets/live-run.mjs'
   pull_request:
     paths:
       - 'distribution/download-core-release.mjs'
+      - 'distribution/companion-release.json'
+      - 'distribution/select-companion-release.mjs'
+      - 'test/companion-workflow-pins.test.mjs'
       - '.github/workflows/collaboration.yml'
       - 'cookbooks/coordinate-participants/**'
       - 'cookbooks/share-live-signals/snippets/live-run.mjs'
@@ -18,36 +25,36 @@ on:
         description: Exact immutable Chronolog commit
         required: false
         type: string
-        default: 'e802f1658cef71ab12711e0921cdc802bbb8d2d0'
       tendriller_ref:
         description: Exact immutable core collaboration commit
         required: false
         type: string
-        default: '79b6845df411e3a910b662b31bae789da38d0bf9'
 permissions:
   contents: read
 concurrency:
-  group: collaboration-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}-${{ inputs.tendriller_ref }}
+  group: collaboration-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}-${{ inputs.tendriller_ref }}-${{ github.event_name == 'workflow_dispatch' && 'explicit' || 'ordinary' }}
   cancel-in-progress: true
 jobs:
   qualify:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    env:
-      CHRONOLOG_REF: ${{ inputs.chronolog_ref || 'e802f1658cef71ab12711e0921cdc802bbb8d2d0' }}
-      CORE_REF: ${{ inputs.tendriller_ref || '79b6845df411e3a910b662b31bae789da38d0bf9' }}
     steps:
-      - name: Require exact companion source
-        shell: bash
-        run: |
-          [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
-          [[ "$CORE_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Select verified companion tuple
+        env:
+          TENDRILLER_REF: ${{ inputs.tendriller_ref }}
+          CHRONOLOG_REF_INPUT: ${{ inputs.chronolog_ref }}
+        run: node distribution/select-companion-release.mjs contrib >> "$GITHUB_ENV"
+      - name: Require exact companion source
+        shell: bash
+        run: |
+          [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
+          [[ "$CORE_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
       - uses: pnpm/action-setup@v4
         with:
           version: '10.12.4'

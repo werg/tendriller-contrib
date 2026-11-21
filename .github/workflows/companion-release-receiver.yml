@@ -1,0 +1,48 @@
+name: Propose qualified companion release
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: companion-release-receiver
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUTOMATION_SOURCE: '9a781f34343a90690df027080af8cf087f358057'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/tendriller
+          ref: '9a781f34343a90690df027080af8cf087f358057'
+          path: .release-planner
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/companion-release/
+            /scripts/check-published-release.mjs
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify public graph and propose this repository's tuple update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .release-planner/scripts/companion-release/cli.mjs --receiver contrib --automation-source "$AUTOMATION_SOURCE" --output "$RUNNER_TEMP/companion-release" --apply --auth-kind repository
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: companion-release-proposal
+          path: ${{ runner.temp }}/companion-release/*.json
