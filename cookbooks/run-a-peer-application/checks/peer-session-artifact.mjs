@@ -11,6 +11,12 @@ export async function verifyPeerSessionArtifact({ installed, archive, allowDirty
   assert.equal(metadata.name, '@chronolog/peer-session');
   const provenanceBytes = await readFile(join(installed, 'provenance.json'));
   const provenance = JSON.parse(provenanceBytes);
+  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' });
+  assert.deepEqual(metadata.optionalDependencies ?? {}, {});
+  assert.deepEqual(metadata.peerDependencies ?? {}, {});
+  assert.deepEqual(metadata.peerDependenciesMeta ?? {}, {});
+  assert.ok(metadata.exports?.['./webrtc-native'], 'The standard package must expose its native factory');
+  assert.equal(provenance.nativeRtc, true, 'The standard package must include native RTC');
   assert.match(provenance.source, /^[a-f0-9]{40}$/u);
   assert.match(provenance.sourceTree, /^[a-f0-9]{40}$/u);
   assert.equal(typeof provenance.dirty, 'boolean');
@@ -25,7 +31,7 @@ export async function verifyPeerSessionArtifact({ installed, archive, allowDirty
   return { metadata, provenance, artifact: {
     name: metadata.name, version: metadata.version, sha256: hash(await readFile(archive)),
     sourceCommit: provenance.source, sourceTree: provenance.sourceTree, sourceDirty: provenance.dirty,
-    provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, optionalNativeRtc: provenance.optionalNativeRtc,
+    provenance: { sha256: hash(provenanceBytes), profile: provenance.profile, nativeRtc: provenance.nativeRtc,
       sqlEngines: provenance.sqlEngines, runtimeModules: provenance.runtimeModules, files: provenance.sha256 },
   } };
 }

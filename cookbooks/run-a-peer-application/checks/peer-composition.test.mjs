@@ -14,7 +14,7 @@ function fixtures() {
     report.executionManifestDigest = (report.topology === 'independent-packed-tasks' ? 'b' : 'a').repeat(64);
     report.artifacts = [{ name: '@chronolog/peer-session', version: `0.0.0-test-${sql ? 'sql' : rtc ? 'rtc' : 'events'}`,
       sha256: digit.repeat(64), sourceCommit: 'd'.repeat(40), sourceTree: 'e'.repeat(40), sourceDirty: false,
-      provenance: { sha256: '4'.repeat(64), profile: report.profile, optionalNativeRtc: rtc,
+      provenance: { sha256: '4'.repeat(64), profile: report.profile, nativeRtc: true,
         sqlEngines: sql ? ['native'] : [], runtimeModules: { 'index.mjs': { inputs: ['packages/peer-session/src/session.ts'], imports: [] } },
         files: { 'index.mjs': '5'.repeat(64), ...(sql ? { 'engine/build/Release/doltlite.node': '6'.repeat(64) } : {}) } } }];
     if (report.host) {
@@ -49,6 +49,8 @@ test('composition refuses missing, duplicate, failed and dirty gates', () => {
   assert.throws(() => assemblePeerComposition(inputs([...fixtures(), fixtures()[0]])), /Duplicate/);
   for (const mutate of [
     reports => { reports[0].passed = false; },
+    reports => { reports[0].artifacts[0].provenance.nativeRtc = false; },
+    reports => { delete reports[0].artifacts[0].provenance.nativeRtc; reports[0].artifacts[0].provenance.optionalNativeRtc = true; },
     reports => { reports[0].source.dirty = true; },
     reports => { reports[3].artifacts[0].sourceDirty = true; },
     reports => { reports[4].host.artifacts[0].sourceDirty = true; },

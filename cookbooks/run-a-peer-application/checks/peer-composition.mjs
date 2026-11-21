@@ -34,7 +34,7 @@ export function assemblePeerComposition(inputs) {
       const proof = artifact.provenance;
       hex(proof?.sha256, 64, 'Missing installed package provenance digest');
       assert.equal(proof.profile, profile, 'The packed profile differs from the exercised one');
-      assert.equal(typeof proof.optionalNativeRtc, 'boolean');
+      assert.equal(proof.nativeRtc, true, 'The standard archive must include native RTC');
       assert.ok(Array.isArray(proof.sqlEngines));
       assert.ok(Object.keys(proof.files ?? {}).length > 0, 'Missing verified package content digests');
       for (const [path, sha256] of Object.entries(proof.files)) {
@@ -76,7 +76,7 @@ export function assemblePeerComposition(inputs) {
     } else {
       if (eventManifest !== undefined) assert.equal(report.executionManifestDigest, eventManifest, 'Event execution manifests differ across consumers');
       eventManifest = report.executionManifestDigest;
-      if (!['native-events', 'hosted-websocket-relay', 'browser-websocket-relay'].includes(gate)) assert.equal(session.provenance.optionalNativeRtc, true, 'RTC gate requires the emitted native transport');
+      if (!['native-events', 'hosted-websocket-relay', 'browser-websocket-relay'].includes(gate)) assert.equal(session.provenance.nativeRtc, true, 'RTC gate requires the emitted native transport');
     }
     if (['hosted-participant', 'hosted-websocket-relay', 'browser-websocket-relay'].includes(gate)) {
       for (const artifact of report.host.artifacts) addPackage(artifact, 'werg/tendriller', false);

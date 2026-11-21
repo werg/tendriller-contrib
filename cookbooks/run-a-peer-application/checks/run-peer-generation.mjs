@@ -64,8 +64,8 @@ try {
     assert.ok(rtc || relay, 'The hosted qualification requires actual peer transport');
   }
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-peer-generation-consumer', private: true, type: 'module' }));
-  execFileSync('npm', ['install', ...(rtc || hostSdk ? [] : ['--offline', '--package-lock=false']), '--ignore-scripts', '--no-audit', '--no-fund',
-    artifact, ...(rtc ? ['werift@0.27.0'] : []), ...(hostSdk ? [resolve(hostSdk)] : [])], {
+  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund',
+    artifact, ...(hostSdk ? [resolve(hostSdk)] : [])], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
@@ -73,26 +73,24 @@ try {
   const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  for (const field of ['dependencies', 'optionalDependencies']) {
-    assert.deepEqual(metadata[field] ?? {}, {}, 'The standalone archive must not fetch runtime dependencies');
-  }
-  assert.deepEqual(metadata.peerDependencies ?? {}, rtc ? { werift: '0.27.0' } : {}, 'The optional native RTC adapter pins its external dependency');
+  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' }, 'Native RTC is a standard automatically installed dependency');
+  assert.deepEqual(metadata.optionalDependencies ?? {}, {});
+  assert.deepEqual(metadata.peerDependencies ?? {}, {});
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(hostSdk ? ['@tendriller/core'] : []), ...(rtc ? ['werift'] : [])]);
+  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(hostSdk ? ['@tendriller/core'] : [])]);
   if (hostSdk) {
     const sdk = report.host.artifacts.find(value => value.name === '@tendriller/core');
     assert.equal(hash(await readFile(resolve(hostSdk))), sdk.sha256, 'The controller must use the exact qualified host SDK');
     assert.equal(tree.dependencies['@tendriller/core'].version, sdk.version);
   }
-  if (rtc) {
-    assert.equal(tree.dependencies.werift.version, '0.27.0');
-    const lockBytes = await readFile(join(consumer, 'package-lock.json'));
-    const lock = JSON.parse(lockBytes);
-    report.runtime.dependencies = { lockSha256: hash(lockBytes),
-      packages: Object.entries(lock.packages).filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@chronolog/peer-session', 'node_modules/@tendriller/core'].includes(path))
-        .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
-    assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
-  } else assert.deepEqual(tree.dependencies['@chronolog/peer-session'].dependencies ?? {}, {});
+  assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0');
+  const lockBytes = await readFile(join(consumer, 'package-lock.json'));
+  const lock = JSON.parse(lockBytes);
+  report.runtime.dependencies = { lockSha256: hash(lockBytes),
+    packages: Object.entries(lock.packages).filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@chronolog/peer-session', 'node_modules/@tendriller/core'].includes(path))
+      .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
+  assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
+
   if (tasks) {
     assert.ok(metadata.exports['./sql'] && metadata.exports['./sql-native'], 'The guarded-task gate requires the common SQL composition and native engine capability');
     report.sqlEngine = provenance.nativeEngine;
