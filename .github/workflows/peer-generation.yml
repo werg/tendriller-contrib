@@ -1,4 +1,5 @@
 name: Independent peer-generation consumer
+run-name: "Companion core=${{ inputs.tendriller_ref || 'tuple' }} kernel=${{ inputs.chronolog_ref || 'tuple' }}"
 on:
   push:
     paths:
