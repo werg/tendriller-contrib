@@ -83,10 +83,9 @@ an anonymized session label is not a conversation-write credential. Test the
 actual client and surface before describing unattended ordinary-chat wake as a
 supported feature.
 
-New cards should use `_meta.ui.resourceUri`, the MCP Apps initialization
-handshake and `ui/message`. The legacy `window.openai` aliases are compatibility
-options, discovered at runtime. An external kitchen browser tab does not have
-the chat's widget bridge. See [MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)
+Cards use `_meta.ui.resourceUri`, the MCP Apps initialization handshake and
+`ui/message`. An external kitchen browser tab does not have the chat's widget
+bridge; offer a manual reference handoff there. See [MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)
 and [its current message type](https://apps.extensions.modelcontextprotocol.io/api/interfaces/app.McpUiMessageRequest.html).
 An accepted message is not an observed answer; a timeout must not trigger a
 second message through a different bridge.
@@ -164,6 +163,22 @@ consent surface. Each page Durable Object owns its approved assistant connection
 event inbox, and encrypted delivery queue while application code and durable state
 remain on the enrolled Chronolog participants. With no queued assistant work, the
 hibernating participant socket adds no timer or idle polling.
+
+Build the allowed native tool controller with `createScopedApplicationTools`
+from `@chronolog/peer-session`, and pass it directly as `tools` to
+`connectApplicationAssistant` from `@tendriller/core/assistant`. Its `execute`
+method owns scoped query/command/operation execution. Keep the original operation
+identity after an uncertain response; do not implement another dispatcher or
+translate calls through a second tool facade.
+
+For durable events, use Chronolog's `forwardSessionEvents` with the application's
+durable checkpoint and projection. Supply
+`createAssistantEventDelivery({ assistant, onSkipped })` as its delivery callback.
+Chronolog owns read views, recovery, cancellation and checkpoint advancement;
+Tendriller supplies host acknowledgement and retry. Record owner-declined
+projections through `onSkipped` separately from delivered events. Advancing a
+checkpoint follows successful callback completion, not merely a socket send.
+The current assistant guide owns the complete setup and lifecycle example.
 
 ## Adapt the connected kitchen specimen
 
@@ -267,10 +282,11 @@ Do not copy every local tool into the remote model allowlist: explicit takeover,
 recovery, reapplication, role management and publication have separate trust
 requirements. A tool listing is a capability description, not a grant.
 
-For another issuer or a custom application domain, use the pinned
-[standalone adapter configuration](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/README.md)
-when appropriate. It requires its own process and native session factory.
-Keep authorization checks, store keys and device signers on the service side.
+For a custom application domain, use the current native bootstrap and hosted
+assistant guide above with the selected service's exact OAuth resource. Keep
+authorization checks, keys and device signers on their owning participant. The
+historical standalone adapter is provenance, not an alternate installation path
+for the current hosted contract.
 
 ## Verify the whole journey and its failures
 
