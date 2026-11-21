@@ -110,7 +110,8 @@ independent storage identities, adopted point, time to usable recovery and known
 lost commands. The initial five-minute freshness target is checked against the
 last command's observed apply time. This short burst qualifies only its recorded
 workload and topology. It does not establish a five-minute loss bound during a
-partition, sustained mobile operation or device suspension; those remain G4.
+partition, sustained mobile operation or device suspension; qualify those
+boundaries separately on the actual devices and networks.
 
 ## SQL and guarded domain commands
 

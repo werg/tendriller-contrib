@@ -1,10 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
+import { resolve, relative, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readCookbooks, readingCatalog, walk } from './catalog.mjs';
 import { gallery } from './gallery.mjs';
+import { snapshotSource, snapshotContentPaths } from './snapshot-source.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const check = process.argv.includes('--check');
 const entries = readCookbooks(root);
@@ -32,17 +33,12 @@ const outputs = new Map([
 ]);
 for(const [path,content] of outputs){if(check){if(readFileSync(resolve(root,path),'utf8')!==content)throw Error(`Generated file is stale: ${path}; run npm run build`);}else writeFileSync(resolve(root,path),content);}
 if(!check){
+ const { commit: sourceCommit, dirty } = snapshotSource(root, process.env.SOURCE_COMMIT);
  const dist=resolve(root,'dist'),site=resolve(dist,'static');rmSync(dist,{recursive:true,force:true});mkdirSync(site,{recursive:true});
- for(const path of ['cookbooks','guides','README.md','PROVENANCE.md','catalog.json','index.html','agent.md','llms.txt'])cpSync(resolve(root,path),resolve(site,path),{recursive:true});
- mkdirSync(resolve(site, 'distribution'), { recursive: true });
- cpSync(resolve(root, 'distribution/source-map.json'), resolve(site, 'distribution/source-map.json'));
- let commit = null, dirty = true;
- try {
-  commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().length > 0;
- } catch {}
- const sourceCommit = process.env.SOURCE_COMMIT || commit;
- if (sourceCommit && !/^[a-f0-9]{40}$/.test(sourceCommit)) throw Error('SOURCE_COMMIT must be a full Git commit SHA');
+ for (const path of snapshotContentPaths) {
+  mkdirSync(dirname(resolve(site, path)), { recursive: true });
+  cpSync(resolve(root, path), resolve(site, path), { recursive: true });
+ }
  const sourceBase = sourceCommit && !dirty ? `https://github.com/werg/tendriller-contrib/blob/${sourceCommit}` : undefined;
  // Current discovery follows main; a clean exported snapshot names its exact source.
  writeFileSync(resolve(site, 'catalog.json'), JSON.stringify(readingCatalog(entries, sourceBase), null, 2) + '\n');
