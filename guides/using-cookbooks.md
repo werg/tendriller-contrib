@@ -25,7 +25,7 @@ native pairing proposal before owner review, and preserve its durable ordering
 pause while the result is uncertain. A finite helper window does not promise
 an always-running participant or automatic recovery from lost private storage.
 
-Import `createLiveView` from `@tendriller/core/collaboration/live-view`; use its
+Import `createLiveView` from `@chronolog/peer-session/browser` (or `@chronolog/peer-session`); use its
 bounded `ready()` for the first coherent read so ordinary recovery does not
 tear down a healthy connection. Import or adapt the starter's
 `helpers/operation-view.mjs` and, when needed, `helpers/reviewed-input.mjs` as

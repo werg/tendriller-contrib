@@ -1,6 +1,6 @@
 // Copy beside configuration.json and worker.mjs in the signed deployment graph.
 // This composes the maintained owner; it does not implement owner election.
-import { openBrowserOwner, createBrowserIdentity } from '@tendriller/core/collaboration/browser';
+import { openBrowserOwner, createBrowserIdentity } from '@tendriller/core/browser-owner';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 
 const configuration = await fetch(new URL('./configuration.json', import.meta.url), { cache: 'no-store' }).then(async response => {

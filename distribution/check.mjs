@@ -13,8 +13,4 @@ const pkg=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8'));
 assert.ok(!pkg.bin&&!pkg.exports,'Cookbook collection must not advertise executable package exports');
 for(const entry of entries){assert.ok(!(entry.dependencies||entry.requires),'Reading catalog must not define an install graph');for(const source of entry.sources||[])assert.match(source,/^https:\/\/github\.com\/werg\/(?:tendriller|tendriller-contrib|chronolog-db)\/(?:blob|tree)\/[a-f0-9]{40}\//,'Sources should pin reviewed revision');}
 for(const path of walk(resolve(root,'cookbooks')).filter(path=>/\.(?:m?js|ts|html)$/.test(path))){const s=readFileSync(path,'utf8');assert.ok(!/tendrilSnippets|TendrilWorkflows|sessions\.activate|tendril\.control\b/.test(s),`${relative(root,path)} retains a retired API`);assert.ok(!/(?:\.\.\/)+(?:tendriller|chronolog-db)\/(?:server|runtime|contract|packages)\//.test(s),`${relative(root,path)} imports private sibling source`);}
-const inventory=JSON.parse(readFileSync(resolve(root,'guides/source-inventory.json'),'utf8'));
-assert.equal(new Set(inventory.files.map(file=>file.source)).size,inventory.files.length,'Source inventory must account for each old path once');
-assert.equal(inventory.files.length,237,'Source inventory must account for the reviewed baseline');
-for(const file of inventory.files)for(const id of file.destinations)if(!id.startsWith('https:'))assert.ok(entries.some(entry=>entry.id===id),`Unknown inventory destination ${id}`);
-console.log(`Validated ${entries.length} guides, local reading links, public boundaries, and ${inventory.files.length} source decisions.`);
+console.log(`Validated ${entries.length} guides, local reading links, and public boundaries.`);

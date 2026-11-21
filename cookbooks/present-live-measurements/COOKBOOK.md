@@ -97,4 +97,4 @@ Both must process the same admitted records, separate runs, retain raw values, a
 - Expire server history. The incomplete-history notice persists after checkpoint/reload.
 - Revoke access. Cached private values do not appear merely because they are on disk.
 
-**Evidence:** five numerical cases and eight browser scenarios across the desktop and mobile adaptations passed. The [pilot record](../../guides/pilot-evidence.json) identifies exact source, runtime, preview, browser, and CI artifacts. These checks cover bounded ingestion, exact values, gaps, reload, and delayed authorization changes. A fixture display does not establish live service authorization or production retention behavior.
+**Evidence:** five numerical cases and eight browser scenarios across the desktop and mobile adaptations passed. These checks cover bounded ingestion, exact values, gaps, reload, and delayed authorization changes. A fixture display does not establish live service authorization or production retention behavior.

@@ -5,11 +5,10 @@ an empty directory and imports only their declared public exports. The native SQ
 engine must be included in the Chronolog archive. Source files from a sibling
 checkout are not a substitute for either package.
 
-The [qualified 9df9308 tuple](../notes/qualification-9df9308.md) records the final
-31-observation native run, both 16-observation authored browser journeys and all
-seven peer transport/domain gates. Its retained original reports and composition
-records can be verified independently of expiring Actions downloads. Later source
-changes require their own qualification.
+The native and browser runners below exercise the 31-observation native run, both
+16-observation authored browser journeys, and all seven peer transport/domain gates.
+Retain each run's original reports and composition records; later source changes
+require their own qualification.
 
 Run the report validator tests with `npm test`. The full runtime entry point is
 `npm run test:collaboration`, with exact archive paths and core provenance:
@@ -218,7 +217,7 @@ node reviewer-cli.mjs --directory /private/clarity-owner \
   --application-id ACTUAL_APPLICATION_ID --policy clarity
 ```
 
-The CLI attaches through `@tendriller/core/collaboration/native`; it never opens
+The CLI attaches through `@tendriller/core/native-owner`; it never opens
 a competing signer or retries attachment as independent enrollment. It claims
 only eligible frozen slots, rereads the current fence before computation and
 result submission, emits disposable signed progress and writes full operation

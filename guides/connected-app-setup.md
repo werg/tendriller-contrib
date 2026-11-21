@@ -129,11 +129,12 @@ login, let the owner complete that sign-in there. Reuse the saved application,
 device store and operation references after each checkpoint instead of creating
 a second page or signer when a review is delayed.
 
-Core's [account-bound setup and reviewed pairing protocol](https://github.com/werg/tendriller/blob/master/docs/ONBOARDING_PROTOCOL_FOLLOWUPS.md)
-describes implemented candidate interfaces and their remaining qualification
-gates. Use them only through the selected host's matching guide and complete
-release. A missing endpoint, incompatible storage or absent release remains an
-explicit upgrade boundary; this guide does not establish deployment.
+Core's [session bootstrap](https://github.com/werg/tendriller/blob/master/docs/SESSION_BOOTSTRAP.md)
+and [MCP agent guide](https://github.com/werg/tendriller/blob/master/docs/MCP_AGENT_GUIDE.md)
+describe account-bound setup and reviewed device pairing. Use them through the
+selected host's matching guide and complete release. A missing endpoint, incompatible
+storage or absent release remains an explicit upgrade boundary; this guide does not
+establish deployment.
 
 For ordinary browser pairing, start the retained native peer before review.
 The browser saves one public request and proves possession using its own key.

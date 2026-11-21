@@ -16,7 +16,7 @@ const sessionMetadata = JSON.parse(readFileSync(join(session, 'package.json'), '
 const coreMetadata = JSON.parse(readFileSync(join(core, 'package.json'), 'utf8'));
 assert.equal(sessionMetadata.name, '@chronolog/peer-session'); assert.equal(coreMetadata.name, '@tendriller/core');
 assert.ok(coreMetadata.exports['./collaboration'], 'The public SDK must export collaboration');
-assert.ok(coreMetadata.exports['./collaboration/browser'] && coreMetadata.exports['./collaboration/worker'], 'Use the matching maintained browser owner SDK');
+assert.ok(coreMetadata.exports['./browser-owner'] && coreMetadata.exports['./worker-owner'], 'Use the matching maintained browser owner SDK');
 assert.ok(sessionMetadata.exports['./sql-browser'], 'Use a public browser SQL archive for the guarded collaboration definition');
 const proof = JSON.parse(readFileSync(join(session, 'provenance.json'), 'utf8'));
 assert.equal(proof.dirty, false, 'Published graphs require clean public session artifacts');

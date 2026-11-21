@@ -39,7 +39,7 @@ try {
     archive: sessionArchive, allowDirty: values['allow-dirty'] });
   assert.ok(session.metadata.exports['./sql-browser']);
   const core = JSON.parse(await readFile(join(consumer, 'node_modules/@tendriller/core/package.json'), 'utf8'));
-  assert.ok(core.exports['./collaboration/browser']); assert.ok(core.exports['./collaboration/worker']);
+  assert.ok(core.exports['./browser-owner']); assert.ok(core.exports['./worker-owner']);
   assert.equal(core.version, sdk.version);
   report.artifacts = [session.artifact, { name: core.name, version: core.version, sha256: sdk.sha256,
     sourceCommit: coreProof.source, sourceTree: coreProof.sourceTree, sourceDirty: coreProof.dirty, provenanceSha256: hash(coreBytes) }];
@@ -68,8 +68,8 @@ try {
     ...['app.mjs', 'board.html', 'discussion.html', 'style.css'].map(name => [`source/page/${name}`, join(here, '../page', name)]),
   ];
   const allowed = new Set(['@chronolog/peer-session', '@chronolog/peer-session/worker', '@chronolog/peer-session/sql',
-    '@chronolog/peer-session/sql-browser', '@tendriller/core/collaboration', '@tendriller/core/collaboration/browser',
-    '@tendriller/core/collaboration/worker', './deployment/bootstrap.mjs', './domain/live-run.mjs', '../domain/review-workspace.mjs',
+    '@chronolog/peer-session/sql-browser', '@tendriller/core/collaboration', '@tendriller/core/browser-owner',
+    '@tendriller/core/worker-owner', './deployment/bootstrap.mjs', './domain/live-run.mjs', '../domain/review-workspace.mjs',
     'esbuild', 'playwright']);
   const imports = new Set();
   for (const [destination, source] of fixtures) {

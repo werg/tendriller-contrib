@@ -10,7 +10,7 @@ Keep author, sequencing, recovery, data membership, ownership and external-tool 
 
 For multi-participant workspaces, start with [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md). Use maintained public owner, collaboration and view-reference primitives; the reference includes two authored layouts and exact-artifact native conformance. Labels and availability do not establish agent execution authority.
 
-The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses the public applied()/shared() contract directly. Executable examples install an explicitly supplied matching @chronolog/peer-session archive. The [qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md) preserves clean native RTC, SQL and hosted runs with exact source and artifact hashes. Browser ownership, SDK recovery orchestration and deployed operating limits require their own evidence. Historical reports retain their source-specific scope and do not define another supported session API.
+The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses the public Chronolog `@chronolog/peer-session` contract directly (`applied()`, `shared()`, `createLiveView`, `forwardSessionEvents`). Executable examples install a matching `@chronolog/peer-session` archive and verify behavior against their exact artifact hashes.
 
 Start from an [application journey](guides/use-cases.md) when the user names an outcome rather than a technical decision. Follow the person through first use, correction, completion, and return; preserve the evidence boundary of every claimed check.
 

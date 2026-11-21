@@ -25,11 +25,10 @@ review policy and editable example UI; it adds no session owner or retry queue.
 Use the exact compatible public archives identified by the qualification report.
 A current source checkout does not establish what a deployed host supports.
 
-The [qualified source tuple](notes/qualification-9df9308.md) passed 31 native
-observations with eight retained signers and 32 attached views, both actual
-Chromium/SQL/OPFS ownership journeys, and the seven-route peer composition.
-That note retains the raw reports, archive hashes, measured local limits and
-separate deployed-device/provider acceptance boundaries.
+The [independent qualification runners](checks/README.md) exercise 31 native
+observations with eight retained signers and 32 attached views, both Chromium/SQL/OPFS
+ownership journeys, and the seven-route peer composition. Keep raw reports, archive
+hashes, and separate deployed-device/provider acceptance boundaries with each run.
 
 ## Choose identities deliberately
 

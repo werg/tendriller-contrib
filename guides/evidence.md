@@ -19,8 +19,8 @@ use a fresh check to report the current collection.
 For executable checks, record the command, exact public core artifact identity or
 revision, scenario scope, observed outcome, and known limits. A tested pairing is
 one reproducible observation, not a synchronized release requirement for prose.
-The [pilot record](pilot-checks.md) separates browser/numerical evidence from actual
-trusted-host authority checks.
+See [capability validation](validation.md) for separating local fixture checks from
+hosted authority checks.
 
 Proposed algorithms must be identified as proposals. Example constants carry their
 assumptions and should be reconsidered for a new task. External host features and

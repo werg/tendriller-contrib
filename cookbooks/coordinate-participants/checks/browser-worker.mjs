@@ -6,7 +6,8 @@ import { bytesDigest, controlParticipantGrant, createGenerationRegistry, createP
 import { openBrowserDevice } from '@chronolog/peer-session/worker';
 import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-session/sql';
 import { createBrowserSqlEngine, loadBrowserEngine } from '@chronolog/peer-session/sql-browser';
-import { serveBrowserOwner } from '@tendriller/core/collaboration/worker';
+import { serveBrowserOwner } from '@tendriller/core/worker-owner';
+import { prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { reviewWorkspace } from '../domain/review-workspace.mjs';
 
 const profileId = new URL(import.meta.url).searchParams.get('profile');
@@ -44,7 +45,7 @@ serveBrowserOwner({ profileId, async openSession({ signal }) {
     session = await openSqlApplication({ device, definition, authority: JSON.parse(decoder.decode(authority)),
       schema: JSON.parse(decoder.decode(schema)), epochKeys: new Map([[0, key]]), databasePath: '/qualification.sqlite',
       createEngine: () => engine, signals: { localEcho: true, delivery: 'neighbors' } });
-    return { session, close: async () => pool?.pauseVfs() };
+    return { session, prepareCommand: (endpoint, name, input) => prepareCollaborationCommand(endpoint, name, input, session.deviceId), close: async () => pool?.pauseVfs() };
   } catch (error) {
     try { if (session) await session.close(); else await device?.close(); } finally { await pool?.pauseVfs(); }
     throw error;

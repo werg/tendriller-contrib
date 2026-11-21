@@ -23,11 +23,10 @@ complete claim fencing or the current collaboration model.
 
 This recipe uses one `@chronolog/peer-session` composition for browser and native
 peers. The session owns encrypted history, exact operation retry, replication,
-discovery and recovery policy. The [qualification note](notes/peer-generation-qualification.md)
-records the exact native, SQL, hosted and browser checkpoints and the independent
-agent business workflow. Local runtime results do not establish deployed-network
-readiness. Earlier implementations retain their original
-[historical evidence](notes/finalized-resident-recipe.md).
+discovery and recovery policy. The [checks guide](checks/README.md) documents the
+native, SQL, hosted, and browser qualification runners and the independent agent
+business workflow. Local runtime results do not establish deployed-network
+readiness.
 
 `operation.applied()` returns execution in the selected generation.
 `operation.shared()` separately observes retained coverage on another peer.
@@ -48,10 +47,8 @@ discovery, enrollment and occasional authenticated generation selection.
 The [primitive and role guide](../../guides/application-primitives.md) explains
 the guarantees. Chronolog's [authority ADR](https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/docs/peer-generation-v1.md)
 owns the wire rules; this cookbook does not implement a second authority policy.
-The [qualification note](notes/peer-generation-qualification.md) separates the
-independent packed session exercise from real browser/RTC and deployed evidence.
-The [historical resident archive](notes/finalized-resident-recipe.md) preserves the
-older immutable-prefix evidence and the original scope of its reports.
+See the [checks guide](checks/README.md) to separate independent packed-session
+runs from real browser/RTC and deployed evidence.
 
 ## Choose one of three entry paths
 
@@ -67,7 +64,7 @@ Use the same application session and backend for every participant. Unavailable 
 never select a second command API or journal. Stronger guarantees are explicit
 capabilities on the same session contract.
 
-The [owned Worker page recipe](notes/peer-session-pages.md) provides two layouts
+The [page builder](checks/build-peer-pages.mjs) packages two layouts
 using domain commands, coherent queries and explicit recovery notices. Its build
 requires a public session package and complete real deployment assets.
 
@@ -119,7 +116,7 @@ inputs, a native application uses the public package:
 
 ```js
 import { openNativeDevice, openNativeApplication } from '@chronolog/peer-session/native';
-import { participateNativeApplication } from '@tendriller/core/collaboration/native-rtc';
+import { participateNativeApplication } from '@tendriller/core/native-rtc';
 import { conversation } from './peer-conversation.mjs';
 
 // Use { create: true } only for explicit first-time device creation.
@@ -194,7 +191,7 @@ waiting state. A client must not mint a competing current generation locally.
 Observe `session.participation.onStatus` for connection/recovery progress. When
 it presents `approval-required`, display the exact proposal and its unknown or
 observed age, then call `approveRecovery(proposal.id)` only after explicit review.
-The [shared page layouts](notes/peer-session-pages.md) implement that presentation
+The [shared page builder](checks/build-peer-pages.mjs) implements that presentation
 without adding a second recovery policy.
 
 ## Reuse a derived view
@@ -308,6 +305,6 @@ The report's `independent-packed-peers` topology uses the maintained in-process
 peer link. Host counters describe the portable control port. It does not claim
 physical RTC routing, browser storage ownership, Tendriller HTTP endpoints,
 production authentication or provider cost. Those remain separate gates in the
-[qualification note](notes/peer-generation-qualification.md). Preserve raw reports,
+[checks guide](checks/README.md). Preserve raw reports,
 source trees, dirty flags and archive digests; do not promote a build or synthetic
 validator test to runtime evidence.

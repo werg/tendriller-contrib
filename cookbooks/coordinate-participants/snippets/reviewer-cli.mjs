@@ -2,7 +2,7 @@
 // process never opens or recreates a signing store when attachment fails.
 import { readFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
-import { attachNativeSession } from '@tendriller/core/collaboration/native';
+import { attachNativeSession } from '@tendriller/core/native-owner';
 import { connectApplicationOwner } from '@chronolog/peer-session/browser';
 import { runReviewer } from './reviewer.mjs';
 

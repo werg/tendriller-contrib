@@ -38,7 +38,7 @@ Keep a preparation checklist small and concrete: current publication saved, requ
 
 Test navigation to each required nested HTML file. A missing offline route must not silently show a different entry page. Verify the intended cold-start path in the target browser and identity context; an already-open tab surviving network loss does not prove a later fresh navigation will work. Do not promise indefinite offline access or background execution.
 
-Use the [current owned-session page composition](../run-a-peer-application/notes/peer-session-pages.md) and qualify the actual target browser and publication graph.
+Use the [current owned-session page composition](../run-a-peer-application/COOKBOOK.md) and qualify the actual target browser and publication graph.
 
 ## Keep local work and the journal understandable
 

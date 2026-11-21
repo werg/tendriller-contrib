@@ -9,15 +9,11 @@ history position. Recovery may abandon a recent suffix, including previously
 applied work; the current session exposes no `final()` wait.
 
 The [peer application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
-uses packed public artifacts directly. Its
-[independent qualification record](../cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
-records exact clean native RTC, SQL, hosted and browser runs, together with the
-scope of each recovery and transport check. Deployed operating limits need
-their own observations. An implementation or method name alone does not
+uses packed public artifacts directly; its
+[checks guide](../cookbooks/run-a-peer-application/checks/README.md) documents the
+native RTC, SQL, hosted, and browser qualification runners. Deployed operating limits
+need their own observations. An implementation or method name alone does not
 establish those qualifications.
-The [historical implementation guide](finalized-peer-applications.md) preserves
-older source-specific results; their runtime fixtures and compatibility paths
-are not part of the supported composition.
 
 Start with the recovery contract. A live cursor can disappear. A submitted
 message can be retained by peers yet disappear from the selected application

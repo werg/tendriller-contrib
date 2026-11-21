@@ -22,11 +22,11 @@ recovery excludes the operation.
 Start with the smallest route that supports the task, then expose the other
 routes through capability discovery and clear failure messages. Reading this
 cookbook grants no account, device or outbound-data permission. Its end-to-end
-evidence remains **explained**: the [test record](notes/evidence.md) distinguishes
-the exercised native/MCP round trip from an unverified live subscribed-chat
-deployment. The companion [core change](https://github.com/werg/tendriller/pull/61)
-provides the runnable service and adapters; the references below pin its tested
-source so implementing agents can inspect the actual contracts.
+evidence remains **explained**: native/MCP round-trip checks do not substitute for
+a live subscribed-chat deployment. See core's
+[Cloudflare assistant setup](https://github.com/werg/tendriller/blob/master/docs/CLOUDFLARE_ASSISTANT.md)
+and [ChatGPT integration guide](https://github.com/werg/tendriller/blob/master/docs/CHATGPT_INTEGRATION.md)
+for the current hosted `/mcp` contracts.
 
 For several people, tools or agents in one application, compose the gateway with
 the [multi-participant reference](../coordinate-participants/COOKBOOK.md) and
@@ -157,19 +157,13 @@ and the integration's configuration documentation for the exact resource.
 
 ## Deploy on the Tendriller Worker
 
-Use the [deployment and readiness note](notes/deployment.md) to configure the
-existing service's `/mcp` and `/connections` routes. The page's Durable Object
-owns the dedicated assistant reader/writer and encrypted delivery journal. It
-opens a peer connection for bounded work and closes it when that work finishes.
-Retain the application's original coordinator so the browser and assistant can
-read and write selected history. With no queued assistant work, the integration
-adds no timer or peer connection.
-
-The bundled adapter supports one configured kitchen version 2 application per
-deployment. It uses the deployment's trusted executable definition and verifies
-it against the application's signed descriptor. When adapting this specimen to
-another domain, add and qualify its trusted Worker adapter first or choose one of
-the fallback routes.
+Follow core's [Cloudflare assistant setup](https://github.com/werg/tendriller/blob/master/docs/CLOUDFLARE_ASSISTANT.md)
+and [OAuth setup](https://github.com/werg/tendriller/blob/master/docs/INTEGRATION_OAUTH.md)
+to enable the service's single account-linked `/mcp` endpoint and `/connections`
+consent surface. Each page Durable Object owns its approved assistant connection,
+event inbox, and encrypted delivery queue while application code and durable state
+remain on the enrolled Chronolog participants. With no queued assistant work, the
+hibernating participant socket adds no timer or idle polling.
 
 ## Adapt the connected kitchen specimen
 
@@ -280,12 +274,11 @@ Keep authorization checks, store keys and device signers on the service side.
 
 ## Verify the whole journey and its failures
 
-The Worker integration test exercises the actual page relay and selected
+The Worker integration tests exercise the actual page relay and selected
 Chronolog history through a read, an authenticated wake, signed callback
 delivery, object eviction, retry with the original delivery ID, and a signed
 reply observed by the coordinator. The callback receiver supplies a scripted
-response. The [evidence record](notes/evidence.md) carries the revision and
-the remaining checks for an actual subscribed conversation.
+response; keep live subscribed-chat runs recorded as separate evidence.
 
 Exercise the application with two real devices before claiming a connected
 result. Demonstrate a request, a read on the other device, the reply, reload,
@@ -304,4 +297,4 @@ Report exact source commits and artifact hashes, the running process and its
 lifetime, publication receipt, selected revision, operation identity and
 delivery state. Log identifiers and status rather than private request text.
 If a live prerequisite is missing, name it and offer the route above that still
-works. Keep the [evidence record](notes/evidence.md) scoped to what was observed.
+works, keeping any test record scoped to what was actually observed.

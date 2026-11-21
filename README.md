@@ -82,14 +82,9 @@ service. These stronger guarantees are capabilities of the same application
 model, not alternative profile-selected runtimes.
 
 The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md)
-uses the public API directly. Its
-[independent qualification record](cookbooks/run-a-peer-application/notes/peer-generation-qualification.md)
-links exact clean native RTC, SQL and hosted package results and states the
-remaining browser, recovery-policy and deployment gates. Executable examples
-require an explicitly supplied matching `@chronolog/peer-session` archive. The
-[historical implementation guide](guides/finalized-peer-applications.md) preserves
-older results under their original guarantees; the superseded runtime fixtures
-have been retired.
+uses the public API directly; its [checks guide](cookbooks/run-a-peer-application/checks/README.md)
+documents the independent packed-artifact qualification runners. Executable examples
+require an explicitly supplied matching `@chronolog/peer-session` archive.
 
 [Live signals](cookbooks/share-live-signals/COOKBOOK.md) cover typing, presence,
 cursors, progress and transient messages without a database. The
@@ -209,9 +204,8 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 
 ## Contribute and verify
 
-See [contribution guidance](guides/contributing.md), [evidence levels](guides/evidence.md),
-and the [source conversion inventory](guides/conversion.md). Useful failures and
-rejected alternatives are valuable contributions.
+See [contribution guidance](guides/contributing.md) and [evidence levels](guides/evidence.md).
+Useful failures and rejected alternatives are valuable contributions.
 
 ```sh
 npm ci
@@ -220,10 +214,10 @@ npm run build
 ```
 
 The ordinary check is local and content-focused: metadata, reading links, generated
-output, source accounting, and deterministic snippet checks. It needs no service or
+output, and deterministic snippet checks. It needs no service or
 contrib/core release synchronization. `dist/` contains a content-only site snapshot
-and an archive manifest. [Pilot verification](guides/pilot-checks.md) explains the
-separate browser and actual-host checks using explicitly supplied public core artifacts.
+and an archive manifest. See [validation](guides/validation.md) for browser and
+hosted qualification using explicitly supplied public core artifacts.
 
 [Source provenance and terms](PROVENANCE.md) remain explicit. This refactor grants
 no new license and makes no compatibility promise for retired product surfaces.

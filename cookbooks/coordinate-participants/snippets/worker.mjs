@@ -1,6 +1,7 @@
 // Fenced dedicated owner for the synchronous-OPFS SQL profile.
 // The page declares this engine capability before opening the retained signer.
-import { serveBrowserOwner } from '@tendriller/core/collaboration/worker';
+import { serveBrowserOwner } from '@tendriller/core/worker-owner';
+import { prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { createPeersClient, createPeerIntroductions } from '@tendriller/core/peers';
 import { verifyAuthorityBundle } from '@chronolog/peer-session';
 import { openBrowserDevice } from '@chronolog/peer-session/worker';
@@ -61,6 +62,7 @@ return { profileId: configuration.profileId,
         openRelayConnection: ({ relay, signal }) => openWebSocketConnection(relay, { ready: relay.ready, signal }),
       }) });
       return { session, control,
+        prepareCommand: (endpoint, name, input) => prepareCollaborationCommand(endpoint, name, input, session.deviceId),
         close: async () => { await pool?.pauseVfs(); },
       };
     } catch (error) {

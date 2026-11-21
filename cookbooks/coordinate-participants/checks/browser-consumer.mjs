@@ -15,7 +15,7 @@ try {
   const bundled = await build({ absWorkingDir: here, entryPoints: { app: 'source/page/app.mjs', worker: 'source/page/deployment/worker.mjs' },
     bundle: true, splitting: true, format: 'esm', platform: 'browser', target: 'es2022', outdir: site,
     outExtension: { '.js': '.mjs' }, metafile: true });
-  assert.ok(Object.keys(bundled.metafile.inputs).some(path => path.includes('node_modules/@tendriller/core/collaboration/')));
+  assert.ok(Object.keys(bundled.metafile.inputs).some(path => path.includes('node_modules/@tendriller/core/session/') || path.includes('node_modules/@tendriller/core/collaboration/')));
   for (const name of ['board.html', 'discussion.html', 'style.css']) await cp(join(here, 'source/page', name), join(site, name));
   await cp(join(here, 'engine'), join(site, 'engine'), { recursive: true });
   server = createServer(async (request, response) => {

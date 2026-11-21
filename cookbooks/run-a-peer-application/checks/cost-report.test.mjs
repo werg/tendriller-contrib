@@ -93,7 +93,7 @@ test('invalid numbers, fabricated zeros, missing provenance and incomplete workl
 });
 
 test('published reference rates remain dated inputs instead of overriding unknown measurements', async () => {
-  const frozen = JSON.parse(await readFile(new URL('../notes/evidence/2026-11-16-cloudflare-pricebook.json', import.meta.url), 'utf8'));
+  const frozen = JSON.parse(await readFile(new URL('./cloudflare-pricebook.json', import.meta.url), 'utf8'));
   const result = calculateCosts(createUsageTemplate(), frozen);
   assert.equal(result.pricingCheckedAt, '2026-11-16');
   assert.ok(result.cases.every(item => item.total === null));

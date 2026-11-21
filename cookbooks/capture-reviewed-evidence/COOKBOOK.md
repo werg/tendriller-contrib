@@ -122,7 +122,7 @@ The [inline specimen](https://github.com/werg/tendriller-contrib/blob/646ceca52c
 The additional evidence-tray, crop/redaction, and accessible review choices above
 are adaptation guidance; they are not added claims about the recorded pilot scope.
 
-Nine historical browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance was pending. The [pilot record](../../guides/pilot-evidence.json) names those exact sources and public artifacts. Those retired transport fixtures do not qualify current content retention or command execution. The [common browser session gate](../run-a-peer-application/checks/README.md) separately exercises actual encrypted content, interrupted transfer, durable reopening and recovery; an adapted capture UI still needs its own interaction checks.
+Nine historical browser scenarios across these specimens passed, including local-storage failure, snapshot recovery, stale rejection, and new typing while acceptance was pending. Those retired transport fixtures do not qualify current content retention or command execution. The [common browser session gate](../run-a-peer-application/checks/README.md) separately exercises actual encrypted content, interrupted transfer, durable reopening and recovery; an adapted capture UI still needs its own interaction checks.
 
 ## Verify the flow
 

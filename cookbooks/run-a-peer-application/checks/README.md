@@ -183,8 +183,7 @@ storage refusal, graceful and abrupt Worker reopening, interrupted content
 transfer, fresh-peer replay and coherent captured views.
 
 Build complete authored page graphs through
-[`build-peer-pages.mjs`](build-peer-pages.mjs) and the
-[owned-session page guide](../notes/peer-session-pages.md). A real deployment must
+[`build-peer-pages.mjs`](build-peer-pages.mjs). A real deployment must
 supply its enrollment and discovery configuration. A successful UI or bundle
 build is not evidence that those services ran.
 
@@ -381,10 +380,9 @@ historical result is silently replaced by a passing report from another source.
 
 ## Evidence and remaining qualification
 
-The [qualification note](../notes/peer-generation-qualification.md) preserves
-actual reports and separates their scopes. The report validators require the
-observations above. Their synthetic tests prove only that missing or
-contradictory evidence is rejected, not that the runtime scenarios passed.
+The report validators require the observations above. Their synthetic tests prove
+only that missing or contradictory evidence is rejected, not that the runtime
+scenarios passed.
 
 Current consumers use `applied()` for execution and `shared()` for retained
 coverage. Neither is irreversible finality. A protected action is an explicit
@@ -396,8 +394,3 @@ home/mobile/restrictive networks, deployed WSS fallback, suspension, quota press
 recovery freshness and provider/device costs. Measure the initial five-minute
 freshness objective under a stated workload with another usable peer; do not
 infer a universal loss bound from a heartbeat or a local run.
-
-Earlier resident/chronological reports remain evidence of their recorded source
-snapshots in [the historical archive](../notes/finalized-resident-recipe.md).
-Those source snapshots retain their former runners and connection snippets.
-They are not maintained as an alternate current session API or deployment path.

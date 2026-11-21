@@ -255,8 +255,7 @@ that task's result. The [adaptation loop](using-cookbooks.md) explains how to mo
 from reading to page-owned source; [testing an adaptive page](../cookbooks/test-adaptive-page/COOKBOOK.md)
 helps select the smallest meaningful check.
 
-These briefs and the expanded feature choices are explained designs. Existing
-executable evidence remains attached to its exact source and artifact record in
-[pilot verification](pilot-checks.md); reading a new route does not extend those
-claims. Record real adaptations, including failures and rejected features, so
-future cookbook improvements are based on observed use.
+These briefs and the expanded feature choices are explained designs. See
+[capability validation](validation.md) for the exact boundaries of executable checks;
+reading a new route does not extend those claims. Record real adaptations, including
+failures and rejected features, so future cookbook improvements are based on observed use.
