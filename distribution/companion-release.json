@@ -1,0 +1,30 @@
+{
+  "format": "tendriller-companion-release/v1",
+  "stage": "published",
+  "core": {
+    "repository": "werg/tendriller",
+    "source": "79b6845df411e3a910b662b31bae789da38d0bf9",
+    "sourceTree": "b65c3c10a86b293a156e51c32509d926d67c889e",
+    "dirty": false
+  },
+  "release": {
+    "sourceCommit": "79b6845df411e3a910b662b31bae789da38d0bf9",
+    "coreRelease": "0.3.0-rc.17",
+    "runtimeId": "7c73ccf86b70ad5601090156b9d21083c91889338140ad3811252ac491ac73ff",
+    "compositionId": "4cb993542c9ece388a3342aa0a9503b192879b1e8903cf7b8f7bacb866423d13",
+    "manifestSha256": "c363cec748336abc0cc6f4af10ca9752a1d71207c249c6c318ee4247dd465742"
+  },
+  "kernel": {
+    "repository": "werg/chronolog-db",
+    "source": "e802f1658cef71ab12711e0921cdc802bbb8d2d0",
+    "sourceTree": "ddcb170f4c842ded088f60e472e5b77aaea23d6c",
+    "dirty": false,
+    "archive": {
+      "role": "session",
+      "file": "chronolog-peer-session-e802f1658cef71ab12711e0921cdc802bbb8d2d0.tgz",
+      "sha256": "0dd11c0762614f92b7c08cc79e624ff647fc4e14ffe688a1512cd1ec98982db9",
+      "size": 216667
+    }
+  },
+  "id": "242ff9a07f83c7c512d132f5b7afd1f88b2c23c476c092ce40a18421e3af8cff"
+}
