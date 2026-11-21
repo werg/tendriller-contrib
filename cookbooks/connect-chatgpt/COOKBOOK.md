@@ -139,12 +139,12 @@ minimize what leaves it.
 
 The Worker uses the existing Tendriller account as the authorization server.
 It checks the exact OAuth grant and current owner, and serves the consent form
-at `/connections` after GitHub or Google sign-in. Operators supply the page
-mapping and register the intended OAuth client. A deployment with a different
-issuer can use the standalone external-provider adapter with trusted
-current-account and owner checks.
+at `/connections` after GitHub or Google sign-in. Configure the intended OAuth
+client on that service and use the participant's exact signed assistant proposal
+for application access. Follow the current service guide for supported issuers
+and configuration rather than a historical adapter.
 
-Both routes require authorization code, PKCE S256, issuer/resource binding and
+The service requires authorization code, PKCE S256, issuer/resource binding and
 current authorization checks. Existing upstream account-login tokens are not
 automatically MCP access tokens. The supplied host supports predefined public
 clients (`none`) and confidential clients (`client_secret_basic`); the exact
@@ -259,7 +259,7 @@ and real transaction guards. A read followed by a command can race.
 | Native RTC is unavailable | Chronolog authentication and participant transport | Use the maintained encrypted relay fallback; do not invent another data endpoint |
 | OAuth is unlinked or expired | Existing app state and device identity | Relink that account; use an already authorized local participant if appropriate |
 | The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Use the compatible external-provider mode; do not turn a public callback into a wildcard or treat an upstream login token as MCP authorization |
-| Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check additive host migration, bridge registration, current enrollment and coordinator availability; local readiness does not prove remote readiness |
+| Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check the selected service's deployment readiness, approved assistant proposal, current enrollment and participant availability; local readiness does not prove remote readiness |
 | The bridge is not enrolled, or its grant was revoked | The explicit owner decision | Obtain verified enrollment or restore permitted access; do not borrow a browser signer |
 | No retained authorized peer has the selected history | The pending request and original operation ID | Restore a retained participant; show offline/unavailable rather than claiming delivery |
 | No active Events subscription, or unsupported client | The application request | Use on-demand tools, the mounted card, or the manual reference handoff |
