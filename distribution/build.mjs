@@ -1,10 +1,44 @@
-import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, statSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { readCookbooks, readingCatalog, walk } from './catalog.mjs';
 import { gallery } from './gallery.mjs';
+
+function packDeterministicTarGz(sourceDir) {
+  const files = walk(sourceDir).map(abs => ({ abs, rel: relative(sourceDir, abs).replaceAll('\\', '/') }))
+    .sort((a, b) => a.rel.localeCompare(b.rel));
+  const chunks = [];
+  for (const { abs, rel } of files) {
+    const data = readFileSync(abs);
+    const mode = (statSync(abs).mode & 0o111) ? 0o755 : 0o644;
+    const header = Buffer.alloc(512, 0);
+    const name = rel.length <= 100 ? rel : rel.slice(rel.lastIndexOf('/') + 1);
+    const prefix = rel.length <= 100 ? '' : rel.slice(0, rel.lastIndexOf('/'));
+    if (Buffer.byteLength(name) > 100 || Buffer.byteLength(prefix) > 155) throw Error(`Archive path too long: ${rel}`);
+    header.write(name, 0, 100, 'utf8');
+    header.write(mode.toString(8).padStart(7, '0') + '\0', 100, 8, 'ascii');
+    header.write('0000000\0', 108, 8, 'ascii');
+    header.write('0000000\0', 116, 8, 'ascii');
+    header.write(data.byteLength.toString(8).padStart(11, '0') + '\0', 124, 12, 'ascii');
+    header.write('00000000000\0', 136, 12, 'ascii');
+    header.fill(0x20, 148, 156);
+    header.write('0', 156, 1, 'ascii');
+    header.write('ustar\0', 257, 6, 'ascii');
+    header.write('00', 263, 2, 'ascii');
+    if (prefix) header.write(prefix, 345, 155, 'utf8');
+    let sum = 0;
+    for (let i = 0; i < 512; i++) sum += header[i];
+    header.write(sum.toString(8).padStart(6, '0') + '\0 ', 148, 8, 'ascii');
+    chunks.push(header, data);
+    const rem = data.byteLength % 512;
+    if (rem) chunks.push(Buffer.alloc(512 - rem, 0));
+  }
+  chunks.push(Buffer.alloc(1024, 0));
+  return gzipSync(Buffer.concat(chunks), { level: 9, mtime: 0 });
+}
 const root = fileURLToPath(new URL('../', import.meta.url));
 const check = process.argv.includes('--check');
 const entries = readCookbooks(root);
@@ -49,7 +83,7 @@ if(!check){
  writeFileSync(resolve(site, 'index.html'), gallery(entries, sourceBase));
  const pkg=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8'));
  const file= `tendriller-cookbooks-${pkg.version}.tgz`;
- execFileSync('tar',['--sort=name','--mtime=@0','--owner=0','--group=0','--numeric-owner','-czf',resolve(dist,file),'-C',site,'.']);
+ writeFileSync(resolve(dist, file), packDeterministicTarGz(site));
  const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
  writeFileSync(resolve(dist,'manifest.json'),JSON.stringify({format:'tendriller-cookbook-snapshot',version:pkg.version,source_commit:sourceCommit,source_dirty:dirty,cookbooks:entries.length,artifacts:[{file,sha256:digest(readFileSync(resolve(dist,file)))}],files:walk(site).map(path=>({path:relative(site,path).replaceAll('\\','/'),sha256:digest(readFileSync(path))}))},null,2)+'\n');
 }

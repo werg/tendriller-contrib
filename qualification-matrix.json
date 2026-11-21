@@ -1,0 +1,268 @@
+{
+  "format": "tendriller-qualification-matrix/v1",
+  "generatedAt": "2026-11-21T23:35:14.576Z",
+  "localTelemetry": {
+    "recordedAt": "2026-11-21T23:35:14.576Z",
+    "host": {
+      "platform": "linux",
+      "arch": "x64",
+      "nodeVersion": "v22.22.1"
+    },
+    "artifacts": {
+      "coreSdkBytes": 140094,
+      "runtimeBytes": 6473736,
+      "toolsBytes": 8955126,
+      "bootstrapScriptBytes": 12963,
+      "chronologControlBytes": 31488,
+      "chronologSessionFullBytes": 205227,
+      "chronologSessionRelayBytes": 202774,
+      "chronologWasmSqlBinaryBytes": 2761210,
+      "profileEventsRelayOnlyTotalBytes": 6816604,
+      "profileEventsFullTotalBytes": 6819057
+    },
+    "benchmarks": {
+      "probeCapabilitiesMs": 16.4,
+      "probeRuntime": {
+        "name": "node",
+        "version": "22.22.1",
+        "nodeSqlite": true,
+        "wasm": true,
+        "nativeAddonSupport": true,
+        "sqlDefaultEngine": "wasm-portable",
+        "totalMemoryMb": 31189,
+        "freeMemoryMb": 15447,
+        "fitsConstrainedSandboxBudget": true
+      },
+      "bootstrapVerifiedExtractMs": 153.24,
+      "checkpointRecoveryPassRate": 1,
+      "measuredProcessRssMb": 70.46,
+      "chronologFastLane": {
+        "durationSec": 34.38,
+        "passedFiles": 59
+      }
+    },
+    "gates": [
+      {
+        "id": 1,
+        "name": "Zero GNU tar / native compiler on events-relay-only & events-full",
+        "status": "passed_local_linux_x64",
+        "evidence": "Pure-JS tar.gz in @tendriller/core/archive, tendriller-bootstrap.mjs, and tendriller-contrib build; CI matrix configured for macOS/Windows."
+      },
+      {
+        "id": 2,
+        "name": "Pure-JS SQL WASM fallback (no silent downgrade to events)",
+        "status": "passed_local_linux_x64",
+        "evidence": "Built Emscripten 4.0.20 DoltLite WASM (2.63 MB); passed 6/6 wasm-conformance and 3/3 chronolog-node-fs VFS host-disk persistence tests."
+      },
+      {
+        "id": 3,
+        "name": "Windows named pipe, long Unix path auto-hash, loopback TCP fallback",
+        "status": "passed_local_linux_x64",
+        "evidence": "session/ipc.mjs tested in scripts/test/ergonomics-portability.test.mjs; Windows CI matrix configured in runtime-matrix.yml."
+      },
+      {
+        "id": 4,
+        "name": "Outbound HTTPS polling gateway + Remote MCP + Local Stdio MCP",
+        "status": "passed_local_linux_x64",
+        "evidence": "Verified via real OAuth + DO admission in server/test/assistant-http-gateway.public.test.ts and Stdio MCP in ergonomics-portability.test.mjs."
+      },
+      {
+        "id": 5,
+        "name": "Browser-led coordination & graceful degradation diagnostics",
+        "status": "passed_local_linux_x64",
+        "evidence": "docs/tutorial/pairing-native.mjs allowBrowserCoordinator + docs/tutorial/helpers/diagnostics-panel.mjs verified."
+      },
+      {
+        "id": 6,
+        "name": "Single-command verified bootstrapper & capability probe",
+        "status": "passed_local_linux_x64",
+        "evidence": "scripts/tendriller-bootstrap.mjs (12963 B) verified extract in 153.24 ms."
+      },
+      {
+        "id": 7,
+        "name": "Connect-or-start startup race convergence + zero-IPC bounded mode",
+        "status": "passed_local_linux_x64",
+        "evidence": "connectOrStartNativeSession tested for bounded mode and concurrent shared startup convergence over loopback TCP."
+      },
+      {
+        "id": 8,
+        "name": "Atomic pre-submission outbox + verbatim local operationId preservation",
+        "status": "passed_local_linux_x64",
+        "evidence": "session/outbox.mjs & session/native.mjs preserveOperationId verified in ergonomics-portability.test.mjs."
+      },
+      {
+        "id": 9,
+        "name": "SQL starter UI + composition v2 profiles",
+        "status": "passed_local_linux_x64",
+        "evidence": "docs/tutorial/sql/{index.html,page.mjs,build.mjs} + COMPOSITION_V2_PROFILES verified."
+      },
+      {
+        "id": 10,
+        "name": "Node 22.15+ / 24+ / Bun / Deno compatibility matrix",
+        "status": "ci_workflow_configured",
+        "evidence": "engines.node >=22.15.0 verified locally on Node v22.22.1; .github/workflows/runtime-matrix.yml configured for Node 22.15/24, Bun, Deno across 3 OSes."
+      },
+      {
+        "id": 11,
+        "name": "Encrypted device checkpoint + anti-split-brain retirement + secret-free source handoff",
+        "status": "passed_local_linux_x64",
+        "evidence": "chronolog-db checkpoint.ts + tendril handoff/checkpoint verified with 100% recovery & DEVICE_RETIRED_BY_CHECKPOINT."
+      },
+      {
+        "id": 12,
+        "name": "ServerlessHostAdapter + Docker/systemd/launchd/Windows service templates",
+        "status": "passed_local_linux_x64",
+        "evidence": "@tendriller/core/serverless tested; deploy/* templates and docs/DEPLOYMENT_GUIDE.md shipped."
+      },
+      {
+        "id": 13,
+        "name": "chronolog-db fast pure-JS test lane & AGENTS.md",
+        "status": "passed_local_linux_x64",
+        "evidence": "pnpm test:fast ran 59 pure-JS files in 34.38s."
+      },
+      {
+        "id": 14,
+        "name": "Live qualification across 5 external cloud-agent surfaces",
+        "status": "pending_live_access",
+        "evidence": "Honest placeholder matrix generated; vendor cloud VM credentials/runs are not locally accessible."
+      }
+    ]
+  },
+  "cloudAgentPlatforms": [
+    {
+      "id": "meta-muse",
+      "name": "Meta Muse",
+      "mode": "outbound-https-mcp-or-polling-gateway",
+      "scenarios": {
+        "use_existing_app_via_connector": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_events_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_sql_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "checkpoint_and_resume_across_replacement": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        }
+      }
+    },
+    {
+      "id": "grok-bot-cursor-cloud",
+      "name": "Grok Bot + Cursor Cloud Agent",
+      "mode": "mcp-or-disposable-sandbox",
+      "scenarios": {
+        "use_existing_app_via_connector": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_events_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_sql_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "checkpoint_and_resume_across_replacement": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        }
+      }
+    },
+    {
+      "id": "openai-dots-codex-cloud",
+      "name": "OpenAI Dots + Work / Codex Cloud + Desktop Bridge",
+      "mode": "remote-mcp-or-desktop-ipc",
+      "scenarios": {
+        "use_existing_app_via_connector": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_events_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_sql_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "checkpoint_and_resume_across_replacement": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        }
+      }
+    },
+    {
+      "id": "claude-duet",
+      "name": "Claude Duet",
+      "mode": "remote-mcp-or-stdio-mcp",
+      "scenarios": {
+        "use_existing_app_via_connector": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_events_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_sql_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "checkpoint_and_resume_across_replacement": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        }
+      }
+    },
+    {
+      "id": "instinct",
+      "name": "Instinct",
+      "mode": "disposable-sandbox-and-handoff",
+      "scenarios": {
+        "use_existing_app_via_connector": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_events_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "create_and_run_sql_app": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        },
+        "checkpoint_and_resume_across_replacement": {
+          "status": "pending_live_access",
+          "verifiedAt": null,
+          "notes": "Not yet executed on live vendor cloud environment; do not fabricate."
+        }
+      }
+    }
+  ]
+}
