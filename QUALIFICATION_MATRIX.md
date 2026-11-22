@@ -1,5 +1,7 @@
 # Tendriller Cross-Platform Qualification Matrix
 
+> Historical local report: the original observations below contain no exact source/artifact bindings and do not qualify the current release. Retained pass labels are historical claims, not results of the scorecard collector. Current generation marks unexecuted gates explicitly and requires `--run-fast-tests` before invoking that suite. Use the exact-source public consumer CI and deployment receipts for release qualification.
+
 Generated: `2026-11-21T23:35:14.576Z` on `linux/x64` (`Node v22.22.1`).
 
 > **Honesty contract:** Measurements below come from real local runs on this host. Unobserved operating systems, external runtimes (Bun/Deno), Emscripten WASM compilation, and commercial cloud-agent VMs are explicitly marked `ci_workflow_configured`, `implemented_wasm_binary_pending_emcc`, or `pending_live_access`—never fabricated.
