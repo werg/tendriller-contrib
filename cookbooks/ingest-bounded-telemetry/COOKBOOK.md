@@ -41,8 +41,9 @@ record and age budgets in the application and acquisition process; do not use
 host capacity as a telemetry allowance or assume claim creates a retention policy.
 
 An independently running producer opens the same owned Chronolog application
-session. Enroll its device with scoped grants for the intended observation
-commands and signal topics. Declare stable source/run identities, use ephemeral
+session. Review its device enrollment and grant only the required data role and
+control rights. Enforce allowed observation commands and signal topics in
+application policy; source labels and topic names are not grants. Declare stable source/run identities, use ephemeral
 signals for transient readings, and submit retained observations through domain
 commands. Keep parsing, calibration and a bounded source spool separate from the
 maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/9e24deea741f828890feb7ea26d62b292df19518/docs/tools/CLI.md)
