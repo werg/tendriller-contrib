@@ -36,7 +36,7 @@ Keep the review interaction small: choose fields, inspect paths and types, label
 
 An independently running acquisition process opens the same owned application session. It declares stable source/run identities, uses bounded signals for transient readings, and submits retained observations through domain commands. Keep parsing, calibration and a bounded source spool separate from the maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) exposes the actual session; there is no second hosted stream/collector data protocol. Acquisition health, applied data, retained coverage and agent handling remain distinct. Keep credentials out of authored pages and exports.
 
-Core's source/run metadata policy also matters: supplied values, including explicit null or an empty string, remain distinguishable from absence, and configured defaults fill absent fields only. Do not overwrite these identities to make a chart look cleaner. Server-assigned producer authority is separate from source-provided labels.
+Define source/run metadata handling in the acquisition code and domain commands: preserve the distinction between supplied null, an empty string and absence, and apply configured defaults only to absent fields. Do not overwrite these identities to make a chart look cleaner. Authenticated session producer authority is separate from source-provided labels. The source-pinned collector links in `sources` are historical provenance for the projection choices, not a current collector installation path.
 
 ## Define transformations as application policy
 
