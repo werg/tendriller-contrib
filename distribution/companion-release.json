@@ -3,28 +3,28 @@
   "stage": "published",
   "core": {
     "repository": "werg/tendriller",
-    "source": "acb45edff2daaae73dd52070c3174e5dd85857b2",
-    "sourceTree": "8b14b3c41be588d74afcd0b6843bd2ceca42eb25",
+    "source": "5ab1ccde4d25370fc1f030c375363cf32a61fb47",
+    "sourceTree": "c9452261fd4f6bef0d893963a38271710c017934",
     "dirty": false
   },
   "release": {
-    "sourceCommit": "acb45edff2daaae73dd52070c3174e5dd85857b2",
+    "sourceCommit": "5ab1ccde4d25370fc1f030c375363cf32a61fb47",
     "coreRelease": "0.3.0-rc.17",
-    "runtimeId": "555036d5168e81efbe9bbd16b5abd33e62f2fd3a4edd610978002da1373256b2",
-    "compositionId": "2baed5ebe4cbff388c566f2859d40778a5894c29baab6c77ab96840c1d98efaf",
-    "manifestSha256": "0b56de7e113442bbcdb38cd429ad7257773915702f10492e9cd01ef5d4524741"
+    "runtimeId": "e752a28caf9f68fe0bf2944fcce2a08b138b0cbd60c79166776474f21e708157",
+    "compositionId": "7160b080bc2efe59b50a7503e39d6876af2c8485ba6e9699cda6771f1af9287e",
+    "manifestSha256": "e41495711019a2b8950f1697ea9bb741fbff5b8b635fd7ce1ed698f11d8209e4"
   },
   "kernel": {
     "repository": "werg/chronolog-db",
-    "source": "21a5a4565b59716d0a63157a43ae11d317ba8534",
-    "sourceTree": "e4d0c68582d4ceed9688882d30c9d96d14e25d23",
+    "source": "6f8b00fb3a80854690689be959b1b1c062b0d460",
+    "sourceTree": "abdc83f5359bc30c8cd72e06d864bb650be98065",
     "dirty": false,
     "archive": {
       "role": "session",
-      "file": "chronolog-peer-session-21a5a4565b59716d0a63157a43ae11d317ba8534.tgz",
-      "sha256": "1592aa26083b74c6082eb6b1295fdf3de93a5b5913a2e36b24719e5b14c6be20",
-      "size": 219583
+      "file": "chronolog-peer-session-6f8b00fb3a80854690689be959b1b1c062b0d460.tgz",
+      "sha256": "57cd26fe458ce61509f0276ae3af3f6e86829d209b8bbc2ea8013a35a7a6a6ca",
+      "size": 208003
     }
   },
-  "id": "ba4f2e7f87f0f52b642b91641dc83e70e5b7b1ed5845b7a8c864e4c009948858"
+  "id": "2491d6a658721af31f2b6a92609184e4c6e3bac3fcb11d54d8241cf9576229ef"
 }
