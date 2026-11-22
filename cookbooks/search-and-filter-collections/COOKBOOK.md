@@ -42,7 +42,7 @@ The same query can have a compact stacked phone layout and a wide table with sev
 
 Show active filters as removable controls and offer a reliable “Clear filters.” A “No results” state should distinguish a restrictive query, no data in scope, unavailable data, and a failed search. Suggest removing a filter or checking scope without silently broadening the search.
 
-Do not imply that a partial local cache is a complete search index. If only recent retained records are loaded, state that coverage and provide an explicit way to request more where supported. [Stream history](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/STREAMS.md) can have retention gaps; an empty local filter is not proof that an event never existed.
+Do not imply that a partial local cache is a complete search index. If only recent retained records are loaded, state that coverage and provide an explicit way to request more where supported. The [selected application history and retained coverage](../../guides/application-primitives.md) can have gaps after retention or recovery; an empty local filter is not proof that an event never existed.
 
 ## Choose where the search runs
 
