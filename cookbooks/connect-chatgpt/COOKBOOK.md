@@ -60,9 +60,11 @@ creation availability. The core CLI's `guide --server ORIGIN` and public
 discovery share the same navigation. Keep runnable setup procedures there.
 
 The source-pinned Node integration examples and qualification notes below are
-records of that optional harness, not an instruction to deploy a second server
-for the normal Cloudflare endpoint. Ordinary OAuth-client calls do not require
-registering another independent agent binding.
+historical provenance only. They are not current installation instructions:
+do not import or deploy their archived standalone server, adapter, or bridge
+configuration. Use the current service guides and public controllers below.
+Ordinary OAuth-client calls do not require registering another independent agent
+binding.
 
 ## Choose the route by the desired interaction
 
@@ -97,14 +99,15 @@ retrievable through that API. Have the configured agent call the authorized
 write-back tool. Keep this route's credential and conversation identity separate
 from MCP Events subscriptions.
 
-The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md)
-becomes available through `trigger_workspace_agent` and
-`get_workspace_agent_run` when the operator configures `workspaceAgent`. It
-checks current account access, selected source and event consent, persists the
-caller-owned operation before sending, and sends static instructions with
-identifiers rather than the question. The conversation key is scoped to the
+The [historical Workspace adapter](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md)
+implemented `trigger_workspace_agent` and `get_workspace_agent_run` with a
+`workspaceAgent` configuration at that pinned source. These are historical
+interface names, not tools promised by the current hosted endpoint. The design
+checked account access, selected source and event consent, persisted the
+caller-owned operation before sending, and sent static instructions with
+identifiers rather than the question. Its conversation key was scoped to the
 configured channel, exact issuer/subject and application. After asynchronous
-authorization, it rereads the selected source and checks the same selected
+authorization, it reread the selected source and checked the same selected
 generation synchronously immediately before provider egress. Already-started
 external I/O cannot be retracted by a later recovery. Exact retries retain
 the original body and idempotency key. The bounded journal preserves accepted
@@ -149,8 +152,10 @@ current authorization checks. Existing upstream account-login tokens are not
 automatically MCP access tokens. The supplied host supports predefined public
 clients (`none`) and confidential clients (`client_secret_basic`); the exact
 callback must come from the intended ChatGPT client. It does not provide dynamic
-client registration or OIDC. If the chosen client requires those capabilities,
-use a compatible issuer instead of loosening redirects or token checks. Follow
+client registration or OIDC. If the chosen client requires unsupported capabilities,
+choose a client supported by the selected service and its advertised MCP resource,
+or use authorized on-demand tools or manual handoff to a supported client.
+Preserve issuer, redirect, resource and device-authorization checks. Follow
 [OpenAI authentication guidance](https://developers.openai.com/plugins/build/auth)
 and the integration's configuration documentation for the exact resource.
 
@@ -180,31 +185,27 @@ projections through `onSkipped` separately from delivered events. Advancing a
 checkpoint follows successful callback completion, not merely a socket send.
 The current assistant guide owns the complete setup and lifecycle example.
 
-## Adapt the connected kitchen specimen
+## Historical kitchen design (provenance only)
 
-The [core kitchen source](https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen)
-includes a real public-session bootstrap, browser Worker, page, signed release
-build, dedicated bridge-device setup, declared commands and deterministic
-queries. Its current definition is version 2 and binds each request to the
-original `cookingStepEventId`. Copy that event ID and the step ID from the same
-`kitchenContext` snapshot; never substitute whichever step is current when the
-request is ordered. Republishing version 2 UI does not upgrade an already
-configured version 1 immutable domain. Provision a new application or use a
-separately supported evolution procedure.
+The [pinned kitchen source](https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen)
+records an older public-session/bootstrap and standalone integration. Its files,
+bridge setup and enrollment commands are not current installation directions.
+Do not import that archived infrastructure into a new app or use it as an OAuth
+fallback. Start with the selected service's current build guide and use the
+canonical scoped controller/event-delivery route above.
 
-When adapting this historical specimen, use the current setup route above:
-preflight the selected host, create the page, configure the definition/authority
-and initial generation, publish the signed UI and retain the native process.
-Prepare any assistant-access proposal, then give the owner the ready page and
-permission-review URLs. Their sign-in adopts the prepared app; it does not gate
-its preparation. Explicitly enroll the verified browser key. If this optional
-Worker adapter is the chosen integration, provision its own device key and
-enroll it as an assistant reader/writer. Keep coordination and publishing on
-their separately authorized devices, and obtain the account's connection consent.
-If a saved enrollment never committed and its expected generation is obsolete,
-`enroll:review` prepares a new signed request and `enroll:approve` requires its
-exact reviewed digest. A committed enrollment keeps exact replay; replay cannot
-restore a later revoked grant. Keep the original immutable records.
+The pinned model's version 2 bound each request to the original
+`cookingStepEventId` and the step ID from the same `kitchenContext` snapshot.
+That is a useful domain invariant when implementing a similar current app:
+retain the exact source event instead of substituting whichever step is current
+when the request is ordered. The historical version number is not the version
+of the current starter, and republishing UI alone does not change an immutable
+domain definition.
+
+The following sequence describes that historical design, not a runnable setup
+procedure or a claim that its old tool names/configuration remain available.
+Current application creation, publication, browser enrollment and assistant
+consent follow the current service guides with their exact reviewed identities.
 
 The specimen follows this user-visible sequence:
 
@@ -258,7 +259,7 @@ and real transaction guards. A read followed by a command can race.
 | The agent sandbox cannot resolve the page host | Original host handle and selected service origin | Use the connected remote MCP route; otherwise resume the participant in an environment that can reach the host |
 | Native RTC is unavailable | Chronolog authentication and participant transport | Use the maintained encrypted relay fallback; do not invent another data endpoint |
 | OAuth is unlinked or expired | Existing app state and device identity | Relink that account; use an already authorized local participant if appropriate |
-| The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Use the compatible external-provider mode; do not turn a public callback into a wildcard or treat an upstream login token as MCP authorization |
+| The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Choose a client supported by the selected service and its exact advertised MCP resource; otherwise use authorized on-demand tools or manual handoff to a supported client. Preserve issuer, redirect, resource checks and device grants |
 | Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check the selected service's deployment readiness, approved assistant proposal, current enrollment and participant availability; local readiness does not prove remote readiness |
 | The bridge is not enrolled, or its grant was revoked | The explicit owner decision | Obtain verified enrollment or restore permitted access; do not borrow a browser signer |
 | No retained authorized peer has the selected history | The pending request and original operation ID | Restore a retained participant; show offline/unavailable rather than claiming delivery |
