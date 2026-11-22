@@ -60,9 +60,11 @@ creation availability. The core CLI's `guide --server ORIGIN` and public
 discovery share the same navigation. Keep runnable setup procedures there.
 
 The source-pinned Node integration examples and qualification notes below are
-records of that optional harness, not an instruction to deploy a second server
-for the normal Cloudflare endpoint. Ordinary OAuth-client calls do not require
-registering another independent agent binding.
+historical provenance only. They are not current installation instructions:
+do not import or deploy their archived standalone server, adapter, or bridge
+configuration. Use the current service guides and public controllers below.
+Ordinary OAuth-client calls do not require registering another independent agent
+binding.
 
 ## Choose the route by the desired interaction
 
@@ -83,10 +85,9 @@ an anonymized session label is not a conversation-write credential. Test the
 actual client and surface before describing unattended ordinary-chat wake as a
 supported feature.
 
-New cards should use `_meta.ui.resourceUri`, the MCP Apps initialization
-handshake and `ui/message`. The legacy `window.openai` aliases are compatibility
-options, discovered at runtime. An external kitchen browser tab does not have
-the chat's widget bridge. See [MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)
+Cards use `_meta.ui.resourceUri`, the MCP Apps initialization handshake and
+`ui/message`. An external kitchen browser tab does not have the chat's widget
+bridge; offer a manual reference handoff there. See [MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)
 and [its current message type](https://apps.extensions.modelcontextprotocol.io/api/interfaces/app.McpUiMessageRequest.html).
 An accepted message is not an observed answer; a timeout must not trigger a
 second message through a different bridge.
@@ -98,14 +99,15 @@ retrievable through that API. Have the configured agent call the authorized
 write-back tool. Keep this route's credential and conversation identity separate
 from MCP Events subscriptions.
 
-The [implemented Workspace adapter](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md)
-becomes available through `trigger_workspace_agent` and
-`get_workspace_agent_run` when the operator configures `workspaceAgent`. It
-checks current account access, selected source and event consent, persists the
-caller-owned operation before sending, and sends static instructions with
-identifiers rather than the question. The conversation key is scoped to the
+The [historical Workspace adapter](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/WORKSPACE_AGENT.md)
+implemented `trigger_workspace_agent` and `get_workspace_agent_run` with a
+`workspaceAgent` configuration at that pinned source. These are historical
+interface names, not tools promised by the current hosted endpoint. The design
+checked account access, selected source and event consent, persisted the
+caller-owned operation before sending, and sent static instructions with
+identifiers rather than the question. Its conversation key was scoped to the
 configured channel, exact issuer/subject and application. After asynchronous
-authorization, it rereads the selected source and checks the same selected
+authorization, it reread the selected source and checked the same selected
 generation synchronously immediately before provider egress. Already-started
 external I/O cannot be retracted by a later recovery. Exact retries retain
 the original body and idempotency key. The bounded journal preserves accepted
@@ -140,18 +142,20 @@ minimize what leaves it.
 
 The Worker uses the existing Tendriller account as the authorization server.
 It checks the exact OAuth grant and current owner, and serves the consent form
-at `/connections` after GitHub or Google sign-in. Operators supply the page
-mapping and register the intended OAuth client. A deployment with a different
-issuer can use the standalone external-provider adapter with trusted
-current-account and owner checks.
+at `/connections` after GitHub or Google sign-in. Configure the intended OAuth
+client on that service and use the participant's exact signed assistant proposal
+for application access. Follow the current service guide for supported issuers
+and configuration rather than a historical adapter.
 
-Both routes require authorization code, PKCE S256, issuer/resource binding and
+The service requires authorization code, PKCE S256, issuer/resource binding and
 current authorization checks. Existing upstream account-login tokens are not
 automatically MCP access tokens. The supplied host supports predefined public
 clients (`none`) and confidential clients (`client_secret_basic`); the exact
 callback must come from the intended ChatGPT client. It does not provide dynamic
-client registration or OIDC. If the chosen client requires those capabilities,
-use a compatible issuer instead of loosening redirects or token checks. Follow
+client registration or OIDC. If the chosen client requires unsupported capabilities,
+choose a client supported by the selected service and its advertised MCP resource,
+or use authorized on-demand tools or manual handoff to a supported client.
+Preserve issuer, redirect, resource and device-authorization checks. Follow
 [OpenAI authentication guidance](https://developers.openai.com/plugins/build/auth)
 and the integration's configuration documentation for the exact resource.
 
@@ -165,31 +169,67 @@ event inbox, and encrypted delivery queue while application code and durable sta
 remain on the enrolled Chronolog participants. With no queued assistant work, the
 hibernating participant socket adds no timer or idle polling.
 
-## Adapt the connected kitchen specimen
+Build the allowed native tool controller with `createScopedApplicationTools`
+from `@chronolog/peer-session`, and pass it directly as `tools` to
+`connectApplicationAssistant` from `@tendriller/core/assistant`. Its `execute`
+method owns scoped query/command/operation execution. Keep the original operation
+identity after an uncertain response; do not implement another dispatcher or
+translate calls through a second tool facade.
 
-The [core kitchen source](https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen)
-includes a real public-session bootstrap, browser Worker, page, signed release
-build, dedicated bridge-device setup, declared commands and deterministic
-queries. Its current definition is version 2 and binds each request to the
-original `cookingStepEventId`. Copy that event ID and the step ID from the same
-`kitchenContext` snapshot; never substitute whichever step is current when the
-request is ordered. Republishing version 2 UI does not upgrade an already
-configured version 1 immutable domain. Provision a new application or use a
-separately supported evolution procedure.
+For durable events, use Chronolog's `forwardSessionEvents` with the application's
+durable checkpoint and projection. Supply
+`createAssistantEventDelivery({ assistant, onSkipped })` as its delivery callback.
+Chronolog owns read views, recovery, cancellation and checkpoint advancement;
+Tendriller supplies host acknowledgement and retry. Record owner-declined
+projections through `onSkipped` separately from delivered events. Advancing a
+checkpoint follows successful callback completion, not merely a socket send.
+The current assistant guide supplies connection setup. The delivery helper's
+bounded retry budget can exhaust; a rejected delivery ends `forwardSessionEvents`.
+Supervise that task with the application's stop signal and an explicit finite
+backoff/retry policy, reopening from its unchanged durable checkpoint. Treat
+`EVENT_FORWARDER_REVIEW_RECOVERY` separately: inspect the checkpoint and selected
+history, apply the application's explicit recovery decision, then resume only
+from a reviewed valid position. Never reset the cursor to skip uncertain work.
+If the assistant closes with `startup_timeout` before its first connection opens,
+create a new assistant with `connectApplicationAssistant` before reopening the
+forwarder from that unchanged durable checkpoint. After its first connection,
+the assistant reconnects without a deadline. Do not recreate it to bypass a
+terminal `participant_replaced` or `approval_changed` disconnect; inspect the
+current participant and approval first.
+A failed batch may have delivered some events before checkpoint persistence;
+restarted forwarding can repeat them. Receivers must deduplicate stable source
+identities within the selected generation rather than assume exactly-once delivery.
 
-When adapting this historical specimen, use the current setup route above:
-preflight the selected host, create the page, configure the definition/authority
-and initial generation, publish the signed UI and retain the native process.
-Prepare any assistant-access proposal, then give the owner the ready page and
-permission-review URLs. Their sign-in adopts the prepared app; it does not gate
-its preparation. Explicitly enroll the verified browser key. If this optional
-Worker adapter is the chosen integration, provision its own device key and
-enroll it as an assistant reader/writer. Keep coordination and publishing on
-their separately authorized devices, and obtain the account's connection consent.
-If a saved enrollment never committed and its expected generation is obsolete,
-`enroll:review` prepares a new signed request and `enroll:approve` requires its
-exact reviewed digest. A committed enrollment keeps exact replay; replay cannot
-restore a later revoked grant. Keep the original immutable records.
+In the published callback contract, `onSkipped` is synchronous: returning a
+Promise does not make the helper await it. A synchronous durable recorder must
+finish before returning. For asynchronous persistence, provide an outer delivery
+callback that creates a per-invocation helper, captures its declined-event record
+synchronously, awaits helper completion, then awaits the durable skipped-record
+write before that outer callback resolves. Propagate write failure instead of
+advancing the checkpoint; keep declined records distinct from delivered receipts.
+Do not share a mutable capture across concurrent delivery invocations.
+
+## Historical kitchen design (provenance only)
+
+The [pinned kitchen source](https://github.com/werg/tendriller/tree/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/examples/kitchen)
+records an older public-session/bootstrap and standalone integration. Its files,
+bridge setup and enrollment commands are not current installation directions.
+Do not import that archived infrastructure into a new app or use it as an OAuth
+fallback. Start with the selected service's current build guide and use the
+canonical scoped controller/event-delivery route above.
+
+The pinned model's version 2 bound each request to the original
+`cookingStepEventId` and the step ID from the same `kitchenContext` snapshot.
+That is a useful domain invariant when implementing a similar current app:
+retain the exact source event instead of substituting whichever step is current
+when the request is ordered. The historical version number is not the version
+of the current starter, and republishing UI alone does not change an immutable
+domain definition.
+
+The following sequence describes that historical design, not a runnable setup
+procedure or a claim that its old tool names/configuration remain available.
+Current application creation, publication, browser enrollment and assistant
+consent follow the current service guides with their exact reviewed identities.
 
 The specimen follows this user-visible sequence:
 
@@ -243,8 +283,8 @@ and real transaction guards. A read followed by a command can race.
 | The agent sandbox cannot resolve the page host | Original host handle and selected service origin | Use the connected remote MCP route; otherwise resume the participant in an environment that can reach the host |
 | Native RTC is unavailable | Chronolog authentication and participant transport | Use the maintained encrypted relay fallback; do not invent another data endpoint |
 | OAuth is unlinked or expired | Existing app state and device identity | Relink that account; use an already authorized local participant if appropriate |
-| The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Use the compatible external-provider mode; do not turn a public callback into a wildcard or treat an upstream login token as MCP authorization |
-| Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check additive host migration, bridge registration, current enrollment and coordinator availability; local readiness does not prove remote readiness |
+| The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Choose a client supported by the selected service and its exact advertised MCP resource; otherwise use authorized on-demand tools or manual handoff to a supported client. Preserve issuer, redirect, resource checks and device grants |
+| Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check the selected service's deployment readiness, approved assistant proposal, current enrollment and participant availability; local readiness does not prove remote readiness |
 | The bridge is not enrolled, or its grant was revoked | The explicit owner decision | Obtain verified enrollment or restore permitted access; do not borrow a browser signer |
 | No retained authorized peer has the selected history | The pending request and original operation ID | Restore a retained participant; show offline/unavailable rather than claiming delivery |
 | No active Events subscription, or unsupported client | The application request | Use on-demand tools, the mounted card, or the manual reference handoff |
@@ -256,7 +296,7 @@ and real transaction guards. A read followed by a command can race.
 | Recovery excluded the source request or reply | Delivery journal and loss/recovery evidence | Reread selected history, display the loss, and require deliberate reapplication if still wanted |
 | An answer refers to an earlier cooking step | Original request and response provenance | Keep the response labeled stale; ask again only as a new deliberate task |
 | The card is unmounted or message outcome is uncertain | Existing conversation and request | Use normal tool calls or inspect the chat before sending another message |
-| A Workspace trigger timed out or its run completed without a reply | Original operation, idempotency key and provider receipt | Inspect `get_workspace_agent_run` and current application status; retry only the original trigger when permitted, and check the configured agent's MCP write-back access |
+| A Workspace trigger timed out or its run completed without a reply | Original operation, idempotency key and provider receipt | Inspect the configured receiver's retained run/delivery receipt and query current application status through authorized tools; retry only the original request when permitted and verify its write-back access. The hosted endpoint does not promise the historical adapter's run-inspection tool |
 | The delivery or Workspace journal is full | Existing receipts and uncertain operation identities | Stop new triggers, reconcile retained work and deliberately archive reviewed records; do not silently discard deduplication evidence |
 | Publisher authority is absent | Prepared assets and review intent | Ask the existing enrolled publisher to sign the exact release |
 
@@ -267,10 +307,11 @@ Do not copy every local tool into the remote model allowlist: explicit takeover,
 recovery, reapplication, role management and publication have separate trust
 requirements. A tool listing is a capability description, not a grant.
 
-For another issuer or a custom application domain, use the pinned
-[standalone adapter configuration](https://github.com/werg/tendriller/blob/149ec6572992955f33fff995a2f7e69f1c3e7059/integrations/chatgpt/README.md)
-when appropriate. It requires its own process and native session factory.
-Keep authorization checks, store keys and device signers on the service side.
+For a custom application domain, use the current native bootstrap and hosted
+assistant guide above with the selected service's exact OAuth resource. Keep
+authorization checks, keys and device signers on their owning participant. The
+historical standalone adapter is provenance, not an alternate installation path
+for the current hosted contract.
 
 ## Verify the whole journey and its failures
 

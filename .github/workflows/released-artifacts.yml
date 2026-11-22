@@ -1,4 +1,4 @@
-name: Released-Artifact Cross-OS Qualification
+name: Cookbook snapshot cross-OS qualification
 on:
   push:
     branches: [main]
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   released-artifacts:
-    name: ${{ matrix.os }} / Node ${{ matrix.node }} (no native toolchain)
+    name: ${{ matrix.os }} / Node ${{ matrix.node }} (content snapshot)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -27,12 +27,9 @@ jobs:
       - name: Install dependencies with lifecycle scripts disabled
         run: npm ci --ignore-scripts
 
-      - name: Verify zero native compiler, Emscripten, or Docker invocation
+      - name: Check content and build the pure-Node cookbook snapshot
         shell: bash
         run: |
-          # Construct a clean toolchain-free PATH retaining Node/npm and basic POSIX utils only.
-          NODE_DIR="$(dirname "$(command -v node)")"
-          echo "Node path: $NODE_DIR"
           node --version
           npm run check
           npm run build

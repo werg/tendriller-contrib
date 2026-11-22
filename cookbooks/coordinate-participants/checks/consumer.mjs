@@ -5,13 +5,13 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { MessageChannel } from 'node:worker_threads';
 import { APPLICATION_COLLECTIVE_ID, bytesDigest, bytesToHex, connectApplications, controlParticipantGrant, createApplicationOwner,
-  createGenerationRegistry, defineApplication, defineCommand, participantGrant, program,
+  createGenerationRegistry, createViewStore, defineApplication, defineCommand, participantGrant, program,
   signApplicationDescriptor, signControlRevision, signTransitionRequest, sqlStatement, verifyAuthorityBundle } from '@chronolog/peer-session';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectApplicationOwner } from '@chronolog/peer-session/browser';
 import { openSqlApplication, prepareSqlApplication } from '@chronolog/peer-session/sql';
 import { createNativeSqlEngine } from '@chronolog/peer-session/sql-native';
-import { captureCollaborationReader, createViewStore, prepareCollaborationCommand } from '@tendriller/core/collaboration';
+import { captureCollaborationReader, prepareCollaborationCommand } from '@tendriller/core/collaboration';
 import { reviewWorkspace, reviewClient } from './review-workspace.mjs';
 import { reviewAssignedTask, runReviewer } from './reviewer.mjs';
 

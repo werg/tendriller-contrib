@@ -1,6 +1,7 @@
 // Editable application UI. The maintained owner and collaboration module own
 // session lifetime, operation persistence and guarded state transitions.
-import { captureCollaborationReader, createCollaborationClient, createViewStore, mountParticipantPanel, operationReference, receiptModel } from '@tendriller/core/collaboration';
+import { captureCollaborationReader, createCollaborationClient, mountParticipantPanel, operationReference, receiptModel } from '@tendriller/core/collaboration';
+import { createViewStore } from '@chronolog/peer-session';
 import { createLiveRun } from './domain/live-run.mjs';
 
 const $ = selector => document.querySelector(selector);

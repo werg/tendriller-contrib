@@ -266,5 +266,6 @@
         }
       }
     }
-  ]
+  ],
+  "qualificationScope": "historical-local-report-without-source-bindings-not-current-release-qualification"
 }

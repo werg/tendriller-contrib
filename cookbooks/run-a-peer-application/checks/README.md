@@ -68,19 +68,13 @@ snapshot. Unconsumed changes coalesce, identical advertisements stay quiet, and
 aborting its signal or returning the iterator retires the listener and unblocks a
 pending read. There is no advertisement interval, TTL expiry or fallback scan.
 
-On 2026-11-20, the actual direct portable gate passed from clean contrib source
-`b469d4d329d67abd06e87e6e8ed55c855d42c4ad` against clean Chronolog source
-`1e4e8406499f3aff0da988046103d0900ca2bd42`, using archive SHA-256
-`4a6fa65ca813e29592b63c833ea78536e766c8332c6917207a5be7315f525601`.
-The empty-directory public-package consumer exercised the notification method
-through the real kernel constructor, automatic connections, exact lost-reply
-retry, 33 commands with the control host blocked and unchanged control traffic,
-reconnect grace, protected-floor recovery and explicitly reviewed recovery for
-unknown freshness. The requested evidence directory is
-`/home/werg/.local/share/tendriller/contrib-push-discovery-1e4`, containing
-`report.json` and the validated `summary.json`. This run qualifies native
-in-process delivery; RTC, browser and hosted qualification remain separate.
-Historical qualification reports below keep their original source identities.
+The empty-directory consumer exercises notifications through the real kernel
+constructor, automatic connections, exact lost-reply retry, commands with the
+control host blocked, reconnect grace, protected-floor recovery and explicitly
+reviewed recovery for unknown freshness. Retain `report.json`, validated
+`summary.json` and the dependency lock in the explicit run output directory.
+A direct result qualifies in-process delivery; RTC, browser and hosted results
+have their own measured boundaries.
 
 The direct run uses an in-process implementation of the public framed transport
 interface. The RTC run uses the public raw native connection composition and
@@ -116,7 +110,8 @@ independent storage identities, adopted point, time to usable recovery and known
 lost commands. The initial five-minute freshness target is checked against the
 last command's observed apply time. This short burst qualifies only its recorded
 workload and topology. It does not establish a five-minute loss bound during a
-partition, sustained mobile operation or device suspension; those remain G4.
+partition, sustained mobile operation or device suspension; qualify those
+boundaries separately on the actual devices and networks.
 
 ## SQL and guarded domain commands
 
@@ -231,51 +226,24 @@ checks grants and usable retained history itself. The gate exercises the same
 automatic and explicitly reviewed recoveries as the portable/native lane and
 requires every owned introduction socket to close.
 
-On 2026-11-20, `test:peer-host -- --transport websocket` passed from clean contrib
-source `0f45b4d54794a3c9bd007893df46f32265f57547` against the exact SDK and engine
-archives from clean core `722d6725fc5d659f77f844642f523125f1ef271c` and the clean
-`1e4e8406499f3aff0da988046103d0900ca2bd42` session archive recorded above. The
-bridge used the public `createPeerDiscoveryWatcher` over the actual workerd
-`page.discoverySocket(peerId)`, delivered notification iteration to the SDK,
-and observed three discovery subscriptions; watcher shutdown assertions passed.
-Discovery advertisements carry no TTL or renewal fields. Both companion
-workflows now default to that same immutable source pair.
+The workflow downloads SDK and engine bytes from the selected immutable public
+source release. `distribution/download-core-release.mjs` verifies URLs, hashes,
+source, composition, provenance and the Chronolog source before retaining those
+bytes; consumers use them without a Core checkout or rebuild. SQL session
+variants require their declared Chronolog capability builds. The current
+[companion tuple](https://github.com/werg/tendriller-contrib/blob/main/distribution/companion-release.json)
+is CI input, not proof that a particular run or deployment passed.
 
-Evidence is in
-`/home/werg/.local/share/tendriller/contrib-hosted-discovery-722-1e4-npm1121`,
-including `host-artifacts.json`, the host dependency lock, and
-`peers/{report,summary}.json`. The run used Node 24.0.1 and an isolated npm
-11.21.3 installation; npm 11.3 failed during peer resolution before workerd
-started. This qualifies the actual packed host with WebSocket transport,
-control-only outage/reconnection, recovery and publication checks. Native RTC,
-browser, deployed OAuth and Internet/provider behavior remain separate gates.
-
-The repeated hosted qualification passed twice from clean contrib
-`8217aea57dd706cdfae126e9ca933825612156c7`, consuming SDK/engine bytes downloaded
-from the public `source-722d6725fc5d659f77f844642f523125f1ef271c` release.
-`distribution/download-core-release.mjs` verifies manifest URLs, hashes, source,
-composition, provenance and the Chronolog source before retaining those bytes;
-companion workflows reuse them without a core checkout or rebuild. SQL/RTC
-session variants still require their declared Chronolog capability builds.
-The retained graph's composition is
-`87ba18a4108436a4fdd03b169251430208e852329497ec090fd525c903d0618d`.
-
-The fixture separates deliberate relay failure from the ordinary-command
-measurement. The unchanged-traffic assertion remains exact. Reconnection waits
-on actual old-connection aborts and replacement openings, verifies a coherent
-read in the same generation, and requires both participant roles to be healthy.
-Hosted startup declares a 30-second reconnect grace covering the two 15-second
-discovery/connection opening budgets; both recovery observation deadlines allow
-that grace plus a bounded 30-second response margin. No 3-second recovery SLA is
-claimed by these later runs. Evidence is in
-`/home/werg/.local/share/tendriller/contrib-hosted-8217aea-public-r1` and
-`/home/werg/.local/share/tendriller/contrib-hosted-8217aea-public-r2`, each retaining
-`peers/{report,summary}.json`, `host-artifacts.json` and its dependency lock.
-Both runs applied 33 commands during the control-only outage with unchanged host
-traffic, closed the old physical connections, observed a replacement opening,
-and passed automatic and explicitly approved recovery. These are native
-workerd/WebSocket checks; browser, RTC and deployed-provider evidence retain
-their separate scope.
+Keep `host-artifacts.json`, the dependency lock, and
+`peers/{report,summary}.json` in each run's explicit output directory. Separate
+deliberate relay failure from ordinary-command measurement. Require unchanged
+control traffic during ordinary work, actual old-connection aborts and
+replacement openings during recovery, a coherent read in the same generation,
+and healthy roles on both participants. Hosted startup declares a 30-second
+reconnect grace covering two 15-second opening budgets; recovery observations
+allow that grace plus a bounded 30-second response margin. Do not infer a
+three-second recovery SLA. These are local packed-workerd/WebSocket checks;
+deployed OAuth and Internet/provider behavior require separate evidence.
 
 ## Forced WebSocket relay and browser relay
 

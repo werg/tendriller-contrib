@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { verifyPeerSessionArtifact } from './peer-session-artifact.mjs';
 
@@ -11,7 +12,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 test('independent native and browser installations preserve the same complete package evidence', async () => {
   const temporary = new URL('../../../test-results/', import.meta.url);
   await mkdir(temporary, { recursive: true });
-  const root = await mkdtemp(join(temporary.pathname, 'peer-artifact-'));
+  const root = await mkdtemp(join(fileURLToPath(temporary), 'peer-artifact-'));
   try {
     const archive = join(root, 'session.tgz'), archiveBytes = Buffer.from('exact synthetic archive');
     const metadata = { name: '@chronolog/peer-session', version: '0.0.0-test', dependencies: { werift: '0.27.0' }, exports: { './webrtc-native': './index.mjs' } };

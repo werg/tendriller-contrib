@@ -53,7 +53,7 @@ progress signal means “current progress unknown,” not that the job failed. T
 keeps high-frequency display traffic independent of transaction and finality
 work.
 
-Choose polling or events from the source's actual capabilities. A collector should use scoped append credentials and run independently of the administrative agent handle. Bound read pages, log bytes, chart points, and diagnostic retention. Raw server retention and visible buffers have different owners; dropping an old log row from the DOM does not delete it from storage or create an archive.
+Choose polling or events from the source's actual capabilities. An independent acquisition process joins the same application session with scoped grants for observation commands and ephemeral signals; keep its private device storage separate from the administrative host handle. Bound read pages, log bytes, chart points, and diagnostic retention. Application history, source spools and visible buffers have separate budgets; dropping an old log row from the DOM does not delete it from storage or create an archive. The source-pinned collector links in `sources` are historical provenance, not a current hosted ingestion endpoint or installation path.
 
 Display the age of the last meaningful observation next to the state. Choose stale thresholds from the expected cadence and known pauses. A heartbeat proves the reporter is alive, not necessarily that the job is progressing. When history expires, preserve an explicit gap rather than joining disconnected points with a continuous line. Label simulations and fixture data in the interface and exported records.
 

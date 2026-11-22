@@ -27,16 +27,35 @@ ephemeral channel deliberately does not replay a backlog on reconnect.
 
 Imagine a remote training job that writes numeric records overnight. The operator needs to set up a source, confirm that the expected run is arriving, leave it running, identify a stalled or lossy feed, and close it without losing admitted records. A useful collector experience therefore includes setup validation, a first-record preview, delivery status, backlog inspection, and an explicit stop/drain choice.
 
-Before collecting a large backlog, claim the page and inspect effective stream limits.
-The create response declares the pre-claim 1 MiB stream-retention ceiling
-(`unclaimed_limits.stream_retained_bytes`); running a collector first can fill
-it even in a normal first-use workflow. Choose its ongoing lifetime deliberately; producer activity neither claims a page nor proves that an agent is available. Keep the collector's scoped producer credential apart from the administrative handle. Show its safe source name and allowed streams in status views, never the credential.
+Prepare and publish the ready signed UI before asking the owner to claim the
+page. The selected service's `/api/service` advertises publication capacity,
+currently **8 MiB per authored file and 25 MiB per page, including retained
+control bytes**. Claim does not increase that capacity. An unclaimed page expires
+after **24 hours**; producer activity neither claims it nor establishes an agent's
+availability. Follow the [current setup guide](https://github.com/werg/tendriller/blob/9e24deea741f828890feb7ea26d62b292df19518/docs/BUILD_AN_APP.md)
+for the selected service origin.
 
-That provisioning path is the hosted collector. Peer applications instead use
-their selected log and scoped application grants; they do not enable the hosted
-stream backend as a second writer for the same observations.
+These host publication limits and the unclaimed-page expiry are independent of
+the application's observation retention and source spool. Define their byte,
+record and age budgets in the application and acquisition process; do not use
+host capacity as a telemetry allowance or assume claim creates a retention policy.
 
-An independently running acquisition process opens the same owned application session. It declares stable source/run identities, uses bounded signals for transient readings, and submits retained observations through domain commands. Keep parsing, calibration and a bounded source spool separate from the maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/ecf3851957d8089075fa95ff19c4eb3b08941363/docs/tools/CLI.md) exposes the actual session; there is no second hosted stream/collector data protocol. Acquisition health, applied data, retained coverage and agent handling remain distinct. Keep credentials out of authored pages and exports.
+An independently running producer opens the same owned Chronolog application
+session. Review its device enrollment and grant only the required data role and
+control rights. Enforce allowed observation commands and signal topics in
+application policy; source labels and topic names are not grants. Declare stable source/run identities, use ephemeral
+signals for transient readings, and submit retained observations through domain
+commands. Keep parsing, calibration and a bounded source spool separate from the
+maintained command retry journal. The [session tooling](https://github.com/werg/tendriller/blob/9e24deea741f828890feb7ea26d62b292df19518/docs/tools/CLI.md)
+exposes this session; there is no second hosted stream/collector data endpoint.
+Keep the producer's private device storage and credentials apart from the
+administrative host handle and out of authored pages and exports. Show its safe
+source name and allowed operations, never its credential.
+
+The source-pinned collector documents and code in this recipe's `sources` are
+historical provenance for acquisition and spool reasoning, not a current
+installation path. Acquisition health, recorded commands, applied observations,
+retained coverage and agent handling remain distinct.
 
 ## Choose acquisition and its failure meaning
 
@@ -49,11 +68,11 @@ An independently running acquisition process opens the same owned application se
 
 A snapshot is not an append-only history. A file-tail offset is not proof of delivery. A command source executes a deliberately configured command with an explicit environment; telemetry contents must never become arbitrary commands. Preserve malformed input as a diagnostic or quarantine reference, within its own byte and privacy budget, rather than coercing it into a zero measurement.
 
-Grant only the intended stream-append authority. If the task requires intervention, design a separate authorized control path; an append credential is not an administrative control channel. Label source-provided run metadata separately from server-assigned producer identity.
+Grant only the intended observation commands and signal topics. If the task requires intervention, design a separately authorized control path; permission to submit observations is not administrative authority. Label source-provided run metadata separately from the authenticated session producer identity.
 
 ## Budget every layer
 
-Set maximum line/frame size, output record size, spool bytes, pending records, retry/backoff, and stream retention independently. Estimate a starting spool from admitted byte rate multiplied by tolerated outage duration, then allow for serialized envelope and filesystem overhead. For example, an illustrative 20 records/second at 500 admitted bytes for a ten-minute outage is about 6 MB before overhead. Measure the actual source, choose a margin, and state what happens when that budget is insufficient.
+Set maximum line/frame size, output record size, spool bytes, pending records, retry/backoff, and application observation retention independently. Estimate a starting spool from admitted byte rate multiplied by tolerated outage duration, then allow for serialized envelope and filesystem overhead. For example, an illustrative 20 records/second at 500 admitted bytes for a ten-minute outage is about 6 MB before overhead. Measure the actual source, choose a margin, and state what happens when that budget is insufficient.
 
 | At capacity | Consequence | Suitable only when |
 | --- | --- | --- |
@@ -64,16 +83,16 @@ Set maximum line/frame size, output record size, spool bytes, pending records, r
 
 These are policy alternatives, not promises that every collector exposes each mode. Verify the selected implementation's actual behavior. A nonblocking tail of an existing durable log can leave unread data upstream; a live source may have no recoverable history. Report which boundary lost data and whether replay is possible.
 
-Keep stable record identities through retry and durable spool recovery. Advance a file-tail checkpoint only when the bytes are safely represented under the spool policy. Upload acknowledgement and local dequeue must survive a crash without either skipping data or inventing a new observation. A bounded chart buffer is a separate presentation decision and cannot conceal collector loss.
+Keep stable record identities through retry and durable spool recovery. Advance a file-tail checkpoint only when the bytes are safely represented under the spool policy. Command recording, applied receipts and local dequeue must survive a crash without either skipping data or inventing a new observation. A bounded chart buffer is a separate presentation decision and cannot conceal collector loss.
 
-For NVIDIA GB10 hosts, core host sampling now exposes `unified_memory:true`
-in its GPU record. On other models the value is `null` (unknown). Do not infer
-unified memory from missing `nvidia-smi` framebuffer counters alone, and do not
-add unified GPU RAM to the host RAM total.
+If the acquisition source reports unified GPU memory, verify its hardware and
+field semantics before displaying a combined budget. Missing `nvidia-smi`
+framebuffer counters alone do not establish unified memory. Keep unsupported
+models explicitly unknown, and do not add shared GPU RAM to the host RAM total.
 
 ## Make status actionable
 
-Distinguish “source connected,” “last record acquired,” “last server acceptance,” and “last page update.” A process can be alive while its input stalls, and a page can be online while the collector is disconnected. Show the age of each meaningful timestamp, pending records/bytes, oldest queued age, rejected-record count, and known gaps. When exact counts are unavailable, label them as estimates.
+Distinguish “source connected,” “last record acquired,” “last command recorded,” “last observation applied,” and “last page update.” A process can be alive while its input stalls, and a page can be online while the collector is disconnected. Show the age of each meaningful timestamp, pending records/bytes, oldest queued age, rejected-record count, and known gaps. When exact counts are unavailable, label them as estimates.
 
 Choose thresholds from the source cadence rather than a universal stale timeout. A once-per-minute snapshot should not appear broken after ten seconds. Provide plain-language actions for common faults: inspect input format, recover a credential file, free spool space, reconnect a source, or review retention. Use text and icons together; a color-only health lamp is insufficient. Avoid live-announcing every sample to assistive technology; announce transitions into or out of a degraded state.
 
@@ -95,7 +114,7 @@ For revocation, repeated permanent rejection, or an invalid source, stop futile 
 | Producer is revoked | Delivery becomes explicitly blocked and credentials remain absent from logs. |
 | One oversized or malformed record arrives | It is rejected or quarantined visibly; later valid input follows the stated policy. |
 | Process restarts with pending work | The spool and checkpoint reconstruct one coherent backlog. |
-| Display evicts old points | Operator status still exposes upstream loss and server retention separately. |
+| Display evicts old points | Operator status still exposes upstream loss and application retention separately. |
 | Stop occurs during a backlog | The interface distinguishes acquisition stopped, draining, drained, and discarded work. |
 
 These checks establish ingestion behavior for the chosen source and implementation. They do not establish measurement accuracy or agent attentiveness.

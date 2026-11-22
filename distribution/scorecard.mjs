@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
+import { collectorGates } from './qualification-status.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const verifyOnly = process.argv.includes('--verify-only');
@@ -47,14 +48,15 @@ async function collectLocalTelemetry() {
 
   const hasTendriller = existsSync(join(tendrillerRoot, 'dist/tendriller-sdk-0.3.0-rc.17.tgz'));
   if (!hasTendriller) {
-    return { ...telemetry, note: 'Sibling tendriller build artifacts not present in this checkout.' };
+    return { ...telemetry, gates: collectorGates(), note: 'Sibling tendriller build artifacts not present; no gates were executed.' };
   }
 
   const artifactsDir = join(tendrillerRoot, 'test/artifacts');
   const artifactFiles = existsSync(artifactsDir) ? readdirSync(artifactsDir) : [];
   const findArtifact = pattern => {
-    const match = artifactFiles.find(name => pattern.test(name));
-    return match ? join(artifactsDir, match) : '';
+    const matches = artifactFiles.filter(name => pattern.test(name));
+    // Multiple checkpoints are ambiguous; never label the first arbitrary one current.
+    return matches.length === 1 ? join(artifactsDir, matches[0]) : '';
   };
   const coreTgz = join(tendrillerRoot, 'dist/tendriller-sdk-0.3.0-rc.17.tgz');
   const runtimeTgz = join(tendrillerRoot, 'dist/tendriller-runtime-0.3.0-rc.17.tgz');
@@ -65,17 +67,17 @@ async function collectLocalTelemetry() {
   const controlTgz = findArtifact(/^chronolog-peer-generation-control-[a-f0-9]{8}\.tgz$/u);
   const wasmBinaryPath = join(chronologRoot, 'artifacts/wasm/sqlite3.wasm');
   const wasmManifestPath = join(chronologRoot, 'artifacts/wasm/manifest.json');
-  const hasRealWasm = existsSync(wasmBinaryPath) && existsSync(wasmManifestPath);
 
-  const coreBytes = fileSize(coreTgz) ?? 0;
-  const runtimeBytes = fileSize(runtimeTgz) ?? 0;
-  const toolsBytes = fileSize(toolsTgz) ?? 0;
-  const bootstrapBytes = fileSize(bootstrapScript) ?? 0;
-  const fullSessionBytes = fileSize(fullSessionTgz) ?? 0;
-  const relaySessionBytes = fileSize(relaySessionTgz) ?? 0;
-  const controlBytes = fileSize(controlTgz) ?? 0;
-  const wasmBinaryBytes = fileSize(wasmBinaryPath) ?? 0;
+  const coreBytes = fileSize(coreTgz);
+  const runtimeBytes = fileSize(runtimeTgz);
+  const toolsBytes = fileSize(toolsTgz);
+  const bootstrapBytes = fileSize(bootstrapScript);
+  const fullSessionBytes = fileSize(fullSessionTgz);
+  const relaySessionBytes = fileSize(relaySessionTgz);
+  const controlBytes = fileSize(controlTgz);
+  const wasmBinaryBytes = fileSize(wasmBinaryPath);
 
+  const total = (...values) => values.every(Number.isFinite) ? values.reduce((sum, value) => sum + value, 0) : null;
   telemetry.artifacts = {
     coreSdkBytes: coreBytes,
     runtimeBytes,
@@ -84,9 +86,10 @@ async function collectLocalTelemetry() {
     chronologControlBytes: controlBytes,
     chronologSessionFullBytes: fullSessionBytes,
     chronologSessionRelayBytes: relaySessionBytes,
-    chronologWasmSqlBinaryBytes: wasmBinaryBytes || null,
-    profileEventsRelayOnlyTotalBytes: coreBytes + runtimeBytes + relaySessionBytes,
-    profileEventsFullTotalBytes: coreBytes + runtimeBytes + fullSessionBytes,
+    chronologWasmSqlBinaryBytes: wasmBinaryBytes,
+    chronologWasmManifestPresent: existsSync(wasmManifestPath),
+    profileEventsRelayOnlyTotalBytes: total(coreBytes, runtimeBytes, relaySessionBytes),
+    profileEventsFullTotalBytes: total(coreBytes, runtimeBytes, fullSessionBytes),
   };
 
   // Measure real local capability probe + nondestructive bootstrapper extraction time.
@@ -141,7 +144,7 @@ async function collectLocalTelemetry() {
   }
 
   let chronologFastLane = null;
-  if (existsSync(join(chronologRoot, 'tools/run-fast-tests.mjs'))) {
+  if (process.argv.includes('--run-fast-tests') && existsSync(join(chronologRoot, 'tools/run-fast-tests.mjs'))) {
     const t0 = performance.now();
     const out = execFileSync(process.execPath, [join(chronologRoot, 'tools/run-fast-tests.mjs')], {
       cwd: chronologRoot,
@@ -158,11 +161,11 @@ async function collectLocalTelemetry() {
 
   let bunVersion = null;
   for (const bin of ['bun', join(process.env.HOME ?? '', '.bun/bin/bun')]) {
-    try { bunVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); break; } catch {}
+    try { bunVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', timeout: 3000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'] }).trim(); break; } catch {}
   }
   let denoVersion = null;
   for (const bin of ['deno', join(process.env.HOME ?? '', '.deno/bin/deno')]) {
-    try { denoVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n')[0].trim(); break; } catch {}
+    try { denoVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', timeout: 3000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'] }).split('\n')[0].trim(); break; } catch {}
   }
 
   telemetry.benchmarks = {
@@ -177,22 +180,10 @@ async function collectLocalTelemetry() {
     denoVersion,
   };
 
-  telemetry.gates = [
-    { id: 1, name: 'Zero GNU tar / native compiler on events-relay-only & events-full', status: 'passed_local_linux_x64', evidence: 'Pure-JS tar.gz in @tendriller/core/archive, tendriller-bootstrap.mjs, and tendriller-contrib build; CI matrix configured for macOS/Windows.' },
-    { id: 2, name: 'Pure-JS SQL WASM fallback (no silent downgrade to events)', status: hasRealWasm ? 'passed_local_linux_x64' : 'implemented_wasm_binary_pending_emcc', evidence: hasRealWasm ? `Built Emscripten 4.0.20 DoltLite WASM (${(wasmBinaryBytes / (1024 * 1024)).toFixed(2)} MB); passed 6/6 wasm-conformance and 3/3 chronolog-node-fs VFS host-disk persistence tests.` : '@chronolog/materializer-doltlite/wasm-node & @chronolog/peer-session/sql-wasm implemented and tested; Emscripten 4.0.20 binary built in chronolog-db release.yml.' },
-    { id: 3, name: 'Windows named pipe, long Unix path auto-hash, loopback TCP fallback', status: 'passed_local_linux_x64', evidence: 'session/ipc.mjs tested in scripts/test/ergonomics-portability.test.mjs; Windows CI matrix configured in runtime-matrix.yml.' },
-    { id: 4, name: 'Outbound HTTPS polling gateway + Remote MCP + Local Stdio MCP', status: 'passed_local_linux_x64', evidence: 'Verified via real OAuth + DO admission in server/test/assistant-http-gateway.public.test.ts and Stdio MCP in ergonomics-portability.test.mjs.' },
-    { id: 5, name: 'Browser-led coordination & graceful degradation diagnostics', status: 'passed_local_linux_x64', evidence: 'docs/tutorial/pairing-native.mjs allowBrowserCoordinator + docs/tutorial/helpers/diagnostics-panel.mjs verified.' },
-    { id: 6, name: 'Single-command verified bootstrapper & capability probe', status: 'passed_local_linux_x64', evidence: `scripts/tendriller-bootstrap.mjs (${bootstrapBytes} B) verified extract in ${bootstrapExtractMs} ms.` },
-    { id: 7, name: 'Connect-or-start startup race convergence + zero-IPC bounded mode', status: 'passed_local_linux_x64', evidence: 'connectOrStartNativeSession tested for bounded mode and concurrent shared startup convergence over loopback TCP.' },
-    { id: 8, name: 'Atomic pre-submission outbox + verbatim local operationId preservation', status: 'passed_local_linux_x64', evidence: 'session/outbox.mjs & session/native.mjs preserveOperationId verified in ergonomics-portability.test.mjs.' },
-    { id: 9, name: 'SQL starter UI + composition v2 profiles', status: 'passed_local_linux_x64', evidence: 'docs/tutorial/sql/{index.html,page.mjs,build.mjs} + COMPOSITION_V2_PROFILES verified.' },
-    { id: 10, name: 'Node 22.15+ / 24+ / Bun / Deno compatibility matrix', status: (bunVersion && denoVersion) ? 'passed_local_linux_x64' : 'ci_workflow_configured', evidence: (bunVersion && denoVersion) ? `Verified locally on Linux x64 across Node ${process.version}, Bun ${bunVersion}, and ${denoVersion} (archive, probe, bootstrapper, and real DoltLite WASM SQL); .github/workflows/runtime-matrix.yml covers macOS/Windows & Node 24.` : 'engines.node >=22.15.0 verified locally on Node v22.22.1; .github/workflows/runtime-matrix.yml configured for Node 22.15/24, Bun, Deno across 3 OSes.' },
-    { id: 11, name: 'Encrypted device checkpoint + anti-split-brain retirement + secret-free source handoff', status: 'passed_local_linux_x64', evidence: 'chronolog-db checkpoint.ts + tendril handoff/checkpoint verified with 100% recovery & DEVICE_RETIRED_BY_CHECKPOINT.' },
-    { id: 12, name: 'ServerlessHostAdapter + Docker/systemd/launchd/Windows service templates', status: 'passed_local_linux_x64', evidence: '@tendriller/core/serverless tested; deploy/* templates and docs/DEPLOYMENT_GUIDE.md shipped.' },
-    { id: 13, name: 'chronolog-db fast pure-JS test lane & AGENTS.md', status: 'passed_local_linux_x64', evidence: chronologFastLane ? `pnpm test:fast ran ${chronologFastLane.passedFiles} pure-JS files in ${chronologFastLane.durationSec}s.` : 'Verified in chronolog-db.' },
-    { id: 14, name: 'Live qualification across 5 external cloud-agent surfaces', status: 'pending_live_access', evidence: 'Honest placeholder matrix generated; vendor cloud VM credentials/runs are not locally accessible.' },
-  ];
+  telemetry.gates = collectorGates({
+    bootstrapVerifiedExtractMs: bootstrapExtractMs, probeCapabilitiesMs: probeMs,
+    checkpointRecoveryPass, chronologFastLane,
+  });
 
   return telemetry;
 }
@@ -210,6 +201,7 @@ function buildMatrixDocument(telemetry) {
   return {
     format: 'tendriller-qualification-matrix/v1',
     generatedAt: telemetry.recordedAt,
+    qualificationScope: 'unqualified-local-measurements',
     localTelemetry: telemetry,
     cloudAgentPlatforms: platforms,
   };
@@ -225,7 +217,7 @@ function renderMarkdown(doc) {
     '',
     `Generated: \`${doc.generatedAt}\` on \`${t.host.platform}/${t.host.arch}\` (\`Node ${t.host.nodeVersion}\`).`,
     '',
-    '> **Honesty contract:** Measurements below come from real local runs on this host. Unobserved operating systems, external runtimes (Bun/Deno), Emscripten WASM compilation, and commercial cloud-agent VMs are explicitly marked `ci_workflow_configured`, `implemented_wasm_binary_pending_emcc`, or `pending_live_access`—never fabricated.',
+    '> Measurements describe only this collector run. Unexecuted gates are `not_executed`; synthetic fixture measurements do not qualify a public release, platform, deployment or live external agent. Use exact source/artifact-bound CI evidence for those claims.',
     '',
     '## Measured Local Artifact Footprint & Benchmarks',
     '',
@@ -241,7 +233,7 @@ function renderMarkdown(doc) {
     `| Total \`events-relay-only\` core+runtime+session archive size | ${kb(a.profileEventsRelayOnlyTotalBytes)} | < 15 MB |`,
     `| Capability probe (\`probeCapabilities\`) | ${b.probeCapabilitiesMs ?? 'n/a'} ms | < 500 ms |`,
     `| Verified local bootstrap extract (\`tendriller-bootstrap.mjs\`) | ${b.bootstrapVerifiedExtractMs ?? 'n/a'} ms | < 15,000 ms |`,
-    `| Encrypted checkpoint export + retire + restore pass rate | ${b.checkpointRecoveryPassRate === 1 ? '100%' : '0%'} | 100% |`,
+    `| Encrypted checkpoint export + retire + restore pass rate | ${typeof b.checkpointRecoveryPassRate === 'number' ? (b.checkpointRecoveryPassRate * 100) + '%' : 'not measured'} | 100% |`,
     `| Measured Node process RSS (probe + SQLite checkpoint) | ${b.measuredProcessRssMb ?? 'n/a'} MB | < 150 MB |`,
     `| \`chronolog-db\` \`pnpm test:fast\` (${b.chronologFastLane?.passedFiles ?? 'n/a'} pure-JS test files) | ${b.chronologFastLane?.durationSec ?? 'n/a'} s | < 30 s target |`,
     '',
@@ -259,10 +251,12 @@ function renderMarkdown(doc) {
       `| ${p.name} | \`${p.mode}\` | \`${p.scenarios.use_existing_app_via_connector.status}\` | \`${p.scenarios.create_and_run_events_app.status}\` | \`${p.scenarios.create_and_run_sql_app.status}\` | \`${p.scenarios.checkpoint_and_resume_across_replacement.status}\` |`
     ),
     '',
-    'Re-generate locally after building sibling `tendriller` and `chronolog-db` checkouts:',
+    'Collect optional local fixture measurements from explicit sibling checkouts. This does not run product qualification. Run heavy checks only on an approved remote runner:',
     '',
     '```sh',
     'node distribution/scorecard.mjs',
+    '# Optional, explicit suite execution on a suitable runner:',
+    'node distribution/scorecard.mjs --run-fast-tests',
     '```',
     '',
   ];

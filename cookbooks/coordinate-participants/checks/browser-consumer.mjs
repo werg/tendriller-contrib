@@ -15,7 +15,17 @@ try {
   const bundled = await build({ absWorkingDir: here, entryPoints: { app: 'source/page/app.mjs', worker: 'source/page/deployment/worker.mjs' },
     bundle: true, splitting: true, format: 'esm', platform: 'browser', target: 'es2022', outdir: site,
     outExtension: { '.js': '.mjs' }, metafile: true });
-  assert.ok(Object.keys(bundled.metafile.inputs).some(path => path.includes('node_modules/@tendriller/core/session/') || path.includes('node_modules/@tendriller/core/collaboration/')));
+  // Prove both installed public owners are bundled without depending on the
+  // SDK's private directory layout or accepting the domain client alone.
+  const coreRoot = join(here, 'node_modules/@tendriller/core');
+  const core = JSON.parse(await readFile(join(coreRoot, 'package.json'), 'utf8'));
+  const inputs = new Set(Object.keys(bundled.metafile.inputs).map(path => resolve(here, path)));
+  for (const name of ['./browser-owner', './worker-owner']) {
+    const target = core.exports[name]?.import;
+    assert.ok(typeof target === 'string' && target.startsWith('./') && !target.split('/').includes('..'),
+      `Installed SDK must declare an import target for ${name}`);
+    assert.ok(inputs.has(resolve(coreRoot, target)), `Browser bundle omits the installed public ${name}`);
+  }
   for (const name of ['board.html', 'discussion.html', 'style.css']) await cp(join(here, 'source/page', name), join(site, name));
   await cp(join(here, 'engine'), join(site, 'engine'), { recursive: true });
   server = createServer(async (request, response) => {

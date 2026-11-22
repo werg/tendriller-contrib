@@ -1,44 +1,12 @@
-import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, statSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from 'node:fs';
+import { resolve, relative, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { readCookbooks, readingCatalog, walk } from './catalog.mjs';
 import { gallery } from './gallery.mjs';
+import { snapshotSource, finishSnapshotSource, snapshotContentPaths } from './snapshot-source.mjs';
+import { packSnapshot } from './snapshot-archive.mjs';
 
-function packDeterministicTarGz(sourceDir) {
-  const files = walk(sourceDir).map(abs => ({ abs, rel: relative(sourceDir, abs).replaceAll('\\', '/') }))
-    .sort((a, b) => a.rel.localeCompare(b.rel));
-  const chunks = [];
-  for (const { abs, rel } of files) {
-    const data = readFileSync(abs);
-    const mode = (statSync(abs).mode & 0o111) ? 0o755 : 0o644;
-    const header = Buffer.alloc(512, 0);
-    const name = rel.length <= 100 ? rel : rel.slice(rel.lastIndexOf('/') + 1);
-    const prefix = rel.length <= 100 ? '' : rel.slice(0, rel.lastIndexOf('/'));
-    if (Buffer.byteLength(name) > 100 || Buffer.byteLength(prefix) > 155) throw Error(`Archive path too long: ${rel}`);
-    header.write(name, 0, 100, 'utf8');
-    header.write(mode.toString(8).padStart(7, '0') + '\0', 100, 8, 'ascii');
-    header.write('0000000\0', 108, 8, 'ascii');
-    header.write('0000000\0', 116, 8, 'ascii');
-    header.write(data.byteLength.toString(8).padStart(11, '0') + '\0', 124, 12, 'ascii');
-    header.write('00000000000\0', 136, 12, 'ascii');
-    header.fill(0x20, 148, 156);
-    header.write('0', 156, 1, 'ascii');
-    header.write('ustar\0', 257, 6, 'ascii');
-    header.write('00', 263, 2, 'ascii');
-    if (prefix) header.write(prefix, 345, 155, 'utf8');
-    let sum = 0;
-    for (let i = 0; i < 512; i++) sum += header[i];
-    header.write(sum.toString(8).padStart(6, '0') + '\0 ', 148, 8, 'ascii');
-    chunks.push(header, data);
-    const rem = data.byteLength % 512;
-    if (rem) chunks.push(Buffer.alloc(512 - rem, 0));
-  }
-  chunks.push(Buffer.alloc(1024, 0));
-  return gzipSync(Buffer.concat(chunks), { level: 9, mtime: 0 });
-}
 const root = fileURLToPath(new URL('../', import.meta.url));
 const check = process.argv.includes('--check');
 const entries = readCookbooks(root);
@@ -66,24 +34,20 @@ const outputs = new Map([
 ]);
 for(const [path,content] of outputs){if(check){if(readFileSync(resolve(root,path),'utf8')!==content)throw Error(`Generated file is stale: ${path}; run npm run build`);}else writeFileSync(resolve(root,path),content);}
 if(!check){
+ const initialSource = snapshotSource(root, process.env.SOURCE_COMMIT);
  const dist=resolve(root,'dist'),site=resolve(dist,'static');rmSync(dist,{recursive:true,force:true});mkdirSync(site,{recursive:true});
- for(const path of ['cookbooks','guides','README.md','PROVENANCE.md','catalog.json','index.html','agent.md','llms.txt'])cpSync(resolve(root,path),resolve(site,path),{recursive:true});
- mkdirSync(resolve(site, 'distribution'), { recursive: true });
- cpSync(resolve(root, 'distribution/source-map.json'), resolve(site, 'distribution/source-map.json'));
- let commit = null, dirty = true;
- try {
-  commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().length > 0;
- } catch {}
- const sourceCommit = process.env.SOURCE_COMMIT || commit;
- if (sourceCommit && !/^[a-f0-9]{40}$/.test(sourceCommit)) throw Error('SOURCE_COMMIT must be a full Git commit SHA');
+ for (const path of snapshotContentPaths) {
+  mkdirSync(dirname(resolve(site, path)), { recursive: true });
+  cpSync(resolve(root, path), resolve(site, path), { recursive: true });
+ }
+ const { commit: sourceCommit, dirty } = finishSnapshotSource(root, initialSource, process.env.SOURCE_COMMIT, site);
  const sourceBase = sourceCommit && !dirty ? `https://github.com/werg/tendriller-contrib/blob/${sourceCommit}` : undefined;
  // Current discovery follows main; a clean exported snapshot names its exact source.
  writeFileSync(resolve(site, 'catalog.json'), JSON.stringify(readingCatalog(entries, sourceBase), null, 2) + '\n');
  writeFileSync(resolve(site, 'index.html'), gallery(entries, sourceBase));
  const pkg=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8'));
  const file= `tendriller-cookbooks-${pkg.version}.tgz`;
- writeFileSync(resolve(dist, file), packDeterministicTarGz(site));
+ writeFileSync(resolve(dist, file), packSnapshot(site));
  const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
  writeFileSync(resolve(dist,'manifest.json'),JSON.stringify({format:'tendriller-cookbook-snapshot',version:pkg.version,source_commit:sourceCommit,source_dirty:dirty,cookbooks:entries.length,artifacts:[{file,sha256:digest(readFileSync(resolve(dist,file)))}],files:walk(site).map(path=>({path:relative(site,path).replaceAll('\\','/'),sha256:digest(readFileSync(path))}))},null,2)+'\n');
 }
