@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { readCookbooks, readingCatalog, walk } from './catalog.mjs';
 import { gallery } from './gallery.mjs';
-import { snapshotSource, snapshotContentPaths } from './snapshot-source.mjs';
+import { snapshotSource, finishSnapshotSource, snapshotContentPaths } from './snapshot-source.mjs';
 import { packSnapshot } from './snapshot-archive.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -34,12 +34,13 @@ const outputs = new Map([
 ]);
 for(const [path,content] of outputs){if(check){if(readFileSync(resolve(root,path),'utf8')!==content)throw Error(`Generated file is stale: ${path}; run npm run build`);}else writeFileSync(resolve(root,path),content);}
 if(!check){
- const { commit: sourceCommit, dirty } = snapshotSource(root, process.env.SOURCE_COMMIT);
+ const initialSource = snapshotSource(root, process.env.SOURCE_COMMIT);
  const dist=resolve(root,'dist'),site=resolve(dist,'static');rmSync(dist,{recursive:true,force:true});mkdirSync(site,{recursive:true});
  for (const path of snapshotContentPaths) {
   mkdirSync(dirname(resolve(site, path)), { recursive: true });
   cpSync(resolve(root, path), resolve(site, path), { recursive: true });
  }
+ const { commit: sourceCommit, dirty } = finishSnapshotSource(root, initialSource, process.env.SOURCE_COMMIT);
  const sourceBase = sourceCommit && !dirty ? `https://github.com/werg/tendriller-contrib/blob/${sourceCommit}` : undefined;
  // Current discovery follows main; a clean exported snapshot names its exact source.
  writeFileSync(resolve(site, 'catalog.json'), JSON.stringify(readingCatalog(entries, sourceBase), null, 2) + '\n');

@@ -183,7 +183,25 @@ Chronolog owns read views, recovery, cancellation and checkpoint advancement;
 Tendriller supplies host acknowledgement and retry. Record owner-declined
 projections through `onSkipped` separately from delivered events. Advancing a
 checkpoint follows successful callback completion, not merely a socket send.
-The current assistant guide owns the complete setup and lifecycle example.
+The current assistant guide supplies connection setup. The delivery helper's
+bounded retry budget can exhaust; a rejected delivery ends `forwardSessionEvents`.
+Supervise that task with the application's stop signal and an explicit finite
+backoff/retry policy, reopening from its unchanged durable checkpoint. Treat
+`EVENT_FORWARDER_REVIEW_RECOVERY` separately: inspect the checkpoint and selected
+history, apply the application's explicit recovery decision, then resume only
+from a reviewed valid position. Never reset the cursor to skip uncertain work.
+A failed batch may have delivered some events before checkpoint persistence;
+restarted forwarding can repeat them. Receivers must deduplicate stable source
+identities within the selected generation rather than assume exactly-once delivery.
+
+In the published callback contract, `onSkipped` is synchronous: returning a
+Promise does not make the helper await it. A synchronous durable recorder must
+finish before returning. For asynchronous persistence, provide an outer delivery
+callback that creates a per-invocation helper, captures its declined-event record
+synchronously, awaits helper completion, then awaits the durable skipped-record
+write before that outer callback resolves. Propagate write failure instead of
+advancing the checkpoint; keep declined records distinct from delivered receipts.
+Do not share a mutable capture across concurrent delivery invocations.
 
 ## Historical kitchen design (provenance only)
 
@@ -272,7 +290,7 @@ and real transaction guards. A read followed by a command can race.
 | Recovery excluded the source request or reply | Delivery journal and loss/recovery evidence | Reread selected history, display the loss, and require deliberate reapplication if still wanted |
 | An answer refers to an earlier cooking step | Original request and response provenance | Keep the response labeled stale; ask again only as a new deliberate task |
 | The card is unmounted or message outcome is uncertain | Existing conversation and request | Use normal tool calls or inspect the chat before sending another message |
-| A Workspace trigger timed out or its run completed without a reply | Original operation, idempotency key and provider receipt | Inspect `get_workspace_agent_run` and current application status; retry only the original trigger when permitted, and check the configured agent's MCP write-back access |
+| A Workspace trigger timed out or its run completed without a reply | Original operation, idempotency key and provider receipt | Inspect the configured receiver's retained run/delivery receipt and query current application status through authorized tools; retry only the original request when permitted and verify its write-back access. The hosted endpoint does not promise the historical adapter's run-inspection tool |
 | The delivery or Workspace journal is full | Existing receipts and uncertain operation identities | Stop new triggers, reconcile retained work and deliberately archive reviewed records; do not silently discard deduplication evidence |
 | Publisher authority is absent | Prepared assets and review intent | Ask the existing enrolled publisher to sign the exact release |
 

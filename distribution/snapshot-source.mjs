@@ -25,3 +25,12 @@ export function snapshotSource(root, requested) {
   if (requested !== undefined) assert.equal(requested, commit, 'SOURCE_COMMIT differs from the actual checkout');
   return { commit, dirty };
 }
+
+
+// Preserve preflight label validation, then observe again after content copying.
+// A clean tree at a different revision cannot identify a mixed copied snapshot.
+export function finishSnapshotSource(root, initial, requested) {
+  const final = snapshotSource(root, requested);
+  assert.equal(final.commit, initial.commit, 'Source revision changed during snapshot copy');
+  return { commit: final.commit, dirty: initial.dirty || final.dirty };
+}
