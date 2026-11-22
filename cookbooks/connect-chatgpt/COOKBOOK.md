@@ -190,6 +190,12 @@ backoff/retry policy, reopening from its unchanged durable checkpoint. Treat
 `EVENT_FORWARDER_REVIEW_RECOVERY` separately: inspect the checkpoint and selected
 history, apply the application's explicit recovery decision, then resume only
 from a reviewed valid position. Never reset the cursor to skip uncertain work.
+If the assistant closes with `startup_timeout` before its first connection opens,
+create a new assistant with `connectApplicationAssistant` before reopening the
+forwarder from that unchanged durable checkpoint. After its first connection,
+the assistant reconnects without a deadline. Do not recreate it to bypass a
+terminal `participant_replaced` or `approval_changed` disconnect; inspect the
+current participant and approval first.
 A failed batch may have delivered some events before checkpoint persistence;
 restarted forwarding can repeat them. Receivers must deduplicate stable source
 identities within the selected generation rather than assume exactly-once delivery.

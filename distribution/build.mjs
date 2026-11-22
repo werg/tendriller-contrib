@@ -40,7 +40,7 @@ if(!check){
   mkdirSync(dirname(resolve(site, path)), { recursive: true });
   cpSync(resolve(root, path), resolve(site, path), { recursive: true });
  }
- const { commit: sourceCommit, dirty } = finishSnapshotSource(root, initialSource, process.env.SOURCE_COMMIT);
+ const { commit: sourceCommit, dirty } = finishSnapshotSource(root, initialSource, process.env.SOURCE_COMMIT, site);
  const sourceBase = sourceCommit && !dirty ? `https://github.com/werg/tendriller-contrib/blob/${sourceCommit}` : undefined;
  // Current discovery follows main; a clean exported snapshot names its exact source.
  writeFileSync(resolve(site, 'catalog.json'), JSON.stringify(readingCatalog(entries, sourceBase), null, 2) + '\n');
