@@ -22,3 +22,11 @@ test('failed fixture, malformed timing and explicit process observations remain 
   assert.match(gates.find(gate => gate.id === 13).evidence, /count: unknown/);
   assert.equal(gates.find(gate => gate.id === 14).status, 'not_executed');
 });
+
+
+test('installed runtime version strings do not prove archive, WASM or platform execution', () => {
+  const gates = collectorGates({ bunVersion: '1.4.5', denoVersion: 'deno 2.9.8' });
+  assert.equal(gates.find(gate => gate.id === 10).status, 'not_executed');
+  assert.equal(gates.find(gate => gate.id === 2).status, 'not_executed');
+  assert(gates.every(gate => gate.status === 'not_executed'));
+});

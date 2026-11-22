@@ -159,6 +159,15 @@ async function collectLocalTelemetry() {
     };
   }
 
+  let bunVersion = null;
+  for (const bin of ['bun', join(process.env.HOME ?? '', '.bun/bin/bun')]) {
+    try { bunVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', timeout: 3000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'] }).trim(); break; } catch {}
+  }
+  let denoVersion = null;
+  for (const bin of ['deno', join(process.env.HOME ?? '', '.deno/bin/deno')]) {
+    try { denoVersion = execFileSync(bin, ['--version'], { encoding: 'utf8', timeout: 3000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'] }).split('\n')[0].trim(); break; } catch {}
+  }
+
   telemetry.benchmarks = {
     probeCapabilitiesMs: probeMs,
     probeRuntime: probe.runtime,
@@ -167,6 +176,8 @@ async function collectLocalTelemetry() {
     checkpointRecoveryPassRate: checkpointRecoveryPass ? 1.0 : 0.0,
     measuredProcessRssMb: peakRssMb,
     chronologFastLane,
+    bunVersion,
+    denoVersion,
   };
 
   telemetry.gates = collectorGates({
