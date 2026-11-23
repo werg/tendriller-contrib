@@ -6,12 +6,45 @@ group: "Choose inputs and algorithms"
 tags: ["motion", "calibration", "heuristics"]
 choices: ["Manual marking or heuristic events", "Rising edge/refractory period or low/high hysteresis", "Raw diagnostics, corrections, and summary uncertainty"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["detect-meaningful-changes", "present-live-measurements", "discover-capabilities"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/motion.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/motion-companion/index.html"]
 ---
 
 # Turn noisy motion into useful events
+
+## Runnable current API specimen
+
+[motion.mjs](snippets/motion.mjs) implements `createMotionController` and a pure
+`createMagnitudeDetector`. It uses gravity-free `event.acceleration` in m/s²,
+explicit high/low thresholds, and an elapsed-time refractory period. It rejects
+missing/nonfinite values and requires a new quiet sample after an observation
+gap. These parameters are a rehearsal heuristic, not calibrated movement counts.
+
+```js
+import { createMotionController } from './snippets/motion.mjs';
+const motion = createMotionController({
+  tendril,
+  detector: { high: 12, low: 4, refractoryMs: 600, gapMs: 2000 },
+  onStatus: state => { document.querySelector('#motion-status').textContent = state; },
+  onSample: sample => { if (sample.detected) document.querySelector('#estimate').textContent = String(sample.count); },
+});
+document.querySelector('#motion-start').onclick = event => {
+  void motion.start(event).catch(error => { document.querySelector('#motion-status').textContent = error.message; });
+};
+document.querySelector('#motion-stop').onclick = () => motion.stop();
+```
+
+The controller calls iOS `DeviceMotionEvent.requestPermission()` in the trusted
+Start handler before any asynchronous probe. It registers pending work first,
+ignores a grant after Stop, removes its listener on visibility loss, and requires
+a fresh Start after return. Call `motion.dispose()` when the authored route ends.
+Keep manual marking and correction controls usable throughout.
+
+The [checks](checks/README.md) exercise permission timing, denied/late permission,
+visibility teardown, refractory equality, low-edge rearming and invalid samples.
+Those deterministic checks do not qualify an iPhone or the accuracy of a physical
+movement detector.
 
 Use motion when a rough movement event is enough: noticing a deliberate shake, detecting a change in orientation, or reviewing a repeated handling task. Consider a packing demonstration in which a person wants to mark each deliberate lift of a phone-mounted test object. The useful outcome is an inspectable estimate with corrections, not an unexplained count that keeps rising.
 

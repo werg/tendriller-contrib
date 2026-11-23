@@ -6,12 +6,55 @@ group: "Choose inputs and algorithms"
 tags: ["hardware", "protocols", "telemetry"]
 choices: ["Direct device, remote collector, or uploaded/simulated data", "Packet framing and bounded carry buffers", "Read-only access versus explicit physical commands"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["run-measurement-experiment", "ingest-bounded-telemetry", "discover-capabilities"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/serial.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/bluetooth.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/connectors.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/hardware-lab.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/hardware-experiment/model.mjs"]
 ---
 
 # Connect an instrument and interpret its protocol
+
+## Runnable current API specimens
+
+[instrument.mjs](snippets/instrument.mjs) contains a bounded UTF-8 newline framer,
+an example reading validator, and read-only `createSerialReader` /
+`createBluetoothReader` adapters. The fixed carry buffer rejects an oversized
+record and resynchronizes at the next newline. A malformed UTF-8 frame is reported
+and discarded. This framing is appropriate only when the instrument's documented
+protocol actually uses newline-delimited UTF-8.
+
+```js
+import { createSerialReader, parseReading } from './snippets/instrument.mjs';
+const reader = createSerialReader({
+  tendril, baudRate: 9600,
+  onFrame(line) {
+    try {
+      const reading = parseReading(line);
+      document.querySelector('#reading').textContent = reading.value + ' ' + reading.unit;
+    } catch { document.querySelector('#instrument-status').textContent = 'Rejected malformed reading.'; }
+  },
+  onReject: reason => { document.querySelector('#instrument-status').textContent = reason; },
+  onStatus: state => { document.querySelector('#instrument-status').textContent = state; },
+});
+document.querySelector('#connect').onclick = event => { void reader.start(event).catch(error => { document.querySelector('#instrument-status').textContent = error.message; }); };
+document.querySelector('#disconnect').onclick = () => reader.stop();
+```
+
+The example reading is `{"value": 23, "unit": "°C"}\n`. Supply matching vendor
+filters when known. For Bluetooth, pass the actual service and notification
+characteristic UUIDs to `createBluetoothReader`; it requests only that service
+and feeds notification fragments through the same bounded framer. It sends no
+actuator commands. A binary instrument needs its own reviewed decoder.
+
+Both adapters register before the chooser, check cancellation after acquisition,
+and keep asynchronous reader/notification closure visible as `stopping`.
+Stop/dispose and visibility loss call `handle.unregister()`; a late chooser or
+connection cannot become a new active run. Call `reader.dispose()` on route exit.
+Expose a file/manual/simulated source alongside the connection controls.
+
+The [checks](checks/README.md) cover split/combined/multibyte frames, malformed
+input, memory bounds, chooser cancellation, cancellation during open/connect,
+reader lock release, and visibility cleanup. Real instruments and chooser UX
+remain separate qualification work.
 
 Use a direct device connection when an instrument provides measurements or controls the task genuinely needs. For a bench temperature experiment, the useful experience is a verified source, a short calibration check, a live reading with units and freshness, an intentional run, and an exportable summary. A transport console alone leaves the person to guess whether the data is meaningful.
 

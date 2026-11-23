@@ -6,12 +6,59 @@ group: "Choose inputs and algorithms"
 tags: ["location", "uncertainty", "routes"]
 choices: ["One fix, manual progress, or continuous tracking", "Accuracy filtering and inner/outer arrival radii", "First-fix, skipped-waypoint, and replanning semantics"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["detect-meaningful-changes", "guide-explicit-checkpoints", "choose-interruptions"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"]
 ---
 
 # Follow location changes and route progress
+
+## Runnable current API specimen
+
+[location.mjs](snippets/location.mjs) supplies `admitFix`, great-circle distance in
+metres, an uncertainty-aware inner/outer `createArrivalTracker`, one-shot/watch
+`createLocationController`, and a coalescing `createFixPublisher`.
+Coordinates are degrees, accuracy/distances are metres, and `sampledAtMs` is the
+browser's observation timestamp. The example limits fix age to 10 seconds and
+accuracy to 50 metres; choose values for the actual task.
+
+```js
+import { createArrivalTracker, createLocationController, createFixPublisher } from './snippets/location.mjs';
+const arrival = createArrivalTracker({ latitude: 52.52, longitude: 13.405 }, { innerM: 30, outerM: 70 });
+let publisher;
+const location = createLocationController({
+  tendril,
+  onFix(fix) {
+    document.querySelector('#arrival').textContent = arrival.update(fix).arrived ? 'Near the stop; confirm your work.' : 'Outside the arrival boundary.';
+    publisher.offer(fix);
+  },
+  onState(value) {
+    document.querySelector('#location-status').textContent = value.state;
+    if (value.state === 'stale' || value.state === 'stopped') arrival.reset();
+    if (value.state === 'stopped') publisher?.stop();
+  },
+});
+function start(event, watch) {
+  location.stop(); publisher?.stop(); arrival.reset();
+  publisher = createFixPublisher(session, { streamId: crypto.randomUUID() });
+  location.start(event, { watch });
+}
+document.querySelector('#once').onclick = event => start(event, false);
+document.querySelector('#follow').onclick = event => start(event, true);
+document.querySelector('#stop').onclick = () => { location.stop(); publisher?.stop(); };
+```
+
+Keep a manual checkpoint button next to these controls. Call `location.dispose()`
+and `publisher?.stop()` on route teardown. A hidden page stops the watch. Registering
+pending work before the native call and checking its signal prevents late fixes
+after Stop from entering another run. One-shot success releases the resource but
+retains a timer to mark the displayed snapshot stale.
+
+The publisher has at most one send and one replaceable pending fix. Receivers
+select the signed author/stream and validate sample age themselves; `latest`
+subscription does not throttle producers. See the [checks](checks/README.md) for
+deterministic and real browser/session coverage. A conservative accuracy-circle
+heuristic does not establish physical presence or completed work.
 
 Use this when progress through physical places is part of a task: a person visits several equipment stations and records an inspection at each. A useful route page gives them the current stop, what to do there, a clear way to confirm completion, and recovery when location becomes uncertain. A moving dot alone does not establish useful progress.
 

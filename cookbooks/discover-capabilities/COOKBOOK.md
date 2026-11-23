@@ -6,12 +6,41 @@ group: "Choose inputs and algorithms"
 tags: ["capabilities", "permissions", "fallbacks"]
 choices: ["No-prompt observation versus a relevant permission request", "API presence, permission, hardware, and actual operation", "Fallbacks that complete the same task"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["capture-reviewed-evidence", "choose-voice-interaction", "connect-instrument", "complete-accessible-interactions"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/probe.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/playground.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/INPUTS.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/explore-device/index.html", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md"]
 ---
 
 # Discover capabilities and design around them
+
+## Runnable current API specimen
+
+Use [capabilities.mjs](snippets/capabilities.mjs) for a task-selected, bounded
+summary and explicit diagnostic sharing. [capability-routes.mjs](snippets/capability-routes.mjs)
+is a smaller form-specific variant that gates authored camera/microphone buttons
+while leaving file and typed inputs usable. Both call the current public
+`tendril.capabilities(filter)`; neither opens a device.
+
+```js
+import { inspectInputs, applyInputChoices } from './snippets/capabilities.mjs';
+const summary = await inspectInputs(tendril, ['camera', 'microphone']);
+applyInputChoices(summary, {
+  buttons: { camera: document.querySelector('#photo'), microphone: document.querySelector('#record') },
+  fileButton: document.querySelector('#file'), textButton: document.querySelector('#describe'),
+  status: document.querySelector('#input-status'),
+});
+```
+
+The page supplies those authored controls and its installed runtime. A permission
+query can fail or be unknown; capture remains a separate trusted local action.
+`shareInputChoices(session, summary, event, { streamId })` additionally checks a
+trusted Share gesture and a 2 KiB JSON budget. It excludes user agent, capture
+timestamp, device labels, active resource names and unrelated capabilities.
+
+The [checks](checks/README.md) exercise filtered gating, denied/missing routes,
+fallbacks, bounded summaries, and import without acquisition. The shared real
+browser check consumes the built public runtime and peer-session package.
+Historical source links below remain provenance, not the runnable dependency.
 
 Use capability discovery when a page can accept information in several ways: a repair report may use a camera, an uploaded image, or a typed description. The person wants to finish that report. Discovery should reveal the best available route without turning first use into a tour of permission prompts.
 

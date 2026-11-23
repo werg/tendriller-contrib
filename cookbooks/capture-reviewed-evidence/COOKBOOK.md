@@ -6,12 +6,68 @@ group: "Collect evidence"
 tags: ["capture", "privacy", "drafts"]
 choices: ["File or typed fallback versus a live sensor", "Inline review versus a separate capture route", "Local draft lifetime and late rejection behavior"]
 capabilities: ["application content", "durable commands"]
-evidence: "explained"
+evidence: "exercised"
 related: ["discover-capabilities", "annotate-a-frame", "recover-outdated-work", "document-a-field-inspection"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/camera.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/input-kit.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/test/continuity.spec.ts", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/photo-inspector/index.html", "https://github.com/werg/tendriller/blob/2cbc6b9be59efad6fe8fdf3353e1858a8729f40e/contract/blobs.mjs"]
 ---
 
 # Capture, review, and send evidence
+
+## Runnable current API observation card
+
+The current [observation.mjs](snippets/observation.mjs), [card.mjs](snippets/card.mjs),
+and [capture.mjs](snippets/capture.mjs) form a runnable agent-requested observation
+flow on the page's existing public runtime/session. A signed, addressed, bounded
+request renders a card; it never opens a sensor. The card presents typed/file
+fallbacks, optional screen-frame/audio capture, preview, Discard, Send, and an
+optional application-declared retention choice.
+
+```js
+import { observeRequests } from './snippets/observation.mjs';
+import { mountObservationCard } from './snippets/card.mjs';
+const lifetime = new AbortController();
+let card;
+void observeRequests({
+  session, requester: nativeDeviceId, signal: lifetime.signal,
+  onRequest(request) {
+    if (card) return; // One visible request; later requests may expire.
+    card = mountObservationCard({ container: document.querySelector('#evidence'), tendril, session, request });
+  },
+});
+```
+
+`nativeDeviceId` is the application's deliberately authorized peer, not a value
+accepted from the incoming payload. Requests use `evidence/request` with
+`{ requestId, recipient, question, expiresAt }`; responses on
+`evidence/response` carry the same request ID, original requester, operation ID,
+reviewed text, immutable content reference and nullable observation time. Imported
+files leave their original observation time unknown; fresh screen/audio routes
+record capture completion, and Send never replaces that timestamp. This is an
+editable example schema, not a required platform protocol. Signal audiences are
+application members; a recipient field is routing metadata.
+
+Screen capture uses a trusted `getDisplayMedia` gesture, bounds dimensions and
+encoded bytes, and stops tracks before encoding/review. Audio capture uses
+`MediaRecorder`, limits time to 15 seconds by default (30 seconds maximum), caps
+evidence at 8 MiB, and supports WebM/MP4/Ogg/WAV when the browser can record that
+type. Finish creates a candidate; Stop sensors, hiding, or Discard cancels it.
+A late media grant is closed. Capturing or previewing never uploads bytes.
+
+Send stages at most 64 KiB per write through `session.content` and transmits only
+after trusted review. Uncertain sends keep their operation identity. An optional
+`retainEvidence(response)` callback must submit the application's declared
+command and inspect its applied accepted/rejected result. The card does not
+invent a durable command in an existing definition. On receiving a confirmed
+read receipt, `card.review.releaseAfterReceipt()` can prune unretained local bytes
+when the installed session exposes `content.prune`; pruning is not remote erasure.
+Before dispatch, discarded stages use `upload.discard()` when available.
+
+Call `lifetime.abort()` and `card?.dispose()` on route teardown. Keep a rejected or
+uncertain dispatched operation available for application recovery; do not
+automatically send a new identity. The [checks](checks/README.md) include
+deterministic cancellation/bounds cases and an actual Chromium-to-native public
+session run with synthetic microphone audio, encrypted content, correlated
+response and an explicitly declared retention command.
 
 Use this when a camera, microphone, file, sketch, or location adds evidence to a task. First ask what the agent needs to know and whether typed input or a file is enough. Opening a sensor, capturing a candidate, uploading bytes, and sending a command are separate decisions. A single button may coordinate them, but the person still needs an intelligible opportunity to review or discard sensitive material.
 

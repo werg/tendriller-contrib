@@ -170,7 +170,7 @@
         "application content",
         "durable commands"
       ],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "discover-capabilities",
         "annotate-a-frame",
@@ -473,7 +473,7 @@
         "Read-only access versus explicit physical commands"
       ],
       "capabilities": [],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "run-measurement-experiment",
         "ingest-bounded-telemetry",
@@ -628,7 +628,7 @@
         "Fallbacks that complete the same task"
       ],
       "capabilities": [],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "capture-reviewed-evidence",
         "choose-voice-interaction",
@@ -752,7 +752,7 @@
         "First-fix, skipped-waypoint, and replanning semantics"
       ],
       "capabilities": [],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "detect-meaningful-changes",
         "guide-explicit-checkpoints",
@@ -932,7 +932,7 @@
         "Raw diagnostics, corrections, and summary uncertainty"
       ],
       "capabilities": [],
-      "evidence": "explained",
+      "evidence": "exercised",
       "related": [
         "detect-meaningful-changes",
         "present-live-measurements",

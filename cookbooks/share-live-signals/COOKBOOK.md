@@ -19,15 +19,15 @@ preview should not need a database transaction, an inclusion receipt or a
 finality service. The next observation can replace a missed one; an expired
 observation disappears.
 
-The public signal channel is independent of durable application storage. It
-works with an explicit transport and authorization policy. Peer applications can
-use the same interface with Chronolog membership, and Tendriller exposes it through
-`tendril.signals`. Hosted pages receive a channel automatically through their
-existing authenticated page socket. Peer deployments install their selected
-channel independently of durable application readiness. `available` reports
-installation, not connectivity or delivery; an unconfigured send fails immediately.
-Signal-only applications do not need to open a SQL database or select a durable
-application backend.
+The public signal channel is independent of durable application storage. Tendriller
+pages and native participants use the same owned Chronolog session's `signals`
+port, with its authenticated peer transport and topic policy. The browser runtime
+exposes that explicitly installed port through `tendril.signals`. Installation is
+independent of durable application readiness: `available` reports installation,
+not connectivity or delivery, and an unconfigured send fails immediately.
+Signal-only applications do not need to open a SQL database. The host handles
+control, publication and introductions; it does not supply a separate live-data
+channel through the page's control socket.
 
 ## Choose what may be lost
 
@@ -67,23 +67,26 @@ use `latest` if it stays within the frame budget.
 The application sends JSON payloads. Authorization and envelope verification
 belong to the channel; the application still validates its payload schema.
 
-A hosted page can use `tendril.signals` directly. A peer bootstrap installs
-`tendril.signals.install(client.signals)`; it does not also send through the hosted
-channel. A standalone bootstrap can install its own `SignalChannel` instead.
-An application can also explicitly select the hosted live channel with
-`connectHostedSignals` or a native host client's `connectSignals`, including
-when its durable history is peer-owned. That choice uses host accounts and
-credentials; it does not grant Chronolog membership or change the durable backend.
-Installation is separate from `tendril.application.install()`. If it happens asynchronously,
-bootstrap may explicitly await `tendril.signals.ready()`; `send()` itself never
-queues work while waiting for a channel.
+Start from the [connected-app setup](../../guides/connected-app-setup.md) and
+reuse its enrolled browser and native sessions. The first-app browser bootstrap
+already installs `session.signals`. A custom bootstrap installs the same port once:
 
-The hosted channel is for authenticated owner devices and the configured agent.
-Guests and display sessions do not subscribe or publish. The host supplies the
-scope, authenticated author, session, sequence and freshness timestamps; it
-stores no signal payload or per-message durable metadata and never wakes a
-conversational agent for these messages. The connected agent explicitly listens
-when it needs live interaction.
+```js
+// session is the existing enrolled browser Worker facade.
+tendril.signals.install(session.signals);
+```
+
+Do not install a second channel when the starter has already done this.
+Installation is separate from `tendril.application.install()`. If composition is
+asynchronous, explicitly await `tendril.signals.ready()`; `send()` itself never
+queues work while waiting for installation. The current [core signal guide](https://github.com/werg/tendriller/blob/master/docs/APPLICATION_SIGNALS.md)
+describes session reach, local echo and transport limits.
+
+The session verifies the signal's scope, author, sequence and signed stream context
+and enforces its current topic policy. Account sign-in alone does not authorize a
+participant to send application signals. A native agent explicitly subscribes to
+its own enrolled session when it needs live interaction. Receiving a signal does
+not arrange a future turn in a conversational host.
 
 ```js
 await tendril.signals.send('typing', { typing: true }, { ttlMs: 2500 });
@@ -107,25 +110,58 @@ independently: one person's short-lived indication must not erase another
 person's still-live indication. Expire the display even if no later packet
 arrives, and clear it immediately when the subscription ends.
 
-`send()` resolving means at least one currently attached route accepted local
-dispatch. It is not a remote delivery receipt, durable acceptance or completed
+`send()` resolving means a configured live route, or enabled local echo, accepted
+local dispatch. It is not a remote delivery receipt, durable acceptance or completed
 action. Keep a transient send failure separate from a durable submission result.
 Never queue yesterday's typing or preview to be resent after reconnect.
 
-A hosted agent or other native SDK client explicitly opens its live connection:
+For a live sensor reading, the browser sends through that same installed port.
+Here `reading` is a page-owned sample acquired under the person's selected sensor
+policy, and `runId` identifies this observation run:
 
 ```js
-const signals = await host.connectSignals({ signal: lifetime.signal });
-try { await signals.send('progress', { completed: 3, total: 5 }); }
-finally { signals.close(); }
+const lifetime = new AbortController();
+await tendril.signals.send('reading', {
+  value: reading.value, unit: reading.unit, observedAtMs: reading.observedAtMs,
+}, { stream: { streamId: runId }, ttlMs: 3000, signal: lifetime.signal });
 ```
 
-The returned port also supports `subscribe()`. It has no reconnect or replay
-outbox: when the connection ends, the application decides whether to open a new
-one and publish fresh observations. Its scope and author come from the
-authenticated hosted session, not fields supplied in the payload.
+The native participant subscribes through its existing session. Select the
+source device's verified author ID and run before coalescing; a payload label
+cannot establish either identity. The example accepts a finite numeric reading with an
+explicit unit and observation timestamp; adapt that schema to the sensor:
 
-For native or standalone use, import `SignalChannel` from
+```js
+const lifetime = new AbortController();
+for await (const event of session.signals.subscribe({
+  topics: ['reading'],
+  streams: [{ authorId: sourceDeviceKey, streamId: runId }],
+  mode: 'latest', signal: lifetime.signal,
+})) {
+  const sample = event.payload;
+  if (!sample || typeof sample !== 'object' || Array.isArray(sample)) continue;
+  if (typeof sample.value !== 'number' || !Number.isFinite(sample.value)
+      || typeof sample.unit !== 'string'
+      || typeof sample.observedAtMs !== 'number'
+      || !Number.isFinite(sample.observedAtMs)) continue;
+  showReading(sample, event.expiresAtMs);
+}
+```
+
+`showReading` must expire its displayed value even if no later packet arrives;
+clear it when the subscription ends. Aborting this subscription does not close the
+owned session or stop the browser's sensor. Keep the source's local Stop effective,
+and stop its watch/tracks separately. Reconnection publishes fresh observations;
+there is no signal replay outbox. Save required observations through the
+application's declared command and content APIs.
+
+### Standalone channel composition
+
+A standalone channel is a lower-level option for an explicitly selected transport
+and authorization policy. It is not a required extra step for an existing
+Tendriller session.
+
+For a standalone application, import `SignalChannel` from
 `@chronolog/signals`. Configure an explicit scope, signing identity, sender
 authorization callback, bounded frame transport and optional credential. Attach
 each connection with `channel.attachRoute({ trySend, close })`, pass its incoming
@@ -263,9 +299,9 @@ page-owned behavior, not network delivery or deployed authorization.
 ## Keep access and lifetime explicit
 
 The scope separates applications; topics describe payloads. Neither is a secret
-nor a permission. The adapter establishes the sender through its authenticated
-hosted session or a verified standalone/Chronolog signature, and enforces its
-topic policy, session/sequence bounds and expiry. A payload cannot replace that identity.
+nor a permission. The session or standalone channel establishes the sender through
+a verified signature and enforces its topic policy, session/sequence bounds and
+expiry. A payload cannot replace that identity.
 The transport must provide the required confidentiality and connection access.
 Do not assume a signed signal is encrypted or a successful introduction grants
 permission to read a database.
@@ -273,8 +309,8 @@ permission to read a database.
 In a governed Chronolog group, a signal-only writer grant explicitly declares
 `program: { sql: false, topics: [], signals: ['typing', 'job-progress'] }`.
 Writer permission does not imply SQL, durable topics or forwarding. The standard
-peer link independently requires reader admission; standalone and hosted
-channels instead use their own configured authorization. No membership or
+peer link independently requires reader admission; a standalone channel
+instead uses its own configured authorization. No membership or
 schema administration role is required to send live information.
 
 The peer RTC adapter uses an independent unordered live channel, separate from

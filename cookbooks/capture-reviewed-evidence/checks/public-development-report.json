@@ -1,0 +1,41 @@
+{
+  "scope": "public-runtime-browser-native-session",
+  "verifiedAt": "2026-11-23T21:17:29.132Z",
+  "runtime": {
+    "version": "0.3.0-rc.17",
+    "id": "42ea20ba820fdb90d592ec0c59b4acaf6b742c7501e0d9a50e5ba11d804c5b5a",
+    "kernelSha256": "50a330c0a6b4dacd12f486102724392dc424d16544d648282d69919dd4280a32",
+    "archiveSha256": "faaa34265fff4e9bb4b06d4284b37500a1c8162835b78b2ea2d50e752205f1b9",
+    "sdkArchiveSha256": "e983f7ec9b2f96fae71f80e8f6e21a6e425f932bcd65dea9c59aed613f388c8b"
+  },
+  "session": {
+    "version": "0.0.0-gb52d3ef3-dirty-relay",
+    "entrySha256": "4ec906b956a03ba1726f85e36859b8125a2eb59781da75a7883ffa6c2197978c",
+    "source": "b52d3ef3df5406c38150c6bc0ab108a7626199d9",
+    "dirty": true,
+    "provenanceSha256": "c46591b91e65b08c5924fbd88c51fea9de94176f6fdf1ddfdeaef3b233502afa",
+    "archiveSha256": "0d0c1296258a133d7a6e9026e6b783a713fb84c66e268654be9b7fa57cfa9c8a",
+    "artifactRole": "validation-only dirty development archive; not installed into the core project or released"
+  },
+  "snippets": {
+    "cookbooks/discover-capabilities/snippets/capabilities.mjs": "4b1b8293cecc5f6e8e08488a619c370320e81386a1307849d8713eb1f362b354",
+    "cookbooks/follow-location-progress/snippets/location.mjs": "916fbb9b911f4b97672ddd14da6e920066f8dfd213e444a90472faa0f34a8a2c",
+    "cookbooks/capture-reviewed-evidence/snippets/observation.mjs": "929cd5a9cba2f549e14d02d0f97cd2fe3feb667a8b7c4f2a276d06ae0b3c2a0f",
+    "cookbooks/capture-reviewed-evidence/snippets/card.mjs": "b6daa03d72e5e2dadd37a21d44af01304f7ed227ea2b410010fa66813430e6bc",
+    "cookbooks/capture-reviewed-evidence/snippets/capture.mjs": "b1377f020ce44354db940a5447cf6d6631730da131c490b42fe1eeb92400f41d"
+  },
+  "checks": [
+    "filtered no-prompt discovery",
+    "trusted geolocation to signed native signal",
+    "Stop sensors invalidation",
+    "remote request only renders",
+    "trusted synthetic audio capture and local review",
+    "64 KiB encrypted content transport",
+    "correlated response",
+    "explicit declared retention command"
+  ],
+  "limits": [
+    "Synthetic Chromium audio and injected geolocation; no physical devices or chooser UX qualified.",
+    "Test bridge replaces network transport; public peer cryptography, content and command execution are real."
+  ]
+}
