@@ -12,7 +12,8 @@ test('Stop and visibility loss clear a completed one-shot snapshot without leavi
     onState(value) { states.push(value); } });
   const sample = { timestamp: 1000, coords: { latitude: 52.52, longitude: 13.405, accuracy: 3 } };
   location.start(gesture, { watch: false }); success(sample);
-  assert.equal(states.at(-1).state, 'fresh'); assert.equal(runtime.resources.size, 0);
+  assert.deepEqual(states.at(-1), { state: 'fresh', sharing: false, sampledAtMs: 1000, expiresAtMs: 11000 });
+  assert.equal(runtime.resources.size, 0);
   location.stop(); assert.deepEqual(states.at(-1), { state: 'stopped', sharing: false });
   expire(); assert.deepEqual(states.at(-1), { state: 'stopped', sharing: false });
   location.start(gesture, { watch: false }); success(sample);

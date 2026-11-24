@@ -18,9 +18,23 @@ export function mountObservationCard({ container, tendril, session, request, ret
   screen.hidden = record.hidden = true; finish.disabled = true;
   container.append(heading, question, disclosure, label, fileLabel, screen, record, finish, preview, keepLabel, discard, send, status);
   let disposed = false, revision = 0, url = null, screenStop = null, capturing = false, sending = false;
+  let capabilities = {};
   const review = createObservationReview({ session, request, retainEvidence, onStatus(value) { status.textContent = value.phase === 'uncertain'
-    ? 'Delivery is uncertain. Inspect the original operation before sending again: ' + value.operationId : 'Response: ' + value.phase; } });
+    ? 'Delivery is uncertain. Inspect the original operation before sending again: ' + value.operationId : 'Response: ' + value.phase;
+    updateControls(); } });
   const audio = createAudioClip({ tendril, document, onStatus(phase) { status.textContent = 'Audio: ' + phase; finish.disabled = phase !== 'recording'; } });
+  function updateControls() {
+    const locked = disposed || sending || !['review', 'error'].includes(review.snapshot().phase);
+    file.disabled = discard.disabled = keep.disabled = text.disabled = locked;
+    send.disabled = locked || capturing;
+    for (const [button, key] of [[screen, 'screen_capture'], [record, 'microphone']]) {
+      const input = capabilities[key];
+      button.hidden = !input?.available;
+      button.disabled = locked || capturing || !input?.available || input.permission === 'denied';
+    }
+    if (locked || !capturing) finish.disabled = true;
+  }
+  updateControls();
   const clearPreview = () => { if (url) URL.revokeObjectURL(url); url = null; preview.replaceChildren(); };
   const candidate = (blob, observedAt = null) => {
     review.setCandidate(blob, { observedAt }); clearPreview(); url = URL.createObjectURL(blob);
@@ -29,13 +43,13 @@ export function mountObservationCard({ container, tendril, session, request, ret
     preview.append(node); status.textContent = 'Review this candidate, then Send or Discard. Nothing has been shared.';
   };
   const error = failure => { if (!disposed && failure.name !== 'AbortError') status.textContent = failure.message; };
-  const cancelCapture = () => { revision++; screenStop?.abort(); screenStop = null; audio.cancel(); capturing = false; };
+  const cancelCapture = () => { revision++; screenStop?.abort(); screenStop = null; audio.cancel(); capturing = false; updateControls(); };
   const run = (event, capture) => {
     if (capturing || sending || disposed) return;
-    const ticket = ++revision; capturing = true;
+    const ticket = ++revision; capturing = true; updateControls();
     // capture(event) executes now, not in a Promise callback, preserving activation.
     capture(event).then(blob => { if (!disposed && ticket === revision) candidate(blob, Date.now()); })
-      .catch(failure => { if (ticket === revision) error(failure); }).finally(() => { if (ticket === revision) { capturing = false; finish.disabled = true; } });
+      .catch(failure => { if (ticket === revision) error(failure); }).finally(() => { if (ticket === revision) { capturing = false; updateControls(); } });
   };
   screen.addEventListener('click', event => run(event, localEvent => {
     screenStop = new AbortController();
@@ -47,18 +61,14 @@ export function mountObservationCard({ container, tendril, session, request, ret
   discard.addEventListener('click', () => { if (sending) return; cancelCapture(); void review.discard().then(() => { clearPreview(); text.value = ''; send.disabled = true; }, error); });
   send.addEventListener('click', event => {
     if (capturing || sending || disposed) return;
-    sending = true; send.disabled = true; screen.disabled = record.disabled = file.disabled = discard.disabled = keep.disabled = text.disabled = true;
+    sending = true; updateControls();
     void review.send(event, { text: text.value, keep: keep.checked }).catch(error).finally(() => {
-      sending = false;
-      if (['review', 'error'].includes(review.snapshot().phase)) send.disabled = screen.disabled = record.disabled = file.disabled = discard.disabled = keep.disabled = text.disabled = false;
+      sending = false; updateControls();
     });
   });
   void tendril.capabilities(['screen_capture', 'microphone']).then(report => {
     if (disposed) return;
-    screen.hidden = !report.capabilities.screen_capture?.available;
-    record.hidden = !report.capabilities.microphone?.available;
-    screen.disabled = report.capabilities.screen_capture?.permission === 'denied';
-    record.disabled = report.capabilities.microphone?.permission === 'denied';
+    capabilities = report.capabilities; updateControls();
   }, () => { if (!disposed) status.textContent = 'Use a file or typed response; optional capture could not be checked.'; });
   return {
     review,
