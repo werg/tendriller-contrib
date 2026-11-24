@@ -9,7 +9,7 @@ npm run build
 npm run check
 ```
 
-The five sensor cookbook test files exercise the copied page modules directly.
+The five sensor cookbooks' checks exercise the copied page modules directly.
 The import check also imports every sensor snippet without browser globals,
 establishing that import alone acquires no resource. Fixtures control chooser
 grants, clocks, visibility, track endings, packet chunks and content writes.
@@ -19,7 +19,9 @@ one-shot/watch location freshness, accuracy, hysteresis and producer coalescing;
 iOS motion permission timing and refractory detection; Serial/Bluetooth framing,
 late connection shutdown and reader locks; trusted screen/audio capture, time and
 byte caps, no auto-capture from an agent request, local review, exact 64 KiB
-staging, discarded work, uncertain sends and explicit retention.
+staging, discarded work, uncertain sends and explicit retention. Card-handler
+fixtures also check that late capability discovery cannot reopen sending or
+discarded reviews and that correcting a response cannot reenable denied inputs.
 
 ## Public runtime and session gate
 

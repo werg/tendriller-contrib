@@ -73,7 +73,7 @@ export function createLocationController({ tendril, geolocation = globalThis.nav
         if (!watch) { current = null; run.handle.unregister(); }
         onFix(fix);
         if (generation !== version || watch && run.handle.signal.aborted) return;
-        onState({ state: 'fresh', sharing: true, sampledAtMs: fix.sampledAtMs });
+        onState({ state: 'fresh', sharing: watch, sampledAtMs: fix.sampledAtMs, expiresAtMs: fix.sampledAtMs + maxAgeMs });
         const timer = schedule(() => {
           if (generation === version && (!watch || current === run && !run.handle.signal.aborted)) onState({ state: 'stale', sharing: false });
         }, Math.max(0, fix.sampledAtMs + maxAgeMs - now()) + 1);
