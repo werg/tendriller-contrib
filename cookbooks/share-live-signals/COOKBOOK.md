@@ -334,6 +334,39 @@ disconnected peer does not instantly learn a revocation elsewhere. Recheck acces
 on reconnect and close channels when the deployment's policy requires it. A
 signal must never grant itself additional rights through its payload.
 
+## Diagnose clock rejection without confusing it with lost authority
+
+A valid signed, authorized signal can be too far in the future or already
+expired at the receiver. Reject that disposable frame and count it without
+tearing down the reliable history connection. This isolation does not turn an
+invalid signature, malformed timestamp or transport/protocol failure into an
+ignorable clock problem.
+
+With a matching session package, inspect the receiver's existing participation
+diagnostics:
+
+```js
+const connections = await session.participation.diagnostics();
+for (const connection of connections) {
+  const counts = connection.signalRejections;
+  if (counts) showSignalDrops(connection.peerId, counts);
+}
+```
+
+`signalRejections` is an optional, bounded snapshot with fixed counters:
+`total`, `clockSkew`, `expired`, `unauthorized`, `duplicate`, `capacity`.
+Absence means unreported, not zero. A connection may carry relayed authors, so
+its peer ID and counters do not establish the originating device's clock offset.
+They retain no payloads or unbounded per-author history.
+
+Inspect the configured skew/expiry policy and actual device time. Do not infer
+remote delivery from `localEcho`, blindly raise TTL/skew limits, or introduce a
+clock-synchronization protocol in each app. Keep the original freshness and
+authorization rules; reestablish useful live state with fresh observations.
+A local diagnostic copy remains useful when the telemetry channel itself drops
+frames. Qualify future/expired frames while a reliable command/read still
+completes, and separately verify invalid signatures and revoked authority.
+
 ## Keep required decisions durable
 
 Use a durable event for submitted chat, a request that must reach a worker, a
@@ -366,6 +399,8 @@ ephemeral typing with retained messages through the same session API.
 | A chunk is missing, expires or overflows | The preview is marked incomplete; the complete durable result repairs it. |
 | Retry after reconnect | Only fresh live observations are sent; no old signal outbox replays. |
 | A sender lacks topic authorization | Delivery fails; connection access or another topic grant does not widen its rights. |
+| A signed, authorized frame exceeds clock tolerance or expires | The receiver counts and drops it; a reliable command/read on that connection still works. |
+| Diagnostic counters are absent or a link carries relayed authors | Absence remains unknown; link counts do not become an invented author clock offset. |
 
 These are adaptation checks. The standalone and integrated channel tests belong
 to Chronolog; existing source-pinned task/chat reports qualify only the exact

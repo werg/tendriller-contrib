@@ -51,6 +51,35 @@ A removed field needs a visible disposition: retain a recoverable draft, move it
 
 A full publication update is different from an in-page render. Use the [publication lifecycle](../publish-coherent-updates/COOKBOOK.md) and choose when drafts are safely preserved before changing versions. A tab may remain on its prior publication while work is pending. Show the available update and its effect, and retain a recovery route if the new interface cannot read the old draft shape. Accepted publication does not prove that this browser displays it.
 
+## Refresh a selected record without replacing its editor
+
+A coherent query normally returns fresh objects. Keep a detail's lifetime tied
+to its stable record ID, not JavaScript object equality. In the matching core
+starter, `mountListDetail` accepts a `renderDetail` result with
+`{ update(record), close() }`. Update the existing display when that ID survives;
+close it when selection changes or the record disappears. Cleanup-only renderers
+still remount on a replacement object, so use the update handle for stateful
+editors rather than adding an object-memoization cache.
+
+Inside that application-owned detail, pass the edited field from each coherent
+snapshot to `mountInlineReview`'s `observe(value)`. An unchanged value preserves
+the draft, confirmation and Undo. A changed saved value can refresh a pristine
+editor; with local work it requires explicit re-review or discard. Save and Undo
+still dispatch guarded domain commands through the application's handlers.
+
+Observation does not resolve an uncertain write. Keep the original operation ID,
+input and guard even if a later snapshot matches the requested text. Only after
+inspecting that operation should the application call
+`reconcile(confirmedValue)`, which deliberately clears draft/review/Undo state.
+Calling it for every snapshot recreates the data-loss problem.
+
+Use the helper shipped in the selected exact release, following its
+[maintained composition example](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md#domain-views-you-can-import).
+Do not assume an older kit has these methods from its version string alone.
+Rehearse fresh-object updates during typing, before and after save confirmation,
+and during a conflicting remote edit. Preserve the input element, caret and
+pending identity while updating non-edited fields.
+
 ## Add features when they solve a real continuity problem
 
 A compact “Changes since you started” view helps a long form; it can be distracting for a two-field check-in. A draft shelf is useful for removed questions, but needs task labels, retention, and a deliberate discard action. A side-by-side comparison helps resolve changed instructions; automatic copying is appropriate only when the meaning remains the same. Undoing a layout change should not roll back already accepted domain work.

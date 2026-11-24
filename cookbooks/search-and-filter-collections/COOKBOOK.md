@@ -60,6 +60,26 @@ For live results, consider a “New items available” banner that lets the pers
 
 Selection needs explicit scope: one item, checked visible items, all loaded items, or every match in an authorized query. “Select all” should state which. A bulk action against a live query can affect records added after selection; use an explicit reviewed set or server-side snapshot semantics where required. Display the count and meaningful exclusions before acting. Revalidate authority and revisions for mutations; a search result is not permission to modify it.
 
+## Give companion views the same selection state
+
+For a map beside a list, compute the route and filtered records once and render
+both from those values. A map selection goes through the same navigation function
+as a list selection; rendering either view must not write a second selection
+store. Preserve the distinction between selected record and visible results
+when filtering hides the selected item.
+
+The core starter's list/detail is application-owned source. Adapt its existing
+URL render/navigation path, or compose `mountInspector` with your own list and
+route controller. Do not scrape private DOM nodes or add another backend query
+to discover the active filter. One map does not require shared `onChange`,
+`select`, placeholder or subscription APIs. Use the
+[composition guidance](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md#compose-a-map-or-another-companion-view)
+and preserve unrelated URL parameters and independent `routeKey` instances.
+
+Exercise deep links, Back/Forward and a fresh live snapshot at desktop and phone
+widths. A long title must wrap without squeezing the Back control into multiple
+lines, and a background refresh must not move focus out of the active editor.
+
 ## Add features that reduce retrieval effort
 
 Saved views help repeated work; name their scope, filters, and ordering and provide edit/delete controls. A pinned view is not a frozen report. If sharing a view by URL, avoid embedding private text or credentials and verify that the receiving identity sees only its authorized scope.
