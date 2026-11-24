@@ -73,7 +73,7 @@ try {
   const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' }, 'Native RTC is a standard automatically installed dependency');
+  assert.deepEqual(metadata.dependencies, { 'better-sqlite3': '13.2.0', werift: '0.27.0' }, 'Native storage and RTC are standard automatically installed dependencies');
   assert.deepEqual(metadata.optionalDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, {});
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));

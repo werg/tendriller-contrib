@@ -11,7 +11,7 @@ export async function verifyPeerSessionArtifact({ installed, archive, allowDirty
   assert.equal(metadata.name, '@chronolog/peer-session');
   const provenanceBytes = await readFile(join(installed, 'provenance.json'));
   const provenance = JSON.parse(provenanceBytes);
-  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' });
+  assert.deepEqual(metadata.dependencies, { 'better-sqlite3': '13.2.0', werift: '0.27.0' });
   assert.deepEqual(metadata.optionalDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependenciesMeta ?? {}, {});

@@ -15,7 +15,7 @@ test('independent native and browser installations preserve the same complete pa
   const root = await mkdtemp(join(fileURLToPath(temporary), 'peer-artifact-'));
   try {
     const archive = join(root, 'session.tgz'), archiveBytes = Buffer.from('exact synthetic archive');
-    const metadata = { name: '@chronolog/peer-session', version: '0.0.0-test', dependencies: { werift: '0.27.0' }, exports: { './webrtc-native': './index.mjs' } };
+    const metadata = { name: '@chronolog/peer-session', version: '0.0.0-test', dependencies: { 'better-sqlite3': '13.2.0', werift: '0.27.0' }, exports: { './webrtc-native': './index.mjs' } };
     const entry = 'export const protocol = true;\n', data = 'export const database = true;\n';
     const provenance = { source: 'd'.repeat(40), sourceTree: 'e'.repeat(40), dirty: false,
       profile: 'peer-generation-v1', nativeRtc: true, sqlEngines: [],
@@ -40,7 +40,11 @@ test('independent native and browser installations preserve the same complete pa
     assert.equal(native.sha256, hash(archiveBytes));
     for (const bad of [
       { ...metadata, dependencies: {} },
-      { ...metadata, dependencies: { werift: '^0.27.0' } },
+      { ...metadata, dependencies: { werift: '0.27.0' } },
+      { ...metadata, dependencies: { 'better-sqlite3': '13.2.0' } },
+      { ...metadata, dependencies: { ...metadata.dependencies, 'better-sqlite3': '^13.2.0' } },
+      { ...metadata, dependencies: { ...metadata.dependencies, werift: '^0.27.0' } },
+      { ...metadata, dependencies: { ...metadata.dependencies, unexpected: '1.0.0' } },
       { ...metadata, peerDependencies: { werift: '0.27.0' } },
       { ...metadata, optionalDependencies: { werift: '0.27.0' } },
       { ...metadata, exports: {} },

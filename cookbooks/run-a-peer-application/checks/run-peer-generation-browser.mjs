@@ -52,7 +52,7 @@ try {
   const { metadata, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' });
+  assert.deepEqual(metadata.dependencies, { 'better-sqlite3': '13.2.0', werift: '0.27.0' });
   assert.deepEqual(metadata.optionalDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, {});
   report.artifacts.push(verifiedArtifact);
