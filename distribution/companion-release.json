@@ -3,16 +3,16 @@
   "stage": "published",
   "core": {
     "repository": "werg/tendriller",
-    "source": "9e24deea741f828890feb7ea26d62b292df19518",
-    "sourceTree": "8c5670e805c8d6d77aa25ec6e37a2fe25d113720",
+    "source": "a0a086ee9a33c8f3aa891b35f30355339ae01818",
+    "sourceTree": "8daeb631c61fb3c7710f7345c884bf087be2f6ff",
     "dirty": false
   },
   "release": {
-    "sourceCommit": "9e24deea741f828890feb7ea26d62b292df19518",
+    "sourceCommit": "a0a086ee9a33c8f3aa891b35f30355339ae01818",
     "coreRelease": "0.3.0-rc.17",
-    "runtimeId": "e752a28caf9f68fe0bf2944fcce2a08b138b0cbd60c79166776474f21e708157",
-    "compositionId": "5067e44bb896c692d1e560e244d8e4d7fb78bedb3b6c7539eb5d014be2ffbef8",
-    "manifestSha256": "39c7d4baf16cd17c6a173b3e370e6a5d840d9212c07e8ea5e45fd160a7917447"
+    "runtimeId": "b79c4a438a62dc41072ae61ccc26cc3e91633b5d46a919222f4741b06b5c075f",
+    "compositionId": "09c27c2899b099de9fd1fe89992dac6561109a0c4236f11ab6ba6d68ef65aa53",
+    "manifestSha256": "89582bfb8aa3e519076a94593fae22bbe9528bd549fef0b6ea8838608a034717"
   },
   "kernel": {
     "repository": "werg/chronolog-db",
@@ -26,5 +26,5 @@
       "size": 208003
     }
   },
-  "id": "6df0b2d160d97b6f7a1ea651efa6508e5b662f42f6f582a22e136d893b52c4dd"
+  "id": "db0cf39654cdcf0f3cbb41d60f79f3e99d9cf33e77424042f37df07265b78683"
 }
