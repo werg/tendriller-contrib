@@ -131,7 +131,7 @@ function run(command, args, cwd, environment = {}) {
 }
 
 async function createBridge(WebSocketServer) {
-  const queue = [], pending = new Map(), relayTasks = new Set();
+  const queue = [], pending = new Map(), relayTasks = new Set(), bridgeSockets = [];
   let nextId = 0, blocked = false, requests = 0, requestBodyBytes = 0, reader, markReady;
   const ready = new Promise(resolve => { markReady = resolve; });
   const enqueue = job => new Promise((resolve, reject) => {
@@ -161,7 +161,7 @@ async function createBridge(WebSocketServer) {
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/asset') return json(res, 200, await enqueue({ kind: 'asset', path: url.searchParams.get('path') ?? '' }));
       if (url.pathname === '/testing/restart') return json(res, 200, await enqueue({ kind: 'restart' }));
-      if (url.pathname === '/testing/relay-traffic') return json(res, 200, await enqueue({ kind: 'relay.traffic' }));
+      if (url.pathname === '/testing/relay-traffic') return json(res, 200, { ...await enqueue({ kind: 'relay.traffic' }), bridgeSockets });
       if (url.pathname === '/testing/relay-cut') return json(res, 200, await enqueue({ kind: 'relay.cut' }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
@@ -188,11 +188,18 @@ async function createBridge(WebSocketServer) {
     const url = new URL(request.url, 'http://localhost');
     if (url.pathname !== '/relay') { socket.destroy(); return; }
     sockets.handleUpgrade(request, socket, head, client => {
-      const task = relaySocket(client, url.searchParams).finally(() => relayTasks.delete(task));
-      relayTasks.add(task); void task.catch(() => client.terminate());
+      const diagnostic = { channel: url.searchParams.get('channel'), peerId: url.searchParams.get('peerId'),
+        lane: url.searchParams.get('lane'), pendingSendsHighWater: 0, terminationCause: null };
+      bridgeSockets.push(diagnostic);
+      const terminate = (cause, error) => {
+        diagnostic.terminationCause ??= error === undefined ? cause : `${cause}: ${String(error)}`;
+        client.terminate();
+      };
+      const task = relaySocket(client, url.searchParams, diagnostic, terminate).finally(() => relayTasks.delete(task));
+      relayTasks.add(task); void task.catch(error => terminate('FIXTURE_RELAY_TASK_FAILED', error));
     });
   });
-  async function relaySocket(client, parameters) {
+  async function relaySocket(client, parameters, diagnostic, terminate) {
     const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
     const opened = enqueue({ kind: 'relay.open', ...fields });
     let closed = false, pendingSends = 0, tail = Promise.resolve();
@@ -201,15 +208,20 @@ async function createBridge(WebSocketServer) {
       const { id } = await opened;
       await enqueue({ kind: 'relay.close', id });
     };
-    client.on('error', () => { void close().catch(() => {}); });
+    client.on('error', error => {
+      diagnostic.terminationCause ??= `FIXTURE_RELAY_SOCKET_ERROR: ${String(error)}`;
+      void close().catch(() => {});
+    });
     client.on('close', () => { void close().catch(() => {}); });
     client.on('message', (bytes, binary) => {
-      if (closed || ++pendingSends > 16) { client.terminate(); return; }
+      if (closed) { terminate('FIXTURE_RELAY_SEND_AFTER_CLOSE'); return; }
+      diagnostic.pendingSendsHighWater = Math.max(diagnostic.pendingSendsHighWater, ++pendingSends);
+      if (pendingSends > 16) { terminate('FIXTURE_RELAY_PENDING_SEND_LIMIT'); return; }
       const frame = { binary, data: binary ? bytes.toString('base64') : bytes.toString('utf8') };
       tail = tail.then(async () => {
         const { id } = await opened;
         if (!closed) await enqueue({ kind: 'relay.send', id, frame });
-      }).catch(() => client.terminate()).finally(() => { pendingSends--; });
+      }).catch(error => terminate('FIXTURE_RELAY_SEND_FAILED', error)).finally(() => { pendingSends--; });
     });
     const { id } = await opened;
     try {

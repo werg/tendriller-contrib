@@ -440,7 +440,8 @@ try {
   report.passed = false; report.error = error instanceof Error ? error.stack : String(error); throw error;
 } finally {
   report.connections = connections.map(connection => ({ ...connection.observed, signaling: connection.mailbox.snapshot(),
-    nativeClosed: connection.native.signal.aborted }));
+    nativeClosed: connection.native.signal.aborted,
+    nativeAbortReason: connection.native.signal.aborted ? String(connection.native.signal.reason) : null }));
   await Promise.allSettled(connections.map(connection => connection.native.close()));
   await browser?.close().catch(() => undefined);
   await Promise.allSettled([...sessions].map(session => session.close()));
