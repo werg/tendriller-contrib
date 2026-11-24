@@ -120,12 +120,12 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 <!-- cookbook-index:start -->
 ### Choose inputs and algorithms
 
-- [Choose a voice interaction](cookbooks/choose-voice-interaction/COOKBOOK.md) — Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.
-- [Connect an instrument and interpret its protocol](cookbooks/connect-instrument/COOKBOOK.md) — Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface.
+- [Choose a voice interaction](cookbooks/choose-voice-interaction/COOKBOOK.md) *(runnable snippets)* — Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.
+- [Connect an instrument and interpret its protocol](cookbooks/connect-instrument/COOKBOOK.md) *(runnable snippets)* — Separate permission, packet framing, command policy, and bounded telemetry from a task-specific hardware interface.
 - [Detect meaningful changes cheaply](cookbooks/detect-meaningful-changes/COOKBOOK.md) — Choose baseline, hysteresis, debounce, and cooldown according to the cost of false triggers and missed events.
-- [Discover capabilities and design around them](cookbooks/discover-capabilities/COOKBOOK.md) — Distinguish API presence from usable permission and offer a task-completing alternative before requesting access.
-- [Follow location changes and route progress](cookbooks/follow-location-progress/COOKBOOK.md) — Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops.
-- [Turn noisy motion into useful events](cookbooks/interpret-motion/COOKBOOK.md) — Calibrate simple motion heuristics and describe their uncertainty before treating an event as progress.
+- [Discover capabilities and design around them](cookbooks/discover-capabilities/COOKBOOK.md) *(runnable snippets)* — Distinguish API presence from usable permission and offer a task-completing alternative before requesting access.
+- [Follow location changes and route progress](cookbooks/follow-location-progress/COOKBOOK.md) *(runnable snippets)* — Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops.
+- [Turn noisy motion into useful events](cookbooks/interpret-motion/COOKBOOK.md) *(runnable snippets)* — Calibrate simple motion heuristics and describe their uncertainty before treating an event as progress.
 - [Notice meaningful visual changes](cookbooks/notice-visual-changes/COOKBOOK.md) — Choose reference frames, thresholds, and sampling budgets for a task where a changed scene matters.
 - [Add local perception with an explicit engine](cookbooks/select-local-perception/COOKBOOK.md) — Choose model assets, confidence rules, coordinate conventions, and evaluation for optional pose, object, or text recognition.
 
@@ -134,7 +134,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Annotate a particular image or frame](cookbooks/annotate-a-frame/COOKBOOK.md) — Keep coordinates, identity, and transforms coherent when evidence is resized or replaced.
 - [Ask a question about reviewed evidence](cookbooks/ask-about-evidence/COOKBOOK.md) — Bind questions and replies to specific sources and distinguish observation from interpretation.
 - [Capture rendered evidence](cookbooks/capture-rendered-evidence/COOKBOOK.md) — Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out.
-- [Capture, review, and send evidence](cookbooks/capture-reviewed-evidence/COOKBOOK.md) — Design permission, review, durable submission, and recovery around evidence the person actually intends to send.
+- [Capture, review, and send evidence](cookbooks/capture-reviewed-evidence/COOKBOOK.md) *(runnable snippets)* — Design permission, review, durable submission, and recovery around evidence the person actually intends to send.
 - [Collect and discuss a sketch](cookbooks/collect-sketch/COOKBOOK.md) — Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context.
 - [Import information for review](cookbooks/import-for-review/COOKBOOK.md) — Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.
 - [Keep evidence and interpretation separate](cookbooks/separate-evidence-interpretation/COOKBOOK.md) — Preserve original observations while allowing conclusions, labels, and explanations to evolve.
@@ -142,7 +142,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 ### Coordinate people and tools
 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
-- [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
+- [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) *(runnable snippets)* — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
 
 ### Decide and act
 
@@ -174,7 +174,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Plan work across time zones and deadlines](cookbooks/plan-time-and-deadlines/COOKBOOK.md) — Distinguish dates, timed commitments, and recurring intent while making overdue work, rescheduling, and real reminder delivery understandable.
 - [Publish the smallest useful page](cookbooks/publish-smallest-page/COOKBOOK.md) — Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it.
 - [Reserve shared resources without double booking](cookbooks/schedule-shared-resources/COOKBOOK.md) — Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks.
-- [Share live signals without recording history](cookbooks/share-live-signals/COOKBOOK.md) — Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.
+- [Share live signals without recording history](cookbooks/share-live-signals/COOKBOOK.md) *(runnable snippets)* — Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy.
 - [Track routines without misleading progress](cookbooks/track-habits-and-routines/COOKBOOK.md) — Separate recurring intentions from observed completion, skips, corrections, reminders, and explicit day-boundary rules.
 - [Triage an incoming queue without losing work](cookbooks/triage-incoming-work/COOKBOOK.md) — Turn incoming items into owned, prioritized work with explicit duplicate, snooze, escalation, and resolution policies.
 
@@ -184,20 +184,21 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
 - [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.
 - [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
-- [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
+- [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) *(runnable snippets)* — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.
 - [Give people control over sensitive information](cookbooks/manage-sensitive-data/COOKBOOK.md) — Minimize collection, keep private and shared representations distinct, and make redaction, export, retention, and deletion reflect actual authority.
 - [Publish coherent page updates](cookbooks/publish-coherent-updates/COOKBOOK.md) — Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
+- [Report live page errors and diagnostics to your agent](cookbooks/report-page-diagnostics/COOKBOOK.md) *(runnable snippets)* — Capture boot-to-runtime browser errors in a redacted ring buffer and stream live diagnostics over ephemeral signals.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
-- [Build a peer application with explicit recovery](cookbooks/run-a-peer-application/COOKBOOK.md) — Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.
+- [Build a peer application with explicit recovery](cookbooks/run-a-peer-application/COOKBOOK.md) *(runnable snippets)* — Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 - [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 
 ### Make sense of information
 
-- [Present live measurements honestly](cookbooks/present-live-measurements/COOKBOOK.md) — Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs.
+- [Present live measurements honestly](cookbooks/present-live-measurements/COOKBOOK.md) *(runnable snippets)* — Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs.
 - [Run a bounded measurement experiment](cookbooks/run-measurement-experiment/COOKBOOK.md) — Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record.
 - [Turn messy records into useful signals](cookbooks/turn-records-into-signals/COOKBOOK.md) — Project fields, preserve units, and bound flattening without silently changing the meaning of a source record.
 <!-- cookbook-index:end -->

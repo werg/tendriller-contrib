@@ -6,7 +6,7 @@ group: "Keep work dependable"
 tags: ["telemetry", "spool", "retention"]
 choices: ["File tail, snapshot command, or remote source", "Scoped producer identity and stable retry records", "Bounded spool, backpressure, and explicit loss"]
 capabilities: []
-evidence: "explained"
+evidence: "exercised"
 related: ["turn-records-into-signals", "present-live-measurements", "observe-long-running-process"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/COLLECTOR.md", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/tools/collector/lib/stream-collector.mjs"]
 ---
@@ -116,5 +116,7 @@ For revocation, repeated permanent rejection, or an invalid source, stop futile 
 | Process restarts with pending work | The spool and checkpoint reconstruct one coherent backlog. |
 | Display evicts old points | Operator status still exposes upstream loss and application retention separately. |
 | Stop occurs during a backlog | The interface distinguishes acquisition stopped, draining, drained, and discarded work. |
+
+For native-hosted private or local API feeds where credentials must stay strictly on the native host and zero durable Chronolog records are needed, see the [runnable private-API feed snippet](snippets/private-api-feed.mjs) and its [executable check](checks/private-api-feed.test.mjs) (paired with `helpers/data-feed.mjs` in the starter).
 
 These checks establish ingestion behavior for the chosen source and implementation. They do not establish measurement accuracy or agent attentiveness.

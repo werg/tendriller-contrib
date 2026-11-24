@@ -12,7 +12,7 @@ const check = process.argv.includes('--check');
 const entries = readCookbooks(root);
 const catalog = readingCatalog(entries);
 const groups = [...new Set(entries.map(e=>e.group || 'Other approaches'))].sort();
-const index = groups.map(group=>`### ${group}\n\n`+entries.filter(e=>(e.group||'Other approaches')===group).map(e=>`- [${e.title}](${e.path}) — ${e.summary}`).join('\n')).join('\n\n');
+const index = groups.map(group=>`### ${group}\n\n`+entries.filter(e=>(e.group||'Other approaches')===group).map(e=>`- [${e.title}](${e.path})${e.runnable ? ' *(runnable snippets)*' : ''} — ${e.summary}`).join('\n')).join('\n\n');
 const readme = readFileSync(resolve(root,'README.md'),'utf8').replace(/<!-- cookbook-index:start -->[\s\S]*?<!-- cookbook-index:end -->/, `<!-- cookbook-index:start -->\n${index}\n<!-- cookbook-index:end -->`);
 const agent = [
  "# Tendriller cookbook reading index",

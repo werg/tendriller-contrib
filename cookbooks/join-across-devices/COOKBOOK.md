@@ -26,7 +26,7 @@ For a person already signed in with retained, enrolled devices, opening the same
 | Join as a participant | Current authorized participant view | Authentication and assignment happen at the service boundary. |
 | Open a shared display | Deliberately public or authorized read-only projection | No raw private data or administrative credentials are exposed. |
 
-A device label describes purpose, not authority. The receiving page must obtain current authorized state rather than trusting query parameters that say “owner” or “facilitator.” The [public protocol](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md) makes page selection and authenticated permissions separate concerns.
+A device label describes purpose, not authority. The receiving page must obtain current authorized state rather than trusting query parameters that say “owner” or “facilitator.” The [public protocol](https://github.com/werg/tendriller/blob/master/docs/PROTOCOL.md) makes page selection and authenticated permissions separate concerns.
 
 ## Build a recognizable arrival journey
 

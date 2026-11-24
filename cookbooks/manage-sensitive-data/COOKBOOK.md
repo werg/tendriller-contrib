@@ -35,7 +35,7 @@ Provide a review step for sensitive uploads or disclosures: what will leave this
 | Export or diagnostic bundle | Who receives the file, and what hidden context does it contain? | Including credentials, private paths, or raw failed records. |
 | Retained history/reference | What keeps the underlying content available? | Claiming that removing one visible row erased every copy. |
 
-Use a trusted application policy when ordinary core access rules cannot enforce the required reader separation. The default workflow registry is empty; [public protocol discovery](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md) does not install a private-record capability. Verify the selected implementation and actual host authorization with distinct identities.
+Use a trusted application policy when ordinary core access rules cannot enforce the required reader separation. The default workflow registry is empty; [public protocol discovery](https://github.com/werg/tendriller/blob/master/docs/PROTOCOL.md) does not install a private-record capability. Verify the selected implementation and actual host authorization with distinct identities.
 
 ## Minimize before storing or sharing
 

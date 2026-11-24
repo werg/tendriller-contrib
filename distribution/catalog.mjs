@@ -44,10 +44,19 @@ export function readCookbooks(root) {
   const directory = resolve(root, 'cookbooks');
   const entries = readdirSync(directory, { withFileTypes: true }).filter(entry => entry.isDirectory()).sort((a,b) => a.name.localeCompare(b.name));
   const found = entries.map(entry => {
-    const path = `cookbooks/${entry.name}/COOKBOOK.md`;
+    const base = `cookbooks/${entry.name}`;
+    const path = `${base}/COOKBOOK.md`;
     const { metadata, body } = parseCookbook(readFileSync(resolve(root, path), 'utf8'), path);
     if (metadata.id !== entry.name) throw new Error(`${path}: id must match its directory`);
-    return { ...metadata, path, body };
+    const snippetsDir = resolve(root, base, 'snippets');
+    const checksDir = resolve(root, base, 'checks');
+    const snippets = existsSync(snippetsDir)
+      ? walk(snippetsDir).map(file => relative(root, file).replaceAll('\\', '/'))
+      : [];
+    const checks = existsSync(checksDir)
+      ? walk(checksDir).filter(file => /\.(?:m?js|ts)$/.test(file)).map(file => relative(root, file).replaceAll('\\', '/'))
+      : [];
+    return { ...metadata, path, body, runnable: snippets.length > 0 || checks.length > 0, snippets };
   });
   const ids = new Set(found.map(entry => entry.id));
   if (ids.size !== found.length) throw new Error('Duplicate cookbook IDs');
@@ -55,14 +64,17 @@ export function readCookbooks(root) {
   return found;
 }
 
+export const SHARED_GUIDANCE = 'Inspect the task and existing page before choosing an approach. Explain consequential tradeoffs and a plausible alternative. Implement in the page\'s own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve platform guarantees and verify relevant failure cases. Reading a cookbook does not install software or activate a trusted capability.';
+
 export function agentPrompt(entry, sourceBase = 'https://github.com/werg/tendriller-contrib/blob/main') {
-  return `Read ${sourceBase}/${entry.path}. Inspect my task and existing page before choosing an approach. ${entry.summary} Explain consequential tradeoffs and a plausible alternative. Implement in the page's own style, structure, and ordinary web technology. Treat example state paths, markup, and parameters as choices. Preserve the referenced platform guarantees and verify relevant failure cases. Reading this cookbook does not install software or activate a trusted capability.`;
+  return `Read ${sourceBase}/${entry.path}. ${entry.summary} Reading this cookbook does not install software or activate a trusted capability.`;
 }
 
 export function readingCatalog(entries, sourceBase) {
   return {
     format: 'tendriller-cookbooks',
     version: 1,
+    guidance: SHARED_GUIDANCE,
     cookbooks: entries.map(({ body, ...entry }) => ({ ...entry, prompt: agentPrompt(entry, sourceBase) })),
   };
 }

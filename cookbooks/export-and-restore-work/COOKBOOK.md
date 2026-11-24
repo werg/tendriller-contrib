@@ -52,7 +52,7 @@ A new copy should create a new application task identity where appropriate while
 
 Preview the changes per affected object and count creates, updates, conflicts, skips, and missing dependencies. For evidence and annotations, preserve the exact source revision relationship even if destination names differ. If the destination changed during review, show the conflict and require a fresh reviewed command rather than silently refreshing its guards.
 
-A portable page restore has core-specific guarantees. Publication, imported shared-file heads, and restored state must obey the current guarded operation and atomic publication contract. Capture the destination head and relevant file revisions before asynchronous transfer; a publication version number alone is not a concurrency guard. Use the current public tooling and [protocol](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md), not a browser loop that claims equivalent atomicity.
+A portable page restore has core-specific guarantees. Publication, imported shared-file heads, and restored state must obey the current guarded operation and atomic publication contract. Capture the destination head and relevant file revisions before asynchronous transfer; a publication version number alone is not a concurrency guard. Use the current public tooling and [protocol](https://github.com/werg/tendriller/blob/master/docs/PROTOCOL.md), not a browser loop that claims equivalent atomicity.
 
 ## Reestablish authority and live services
 

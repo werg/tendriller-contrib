@@ -327,17 +327,29 @@ async function refreshParticipants() {
 
 const eligibilityKey = () => JSON.stringify(entries.map(entry => [entry.deviceId, entry.authorized, entry.revoked,
   entry.applicationAdministrator, entry.label, entry.endpoint?.endpointIncarnation, entry.endpoint?.state]));
+function pollParticipantsOnce() {
+  const previous = eligibilityKey();
+  return refreshParticipants().then(() => {
+    if (!observation.signal.aborted && snapshot && previous !== eligibilityKey()) paintTasks(snapshot.value);
+  }).catch(error => {
+    if (!observation.signal.aborted) { participantPanel?.update(entries); report(error); }
+  });
+}
 function scheduleParticipants() {
   clearTimeout(participantTimer);
   if (observation.signal.aborted) return;
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
   participantTimer = setTimeout(() => {
-    const previous = eligibilityKey();
-    void refreshParticipants().then(() => {
-      if (!observation.signal.aborted && snapshot && previous !== eligibilityKey()) paintTasks(snapshot.value);
-    }).catch(error => {
-      if (!observation.signal.aborted) { participantPanel?.update(entries); report(error); }
-    }).finally(scheduleParticipants);
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+    void pollParticipantsOnce().finally(scheduleParticipants);
   }, 10_000);
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (observation.signal.aborted) return;
+    if (document.visibilityState === 'visible') void pollParticipantsOnce().finally(scheduleParticipants);
+    else clearTimeout(participantTimer);
+  }, { signal: observation.signal });
 }
 
 function paint(value, taskId = selectedTask) {

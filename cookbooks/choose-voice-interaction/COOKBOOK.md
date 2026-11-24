@@ -6,7 +6,7 @@ group: "Choose inputs and algorithms"
 tags: ["voice", "consent", "engines"]
 choices: ["Typed input, push-to-talk, VAD, or wake engine", "Local processing and explicit resource installation", "Review recognized text and control output independently"]
 capabilities: ["optional voice adapter"]
-evidence: "explained"
+evidence: "exercised"
 related: ["capture-reviewed-evidence", "discover-capabilities", "coordinate-devices"]
 sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/ptt.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/vad.js", "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/voice-coach/index.html", "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/control/speech.ts"]
 ---
@@ -44,7 +44,7 @@ For low-consequence dictation, automatic insertion may be sufficient. For a comm
 
 ## Keep the processing and lifecycle honest
 
-The [public voice contract](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/HANDS_FREE.md) makes voice an optional adapter. Construction starts no microphone, speech, or download. A stored engine preference is not consent to listen or play audio on a new visit. Use its explicit preparation, capture, cancellation, stop, and disposal lifecycle through page-owned controls; do not build a second invisible auto-restart loop around it.
+The [public voice contract](https://github.com/werg/tendriller/blob/master/docs/HANDS_FREE.md) makes voice an optional adapter (`@tendriller/runtime/voice`), providing `mountAgentChat`, `mountVoiceControls`, and `createVoice` with `"auto"` (immediate, browser permission is consent), `"session"` (once per visible session, no per-utterance popups), or `"prompt"` consent modes, live RMS level metering, browser/neural TTS output, and barge-in. See the [runnable voice chat controller snippet](snippets/voice-chat.mjs) and its [check](checks/voice-chat.test.mjs).
 
 Browser SpeechRecognition is an engine choice, not evidence of local processing. The reviewed adapter's local mode requires supported local recognition and language assets; browser mode may use a network provider. Neither is a dedicated low-power acoustic wake-word model. Explain the chosen mode and fail visibly when it is unavailable rather than silently changing processing location. A model installation has its own size, progress, cancellation, and failure state.
 

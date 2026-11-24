@@ -42,7 +42,7 @@ A compact instrument page may need one visible alert and local mute. A collabora
 | Durable server timer | Record a scheduled occurrence without a running page tab. | The task still needs an authorized receiver and declared missed-run policy. |
 | Web Push | Notify an opted-in owner device while the page may be closed. | Provider acceptance is not guaranteed display or reading. |
 
-The [public notification guide](https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PUSH_NOTIFICATIONS.md) distinguishes service readiness, local permission, subscription, and server registration. Check service availability before inviting opt-in, request subscription from a deliberate user action, and offer a test. Keep private payload details out of notification titles and bodies, which can appear on a locked or shared screen.
+The [public notification guide](https://github.com/werg/tendriller/blob/master/docs/PUSH_NOTIFICATIONS.md) distinguishes service readiness, local permission, subscription, and server registration. Check service availability before inviting opt-in, request subscription from a deliberate user action, and offer a test. Keep private payload details out of notification titles and bodies, which can appear on a locked or shared screen.
 
 Keep the underlying task durable where it matters. Push is a delivery channel, not the sole record of a required decision. A notification tap should load current authorized state rather than trusting stale payload text as the action to execute.
 

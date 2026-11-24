@@ -344,6 +344,10 @@
       ]
     },
     {
+      "id": "report-page-diagnostics",
+      "sources": []
+    },
+    {
       "id": "resume-across-sessions",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/AGENT_HOSTS.md",
