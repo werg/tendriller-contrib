@@ -95,7 +95,9 @@ await writeFile(hostEvidencePath, `${JSON.stringify(hostEvidence, null, 2)}\n`);
 
 const require = createRequire(join(hostDirectory, 'package.json'));
 const { WebSocketServer } = require('ws');
-const { PEER_RELAY_LIMITS } = await import(pathToFileURL(require.resolve('@tendriller/core/peers')).href);
+// Resolve the SDK's import-only public export from the isolated installation.
+await write('relay-limits.mjs', "export { PEER_RELAY_LIMITS } from '@tendriller/core/peers';\n");
+const { PEER_RELAY_LIMITS } = await import(pathToFileURL(join(hostDirectory, 'relay-limits.mjs')).href);
 const bridge = await createBridge(WebSocketServer, PEER_RELAY_LIMITS);
 await write('vitest.config.mjs', `import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin';
 import { defineConfig } from 'vitest/config';
