@@ -207,12 +207,11 @@ async function createBridge(WebSocketServer, relayLimits) {
     const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
     const opened = enqueue({ kind: 'relay.open', ...fields });
     let closed = false;
-    const ingress = createRelayIngress(client, { limits: relayLimits, forward: async frame => {
+    const ingress = createRelayIngress(client, { limits: relayLimits, lane: fields.lane, diagnostic, forward: async frame => {
       const { id } = await opened;
       if (!closed) await enqueue({ kind: 'relay.send', id, frame });
     } });
     Object.defineProperties(diagnostic, {
-      pendingSendsHighWater: { enumerable: true, get: () => ingress.stats.maxPendingFrames },
       ingress: { enumerable: true, get: () => ingress.stats },
     });
     const close = async () => {
@@ -225,8 +224,8 @@ async function createBridge(WebSocketServer, relayLimits) {
       void close().catch(() => {});
     });
     client.on('close', () => { void close().catch(() => {}); });
-    const { id } = await opened;
     try {
+      const { id } = await opened;
       while (!closed) {
         const event = await enqueue({ kind: 'relay.next', id });
         if (event.type === 'close') {

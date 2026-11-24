@@ -5,7 +5,7 @@ import test from 'node:test';
 import { createRelayIngress } from './peer-generation-relay-ingress.mjs';
 
 // The packed SDK supplies these at runtime; mirror its declared v1 window here.
-const limits = { packetBytes: 65_536, pendingPackets: 32, pendingBytes: 512 * 1024 };
+const limits = { packetBytes: 65_536, pendingPackets: 32, pendingBytes: 512 * 1024, livePendingPackets: 8 };
 const deferred = () => { let resolve; const promise = new Promise(yes => { resolve = yes; }); return { promise, resolve }; };
 class Socket extends EventEmitter {
   pauses = 0; resumes = 0; terminated = false;
@@ -39,10 +39,10 @@ for (const count of [17, 64]) test(`raw relay ingress preserves a legal coalesce
 
 test('raw relay ingress refuses frame-count, byte and individual-packet overflow without growing its queue', async () => {
   for (const [count, size, binary, error] of [
-    [65, 20, true, 'QUEUE'],
-    [9, 65_540, true, 'QUEUE'],
-    [1, 65_541, true, 'PACKET'],
-    [1, 257, false, 'PACKET'],
+    [66, 20, true, 'PENDING_SEND'],
+    [10, 65_540, true, 'PENDING_BYTE'],
+    [1, 65_541, true, 'INGRESS_PACKET'],
+    [1, 257, false, 'INGRESS_PACKET'],
   ]) {
     const socket = new Socket();
     const ingress = createRelayIngress(socket, { limits, forward: async () => { assert.fail('Refused bursts must not be forwarded'); } });
@@ -50,7 +50,7 @@ test('raw relay ingress refuses frame-count, byte and individual-packet overflow
     assert.equal(socket.terminated, true);
     assert.ok(ingress.stats.pendingFrames <= ingress.stats.maxFrames);
     assert.ok(ingress.stats.pendingBytes <= ingress.stats.maxBytes);
-    await assert.rejects(ingress.close(), new RegExp(`FIXTURE_RELAY_INGRESS_${error}_LIMIT`, 'u'));
+    await assert.rejects(ingress.close(), new RegExp(`FIXTURE_RELAY_${error}_LIMIT`, 'u'));
     assert.equal(ingress.stats.pendingFrames, 0); assert.equal(ingress.stats.pendingBytes, 0);
     assert.equal(socket.listenerCount('message'), 0);
   }
@@ -76,4 +76,48 @@ test('raw relay ingress fences queued frames on forwarding failure and owner clo
     assert.equal(ingress.stats.pendingFrames, 0); assert.equal(ingress.stats.pendingBytes, 0);
     assert.equal(socket.listenerCount('message'), 0);
   }
+});
+
+
+test('socket backpressure retains both windows plus an in-flight HTTP completion', async () => {
+  const socket = new Socket(), entered = deferred(), gate = deferred(), complete = deferred(), delivered = [];
+  const ingress = createRelayIngress(socket, { limits, forward: async frame => {
+    delivered.push(frame);
+    if (delivered.length === 1) { entered.resolve(); await gate.promise; }
+    if (delivered.length === 65) complete.resolve();
+  } });
+  socket.emit('message', Buffer.alloc(20), true);
+  await entered.promise;
+  try {
+    for (let index = 0; index < 32; index++) {
+      socket.emit('message', Buffer.alloc(16_388, index), true);
+      socket.emit('message', Buffer.from(JSON.stringify({ t: 'received', sequence: index })), false);
+    }
+    assert.equal(socket.terminated, false); assert.equal(socket.pauses, 1);
+    assert.equal(ingress.stats.pendingFrames, 65); assert.equal(ingress.stats.maxFrames, 65);
+    assert.equal(delivered.length, 1);
+  } finally { gate.resolve(); }
+  await complete.promise; await setImmediate();
+  assert.equal(socket.resumes, 1); assert.equal(ingress.stats.pendingFrames, 0);
+  await ingress.close();
+});
+
+test('live socket backpressure uses its smaller window and fences overflow', async () => {
+  const socket = new Socket(), entered = deferred(), gate = deferred(); let calls = 0;
+  const ingress = createRelayIngress(socket, { limits, lane: 'live', forward: async () => {
+    calls++; entered.resolve(); await gate.promise;
+  } });
+  socket.emit('message', Buffer.alloc(20), true); await entered.promise;
+  try {
+    for (let index = 0; index < 8; index++) {
+      socket.emit('message', Buffer.alloc(20), true);
+      socket.emit('message', Buffer.from('{}'), false);
+    }
+    assert.equal(socket.terminated, false); assert.equal(ingress.stats.pendingFrames, 17);
+    assert.equal(ingress.stats.maxFrames, 17); assert.equal(socket.pauses, 1);
+    socket.emit('message', Buffer.from('{}'), false);
+    assert.equal(socket.terminated, true);
+  } finally { gate.resolve(); }
+  await assert.rejects(ingress.close(), /FIXTURE_RELAY_PENDING_SEND_LIMIT/u);
+  assert.equal(calls, 1); assert.equal(ingress.stats.pendingFrames, 0);
 });
