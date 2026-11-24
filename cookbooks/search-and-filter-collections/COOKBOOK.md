@@ -73,7 +73,7 @@ URL render/navigation path, or compose `mountInspector` with your own list and
 route controller. Do not scrape private DOM nodes or add another backend query
 to discover the active filter. One map does not require shared `onChange`,
 `select`, placeholder or subscription APIs. Use the
-[composition guidance](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md#compose-a-map-or-another-companion-view)
+[composition guidance](https://github.com/werg/tendriller/blob/bb71b65aa8e773de02f141f82f451898d61735a2/docs/APP_PATTERNS.md#compose-a-map-or-another-companion-view)
 and preserve unrelated URL parameters and independent `routeKey` instances.
 
 Exercise deep links, Back/Forward and a fresh live snapshot at desktop and phone
