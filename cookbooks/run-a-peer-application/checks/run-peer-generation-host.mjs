@@ -9,7 +9,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
-import { createRelayBridgeSender } from './peer-generation-relay-bridge.mjs';
+import { createRelayIngress } from './peer-generation-relay-ingress.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
@@ -95,6 +95,7 @@ await writeFile(hostEvidencePath, `${JSON.stringify(hostEvidence, null, 2)}\n`);
 
 const require = createRequire(join(hostDirectory, 'package.json'));
 const { WebSocketServer } = require('ws');
+// Resolve the SDK's import-only public export from this independent install.
 await write('relay-limits.mjs', "export { PEER_RELAY_LIMITS } from '@tendriller/core/peers';\n");
 const { PEER_RELAY_LIMITS } = await import(pathToFileURL(join(hostDirectory, 'relay-limits.mjs')).href);
 const bridge = await createBridge(WebSocketServer, PEER_RELAY_LIMITS);
@@ -198,11 +199,11 @@ async function createBridge(WebSocketServer, relayLimits) {
         diagnostic.terminationCause ??= error === undefined ? cause : `${cause}: ${String(error)}`;
         client.terminate();
       };
-      const task = relaySocket(client, url.searchParams, diagnostic, terminate).finally(() => relayTasks.delete(task));
+      const task = relaySocket(client, url.searchParams, diagnostic).finally(() => relayTasks.delete(task));
       relayTasks.add(task); void task.catch(error => terminate('FIXTURE_RELAY_TASK_FAILED', error));
     });
   });
-  async function relaySocket(client, parameters, diagnostic, terminate) {
+  async function relaySocket(client, parameters, diagnostic) {
     const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
     const opened = enqueue({ kind: 'relay.open', ...fields });
     let closed = false;
@@ -216,16 +217,19 @@ async function createBridge(WebSocketServer, relayLimits) {
       void close().catch(() => {});
     });
     client.on('close', () => { void close().catch(() => {}); });
-    const sender = createRelayBridgeSender({ limits: relayLimits, lane: fields.lane, diagnostic,
-      isClosed: () => closed, terminate,
+    const ingress = createRelayIngress(client, { limits: relayLimits, lane: fields.lane,
+      onFailure: error => { diagnostic.terminationCause ??= String(error); },
       forward: async frame => {
         const { id } = await opened;
         if (!closed) await enqueue({ kind: 'relay.send', id, frame });
       },
     });
-    client.on('message', (bytes, binary) => sender.send(bytes, binary));
-    const { id } = await opened;
+    Object.defineProperties(diagnostic, {
+      pendingSendsHighWater: { enumerable: true, get: () => ingress.stats.maxPendingFrames },
+      pendingBytesHighWater: { enumerable: true, get: () => ingress.stats.maxPendingBytes },
+    });
     try {
+      const { id } = await opened;
       while (!closed) {
         const event = await enqueue({ kind: 'relay.next', id });
         if (event.type === 'close') {
@@ -238,7 +242,7 @@ async function createBridge(WebSocketServer, relayLimits) {
         if (client.readyState !== 1) break;
         client.send(event.binary ? Buffer.from(event.data, 'base64') : event.data, { binary: event.binary });
       }
-    } finally { await close(); await sender.settled(); }
+    } finally { try { await close(); } finally { await ingress.close(); } }
   }
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   return { url: `http://127.0.0.1:${server.address().port}`, ready,
