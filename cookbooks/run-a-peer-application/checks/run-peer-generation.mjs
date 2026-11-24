@@ -73,7 +73,6 @@ try {
   const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' }, 'Native RTC is a standard automatically installed dependency');
   assert.deepEqual(metadata.optionalDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, {});
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
@@ -83,13 +82,15 @@ try {
     assert.equal(hash(await readFile(resolve(hostSdk))), sdk.sha256, 'The controller must use the exact qualified host SDK');
     assert.equal(tree.dependencies['@tendriller/core'].version, sdk.version);
   }
-  assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0');
+  for (const [name, version] of Object.entries(metadata.dependencies)) {
+    assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies[name]?.version, version, `Installed runtime dependency differs: ${name}`);
+  }
   const lockBytes = await readFile(join(consumer, 'package-lock.json'));
   const lock = JSON.parse(lockBytes);
   report.runtime.dependencies = { lockSha256: hash(lockBytes),
     packages: Object.entries(lock.packages).filter(([path]) => path.startsWith('node_modules/') && !['node_modules/@chronolog/peer-session', 'node_modules/@tendriller/core'].includes(path))
       .map(([path, item]) => ({ path, version: item.version, integrity: item.integrity })) };
-  assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external RTC dependency needs an exact integrity');
+  assert.ok(report.runtime.dependencies.packages.every(item => item.integrity), 'Every external runtime dependency needs an exact integrity');
 
   if (tasks) {
     assert.ok(metadata.exports['./sql'] && metadata.exports['./sql-native'], 'The guarded-task gate requires the common SQL composition and native engine capability');

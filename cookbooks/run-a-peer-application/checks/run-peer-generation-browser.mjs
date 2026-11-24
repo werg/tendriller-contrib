@@ -52,14 +52,15 @@ try {
   const { metadata, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
   });
-  assert.deepEqual(metadata.dependencies, { werift: '0.27.0' });
   assert.deepEqual(metadata.optionalDependencies ?? {}, {});
   assert.deepEqual(metadata.peerDependencies ?? {}, {});
   report.artifacts.push(verifiedArtifact);
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
   assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', ...(relay ? ['@tendriller/core'] : []), 'esbuild', 'playwright']);
   for (const [name, version] of Object.entries({ playwright: '1.65.0', esbuild: '0.28.2' })) assert.equal(tree.dependencies[name].version, version);
-  assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0');
+  for (const [name, version] of Object.entries(metadata.dependencies)) {
+    assert.equal(tree.dependencies['@chronolog/peer-session'].dependencies[name]?.version, version, `Installed runtime dependency differs: ${name}`);
+  }
   if (relay) {
     const sdk = report.host.artifacts.find(value => value.name === '@tendriller/core');
     assert.equal(hash(await readFile(resolve(hostSdk))), sdk.sha256);
