@@ -6,9 +6,10 @@ import { createHash } from 'node:crypto';
 import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
+import { createRelayBridgeSender } from './peer-generation-relay-bridge.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
@@ -94,7 +95,9 @@ await writeFile(hostEvidencePath, `${JSON.stringify(hostEvidence, null, 2)}\n`);
 
 const require = createRequire(join(hostDirectory, 'package.json'));
 const { WebSocketServer } = require('ws');
-const bridge = await createBridge(WebSocketServer);
+await write('relay-limits.mjs', "export { PEER_RELAY_LIMITS } from '@tendriller/core/peers';\n");
+const { PEER_RELAY_LIMITS } = await import(pathToFileURL(join(hostDirectory, 'relay-limits.mjs')).href);
+const bridge = await createBridge(WebSocketServer, PEER_RELAY_LIMITS);
 await write('vitest.config.mjs', `import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin';
 import { defineConfig } from 'vitest/config';
 import { createRequire } from 'node:module';
@@ -130,7 +133,7 @@ function run(command, args, cwd, environment = {}) {
   return { child, done };
 }
 
-async function createBridge(WebSocketServer) {
+async function createBridge(WebSocketServer, relayLimits) {
   const queue = [], pending = new Map(), relayTasks = new Set(), bridgeSockets = [];
   let nextId = 0, blocked = false, requests = 0, requestBodyBytes = 0, reader, markReady;
   const ready = new Promise(resolve => { markReady = resolve; });
@@ -202,7 +205,7 @@ async function createBridge(WebSocketServer) {
   async function relaySocket(client, parameters, diagnostic, terminate) {
     const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
     const opened = enqueue({ kind: 'relay.open', ...fields });
-    let closed = false, pendingSends = 0, tail = Promise.resolve();
+    let closed = false;
     const close = async () => {
       if (closed) return; closed = true;
       const { id } = await opened;
@@ -213,16 +216,14 @@ async function createBridge(WebSocketServer) {
       void close().catch(() => {});
     });
     client.on('close', () => { void close().catch(() => {}); });
-    client.on('message', (bytes, binary) => {
-      if (closed) { terminate('FIXTURE_RELAY_SEND_AFTER_CLOSE'); return; }
-      diagnostic.pendingSendsHighWater = Math.max(diagnostic.pendingSendsHighWater, ++pendingSends);
-      if (pendingSends > 16) { terminate('FIXTURE_RELAY_PENDING_SEND_LIMIT'); return; }
-      const frame = { binary, data: binary ? bytes.toString('base64') : bytes.toString('utf8') };
-      tail = tail.then(async () => {
+    const sender = createRelayBridgeSender({ limits: relayLimits, lane: fields.lane, diagnostic,
+      isClosed: () => closed, terminate,
+      forward: async frame => {
         const { id } = await opened;
         if (!closed) await enqueue({ kind: 'relay.send', id, frame });
-      }).catch(error => terminate('FIXTURE_RELAY_SEND_FAILED', error)).finally(() => { pendingSends--; });
+      },
     });
+    client.on('message', (bytes, binary) => sender.send(bytes, binary));
     const { id } = await opened;
     try {
       while (!closed) {
@@ -237,7 +238,7 @@ async function createBridge(WebSocketServer) {
         if (client.readyState !== 1) break;
         client.send(event.binary ? Buffer.from(event.data, 'base64') : event.data, { binary: event.binary });
       }
-    } finally { await close(); await tail; }
+    } finally { await close(); await sender.settled(); }
   }
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   return { url: `http://127.0.0.1:${server.address().port}`, ready,
