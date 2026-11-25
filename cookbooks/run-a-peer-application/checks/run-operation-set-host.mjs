@@ -36,7 +36,7 @@ assert.match(manifest.source, /^[a-f0-9]{40}$/u); assert.match(manifest.sourceTr
 assert.equal(typeof manifest.dirty, 'boolean');
 if (!values['allow-dirty']) assert.equal(manifest.dirty, false, 'Host artifacts must come from clean source');
 const expectedArchives = new Map(manifest.artifacts.map(value => [value.file, value]));
-const hostEvidence = { runtime: 'workerd', identity: 'synthetic authenticated test accounts',
+const hostEvidence = { runtime: 'workerd', npmCache: process.env.OPERATION_SET_HOST_NPM_CACHE ? 'reused-public-integrity-cache' : 'isolated', identity: 'synthetic authenticated test accounts',
   publicImports: ['@tendriller/core/peers', '@tendriller/engine/testing'],
   fixtureSha256: hash(await readFile(join(here, 'operation-set-host.scenarios.mjs'))), artifacts: [] };
 for (const [name, path] of [['@tendriller/core', sdk], ['@tendriller/engine', engine]]) {
@@ -54,7 +54,7 @@ await copyFile(join(here, 'operation-set-host.scenarios.mjs'), join(hostDirector
 await write('entry.mjs', "export { default, Tendril, Admission } from '@tendriller/engine';\n");
 await mkdir(join(hostDirectory, 'assets')); await write('assets/index.txt', 'Independent peer qualification assets');
 execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: hostDirectory, stdio: 'inherit',
-  env: { ...process.env, npm_config_cache: join(output, 'host-npm-cache') } });
+  env: { ...process.env, npm_config_cache: process.env.OPERATION_SET_HOST_NPM_CACHE ? resolve(process.env.OPERATION_SET_HOST_NPM_CACHE) : join(output, 'host-npm-cache') } });
 const installedEngine = join(hostDirectory, 'node_modules/@tendriller/engine');
 const { ratelimits } = JSON.parse(await readFile(join(installedEngine, 'testing-ratelimits.json')));
 assert.ok(Array.isArray(ratelimits) && ['PAGE_RATE', 'ACCOUNT_RATE'].every(name => ratelimits.some(binding => binding.name === name)),

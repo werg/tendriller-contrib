@@ -37,7 +37,7 @@ const reportPath = join(output, 'report.json');
 const report = {
   format: 'operation-set-consumer/v1', protocol: 'chronolog-crdt-v1', mode: 'runtime',
   topology: tasks ? 'independent-packed-tasks' : rtc ? 'independent-native-rtc' : relay ? 'independent-native-websocket' : 'independent-packed-peers', passed: false,
-  runtime: { node: process.version, platform: process.platform, architecture: process.arch },
+  runtime: { node: process.version, platform: process.platform, architecture: process.arch, npmCache: process.env.OPERATION_SET_NPM_CACHE ? 'reused-public-integrity-cache' : 'isolated' },
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'),
     tree: git('rev-parse', 'HEAD^{tree}'), dirty: git('status', '--porcelain', '--untracked-files=all').length > 0 },
   artifacts: [], fixtures: [], error: null,
@@ -70,7 +70,7 @@ try {
   execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund',
     artifact, resolve(values.authority), ...(hostSdk ? [resolve(hostSdk)] : [])], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
+    env: { ...process.env, npm_config_cache: process.env.OPERATION_SET_NPM_CACHE ? resolve(process.env.OPERATION_SET_NPM_CACHE) : join(output, 'empty-npm-cache') },
   });
   const installed = join(consumer, 'node_modules/@chronolog/peer-session');
   const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
