@@ -51,6 +51,7 @@ try {
     ...(hostSdk ? [['operation-set-host-client.mjs', join(here, 'operation-set-host-client.mjs')]] : []),
     ['operation-set-authority.mjs', join(here, 'operation-set-authority.mjs')],
     ...(hostSdk ? [['operation-set-host-request.mjs', join(here, 'operation-set-host-request.mjs')]] : []),
+    ...(hostSdk ? [['operation-set-host-document.mjs', join(here, 'operation-set-host-document.mjs')]] : []),
     ['operation-set-participation.mjs', join(here, 'operation-set-participation.mjs')],
     ...(!tasks ? ['operation-set-scenario.mjs', 'operation-set-finality.mjs', 'operation-set-native-restart.mjs'].map(name => [name, join(here,name)]) : []),
     ...(relay ? [['operation-set-websocket-transport.mjs', join(here, 'operation-set-websocket-transport.mjs')]] : []),
@@ -109,7 +110,7 @@ try {
         ...(relay ? ['@chronolog/peer-session/websocket'] : []),
         ...(hostSdk ? ['@tendriller/core/peers', '@tendriller/core/authority'] : []),
         ...(tasks ? ['@chronolog/peer-session/sql', '@chronolog/peer-session/sql-native', '@chronolog/peer-session/sql-wasm'] : []),
-        './operation-set-authority.mjs', './operation-set-finality.mjs', './operation-set-definition.mjs', './operation-set-scenario.mjs', './operation-set-participation.mjs', './operation-set-host-client.mjs', './operation-set-host-request.mjs', './operation-set-websocket-transport.mjs', './operation-set-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
+        './operation-set-authority.mjs', './operation-set-finality.mjs', './operation-set-definition.mjs', './operation-set-scenario.mjs', './operation-set-participation.mjs', './operation-set-host-client.mjs', './operation-set-host-request.mjs', './operation-set-host-document.mjs', './operation-set-websocket-transport.mjs', './operation-set-task-definition.mjs', './peer-conversation.mjs'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
     }
     await writeFile(join(consumer, name), bytes, { flag: 'wx' });

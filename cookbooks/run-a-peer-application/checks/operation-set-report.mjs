@@ -51,6 +51,18 @@ export function validateNetwork(report) {
     assert.equal(report.relay.reconnect?.physicalLinksCut, true); assert.equal(report.relay.reconnect?.reconnected, true);
   }
 }
+// The authored source and the host's complete injected document are distinct digests.
+function validateServedPublication(value) {
+  hex(value.authoredSourceDigest); hex(value.servedDocumentDigest); assert.notEqual(value.servedDocumentDigest, value.authoredSourceDigest);
+  assert.ok(Number.isSafeInteger(value.version) && value.version > 0);
+  for (const retired of ['expectedCodeDigest', 'servedCodeDigest']) assert.equal(retired in value, false, `Retired ambiguous field ${retired}`);
+  const injection = value.injection;
+  assert.equal(injection?.verified, true); assert.equal(injection.status, 200); assert.equal(injection.authoredSuffixExact, true);
+  assert.equal(injection.publicationId, String(value.version)); assert.match(injection.documentPath ?? '', /^[^/]+\.html$/u);
+  hex(injection.runtimeId); assert.ok(typeof injection.runtimeVersion === 'string' && injection.runtimeVersion.length > 0);
+  assert.equal(injection.runtimeBase, `/_tendril/runtime/${injection.runtimeId}/`); assert.equal(injection.runtimeScript, `${injection.runtimeBase}tendril.js`);
+  assert.ok(Array.isArray(injection.metadata));
+}
 export function validateHost(report) {
   if (report.hostOutage?.boundary === 'no-server') { assert.equal(report.hostOutage.requests, 0); assert.equal(report.hostOutage.finalizerProcesses, 0); return; }
   assert.equal(report.hostOutage?.boundary, 'tendriller-workerd-http'); assert.equal(report.host?.runtime, 'workerd');
@@ -62,7 +74,8 @@ export function validateHost(report) {
   for (const field of ['administratorWithoutPublisher', 'exactRetry', 'lostReplyAfterPersistence', 'alteredBytesRejected', 'nonPublisherRejected', 'staleHeadRejected',
     'priorCodeRetained', 'headAndCodeSurviveRestart', 'applicationAuthorityUnchanged']) assert.equal(publication?.[field], true, `Missing publication ${field}`);
   hex(publication.first?.id); hex(publication.second?.id); assert.notEqual(publication.first.id, publication.second.id);
-  for (const value of [publication.first, publication.second]) { hex(value.expectedCodeDigest); assert.equal(value.servedCodeDigest, value.expectedCodeDigest); }
+  for (const value of [publication.first, publication.second]) validateServedPublication(value);
+  assert.equal(publication.second.injection.runtimeId, publication.first.injection.runtimeId); assert.ok(publication.second.version > publication.first.version);
   assert.equal(publication.second.previous, publication.first.id);
   assert.deepEqual(report.host.artifacts.map(value => value.name), ['@tendriller/core', '@tendriller/engine']);
   for (const value of report.host.artifacts) { hex(value.sha256); hex(value.sourceCommit, 40); hex(value.sourceTree, 40); }

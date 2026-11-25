@@ -1,4 +1,5 @@
 import { createHostRequester } from './operation-set-host-request.mjs';
+import { verifyServedPublication } from './operation-set-host-document.mjs';
 // Public host controls over a bounded test bridge to the real Workerd engine.
 // Never carries epoch keys or application transaction bodies.
 import assert from 'node:assert/strict';
@@ -56,7 +57,10 @@ export function createHostedFixture(base) {
       let original;
       await assert.rejects((async () => { original = await client.publish(first.publication, first.assets); throw Error('PUBLICATION_REPLY_LOST'); })(), /PUBLICATION_REPLY_LOST/);
       const retried = await client.publish(first.publication, first.assets); assert.deepEqual(retried, original);
-      const servedFirst = await request('/testing/asset?path=page-0.html'); assert.equal(hash(Buffer.from(servedFirst.text)), first.digest);
+      // The host serves authored bytes behind its own runtime injection; verify both, never the injected document as source.
+      const served = async (route, authored, receipt) => verifyServedPublication({ served: await request(`/testing/asset?path=${route}`),
+        authored, receipt, path: route.slice(route.lastIndexOf('/') + 1), applicationId });
+      const servedFirst = await served('page-0.html', first.bytes, original);
       const altered = structuredClone(first.publication); altered.payload.entry = 'altered.html';
       await assert.rejects(client.publish(altered, first.assets));
       assert.equal(actual.memberships.at(-1).payload.members.find(member=>member.publicKey===devices[1].identity.publicKey).administrator,true);
@@ -67,17 +71,21 @@ export function createHostedFixture(base) {
       const secondReceipt = await client.publish(second.publication, second.assets);
       const stale = await signed('<!doctype html><p>Stale</p>', 'publication-stale', 0, null);
       await assert.rejects(client.publish(stale.publication, stale.assets));
-      const servedSecond = await request('/testing/asset?path=page-1.html'); assert.equal(hash(Buffer.from(servedSecond.text)), second.digest);
-      const retained = await client.publication(first.publication.id); assert.deepEqual(retained.publication, first.publication);
-      assert.equal(hash(Buffer.from((await request('/testing/asset?path=page-0.html')).text)), first.digest);
+      const servedSecond = await served('page-1.html', second.bytes, secondReceipt);
+      const headFirst = await served('page-0.html', first.bytes, secondReceipt);
+      assert.equal(headFirst.authoredSourceDigest, first.digest);
+      const retained = await client.publication(first.publication.id); assert.deepEqual(retained.publication, first.publication); assert.equal(retained.version, original.version);
+      const pinnedFirst = () => served(`_publications/${original.version}/page-0.html`, first.bytes, original);
+      assert.equal((await pinnedFirst()).authoredSourceDigest, first.digest);
       await post('/testing/restart'); assert.deepEqual(await client.publication(), secondReceipt);
-      assert.equal(hash(Buffer.from((await request('/testing/asset?path=page-1.html')).text)), second.digest);
+      const restartedSecond = await served('page-1.html', second.bytes, secondReceipt);
+      assert.equal(restartedSecond.authoredSourceDigest, second.digest); assert.equal((await pinnedFirst()).authoredSourceDigest, first.digest);
+      assert.equal(restartedSecond.injection.runtimeId, servedFirst.injection.runtimeId);
       const after = decodeRecord(authorityRecordBytes((await client.application()).authority)); assert.equal(await recordDigest(after), beforeAuthority);
       return { administratorWithoutPublisher:true, exactRetry: true, lostReplyAfterPersistence: true, alteredBytesRejected: true, nonPublisherRejected: true,
         staleHeadRejected: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true,
-        first: { id: first.publication.id, expectedCodeDigest: first.digest, servedCodeDigest: hash(Buffer.from(servedFirst.text)), version: original.version },
-        second: { id: second.publication.id, previous: second.publication.payload.previous, expectedCodeDigest: second.digest,
-          servedCodeDigest: hash(Buffer.from(servedSecond.text)), version: secondReceipt.version } };
+        first: { id: first.publication.id, version: original.version, ...servedFirst },
+        second: { id: second.publication.id, previous: second.publication.payload.previous, version: secondReceipt.version, ...servedSecond } };
     };
     return { bundle: actual, participant,
       challenge: publicKey => client.challenge(publicKey),

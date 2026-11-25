@@ -121,7 +121,11 @@ and authenticated membership-head comparison. No epoch keys reach the host.
 Publication is independent of data authority. The checks sign actual authored
 HTML, lose a reply after persistence, retry the exact release, reject altered
 bytes/non-publishers/stale heads, retain prior code, restart Workerd, and verify
-served bytes and unchanged application authority. Ordinary data writes do not
+unchanged application authority. The served HTML is verified in two parts: the
+exact authored bytes (signed file hash and size) as the suffix, and the host's
+strict runtime injection as the prefix (JSON configuration with the signed file
+table and publication version, install metadata, and the pinned runtime script).
+Reports keep `authoredSourceDigest` and `servedDocumentDigest` separate. Ordinary data writes do not
 call host control endpoints.
 
 Use `--transport websocket` to force direct refusal and exercise actual native
