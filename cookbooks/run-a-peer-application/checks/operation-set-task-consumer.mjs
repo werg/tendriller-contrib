@@ -101,7 +101,7 @@ try {
   const reopenedDevice = await openNativeDevice({ path: join(directory, 'root.sqlite') }); devices.push(reopenedDevice);
   const reopened = await open(reopenedDevice, 'a', true), afterReload = await query(reopened);
   assert.equal(reopened.identity.publicKey, identity); assert.deepEqual(afterReload, beforeReload);
-  assert.equal((await reopened.operation('late-insert').materialized()).outcome, 'accepted');
+  assert.equal((await reopened.operations.get('late-insert').materialized()).outcome, 'accepted');
   report.reload = { identityBefore: identity, identityAfter: reopened.identity.publicKey, before: hash(beforeReload), after: hash(afterReload), cachedAuthority: true };
   const loaded = await loadNodeWasmEngine(fileURLToPath(new URL('./wasm/', import.meta.resolve('@chronolog/peer-session'))));
   const wasmEngine = createNodeWasmSqlEngine({ module: loaded.module, manifest: loaded.manifest });
@@ -111,7 +111,7 @@ try {
     createMaterializer: ({rootPrincipal}) => createSqlMaterializationRuntime({engine:wasmEngine,rootPrincipal,path:join(directory,'wasm-sql.sqlite'),checkpointEvery:1}) });
   sessions.push(wasm); await wasm.mergeFacts(reopened.exportFacts());
   const wasmView = await query(wasm), nativeView = await query(reopened); assert.deepEqual(wasmView,nativeView);
-  const outcomes = session => session.exportFacts().envelopes.map(envelope => { const inspected=session.operation(envelope.payload.proposalId).inspect();return [inspected.proposalId,inspected.materialized?.outcome,inspected.materialized?.rejectionCode]; }).sort((a,b)=>a[0].localeCompare(b[0]));
+  const outcomes = session => session.exportFacts().envelopes.map(envelope => { const inspected=session.operations.get(envelope.payload.proposalId).inspect();return [inspected.proposalId,inspected.materialized?.outcome,inspected.materialized?.rejectionCode]; }).sort((a,b)=>a[0].localeCompare(b[0]));
   assert.deepEqual(outcomes(wasm),outcomes(reopened));
   const wasmBefore=hash(wasmView),wasmIdentity=wasm.identity.publicKey;await wasm.close();
   const wasmDevice=await openNativeDevice({path:join(directory,'wasm.sqlite')});devices.push(wasmDevice);

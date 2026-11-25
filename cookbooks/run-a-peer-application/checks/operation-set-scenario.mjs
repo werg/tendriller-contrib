@@ -118,19 +118,19 @@ export async function runOperationSetScenario({ path, connectSessions, createHos
     const crashed = spawnSync(process.execPath,[fileURLToPath(new URL('./operation-set-native-restart.mjs',import.meta.url)),join(directory,'a.sqlite'),applicationId],{timeout:30000,encoding:'utf8'});
     assert.equal(crashed.status,73,crashed.stderr);assert.equal(crashed.signal,null);
     const reopened = await open(await openDevice('a'), true);
-    const abrupt = reopened.operation('native-abrupt-durable');assert.ok(abrupt?.stored);assert.equal((await abrupt.materialized()).outcome,'accepted');
+    const abrupt = reopened.operations.get('native-abrupt-durable');assert.ok(abrupt?.stored);assert.equal((await abrupt.materialized()).outcome,'accepted');
     const crashObservation=JSON.parse(crashed.stdout);assert.equal(abrupt.id,crashObservation.proposalId);
     assert.equal(abrupt.inspect().authorTimestampMs,crashObservation.authorTimestampMs);
     const crashSignedDigest=await exactHash(reopened.exportFacts().envelopes.find(value=>value.payload.proposalId===abrupt.id));
     assert.equal(crashSignedDigest,crashObservation.signedDigest);
     assert.equal(reopened.identity.publicKey, identity);
-    assert.equal(reopened.operation('offline-a').id, savedId);
+    assert.equal(reopened.operations.get('offline-a').id, savedId);
     assert.equal(await exactHash(reopened.exportFacts().envelopes.find(item => item.payload.proposalId === savedId)), savedEnvelope);
     const reconnect = await connect(reopened, b); await reconnect.synchronize();
     assert.deepEqual(await query(reopened), await query(b));
     assert.ok((await query(reopened)).messages.some(row => row.proposalId === disconnected.id));
     report.reload = { identityBefore: identity, identityAfter: reopened.identity.publicKey, proposalBefore: savedId,
-      proposalAfter: reopened.operation('offline-a').id, signedBefore: savedEnvelope,
+      proposalAfter: reopened.operations.get('offline-a').id, signedBefore: savedEnvelope,
       signedAfter: await exactHash(reopened.exportFacts().envelopes.find(item => item.payload.proposalId === savedId)),
       cachedAuthority: true, disconnectedAuthoring: true, automaticUnion: true, abruptNativeRestart:true, abruptExitCode:crashed.status, abruptProposal:abrupt.id, abruptSignedBefore:crashObservation.signedDigest, abruptSignedAfter:crashSignedDigest,
       digest: hash(await query(reopened)), peerDigest: hash(await query(b)) };

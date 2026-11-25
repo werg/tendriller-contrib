@@ -38,14 +38,14 @@ export async function qualifyFinality(directory) {
       await observer.finality.submitProofs(proofs);await assert.rejects(observer.readView({view:'final'}),/FINAL_READ_UNAVAILABLE/);
       await observer.mergeFacts(a.exportFacts());const finalView=await observer.readView({view:'final'});assert.equal(finalView.readEvents().events.length,1);finalView.release();
       await a.mergeFacts(offline.exportFacts());await a.readView().then(view=>view.release());
-      const excluded=a.operation(delayed.id).inspect();assert.equal(excluded.stored,true);assert.equal(excluded.excluded,true);assert.equal(excluded.authorTimestampMs,'50');
+      const excluded=a.operations.get(delayed.id).inspect();assert.equal(excluded.stored,true);assert.equal(excluded.excluded,true);assert.equal(excluded.authorTimestampMs,'50');
       assert.equal(await recordDigest(a.exportFacts().envelopes.find(value=>value.payload.proposalId===delayed.id)),originalDigest);
       const retry=await offline.command('postMessage',{messageId:'delayed-offline',text:'delayed-offline'},{operationId:'delayed-offline'});assert.equal(retry.id,delayed.id);
       const identity=a.identity.publicKey;await a.close();
       const device=await openNativeDevice({path:join(directory,`${kind}-a.sqlite`)});devices.push(device);
       const reopened=await createApplicationSession({device,applicationId,definition:conversation});sessions.push(reopened);
-      assert.equal(reopened.identity.publicKey,identity);assert.equal((await reopened.operation('included').finalized()).outcome,'accepted');
-      const retained=reopened.operation(delayed.id).inspect();assert.equal(retained.excluded,true);
+      assert.equal(reopened.identity.publicKey,identity);assert.equal((await reopened.operations.get('included').finalized()).outcome,'accepted');
+      const retained=reopened.operations.get(delayed.id).inspect();assert.equal(retained.excluded,true);
       results.push({policy:kind,unavailableProviderLocalAuthoring:true,proofs:proofs.length,threshold:kind==='fixed-validator'?2:1,
         included:admitted.id,finalized:true,missingBodyBlockedFinalRead:true,lateExcluded:true,lateProposal:delayed.id,
         originalSignedDigest:originalDigest,retainedSignedDigest:await recordDigest(reopened.exportFacts().envelopes.find(value=>value.payload.proposalId===delayed.id)),
