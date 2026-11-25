@@ -220,7 +220,7 @@ try {
     while (scaleViews[index].length < 4) {
       const channel = new MessageChannel(); channels.push(channel.port1, channel.port2);
       const narrow = index === 1 && scaleViews[index].length === 1;
-      owners[index].attach(channel.port1, narrow ? { maxStreams: 2, maxRequests: 4,
+      owners[index].attach(channel.port1, narrow ? { maxRequests: 8,
         capabilities: ['commands', 'queries', 'events', 'signals', 'operations'] } : {});
       const view = await connectApplicationOwner(channel.port2, { applicationId, context: { viewId: `scale-${index}-${scaleViews[index].length}`,
           documentPath: `/scale/${roles[index]}/${scaleViews[index].length}.html` } });
@@ -240,6 +240,9 @@ try {
   const noisy = scaleViews[1][1], sibling = scaleViews[1][2];
   const saturated = ['load-a', 'load-b', 'load-c', 'load-d'].map(topic => noisy.signals.subscribe({ topics: [topic], signal: signal() })[Symbol.asyncIterator]());
   const warming = saturated.map(iterator => iterator.next());
+  // If a later assertion fails first, closing the facade rejects these pending
+  // reads; observe that cleanup rejection so the original failure is reported.
+  for (const waiting of warming) void waiting.catch(() => undefined);
   // The first reply admits stream.open; a second ordered round trip also
   // follows the deferred stream.next registration before disposable sends.
   await noisy.query('collab.snapshot', null);
@@ -263,6 +266,7 @@ try {
   const progress = scaleViews[6][0].signals.subscribe({ topics: ['progress'], mode: 'latest',
     streams: [{ authorId: sessions[3].identity.publicKey, streamId: 'run-a' }, { authorId: sessions[3].identity.publicKey, streamId: 'run-b' }], signal: signal() })[Symbol.asyncIterator]();
   const firstProgress = progress.next();
+  void firstProgress.catch(() => undefined);
   // The facade opens a stream asynchronously. Two round trips on its ordered
   // port fence stream.open and the subsequent stream.next registration. Signals
   // sent before a subscriber exists are correctly disposable, not buffered.
