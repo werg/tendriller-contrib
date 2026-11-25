@@ -367,7 +367,8 @@ try {
   await signedMessage.materialized({ signal: signal() });const messageOutcome={...signedMessage.inspect(),...signedMessage.inspect().materialized}; assert.equal(messageOutcome.outcome, 'accepted');
   const message = (await clients[loser].snapshot()).value.messages.find(value => value.messageId === 'untrusted-reference');
   assertReference(message.operation, messageOutcome, sessions[loser].identity.publicKey);
-  assert.equal(message.source.identity.publicKey, sessions[loser].identity.publicKey); assert.equal(message.source.evidence, 'signer-asserted');
+  assert.equal(message.source.deviceId, sessions[loser].identity.publicKey); assert.equal(message.source.evidence, 'signer-asserted');
+  assert.equal(message.source.contextEvidence, 'caller-asserted');
   assert.equal(message.source.assertedDeviceId, sessions[0].identity.publicKey);
 
   // Raw writers must not admit a row that the public projection cannot decode
