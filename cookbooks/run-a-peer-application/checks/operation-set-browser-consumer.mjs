@@ -99,7 +99,7 @@ try {
   context=await browser.newContext({viewport:{width:1280,height:900}}); page=await context.newPage();
   const pageErrors=[];page.on('pageerror',failure=>pageErrors.push(failure.message));
   const address=`${origin}/?${new URLSearchParams({applicationId:appId,name:deviceName,create:'true'})}`;
-  await page.goto(address);await page.waitForFunction(()=>globalThis.application?.status.canAuthor);
+  await page.goto(address);await page.evaluate(()=>import('/page.mjs').then(module=>module.applicationReady).then(()=>true));await page.waitForFunction(()=>globalThis.application?.status.canAuthor);
   await page.waitForSelector('#empty',{state:'visible'});await page.screenshot({path:join(directory,'empty.png'),fullPage:true});
   const opened=await page.evaluate(()=>fixture.transport('observe'));assert.notEqual(opened.identity,native.identity.publicKey);
   assert.equal(opened.status.connectedPeers,0);
