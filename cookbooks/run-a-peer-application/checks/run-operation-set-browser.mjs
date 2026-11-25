@@ -85,7 +85,7 @@ try {
       assert.ok(specifier.startsWith('node:') || ['@chronolog/authority', '@chronolog/peer-session', '@chronolog/peer-session/native',
         '@chronolog/peer-session/sql', '@chronolog/peer-session/sql-browser', '@chronolog/peer-session/sql-native', '@chronolog/peer-session/browser', '@chronolog/peer-session/worker', '@chronolog/peer-session/webrtc', '@chronolog/peer-session/webrtc-native',
         ...(relay ? ['@chronolog/peer-session/websocket', '@tendriller/core/peers', '@tendriller/core/authority'] : []),
-        './operation-set-authority.mjs', './operation-set-browser-sql.mjs', '/sql.mjs', './operation-set-participation.mjs', './operation-set-host-client.mjs', './operation-set-host-request.mjs', './operation-set-definition.mjs', './operation-set-browser-transport.mjs', './operation-set-native-transport.mjs', './operation-set-browser-resources.mjs', './deployment/bootstrap.mjs', '../page.mjs',
+        './operation-set-authority.mjs', './operation-set-browser-sql.mjs', '/sql.mjs', '/page.mjs', './operation-set-participation.mjs', './operation-set-host-client.mjs', './operation-set-host-request.mjs', './operation-set-definition.mjs', './operation-set-browser-transport.mjs', './operation-set-native-transport.mjs', './operation-set-browser-resources.mjs', './deployment/bootstrap.mjs', '../page.mjs',
         './typing.mjs', 'playwright', 'esbuild'].includes(specifier), `Non-public consumer import: ${specifier}`);
       if (specifier.startsWith('@')) imports.add(specifier);
       if (['playwright', 'esbuild'].includes(specifier)) tools.add(specifier);
