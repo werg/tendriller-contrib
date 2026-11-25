@@ -72,7 +72,7 @@
         "id": 5,
         "name": "Browser-led coordination & graceful degradation diagnostics",
         "status": "passed_local_linux_x64",
-        "evidence": "docs/tutorial/pairing-native.mjs allowBrowserCoordinator + docs/tutorial/helpers/diagnostics-panel.mjs verified."
+        "evidence": "docs/tutorial/shared/pairing-native.mjs allowBrowserCoordinator + docs/tutorial/shared/helpers/diagnostics-panel.mjs verified."
       },
       {
         "id": 6,
@@ -96,7 +96,7 @@
         "id": 9,
         "name": "SQL starter UI + composition v2 profiles",
         "status": "passed_local_linux_x64",
-        "evidence": "docs/tutorial/sql/{index.html,page.mjs,build.mjs} + COMPOSITION_V2_PROFILES verified."
+        "evidence": "docs/tutorial/templates/inventory/{index.html,page.mjs,build.mjs} + COMPOSITION_V2_PROFILES verified."
       },
       {
         "id": 10,

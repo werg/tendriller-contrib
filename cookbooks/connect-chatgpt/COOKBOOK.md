@@ -49,11 +49,11 @@ selected connector's `serviceOrigin` throughout, including staging.
 For a new app, check `/api/readiness` before downloads or installation, then use
 the host's build guide and immutable first-app release. Stop on paused or
 unverified creation. Check native runtime and retained-process capabilities,
-then prepare authority, the first signed UI and any assistant-access proposal
+register the workspace agent and create the page, then prepare authority, the first signed UI and any assistant-access proposal
 before asking the owner to sign in; do not stop to request a “claimed” reply.
 The ready page and permission-review URL can be given together. Owner sign-in
-retains the prepared keys and code; browser enrollment and assistant consent
-remain explicit. For an existing app, request `topic: "connect"` and use that
+claims the prepared agent and its pages; browser enrollment and assistant
+consent remain explicit. For an existing app, request `topic: "connect"` and use that
 participant's real permission-review URL. An empty `list_tendrils` lists no
 assistant-connected apps; it does not imply a missing plugin or establish
 creation availability. The core CLI's `guide --server ORIGIN` and public
