@@ -40,7 +40,7 @@ without an active reasoning turn. Keep native-owner connectivity, actual
 request-worker availability and conversation-host delivery separate. Match
 presence to that worker's consumer/run and handled topics; only the worker's
 own lifetime may renew it. The [resuming-agent cookbook](../connect-resuming-agent/COOKBOOK.md)
-covers Codex queue/app-server candidates and the stopped-worker/native-owner-alive
+covers active Codex steering, idle queue/resume and the stopped-worker/native-owner-alive
 test. Follow core's [conversation-delivery guide](https://github.com/werg/tendriller/blob/master/docs/CONVERSATION_DELIVERY.md)
 through the selected service when commissioning a live route.
 
@@ -80,7 +80,7 @@ binding.
 | MCP Events subscription | Ask a supported Work chat or dot to watch a selected application's help requests | The tool prerequisites plus an active verified callback, finite lifetime and durable delivery journal | Delivery is asynchronous; webhook acceptance does not prove an answer |
 | Mounted MCP Apps card | Refresh a request and deliberately press **Send this to ChatGPT** | A compatible mounted host, allowed tool calls and message capability | Closing or hiding the card removes any availability assumption |
 | Native CLI / JSON-lines participant | Let an implementing agent query and command the application directly | Public session archive, its own enrolled device, reachable peers and retained local storage | A temporary process stops when its environment ends |
-| Codex thread queue or app-server client | Submit retained page work to the deliberately selected existing Codex thread | A compatible installed host, exact store/daemon/thread binding, one supervised receiver and an observed two-request rehearsal | Queue admission or resume invocation alone does not prove a turn, receipt or answer; another server or per-page agent is not automatically the same conversation |
+| Codex thread receiver | Inject retained page work into the observed active turn, or queue/resume while idle | A compatible installed host, exact store/daemon/thread binding, one supervised receiver and observed active/idle rehearsals | Plain `codex queue` waits while a turn is busy. Steer/queue admission alone does not prove handling, receipt or answer; another server or per-page agent is not automatically the same conversation |
 | Manual reference handoff | Copy application/request identifiers into a connected assistant chat | A retained request and a later authorized tool-capable chat | The person initiates the turn; copied identifiers grant no access |
 | Workspace Agent API trigger | Route a request through the implemented adapter to a deliberately configured published workspace agent | Separate agent access token, published channel ID, explicit egress policy and response write-back tool | The configured agent has its own conversation; provider completion does not prove application write-back |
 | Local voice, photo or realtime input | Draft or analyze explicitly captured input before creating a domain request | Device consent and the application's selected sensor/provider route | Continuous media should use its own transport and budget, not event webhooks |

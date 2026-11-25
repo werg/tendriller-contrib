@@ -531,7 +531,7 @@
     {
       "id": "connect-resuming-agent",
       "title": "Connect an agent that actually resumes",
-      "summary": "Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.",
+      "summary": "Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work.",
       "group": "Keep work dependable",
       "tags": [
         "agents",
@@ -539,8 +539,8 @@
         "recovery"
       ],
       "choices": [
-        "Socket/IPC, wait task, webhook, or scheduled check",
-        "Exact receiver identity and count-only wake notices",
+        "Active-turn steering or idle queue/resume",
+        "Exact receiver identity and reference-only notices",
         "Delivered versus handled checkpoints and rearming"
       ],
       "capabilities": [],
@@ -557,7 +557,7 @@
       "path": "cookbooks/connect-resuming-agent/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-resuming-agent/COOKBOOK.md. Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/connect-resuming-agent/COOKBOOK.md. Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "coordinate-devices",
