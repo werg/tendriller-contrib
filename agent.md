@@ -8,6 +8,8 @@ Use the [common application session](guides/application-primitives.md): one comm
 
 Keep author, sequencing, recovery, data membership, ownership and external-tool authority separate. Preserve verified requester provenance through effect journals; payload roles grant no private credentials. Irreversible work requires an explicitly configured protected checkpoint covering its prerequisites or a durable external-action service. Keep stable effect identities, authorization and reconciliation; reversible computation may follow an explicit rerun policy. Stronger guarantees are declared capabilities of the same application contract, not alternate runtime profiles.
 
+For unattended replies, read [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) and the selected core host's conversation-delivery guide. Bind ephemeral availability to the actual request worker and handled topics, not the native session owner or one-shot waiter. Qualify the exact conversation through a request, receipt and answer, then a second request after the turn ends. Preserve private thread bindings and durable handled checkpoints; queue admission is not completed work.
+
 For multi-participant workspaces, start with [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md). Use maintained public owner, collaboration and view-reference primitives; the reference includes two authored layouts and exact-artifact native conformance. Labels and availability do not establish agent execution authority.
 
 The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses the public Chronolog `@chronolog/peer-session` contract directly (`applied()`, `shared()`, `createLiveView`, `forwardSessionEvents`). Executable examples install a matching `@chronolog/peer-session` archive and verify behavior against their exact artifact hashes.
@@ -78,7 +80,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 
 - [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
-- [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.
+- [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work.
 - [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
 - [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) *(runnable snippets)* — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.

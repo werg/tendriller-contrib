@@ -4,6 +4,7 @@
 
 - [Connected-app setup on the selected service](guides/connected-app-setup.md)
 - [Common application session](guides/application-primitives.md)
+- [Worker lifetime and conversation delivery](cookbooks/connect-resuming-agent/COOKBOOK.md)
 - [Multi-participant reference](cookbooks/coordinate-participants/COOKBOOK.md)
 - [Exact-artifact collaboration checks](cookbooks/coordinate-participants/checks/README.md)
 - [Application journeys](guides/use-cases.md)

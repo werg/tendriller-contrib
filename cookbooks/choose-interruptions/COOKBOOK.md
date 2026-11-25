@@ -38,7 +38,7 @@ A compact instrument page may need one visible alert and local mute. A collabora
 | Quiet state or stream record | Preserve an observation for later inspection. | Recording does not establish that anyone noticed it. |
 | Local visual cue | Help someone actively using the page. | It depends on the view being available and must remain understandable without color alone. |
 | Local sound or speech | Attract attention during a deliberate active session. | Playback may be muted or unavailable; local Stop must remain effective. |
-| Agent wake | Resume the intended connected host conversation for useful work. | A wake notice is not the person's notification or proof that work completed. |
+| Agent wake | Resume the intended connected host conversation through its explicitly supported receiver. | Native connectivity, waiter output and queue admission do not prove a turn or completed work; verify the same conversation after two requests. |
 | Durable server timer | Record a scheduled occurrence without a running page tab. | The task still needs an authorized receiver and declared missed-run policy. |
 | Web Push | Notify an opted-in owner device while the page may be closed. | Provider acceptance is not guaranteed display or reading. |
 

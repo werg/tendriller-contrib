@@ -75,6 +75,25 @@ verified authority and enforces the command's execution and domain guards.
 Database failure can make data operations unavailable while the authenticated
 control and live connection remain usable.
 
+## Keep connectivity, worker availability and host wake distinct
+
+A native owner can retain a healthy protocol session while its assistant worker
+is stopped. A worker's ephemeral presence names its consumer/run and handled
+topics and ends with that worker; a shared signer or connected peer does not
+identify which worker is available. Durable receipts and answers establish
+handling separately. A one-shot event waiter or successful forwarder dispatch
+does not resume a model conversation.
+
+For unattended multi-page requests, configure and test one receiver against the
+intended existing host conversation. Preserve each page/history/request identity,
+one writer per durable consumer checkpoint, and exact retry identities. A host
+queue can acknowledge a notice before a turn begins, so its delivery cursor is
+separate from handled progress. Follow
+[resuming agents](../cookbooks/connect-resuming-agent/COOKBOOK.md) and the selected
+service's conversation-delivery guide for supported mechanisms and two-probe
+qualification. When host admission is missing or blocked, retain the requests
+and show the required next action.
+
 ## Follow the authenticated selected history
 
 An authorized coordinating peer orders commands during one session generation. Other peers retain the original

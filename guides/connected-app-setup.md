@@ -155,13 +155,16 @@ guide does not establish deployment.
 
 ### Run one agent program for every page
 
-`npm run agent` (`tendril agent run`) is the only long-running local program. It
-keeps one hub connection for setup notices, discovery, invitations, WebRTC
+`npm run agent` (`tendril agent run`) is the long-running native session owner.
+It keeps one hub connection for setup notices, discovery, invitations, WebRTC
 rendezvous and assistant adapter streams of every granted, initialized page, and
 opens one Chronolog session per page with its own device store signed by the
 shared key. Application sync data keeps direct per-page connections. Other
 commands are short invocations that attach to it: `tendril --page <slug> <command>`.
 Start it before the owner opens the page and keep it running while browsers write.
+A separate assistant worker or host-delivery bridge has its own supervised
+lifetime. The native owner may stay connected when that worker is stopped; it
+must not advertise the worker's request topics or renew its listening state.
 
 Browser pairing is processed automatically by that program. The browser saves one
 public request and proves possession of its own key; the page's owner durably
@@ -198,6 +201,40 @@ devices. Core's
 [continuation guide](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md#continue-after-a-lost-credential-or-device)
 is authoritative; confirm that the selected host supports each route. Keep the
 original page identity, descriptor and device stores.
+
+## Qualify conversation delivery during setup
+
+When the requested result includes unattended replies in an existing conversation,
+read the selected service's `/docs/CONVERSATION_DELIVERY.md` (or
+`tendril_guide` topic `conversation` when advertised) before promising wake.
+Use the [maintained source guide](https://github.com/werg/tendriller/blob/master/docs/CONVERSATION_DELIVERY.md)
+to distinguish available mechanisms from features deployed by that host.
+
+For Codex, inspect the installed CLI and the intended thread's store/daemon.
+Plain `codex queue --thread UUID --message TEXT --resume` submits to an existing
+thread but waits while a turn is running. A receiver required to inject incoming
+requests must inspect current thread state and use `turn/steer` with the observed
+active turn ID; queue/resume handles idle or unloaded state. Steering supplies
+input at the next applicable continuation boundary, not an interruption of a
+running tool. Preserve explicitly interrupted state and normal host approvals.
+
+These mechanisms require the correct existing thread and daemon/store; an
+arbitrary ChatGPT conversation identifier is not interchangeable. A successful
+steer or queue admission is not a receipt or answer. Queue resume can still fail
+with a warning; retain uncertainty and inspect the original admission instead
+of silently queueing a second notice after a timeout.
+A one-shot Tendriller waiter, MCP catch-up read or inbox card supplies no such
+admission mechanism on its own.
+
+Retain one configured workspace conversation for all its pages when that is the
+person's intent. Keep the thread binding private, preserve page/history/request
+identity and serialize receiver dispatch without waiting for a running turn to
+finish. Verify an incoming request is injected into that same active Codex turn,
+then verify idle wake and a second request after the answering turn ends. A
+notice merely queued until completion fails the active case. If the installed host
+cannot perform that route, show the missing capability and preserve requests
+for manual continuation. Reauthentication, host admission failure and worker
+exit need distinct actionable statuses; a native-owner heartbeat cannot hide them.
 
 ## Verify the connected result and state its lifetime
 
