@@ -166,7 +166,7 @@ try {
   const beforeReload=await snapshot(),beforeRequests=fixtureRequests;
   await page.evaluate(()=>fixture.crash());await link.link.close();
   if(relay)await hostFixture.cutRelays();
-  await context.setOffline(true);await page.reload();await page.waitForFunction(()=>globalThis.application?.status.canAuthor);
+  await context.setOffline(true);await page.reload();await page.evaluate(()=>import('/page.mjs').then(module=>module.applicationReady).then(()=>true));await page.waitForFunction(()=>globalThis.application?.status.canAuthor);
   const reopened=await page.evaluate(()=>fixture.transport('observe'));assert.equal(reopened.identity,opened.identity);assert.equal(fixtureRequests,beforeRequests);
   assert.deepEqual((await snapshot()).events,beforeReload.events);
   const offlineContent=await page.evaluate(async reference=>{const bytes=await application.content.readBytes(reference,{maxBytes:200000});return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(value=>value.toString(16).padStart(2,'0')).join('');},reference);
