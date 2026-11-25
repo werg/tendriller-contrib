@@ -17,9 +17,8 @@ Use the seven-mode package workflow described in [peer application checks](../co
 ## Qualify the selected composition before claiming these paths
 
 The live-editor, scoped attach-publication, recovery-evidence and signal-counter
-guidance requires packages that contain those APIs. The cookbook's historical
-source pins and existing companion-release record retain their recorded scope;
-prose updates do not qualify a new artifact or deployment.
+guidance requires packages that contain those APIs. Prose updates do not
+qualify a new artifact or deployment.
 
 For the selected candidate, retain exact core/session identities and test
 immutable snapshot/save ordering, explicit publication permission and exact retry,
