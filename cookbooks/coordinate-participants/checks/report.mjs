@@ -80,7 +80,9 @@ export function validateCollaborationReport(report, { allowDirty = false } = {})
   assert.equal(readScope.eventsOnlyRawDenied, 'ENDPOINT_CAPABILITY_FORBIDDEN');
   assert.equal(readScope.namedQueryRawDenied, 'ENDPOINT_RAW_SQL_FORBIDDEN');
   assert.equal(readScope.queryOnlyEventsDenied, 'ENDPOINT_CAPABILITY_FORBIDDEN');
-  for (const field of ['allowedNamedQuery', 'allowedRawQuery', 'deniedCaptureReleasedReservation', 'reviewerReadFailureRetiredObserver', 'siblingUsable']) assert.equal(readScope[field], true);
+  assert.equal(readScope.noReadCapabilityViewDenied, 'ENDPOINT_CAPABILITY_FORBIDDEN');
+  assert.equal(readScope.eventsOnlyViewLimitDenied, 'ENDPOINT_VIEW_LIMIT');
+  for (const field of ['eventsOnlyViewAllowed', 'eventsOnlyEventsAllowed', 'releasedViewRestoredCapacity', 'allowedNamedQuery', 'allowedRawQuery', 'deniedCaptureReleasedReservation', 'reviewerReadFailureRetiredObserver', 'siblingUsable']) assert.equal(readScope[field], true);
   const pages = observation('boundedCapturedPages');
   assert.ok(pages.heldTaskCount > pages.visibleTaskLimit); assert.equal(pages.visibleTaskLimit, 2);
   assert.equal(pages.completeAcceptedSummaries, 2); assert.equal(pages.capturedMessages, 2); assert.equal(pages.latestMessages, 3);

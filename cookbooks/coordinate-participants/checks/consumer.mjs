@@ -130,7 +130,17 @@ try {
   const eventsOnly = await attach('events-only', '/scope/events.html', { capabilities: ['events'], maxViews: 1 });
   const namedOnly = await attach('named-only', '/scope/named.html', { capabilities: ['queries', 'events'], queries: ['collab.snapshot'], maxViews: 1 });
   const queryOnly = await attach('query-only', '/scope/query.html', { capabilities: ['queries'], maxViews: 1 });
-  await denied(eventsOnly.readView(),'ENDPOINT_CAPABILITY_FORBIDDEN');
+  // The owner admits a coherent view when either queries or events is granted;
+  // each view method is then checked against its own capability.
+  const diagnosticsOnly = await attach('diagnostics-only', '/scope/diagnostics.html', { capabilities: ['diagnostics'], maxViews: 1 });
+  await denied(diagnosticsOnly.readView(),'ENDPOINT_CAPABILITY_FORBIDDEN');
+  await diagnosticsOnly.detach();
+  const eventsView = await eventsOnly.readView();
+  await denied(eventsView.query('SELECT 1'),'ENDPOINT_CAPABILITY_FORBIDDEN');
+  assert.ok(Array.isArray((await eventsView.readEvents()).events));
+  await denied(eventsOnly.readView(),'ENDPOINT_VIEW_LIMIT');
+  await eventsView.release();
+  await (await eventsOnly.readView()).release();
   const namedView=await namedOnly.readView(),queryView=await queryOnly.readView();
   await denied(namedView.query('SELECT id FROM collab_journal'),'ENDPOINT_RAW_SQL_FORBIDDEN');
   assert.ok(Array.isArray((await eventsOnly.readEvents()).events));
@@ -157,6 +167,8 @@ try {
   assert.equal(sessions[1].signal.aborted, false); assert.equal(owner.endpoints().length, 2);
   observed('capturedReadScope', { eventsOnlyRawDenied: 'ENDPOINT_CAPABILITY_FORBIDDEN',
     namedQueryRawDenied: 'ENDPOINT_RAW_SQL_FORBIDDEN', queryOnlyEventsDenied: 'ENDPOINT_CAPABILITY_FORBIDDEN',
+    noReadCapabilityViewDenied: 'ENDPOINT_CAPABILITY_FORBIDDEN', eventsOnlyViewAllowed: true, eventsOnlyEventsAllowed: true,
+    eventsOnlyViewLimitDenied: 'ENDPOINT_VIEW_LIMIT', releasedViewRestoredCapacity: true,
     allowedNamedQuery: true, allowedRawQuery: true, deniedCaptureReleasedReservation: true,
     reviewerReadFailureRetiredObserver: true, siblingUsable: true });
   const boardClient = reviewClient({ session: board, endpoint: board.endpoint, runId: 'board-run' });
