@@ -67,7 +67,7 @@ A foreground timer can change attention while the page is active; it cannot prom
 
 Choose the clock, time zone, recurrence and missed-occurrence policy explicitly. Record a stable occurrence identity, the relevant schedule version, the scheduler's observed outcome and external delivery separately. A service acknowledgement does not prove a notification was displayed or read. Keep unresolved work visible when delivery is unavailable.
 
-Application scheduling state is subject to the same explicit history recovery as other domain data. A recovered projection must not dispatch an irreversible notification or external action blindly. Use an explicitly qualified protected or durable action boundary for that effect, including original requester authority and deduplication.
+Application scheduling state is revisable like other domain data: an earlier arriving operation can change it and a configured closed frontier can exclude delayed offline work. A rederived projection must not dispatch an irreversible notification or external action blindly. Use an explicitly qualified protected or durable action boundary for that effect, including original requester authority and deduplication.
 
 ## Make snooze and cancellation dependable
 

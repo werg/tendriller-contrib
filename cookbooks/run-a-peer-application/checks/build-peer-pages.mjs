@@ -12,7 +12,8 @@ const here = dirname(fileURLToPath(import.meta.url)), session = resolve(values.s
 const metadata = JSON.parse(readFileSync(join(session, 'package.json'), 'utf8'));
 assert.equal(metadata.name, '@chronolog/peer-session');
 const provenance = JSON.parse(readFileSync(join(session, 'provenance.json'), 'utf8'));
-assert.equal(provenance.profile, 'peer-generation-v1');
+assert.equal(provenance.profile, 'chronolog-crdt-v1');
+assert.equal(provenance.dirty, false, 'Publish only a clean-source page graph');
 for (const [name, digest] of Object.entries(provenance.sha256)) {
   const file = resolve(session, name), path = relative(session, file);
   assert.ok(path && !isAbsolute(path) && path !== '..' && !path.startsWith(`..${sep}`));
@@ -25,6 +26,7 @@ for (const source of [here, session, deployment]) {
 }
 mkdirSync(output, { recursive: true }); assert.equal(readdirSync(output).length, 0, 'Use an empty output directory');
 cpSync(join(here, 'peer-ui'), output, { recursive: true });
+writeFileSync(join(output,'app.mjs'),readFileSync(join(here,'peer-ui/app.mjs'),'utf8').replaceAll("'@chronolog/peer-session/browser'","'./peer-session/browser.mjs'"));
 copyFileSync(join(here, 'shared/typing.mjs'), join(output, 'typing.mjs'));
 cpSync(session, join(output, 'peer-session'), { recursive: true, dereference: false });
 cpSync(deployment, join(output, 'deployment'), { recursive: true, dereference: false });

@@ -37,7 +37,7 @@ Assignments and feedback can be as sensitive as answers. A facilitator's ability
 
 Define queries and commands through the [common application session](../run-a-peer-application/COOKBOOK.md). For example, your definition may declare an assignment query, a response command and a round-close command. The command checks the verified author, assignment identity, prompt version, answer version and closed status inside one deterministic transaction. These are domain operations you implement; there is no installed private-response vocabulary.
 
-Capture a coherent query result before the person begins or reviews a draft. Retain both its application revision and the domain versions needed by the command. `basedOn` orders the attempt after a captured revision; it does not replace those transactional guards. Use a stable operation ID for the submitted snapshot, inspect the maintained journal after reopening, and retry that exact operation after a lost reply. Applied rejection needs review; an abandoned attempt after explicit history recovery needs a deliberately linked new operation.
+Capture a coherent query result before the person begins or reviews a draft. Retain both its application revision and the domain versions needed by the command. The captured revision identifies what the person reviewed; it is not an operation-order input or a transactional guard, so check the domain versions inside the signed transaction. Use a stable operation ID for the submitted snapshot, inspect the maintained journal after reopening, and retry that exact operation after a lost reply. A materialized rejection needs review; because an earlier arriving operation can revise it, rederive the view rather than treating it as final. If a configured closed-time frontier excludes the attempt, the original intent stays visible and any new response is a deliberate, newly reviewed operation.
 
 Within one application, archive metadata and round closure can be one guarded transaction. Content retention is a separate receipt that must be obtained and checked. If the design splits private responses across applications, closure and aggregation span histories: show individual coverage and partial failures, or introduce an explicitly qualified coordination capability. Do not label several independent commands an atomic reset.
 
@@ -45,7 +45,7 @@ Within one application, archive metadata and round closure can be one guarded tr
 
 Explain who reads raw answers, what may be published, whether answers may change, and how long drafts and archives remain. “Private” should name its readers. A shared screen that omits names does not make the protocol anonymous.
 
-The participant sees the current authorized assignment, a local draft and an intentional submit action. Distinguish saved locally, applied accepted or rejected, retained coverage, and recovery that abandoned a prior result. A facilitator changing the prompt must not relabel an old pending answer. Keep its original context and preserve later typing separately.
+The participant sees the current authorized assignment, a local draft and an intentional submit action. Distinguish stored locally, materialized accepted or rejected, retained coverage, finality when configured, and a configured closed-time exclusion of a prior result. A facilitator changing the prompt must not relabel an old pending answer. Keep its original context and preserve later typing separately.
 
 The facilitator sees expected, received and missing responses, source revisions, private review and a separate aggregate draft. Missing is not a negative answer. Explain whether a denominator counts invitations, active assignments or received answers. Review identifying quotations and rare categories before sharing; aggregation does not automatically anonymize text.
 
@@ -56,13 +56,13 @@ Use keyboard-accessible forms and meaningful labels. Store recoverable drafts on
 ## Adapt the plan
 
 1. List every reader, writer, administrator and external actor. Decide which application histories each can access and how enrollment obtains keys.
-2. Choose stable prompt, participant and response identities. Distinguish domain round versions from application recovery generations.
+2. Choose stable prompt, participant and response identities. Keep domain round versions separate from application revisions and finality policy.
 3. Implement the smallest guarded definition. Test a malicious signed command, a guessed record ID and direct encrypted-content access, not only disabled controls.
 4. Build the participant form and facilitator review independently around their different tasks. Keep new drafts separate from immutable submitted snapshots.
 5. Give the shared display access only to the results application. Do not connect it to raw responses and merely omit fields from the rendering.
 6. Publish an aggregate from an explicit reviewed snapshot. Record coverage, denominators, omissions and source revisions without exposing private values.
 7. Define close, withdrawal, correction, deletion and archive policy. Show partial progress honestly when the operation spans applications or content stores.
-8. Exercise recovery: retain original operation identities, show abandoned work and require review before reapplication.
+8. Exercise late arrival and exclusion: retain original operation identities, show a response whose outcome changed or was excluded by a configured closed frontier, and require review before any new submission.
 
 ## Verify the actual boundaries
 
@@ -71,10 +71,10 @@ Use keyboard-accessible forms and meaningful labels. Store recoverable drafts on
 | Two participants connect and request each other's history or keys. | The actual membership and encryption boundary refuses access; a filtered query alone is insufficient. |
 | A participant submits a facilitator-only command directly. | Verified author checks reject it inside execution. |
 | Two edits race from the same response version. | The guarded definition accepts only the permitted result and preserves the stale draft. |
-| A response reply is lost. | Retry recovers the same signed attempt and outcome without duplicate answers. |
+| A response reply is lost. | Retry resumes the same signed proposal and outcome without duplicate answers. |
 | The facilitator publishes an aggregate. | The display history contains only reviewed results and intended provenance. |
 | A round closes while a participant is offline. | Old intent retains its original domain version and cannot silently reopen the round. |
-| Recovery abandons a response or aggregate. | The application shows the selected history and affected operations; it does not silently resubmit. |
+| An earlier operation or a closed frontier changes or excludes a response or aggregate. | The application rederives from a coherent snapshot and shows the affected operations; it never silently retimestamps or resubmits. |
 | Reader membership changes. | New access follows actual control and key policy; cached private UI clears without claiming past plaintext was erased. |
 | Content retention or one cross-application close fails. | The result identifies the missing coverage instead of reporting atomic completion. |
 

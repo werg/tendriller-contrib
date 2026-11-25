@@ -58,24 +58,28 @@ sign-in, an approved assistant connection and a copied page link do not enroll
 that browser's signer. Check the session in the browser actually being used;
 sign-in elsewhere does not authenticate an agent-controlled browser.
 
-Current core source implements reviewed pairing; confirm that the selected
-host and its exact release support it before using that route. The browser
-proves possession with its own retained key. The existing native owner durably
-pauses ordering and stages the exact signed proposal before the service-origin
-owner review. That review binds the fingerprint, account, application, origins,
-rights and retained history. A copied link or successful sign-in grants none of
-those device rights by itself.
+Enrollment authenticates the account, exact page origin and the browser's own
+device-key proof. It is not a transfer of the old device's private keys. An
+additional device needs an explicit grant from an authorized owner and explicit,
+authenticated key provisioning (a recipient-encrypted package) before it can read
+or author. An empty local store cannot invent keys it was never given. Keep the
+retained request identity and private recipient-agreement key in the owning
+device store across reload and retry. A copied link, successful sign-in or
+granted metadata alone gives none of those rights.
 
-The starter's native processing window lasts at most ten minutes, with idle
-checks backing off to thirty seconds. Restart the same retained native owner if
-that window ends; closing it preserves any uncertain ordering pause. Resume a
-lost reply with the same request, native
-checkpoint and browser key; reconcile the original signed outcome before writes
-resume. Expired or stale requests require an explicit new review for that device.
-Do not silently grant rights, replace an identity, choose another prefix or
+Enrollment does not pause the source device or select application history. A
+device that is already initialized keeps storing and materializing its own work
+locally while another device waits for review or keys. Do not show a keyless
+device as ready to Save or as an empty current application; show the actual
+pending provisioning step instead. Retained devices open their cached local state
+first and refresh authority in the background.
+
+Resume a lost reply with the same signed request and browser key. Do not create a
+second grant, page or signer. An expired or stale request needs an explicit new
+review for that device. Do not silently grant rights, replace an identity or
 present a reviewed proposal as a connected application. Verify the actual peer
-session and same-key reopen separately; this cookbook's historical evidence does
-not certify the newer protocol or a deployed service.
+session and same-key reopen separately. This cookbook's historical evidence does
+not certify a deployed service or the selected release.
 
 Authoritative accepted progress can be reloaded through an authorized read. An unsent local draft has different ownership and durability. Let the person choose whether to keep it local, transfer it through an authorized application mechanism, or export it for their own recovery. Do not imply that copying the page URL copied the draft.
 
@@ -97,8 +101,9 @@ The sender's progress indicator should be calm and precise: waiting for an autho
 | Scan from a real display at the expected distance. | The code works at usable size and a text/copy alternative remains available. |
 | Use a device with no camera or denied camera permission. | Joining remains possible through the link; scanning failure does not block the task. |
 | Change the purpose or role-looking URL parameter. | Permissions do not change with presentation hints. |
-| Reload after requesting pairing or lose the enrollment response. | The same request, browser key and signed attempt resume; no second grant or page is created. |
-| Leave the native coordinator offline, let a review expire, or revoke an enrolled key. | The UI names the actual pending, expired or revoked state; refresh never silently restores authority. |
+| Reload after requesting enrollment or lose the enrollment response. | The same request, browser key and signed intent resume; no second grant or page is created. |
+| Leave the owner review unanswered, let a request expire, or revoke an enrolled key. | The UI names the actual pending, expired or revoked state; refresh never silently restores authority. An initialized device keeps authoring locally. |
+| Open an enrolled browser that has no application keys. | It shows the provisioning path and no Save-ready state; it never fabricates an empty application. |
 | Disconnect during draft transfer, then edit the source. | The original snapshot, receipt, and newer draft remain distinguishable. |
 | Open a stale task or publication link. | The person sees an accurate stale/expired explanation and a deliberate continuation path. |
 | Inspect QR contents, logs, and copied instructions. | They contain the intended user-facing URL and no agent secret or private draft. |

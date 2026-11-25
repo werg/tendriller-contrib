@@ -5,9 +5,9 @@ export function sensingDefinition({ defineApplication, defineCommand, defineQuer
       input: { type: 'object', properties: {
         requestId: { type: 'string' }, recipient: { type: 'string' }, operationId: { type: 'string' }, text: { type: 'string' },
         reference: { anyOf: [{ type: 'null' }, { type: 'object', properties: {
-          profile: { type: 'string' }, applicationId: { type: 'string' }, historyId: { type: 'string' }, id: { type: 'string' },
+          profile: { type: 'string', enum: ['authored-content-v1'] }, applicationId: { type: 'string' }, id: { type: 'string' },
           epoch: { type: 'integer' }, bytes: { type: 'integer' }, mediaType: { type: 'string' },
-        }, required: ['profile', 'applicationId', 'historyId', 'id', 'epoch', 'bytes', 'mediaType'], additionalProperties: false }] }, observedAt: { anyOf: [{ type: 'null' }, { type: 'number' }] },
+        }, required: ['profile', 'applicationId', 'id', 'epoch', 'bytes', 'mediaType'], additionalProperties: false }] }, observedAt: { anyOf: [{ type: 'null' }, { type: 'number' }] },
       }, required: ['requestId', 'recipient', 'operationId', 'text', 'reference', 'observedAt'], additionalProperties: false },
       prepare(input) { return program(emit('retained-evidence', input)); },
     }),

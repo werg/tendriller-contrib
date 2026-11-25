@@ -1,20 +1,8 @@
 <!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peer conversation</title><link rel="stylesheet" href="./style.css"></head>
-<body class="compact">
-  <header><p class="eyebrow">Shared workspace</p><h1>Conversation and tasks</h1>
-    <p id="status" role="status">Opening this device…</p><p id="revision" class="quiet"></p>
-    <aside id="recovery" hidden><h2>History recovered</h2><p id="recovery-message"></p><p>Review excluded work before creating a new attempt. Your unsent draft stays here.</p></aside>
-    <aside id="recovery-choice" hidden aria-labelledby="recovery-choice-title"><h2 id="recovery-choice-title">Recovery needs your choice</h2><p id="recovery-choice-message"></p><details><summary>Review available history</summary><pre id="recovery-choice-details"></pre></details><button id="approve-recovery" type="button" disabled>Recover from this history</button></aside>
-  </header>
-  <main>
-    <section><h2>Conversation</h2><ol id="conversation"></ol><p id="typing" class="quiet" aria-live="polite"></p>
-      <form id="message-form"><label for="message">Your message</label><textarea id="message" maxlength="4096" rows="4" disabled></textarea><button id="send" disabled>Send message</button></form>
-      <p class="quiet">A committed attempt may be excluded by explicit history recovery.</p>
-    </section>
-    <section id="tasks-section" hidden><h2>Tasks</h2><form id="task-form"><label for="task-title">New task</label><input id="task-title" maxlength="512" required><button>Add task</button></form><ul id="tasks"></ul></section>
-    <section class="receipts"><h2>Your attempts</h2><p>Review an excluded attempt before reapplying it.</p><ol id="operations"></ol></section>
-  </main>
-  <script type="module" src="./app.mjs"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peer workspace</title><link rel="stylesheet" href="./style.css"></head>
+<body class="compact"><header><p class="eyebrow">Local-first shared workspace</p><h1>Conversation and tasks</h1><p id="status" role="status">Opening this device…</p><p id="revision" class="quiet"></p><p id="error" role="alert" hidden></p></header>
+<main><section><h2>Conversation <span id="message-count">0</span></h2><p id="empty">No messages yet. You can write while disconnected.</p><ol id="conversation"></ol><p id="typing" aria-live="polite"></p>
+<form id="message-form"><label for="message">Your message</label><textarea id="message" maxlength="4096" rows="4" disabled></textarea><button id="send" disabled>Save message locally</button></form><p class="quiet">Stored locally does not mean retained by peers or finalized. Provisional outcomes can change after earlier operations arrive.</p></section>
+<section id="detail"><h2>Message inspector</h2><p id="detail-empty">Choose a message to inspect its authenticated author and signed intent.</p><dl id="message-detail"></dl></section>
+<section id="tasks-section" hidden><h2>Tasks</h2><form id="task-form"><label for="task-title">New task</label><input id="task-title" maxlength="512" required><button>Add task locally</button></form><ul id="tasks"></ul></section>
+<section class="receipts"><h2>Your signed intents</h2><p>Exact retry uses the original operation ID, signed bytes and author timestamp. An excluded intent remains inspectable.</p><ol id="operations"></ol></section></main><script type="module" src="./app.mjs"></script></body></html>

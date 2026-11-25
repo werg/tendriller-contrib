@@ -4,7 +4,7 @@ title: "Keep a task useful offline and reconnect deliberately"
 summary: "Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return."
 group: "Keep work dependable"
 tags: ["offline", "drafts", "recovery"]
-choices: ["Saved publication versus unsaved optional capabilities", "Local work versus accepted server outcomes", "Original retries versus reviewed reconciliation"]
+choices: ["Saved publication versus unsaved optional capabilities", "Local materialization versus retention and finality", "Original retries versus reviewed reconciliation"]
 related: ["recover-outdated-work", "publish-coherent-updates", "resume-across-sessions"]
 sources: ["https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md", "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/PROTOCOL.md"]
 capabilities: []
@@ -13,19 +13,19 @@ evidence: "explained"
 
 # Keep a task useful offline and reconnect deliberately
 
-Use this when a task must remain useful through weak connectivity: a field checklist, reviewed observation form, or reference page used away from a network. Start by deciding which actions are valuable locally and which require current application authority or an explicit external capability. If offline work would create more uncertainty than value, a readable saved reference and an explicit “Reconnect to submit” state may be sufficient.
+Use this when a task must remain useful through weak connectivity: a field checklist, reviewed observation form, or reference page used away from a network. Start by deciding which actions are valuable locally and which require current application authority or an explicit external capability. A network-only external action may need “Reconnect to contact the provider”; ordinary authorized Chronolog writes do not.
 
 ## Promise a specific offline task
 
 For a field inspection, the person may need the procedure, previously authorized context, an unsent note, and a reviewed photograph while disconnected. They cannot assume that a new reservation, private authorization, remote agent response, or live stream append will succeed. Write that boundary into the interface before departure.
 
-Separate five states: the page's exact publication is saved, the application has the required local data, a draft is persisted, a command is saved, and the selected application history has applied it. A single “Offline ready” badge should not imply all five. Show which optional features need a connection, which evidence remains only on this device, and which application revision was last observed.
+Separate five states: the page's exact publication is saved, the application has the required local data, a draft is persisted, a command is saved, and the operation has a current local materialized outcome. Peer retention and configured finality are separate facts. A single “Offline ready” badge should not imply all five. Show which optional features need a connection, which evidence remains only on this device, and which application revision was last observed.
 
 | Offline need | Useful approach | Limitation to expose |
 | --- | --- | --- |
 | Read the authored procedure | Save the exact publication through the public lifecycle. | Saving one version does not establish readiness of another. |
 | Continue a local draft | Persist the minimum draft and evidence under a disclosed policy. | Browser storage can fail or be cleared; this is not a remote backup. |
-| Submit durable application intent | Use the common session command and inspect its original operation. | Locally saved is not applied; stale domain work may reject and recovery may abandon it. |
+| Submit durable application intent | Use the common session command and inspect its original operation. | Stored intent can materialize offline; its provisional result may change when earlier facts arrive. This is not peer backup or finality. |
 | Send transient readings | Use the session signal channel with a declared expiry. | Signals have no offline queue or durable replay. |
 | Use optional speech or a model | Prepare and verify that specific dependency and capability. | Publication readiness does not imply an unused model was downloaded. |
 | Read private records | Follow the application's current authorization and cache policy. | A cached record does not itself grant permission to display it. |
@@ -42,23 +42,23 @@ Use the [current owned-session page composition](../run-a-peer-application/COOKB
 
 ## Keep local work and the journal understandable
 
-Snapshot each submitted intent separately from the editable draft. Preserve application identity, immutable evidence references, the reviewed domain versions and the session's original signed attempt. An activity card can say “Saved on this phone” while still waiting for an eligible coordinator. Administrative credentials do not belong in those application records.
+Snapshot each submitted intent separately from the editable draft. Preserve application identity, immutable evidence references, the reviewed domain versions and the session's original signed attempt. An activity card can independently say “Stored on this phone”, “Materialized locally” and “Not yet retained by another device”. No coordinator is needed. Administrative credentials do not belong in those application records.
 
-Use the common session for all commands. `session.operations` restores original attempts after reopening, `session.retry` resumes exact delivery, and `applied()` distinguishes accepted from rejected execution in the selected history. `shared()` separately observes retained coverage. Keep editable drafts outside the immutable submitted snapshot, but do not duplicate the session's command queue.
+Use the common session for all commands. `session.operations.get` restores original references after reopening; `session.operations.retry` wakes work on the exact signed proposal without changing its timestamp or body. Inspect or await `materialized()` for the current accepted/rejected outcome and `retained()` for authenticated independent copies. Configured `finalized()` is separate and explicitly unsupported in no-finality mode. Keep editable drafts outside the immutable submitted snapshot; do not create another command queue.
 
-A disconnected peer can retain useful data and saved intent, but availability depends on the selected coordinator and actual connectivity. Application recovery can abandon a suffix that was previously applied. Reread the selected history after a recovery notice and offer deliberate linked reapplication for excluded work. Do not change signed inputs, operation IDs or domain guards during retry.
+An initialized disconnected peer stores and materializes authorized work locally. Reconnection unions signed facts, and earlier operations can revise current SQL results, events and schema. Derive the UI from the replacement snapshot rather than appending arrivals. With no finality, valid arbitrarily late work remains eligible; with configured sealed time, unseen late work can be excluded. Retain that original intent and require explicit review for any new submission. Never change signed inputs, operation IDs or domain guards during retry.
 
 Transient signals expire and have no durable replay. For telemetry that must survive interruption, use a bounded acquisition spool feeding declared application commands with stable domain IDs and expose any rejected or discarded samples. The spool manages source acquisition; it must not become a second command retry journal. Content retention also needs its own actual copy/coverage checks.
 
 Bound draft bytes, attachment counts and pending operations. On quota failure, keep the last coherent draft and explain what cannot be saved. A draft left only in the open tab is not reload-safe. Never silently evict unsent evidence unless that is an explicit visible policy.
 
-A connectivity indicator reports transport separately from authority, execution and feature readiness. Returning connectivity can coexist with missing keys, stale authority or recovery in progress. Keep meaningful status accessible without repeatedly interrupting typing.
+A connectivity indicator reports transport separately from authority, execution and feature readiness. Returning connectivity can coexist with missing keys, a pending authority dependency or replay in progress. Keep meaningful status accessible without repeatedly interrupting typing.
 
 ## Reconnect without changing historical intent
 
 1. Establish the current page identity, reader authority, service capabilities, and task context. Reauthorize before restoring sensitive projections when required.
-2. Reconcile original pending commands using their captured identities and generations. Runtime retry must preserve their original meaning; do not attach a newly fetched generation to an old payload.
-3. Show accepted, rejected, and uncertain outcomes per item. A stale rejection should offer comparison with current task state and an explicit new submission action.
+2. Reconcile pending proposals using their original application, author, operation and proposal identities. Resume cached local work before background refresh; retry never changes the signed timestamp or payload.
+3. Show current accepted, rejected, dependency-pending and finality-excluded outcomes separately. A provisional rejection can change after an earlier fact arrives; a genuinely new decision needs an explicit reviewed submission.
 4. Read a coherent `session.query` or captured read view, retaining its revision. Inspect current domain records and retained event coverage; an old receipt does not describe every later change. A separate scheduling capability has its own actual current-state query.
 5. Apply a new publication only under the page's draft-aware policy. Offline readiness for the previous version must not be relabeled as readiness for the update.
 6. Reestablish optional sensors or voice through intentional local action. Reconnection does not authorize restarting hardware or speech.
@@ -77,7 +77,7 @@ For conflicts, keep both the original snapshot and current draft. Explain whethe
 | Task resets while an observation is queued | Original intent remains stale and can only be resubmitted through deliberate current review. |
 | Connection returns after a new draft is typed | Older receipts cannot erase or overwrite the new draft. |
 | Two conditional row edits survive a reload | The session journal and original-operation receipts identify each row; the page does not reconstruct commands from visible values. |
-| Recovery excludes a previously applied observation | Its abandoned identity remains inspectable and reapplication requires current review. |
+| An earlier proposal changes a displayed result, or sealed-time policy excludes late intent | Recompute the result from the new revision, retain the exact original proposal and preserve newer drafts; any new intent needs explicit review. |
 | Access changes while private restoration is pending | Late callbacks cannot repaint content from the previous authority context. |
 
 This guide proposes an offline experience. Actual offline readiness, storage behavior, service rejection, and device capability need separate checks in the chosen adaptation.

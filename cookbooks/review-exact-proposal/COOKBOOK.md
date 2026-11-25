@@ -23,7 +23,7 @@ The desired outcome is an informed decision attached to a particular immutable p
 2. **Orient.** Show why a decision is needed, who may make it, and when it expires. Give a concise summary with access to the consequential detail.
 3. **Inspect.** Let the person compare changes, open referenced evidence, and ask a question. A clarification should not silently mutate the proposal already on screen.
 4. **Decide.** Offer explicit approve and reject actions; “Request revision” can be a separate application conversation. Avoid a preselected approval or an ambiguous “Continue” for a consequential action.
-5. **Acknowledge.** Report locally saved, applied accepted/rejected, and retained coverage separately. Disabling a button locally helps usability but is not the authority boundary.
+5. **Acknowledge.** Report stored locally, materialized accepted/rejected, retained coverage and finality (when configured) separately. Disabling a button locally helps usability but is not the authority boundary.
 6. **Execute.** Run only the exact approved payload under the declared execution policy. Show waiting, running, and the actual known result.
 7. **Resolve uncertainty.** If an external request may have succeeded but its reply was lost, explain that outcome uncertainty and reconcile before another attempt.
 8. **Retain the record.** Keep proposal identity/version, decision, execution identity, and outcome under the application's access and retention rules.
@@ -48,17 +48,17 @@ Keep the viewer's local decision draft separate from the immutable proposal. Cap
 | Revision | Replace only undecided content with a new version. | Decided proposals need a new action rather than silent amendment. |
 | Cancellation | Implement an explicit state/policy if the task requires it. | A request racing an external effect may arrive too late to undo it. |
 
-The application definition enforces signer authority and proposal version in its command transaction. An action capability with an authoritative clock must enforce real-time expiry; a browser countdown and deterministic event replay do not supply one. Application history selection and recovery do not replace the proposal's semantic version.
+The application definition enforces signer authority and proposal version in its command transaction. An action capability with an authoritative clock must enforce real-time expiry; a browser countdown and deterministic event replay do not supply one. Operation-set replay and closed-time finality do not replace the proposal's semantic version.
 
 ## Use the common application session
 
-Declare proposal queries and commands in the same definition used by the rest of the application. Capture the immutable proposal and its version with `session.query`, then submit the decision with `session.command` under a stable operation ID. The command must check the authenticated author, the exact version and payload digest, and whether the proposal still permits a response. `basedOn` carries the captured application revision; domain checks still belong inside the transaction. The [guarded task example](../run-a-peer-application/snippets/peer-task-board.mjs) demonstrates this definition boundary.
+Declare proposal queries and commands in the same definition used by the rest of the application. Capture the immutable proposal and its version with `session.query`, then submit the decision with `session.command` under a stable operation ID. The command must check the authenticated author, the exact version and payload digest, and whether the proposal still permits a response. The captured application revision records what was reviewed; it is not an order input, so domain checks still belong inside the transaction. The [guarded task example](../run-a-peer-application/snippets/peer-task-board.mjs) demonstrates this definition boundary.
 
 Choose domain states such as pending, approved, rejected, executing, completed, failed and outcome unknown. Cancellation, multiple approvers and escalation are separate domain policies; implement their guards and tests before offering the corresponding controls. Their names are application vocabulary, not built-in runtime methods.
 
 History readers can obtain the application data they are authorized to replicate. A query projection or hidden Approve button does not create a private storage boundary. Keep confidential proposal material in an application whose reader membership and keys fit that audience, and test unauthorized signed commands directly.
 
-An applied decision can be abandoned by explicit application recovery. Neither `applied()` nor `shared()` establishes an irreversible approval boundary. A consequential external action needs an explicitly configured protected checkpoint or independently durable action service with an execution identity bound to the approved bytes. The ordinary host participant does not execute this application workflow. If that stronger capability is absent, show the decision and leave execution unavailable.
+A materialized decision is a provisional result: an earlier arriving operation (for example a revoked approver grant or changed proposal) can revise it, and a configured closed frontier can exclude a delayed offline decision. Neither `materialized()` nor `retained()` establishes an irreversible approval boundary, and `finalized()` is only as strong as the configured policy. A consequential external action needs an explicitly configured protected checkpoint or independently durable action service with an execution identity bound to the approved bytes. The ordinary host participant does not execute this application workflow. If that stronger capability is absent, show the decision and leave execution unavailable.
 
 The [archived reference module](https://github.com/werg/tendriller-contrib/blob/646ceca52c1cd4c164ef3af7c9bddeba3e3df90f/cookbooks/review-exact-proposal/snippets/approval.mjs) records an earlier hosted executor. It is historical policy evidence, not an installable extension for the current host.
 
@@ -84,10 +84,10 @@ A reason field can help the agent revise a rejected proposal, but should not be 
 | The proposal changes between render and click. | The old version cannot approve different content; the reviewer can inspect the difference. |
 | The local clock is wrong or response expiry passes. | The configured action capability's authoritative time policy determines validity and the UI explains the rejection. |
 | Approval is accepted but execution starts after expiry. | The selected execution-start policy is enforced. |
-| An accepted response loses its acknowledgement. | Its original result is recoverable without another decision. |
+| An accepted response loses its acknowledgement. | Its original operation and current outcome are inspectable without another decision. |
 | A downstream timeout occurs after a possible effect. | Uncertainty is recorded and reconciled; no blind duplicate execution occurs. |
 | Completion arrives after cancellation was requested. | The actual result is shown with the cancellation race explained. |
 | A referenced file is replaced. | Execution still uses the approved immutable content or refuses an invalid dependency. |
-| Recovery abandons an applied approval. | Ordinary application work follows the recovery notice; no external action is dispatched from the abandoned projection. |
+| An earlier operation revises or a closed frontier excludes an approval. | The view rederives from a coherent snapshot; no external action is dispatched from a provisional projection. |
 
-The [archived checks](checks/) preserve the former reference's exact-version, owner, expiry, immutable-payload and stable-execution-identity observations. Those results do not qualify the current application or an external action capability. Exercise the real command, recovery and action boundaries for any new implementation; a screenshot or synthetic approval receipt cannot establish them.
+The [archived checks](checks/) preserve the former reference's exact-version, owner, expiry, immutable-payload and stable-execution-identity observations. Those results do not qualify the current application or an external action capability. Exercise the real command, late-arrival and action boundaries for any new implementation; a screenshot or synthetic approval receipt cannot establish them.

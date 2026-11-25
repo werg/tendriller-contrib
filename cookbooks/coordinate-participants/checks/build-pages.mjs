@@ -7,12 +7,13 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-const { values } = parseArgs({ options: { session: { type: 'string' }, core: { type: 'string' },
+const { values } = parseArgs({ options: { session: { type: 'string' }, authority: {type:'string'}, core: { type: 'string' },
   deployment: { type: 'string' }, wasm: { type: 'string' }, output: { type: 'string' } } });
-for (const name of ['session', 'core', 'deployment', 'output']) assert.ok(values[name], `Required: --${name} /exact/path`);
+for (const name of ['session', 'authority','core', 'deployment', 'output']) assert.ok(values[name], `Required: --${name} /exact/path`);
 const here = dirname(fileURLToPath(import.meta.url)), session = resolve(values.session), core = resolve(values.core),
-  deployment = resolve(values.deployment), output = resolve(values.output);
+  authority=resolve(values.authority), deployment = resolve(values.deployment), output = resolve(values.output);
 const sessionMetadata = JSON.parse(readFileSync(join(session, 'package.json'), 'utf8'));
+const authorityMetadata=JSON.parse(readFileSync(join(authority,'package.json'),'utf8'));assert.equal(authorityMetadata.name,'@chronolog/authority');
 const coreMetadata = JSON.parse(readFileSync(join(core, 'package.json'), 'utf8'));
 assert.equal(sessionMetadata.name, '@chronolog/peer-session'); assert.equal(coreMetadata.name, '@tendriller/core');
 assert.ok(coreMetadata.exports['./collaboration'], 'The public SDK must export collaboration');
@@ -25,13 +26,20 @@ for (const [name, digest] of Object.entries(proof.sha256)) {
   assert.ok(scoped && !isAbsolute(scoped) && scoped !== '..' && !scoped.startsWith(`..${sep}`));
   assert.equal(hash(readFileSync(file)), digest, `Session artifact changed: ${name}`);
 }
+const authorityProof=JSON.parse(readFileSync(join(authority,'provenance.json'),'utf8'));
+assert.equal(authorityProof.format,'chronolog-authority-package/v1');assert.equal(authorityProof.profile,'chronolog-crdt-v1');assert.equal(authorityProof.dirty,false);
+assert.equal(authorityProof.source,proof.source);assert.equal(authorityProof.sourceTree,proof.sourceTree);
+for(const [name,digest] of Object.entries(authorityProof.sha256)){
+  const file=resolve(authority,name),scoped=relative(authority,file);assert.ok(scoped&&!isAbsolute(scoped)&&scoped!=='..'&&!scoped.startsWith(`..${sep}`));
+  assert.equal(hash(readFileSync(file)),digest,`Authority artifact changed: ${name}`);
+}
 const customBootstrap = existsSync(join(deployment, 'bootstrap.mjs'));
 if (!customBootstrap) {
   assert.ok(values.wasm, 'The supplied bootstrap templates require --wasm /exact/browser-engine');
   const config = JSON.parse(readFileSync(join(deployment, 'configuration.json'), 'utf8'));
   assert.match(config.applicationId, /^[a-f0-9]{64}$/u);
-  assert.equal(config.descriptor?.payload?.applicationId, config.applicationId);
-  assert.equal(config.schema?.payload?.applicationId, config.applicationId);
+  assert.match(config.executionManifestDigest,/^[a-f0-9]{64}$/u);
+  assert.equal(Object.hasOwn(config,'schema'),false,'Application DDL is an ordinary root-authored transaction');
   assert.ok(Array.isArray(config.administrators) && config.administrators.length > 0);
   for (const signer of config.administrators) assert.match(signer, /^[a-f0-9]{64}$/u);
   assert.match(config.profileId, /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u);
@@ -47,7 +55,7 @@ if (values.wasm) {
   engine = { manifest, directory: wasm };
 }
 for (const source of [here, resolve(here, '../page'), resolve(here, '../snippets'),
-  resolve(here, '../../share-live-signals/snippets'), session, core, deployment, ...(engine ? [engine.directory] : [])]) {
+  resolve(here, '../../share-live-signals/snippets'), session, authority,core, deployment, ...(engine ? [engine.directory] : [])]) {
   const scoped = relative(source, output);
   assert.ok(scoped === '..' || scoped.startsWith(`..${sep}`) || isAbsolute(scoped), 'Output must be outside its source trees');
 }
@@ -57,9 +65,10 @@ mkdirSync(dirname(output), { recursive: true });
 mkdirSync(output);
 cpSync(join(here, '../page'), output, { recursive: true, dereference: false });
 cpSync(session, join(output, 'peer-session'), { recursive: true, dereference: false });
+cpSync(authority,join(output,'authority'),{recursive:true,dereference:false});
 cpSync(core, join(output, 'core'), { recursive: true, dereference: false });
 cpSync(deployment, join(output, 'deployment'), { recursive: true, dereference: false });
-if (!customBootstrap) for (const name of ['bootstrap.mjs', 'worker.mjs', 'review-workspace.mjs'])
+if (!customBootstrap) for (const name of ['bootstrap.mjs','bootstrap-authority.mjs', 'worker.mjs', 'review-workspace.mjs'])
   cpSync(join(here, '../snippets', name), join(output, 'deployment', name));
 if (engine) {
   mkdirSync(join(output, 'engine'));
@@ -70,12 +79,13 @@ mkdirSync(join(output, 'domain'));
 writeFileSync(join(output, 'domain/review-workspace.mjs'), readFileSync(join(here, '../snippets/review-workspace.mjs')));
 writeFileSync(join(output, 'domain/live-run.mjs'), readFileSync(join(here, '../../share-live-signals/snippets/live-run.mjs')));
 const packages = new Map([['@chronolog/peer-session', { directory: 'peer-session', metadata: sessionMetadata }],
+  ['@chronolog/authority',{directory:'authority',metadata:authorityMetadata}],
   ['@tendriller/core', { directory: 'core', metadata: coreMetadata }]]);
 for (const path of walk(output).filter(path => path.endsWith('.mjs'))) {
   const original = readFileSync(path, 'utf8');
   const compiled = rewriteModuleSpecifiers(original, specifier => {
-    if (!/^@(?:chronolog\/peer-session|tendriller\/core)(?:\/|$)/u.test(specifier)) return specifier;
-    const packageName = specifier.startsWith('@chronolog/peer-session') ? '@chronolog/peer-session' : '@tendriller/core';
+    if (!/^@(?:chronolog\/(?:peer-session|authority)|tendriller\/core)(?:\/|$)/u.test(specifier)) return specifier;
+    const packageName=[...packages.keys()].find(name=>specifier===name||specifier.startsWith(name+'/'));assert.ok(packageName);
     const selected = packages.get(packageName), key = specifier === packageName ? '.' : `.${specifier.slice(packageName.length)}`;
     const declaration = selected.metadata.exports[key], exported = typeof declaration === 'string' ? declaration : declaration?.import;
     assert.equal(typeof exported, 'string', `No public browser implementation for ${specifier}`);
@@ -90,8 +100,9 @@ for (const path of walk(output).filter(path => path.endsWith('.mjs'))) {
   if (compiled !== original) writeFileSync(path, compiled);
 }
 const files = walk(output).map(path => ({ path: relative(output, path).split(sep).join('/'), sha256: hash(readFileSync(path)) }));
-writeFileSync(join(output, 'specimen-manifest.json'), `${JSON.stringify({ format: 'collaboration-pages/v1',
+writeFileSync(join(output, 'specimen-manifest.json'), `${JSON.stringify({ format: 'collaboration-authored-pages/v1',
   entries: ['board.html', 'discussion.html'], session: { version: sessionMetadata.version, source: proof.source, sourceTree: proof.sourceTree },
+  authorityPackage:{version:authorityMetadata.version,source:authorityProof.source,sourceTree:authorityProof.sourceTree},
   core: { version: coreMetadata.version, sourceEvidence: 'provided-public-package-directory' },
   ...(engine ? { wasm: { sha256: engine.manifest.wasmSha256, toolchain: engine.manifest.toolchain } } : {}),
   bootstrap: customBootstrap ? 'supplied deployment module' : 'reference authenticated host bootstrap',

@@ -34,18 +34,20 @@ export const createProfile = () => createBrowserIdentity(ownerOptions);
 /** The owner supplies its currently verified local authority. Roster refresh does
  * not call the control host; publication labels remain descriptive. */
 export async function readParticipants(session) {
-  const authority = await verifyAuthorityBundle(await session.authority(), configuration.descriptor);
+  const authority = await session.readAuthority();
+  await verifyAuthorityBundle(authority);
+  if (authority.descriptor.payload.applicationId !== configuration.applicationId) throw Error('Wrong application scope');
   const endpoints = await session.endpoints();
-  return authority.control.payload.grants.filter(grant => grant.reader).flatMap(grant => {
+  return authority.memberships.at(-1).payload.members.filter(grant => grant.reader).flatMap(grant => {
     const label = configuration.participants?.[grant.publicKey] ?? {};
     const common = { deviceId: grant.publicKey, canRead: true, authorized: grant.writer === true, revoked: false,
       kind: label.kind === 'agent' ? 'agent' : 'person', label: label.label ?? `Signer ${grant.publicKey.slice(0, 8)}`,
       deviceLabel: label.deviceLabel ?? 'Enrolled device', route: label.route ?? 'unknown',
       identityEvidence: 'authenticated-signer', labelEvidence: 'publication-description',
       applicationAdministrator: configuration.administrators.includes(grant.publicKey),
-      capabilities: ['review'], controlRevision: authority.control.payload.revision };
-    if (grant.publicKey !== session.deviceId) return [common];
-    return endpoints.map(endpoint => ({ ...common, endpoint: { ...endpoint, deviceId: session.deviceId },
+      capabilities: ['review'], controlRevision: authority.memberships.at(-1).payload.revision };
+    if (grant.publicKey !== session.identity.publicKey) return [common];
+    return endpoints.map(endpoint => ({ ...common, endpoint: { ...endpoint, deviceId: session.identity.publicKey },
       viewLabel: endpoint.context.documentPath ?? 'Local view',
       presence: { phase: endpoint.state, expiresAt: Date.now() + 30_000 } }));
   });

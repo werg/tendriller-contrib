@@ -1,8 +1,8 @@
 // Domain policy only. Core owns its guarded schema, command vocabulary and clients.
 import { createCollaborationDefinition, createCollaborationClient } from '@tendriller/core/collaboration';
 
-export function reviewWorkspace({ administrators }) {
-  return createCollaborationDefinition({ id: 'independent-review-workspace', version: '1', administrators,
+export function reviewWorkspace({ administrators, members = [] }) {
+  return createCollaborationDefinition({ id: 'independent-review-workspace', version: '1', administrators, members,
     limits: { slots: 8, activeClaimsPerSigner: 4, payloadBytes: 8192 } });
 }
 

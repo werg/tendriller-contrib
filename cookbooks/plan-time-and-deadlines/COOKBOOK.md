@@ -55,11 +55,11 @@ Choose calendar semantics in the domain: a named time zone, interval versus wall
 
 A late reminder may still be useful, may coalesce several missed occurrences or may be skipped. Define the policy and record what happened without treating missing observation as task completion. A foreground timeout is suitable only when the promise explicitly ends with the active page.
 
-Provider acceptance does not prove display or reading. Notifications can repeat after uncertain delivery, and unavailable delivery must leave the underlying task discoverable. Preserve the external action's stable identity and use its actual reconciliation support. An ordinary applied occurrence can be abandoned by history recovery; irreversible external work requires the selected protected boundary rather than automatic replay.
+Provider acceptance does not prove display or reading. Notifications can repeat after uncertain delivery, and unavailable delivery must leave the underlying task discoverable. Preserve the external action's stable identity and use its actual reconciliation support. An ordinary materialized occurrence is revisable when an earlier operation arrives, and a configured closed frontier can exclude late offline work; irreversible external work requires the selected protected boundary rather than automatic replay.
 
 ## Reschedule without conflicting intent
 
-Capture the current schedule domain version with a coherent query. A schedule-change command validates the authenticated author, reviewed version and proposed rule before updating the domain record. `basedOn` retains application ordering; it does not replace the schedule guard. Use a stable operation ID, exact retry and journal inspection after a lost reply.
+Capture the current schedule domain version with a coherent query. A schedule-change command validates the authenticated author, reviewed version and proposed rule before updating the domain record. The captured revision records what was reviewed and is not an order input; it does not replace the schedule guard. Use a stable operation ID, exact retry and journal inspection after a lost reply.
 
 If the actual scheduler has separate state, confirm its accepted update and current schedule before claiming a reminder changed. Show partial progress explicitly. A rejected old operation cannot become a newly reviewed schedule merely because a quota, date or version changed. A future correction needs a new operation after review.
 
@@ -81,7 +81,7 @@ Use distinct states for no deadline, scheduled, overdue, completed late, cancell
 | A repeat is missed during service unavailability. | The selected `fire_once` or `skip` policy and history explain the result. |
 | Task saving succeeds but reminder creation fails. | The UI reports both outcomes and offers a deliberate scheduling recovery. |
 | A creation commits but its reply is lost, then the page reloads. | The persisted pending command keeps its CID and exact body; replay returns one timer, and the UI refreshes the current schedule. |
-| A timer-slot or lifetime rejection is lost, then capacity or lifetime improves. | The original CID recovers the original rejection; only a newly reviewed command can schedule the reminder. |
+| A timer-slot or lifetime rejection is lost, then capacity or lifetime improves. | The original CID resumes the original proposal and its current outcome; only a newly reviewed command can schedule the reminder. |
 | A queued cancellation is shown while offline. | It is labelled awaiting service; local mute works, and the UI does not claim the server timer stopped. |
 | A deadline is moved after a push request was accepted. | Current task state is authoritative and any stale notice is understandable. |
 | Two editors submit changes from the same timer revision. | One revision wins; the stale command is rejected without changing the winner or cancelling its pending notifications. |

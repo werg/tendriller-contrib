@@ -23,7 +23,7 @@ a native participant does not add a wake API to the surrounding chat host.
 
 ## Design the person's delivery experience first
 
-For a maintenance page, a person might send a question, return to their task, and come back when an answer is ready. Separate the states they can reasonably rely on: composing, queued on this device, applied in the selected application history, awaiting an agent, answered, and unable to deliver. “Sent” must not imply “read” or “finished.” A delayed reply should remain attached to the original request even if the user has moved to another task.
+For a maintenance page, a person might send a question, return to their task, and come back when an answer is ready. Separate the states they can reasonably rely on: composing, stored on this device, materialized as accepted in the current operation-set replay, awaiting an agent, answered, and unable to deliver. “Sent” must not imply “read” or “finished.” A delayed reply should remain attached to the original request even if the user has moved to another task.
 
 Provide a compact delivery panel with the last verified connection time, unresolved requests, and a recovery action. Keep private host session IDs and credentials out of that panel. When the receiver is unavailable, preserve accepted work and explain whether it will be retried, checked on a schedule, or requires reconnection. Do not make people resubmit because the agent is slow; duplicate requests create uncertainty about intent.
 
@@ -64,7 +64,7 @@ Process batches in order under the selected consumer policy. Advance the handled
 
 External side effects need their own deduplication or reconciliation. If a worker crashes after an external action but before acknowledgement, first find the action's authoritative result. Blindly repeating it is unsafe, while marking it handled without evidence loses the request. A durable Tendriller receipt does not make another system exactly once. A chart checkpoint is unrelated to this consumer acknowledgement.
 
-Use the maintained application/effect journal and actual device ownership rules for concurrent or restarted agents. Do not let multiple uncoordinated processes overwrite a handled position or invent a second checkpoint file beside the session. Recovery notices can abandon applied events: reversible computation may follow a declared rerun policy, while irreversible work requires an explicit protected checkpoint or independently durable action capability. The pinned sources record historical origins, not an alternate active bridge implementation.
+Use the maintained application/effect journal and actual device ownership rules for concurrent or restarted agents. Do not let multiple uncoordinated processes overwrite a handled position or invent a second checkpoint file beside the session. A late earlier operation can revise a materialized event, and a configured closed frontier can exclude a delayed one: reversible computation may follow a declared rederive policy, while irreversible work requires an explicit protected checkpoint or independently durable action capability. The pinned sources record historical origins, not an alternate active bridge implementation.
 
 ## Recover and retire visibly
 

@@ -107,22 +107,22 @@ checked account access, selected source and event consent, persisted the
 caller-owned operation before sending, and sent static instructions with
 identifiers rather than the question. Its conversation key was scoped to the
 configured channel, exact issuer/subject and application. After asynchronous
-authorization, it reread the selected source and checked the same selected
-generation synchronously immediately before provider egress. Already-started
-external I/O cannot be retracted by a later recovery. Exact retries retain
+authorization, it reread the selected source and checked the same source
+revision synchronously immediately before provider egress. Already-started
+external I/O cannot be retracted by a later revision of the materialized request. Exact retries retain
 the original body and idempotency key. The bounded journal preserves accepted
-receipts, including late receipts after recovery, without treating them as a
+receipts, including late receipts after a later revision, without treating them as a
 current request or a signed application answer. Test this route with a real
 published channel before promising unattended completion.
 
 ## Put the trust boundaries in the implementation
 
 The ordinary Tendriller host remains the filtered participant for account
-access, signed controls, publication and peer introductions. It is not an
+access, signed authority metadata, publication and peer introductions. It is not an
 application execution engine or private history reader. Run the optional remote
 integration as an explicitly enrolled native participant with its own signer
 and persistent device store. Reuse the public native bootstrap and the existing
-direct/relay introductions; do not add another coordinator-election policy.
+direct/relay introductions; do not add another ordering or coordinator policy.
 
 Keep these decisions separate:
 
@@ -198,7 +198,8 @@ terminal `participant_replaced` or `approval_changed` disconnect; inspect the
 current participant and approval first.
 A failed batch may have delivered some events before checkpoint persistence;
 restarted forwarding can repeat them. Receivers must deduplicate stable source
-identities within the selected generation rather than assume exactly-once delivery.
+identities and proposal IDs, replacing or retracting by stable event identity
+when a revision changes them, rather than assume exactly-once delivery.
 
 In the published callback contract, `onSkipped` is synchronous: returning a
 Promise does not make the helper await it. A synchronous durable recorder must
@@ -238,7 +239,7 @@ The specimen follows this user-visible sequence:
    one durable pending slot under an exclusive Web Lock, then submits
    `requestAssistance` using that original operation ID. Another tab cannot
    overwrite the retained command.
-2. A coherent selected-history read produces the request event. The allowlisted
+2. A coherent materialized snapshot read produces the request event. The allowlisted
    projection emits a small `assistant.help_requested` notification containing
    the request identifier and category. It omits the question and media.
 3. A matching active subscription receives one signed envelope. The journal
@@ -248,7 +249,7 @@ The specimen follows this user-visible sequence:
    context, step, expiry and conflicts, then submits `reply_to_assistance` with a
    caller-owned stable operation ID. This becomes a normal signed application
    command from the enrolled bridge.
-5. The page sees `session.changes()`, rereads the selected history and displays
+5. The page sees `session.changes()`, rereads a coherent snapshot and displays
    the correlated answer. A changed step remains visibly stale. The person can
    inspect conflicts; no response automatically changes stock or buys anything.
 6. If no subscriber is active, the request remains visible and the person can
@@ -258,9 +259,8 @@ The specimen follows this user-visible sequence:
 The page reads the latest 20 compact request summaries and exposes a separate
 `assistanceStatus` read for the full question and canonical answer, including an
 older request entered by ID. Bounded reply/conflict lists retain counts and
-truncation flags; omitted history is not silently resolved. For an abandoned or
-`needsReapply` operation, an explicit review can release its pending slot while
-retaining the original reference. It never automatically submits replacement
+truncation flags; omitted history is not silently resolved. For an operation excluded by a configured closed frontier, an explicit review can
+release its pending slot while retaining the original reference. It never automatically submits replacement
 work. A stale acknowledgment only clears the exact operation it inspected.
 If the released-reference list is full, download it from **Released operation
 references**, select that file to verify and clear its matching entries, then
@@ -286,14 +286,14 @@ and real transaction guards. A read followed by a command can race.
 | The intended client requires unsupported registration or identity features | Exact redirects, issuer/resource checks and current authority | Choose a client supported by the selected service and its exact advertised MCP resource; otherwise use authorized on-demand tools or manual handoff to a supported client. Preserve issuer, redirect, resource checks and device grants |
 | Local preflight passes but online preflight fails | The private stores, signing keys and actual application mapping | Check the selected service's deployment readiness, approved assistant proposal, current enrollment and participant availability; local readiness does not prove remote readiness |
 | The bridge is not enrolled, or its grant was revoked | The explicit owner decision | Obtain verified enrollment or restore permitted access; do not borrow a browser signer |
-| No retained authorized peer has the selected history | The pending request and original operation ID | Restore a retained participant; show offline/unavailable rather than claiming delivery |
+| No retained authorized peer has the operation | The pending request and original operation ID | The device keeps it stored locally. Restore a retained participant for peer delivery; show offline/unavailable rather than claiming delivery |
 | No active Events subscription, or unsupported client | The application request | Use on-demand tools, the mounted card, or the manual reference handoff |
 | A webhook was accepted but no answer appeared | Delivery ID and application request | Inspect callback receipt and current request; an asynchronous assistant run may still be pending |
 | A command timed out | Exact saved input, operation ID and signed attempt | Inspect the original operation, then retry it exactly; do not generate a new domain attempt |
 | Web Locks or durable browser storage are unavailable | The unsent question and any retained operation | Use a compatible browser or authorized native participant; do not bypass durable reservation before sending |
-| An abandoned operation blocks the next request | Its signed attempt and original input | Explicitly review and release that terminal reference, then deliberately start new work if still needed |
-| Enrollment became obsolete before it ever committed | The original signed request and current verified authority | Review a replacement with the exact key/grants/prefix, then approve its digest; do not silently replace a historical request |
-| Recovery excluded the source request or reply | Delivery journal and loss/recovery evidence | Reread selected history, display the loss, and require deliberate reapplication if still wanted |
+| A finality-excluded operation blocks the next request | Its signed proposal and original input | Explicitly review and release that terminal reference, then deliberately start new work if still needed |
+| Enrollment became obsolete before it ever committed | The original signed request and current verified authority | Review a replacement with the exact key and grants, then approve its digest; do not silently replace a historical request |
+| A closed frontier excluded the source request or reply | Delivery journal and exclusion evidence | Reread a coherent snapshot, display the exclusion, and require a deliberate new reviewed operation if still wanted; never silently retimestamp it |
 | An answer refers to an earlier cooking step | Original request and response provenance | Keep the response labeled stale; ask again only as a new deliberate task |
 | The card is unmounted or message outcome is uncertain | Existing conversation and request | Use normal tool calls or inspect the chat before sending another message |
 | A Workspace trigger timed out or its run completed without a reply | Original operation, idempotency key and provider receipt | Inspect the configured receiver's retained run/delivery receipt and query current application status through authorized tools; retry only the original request when permitted and verify its write-back access. The hosted endpoint does not promise the historical adapter's run-inspection tool |
@@ -303,8 +303,8 @@ and real transaction guards. A read followed by a command can race.
 The native fallback can use the existing public
 `createApplicationTools(session)` or `serveApplicationToolLines(...)` facade,
 which exposes declared query, command, operation, wait and exact-retry semantics.
-Do not copy every local tool into the remote model allowlist: explicit takeover,
-recovery, reapplication, role management and publication have separate trust
+Do not copy every local tool into the remote model allowlist: finalizer signing,
+role management, key provisioning and publication have separate trust
 requirements. A tool listing is a capability description, not a grant.
 
 For a custom application domain, use the current native bootstrap and hosted
@@ -315,10 +315,10 @@ for the current hosted contract.
 
 ## Verify the whole journey and its failures
 
-The Worker integration tests exercise the actual page relay and selected
-Chronolog history through a read, an authenticated wake, signed callback
+The Worker integration tests exercise the actual page relay and a materialized
+Chronolog snapshot through a read, an authenticated wake, signed callback
 delivery, object eviction, retry with the original delivery ID, and a signed
-reply observed by the coordinator. The callback receiver supplies a scripted
+reply observed by the page. The callback receiver supplies a scripted
 response; keep live subscribed-chat runs recorded as separate evidence.
 
 Exercise the application with two real devices before claiming a connected

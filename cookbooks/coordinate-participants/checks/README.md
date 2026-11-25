@@ -1,14 +1,14 @@
 # Independent collaboration checks
 
-The consumer installs `@chronolog/peer-session` and `@tendriller/core` archives in
+The consumer installs `@chronolog/peer-session`, standalone `@chronolog/authority` and `@tendriller/core` archives in
 an empty directory and imports only their declared public exports. The native SQL
 engine must be included in the Chronolog archive. Source files from a sibling
 checkout are not a substitute for either package.
 
-The native and browser runners below exercise the 31-observation native run, both
-16-observation authored browser journeys, and all seven peer transport/domain gates.
-Retain each run's original reports and composition records; later source changes
-require their own qualification.
+The authored-operation source port is **not yet qualified** against a fresh public
+archive/engine composition. Historical selected-history reports are rejected, not
+renamed. Run the replacement native and browser gates with the exact new tuple;
+source-level validator tests alone do not qualify SQL, replication or OPFS.
 
 Run the report validator tests with `npm test`. The full runtime entry point is
 `npm run test:collaboration`, with exact archive paths and core provenance:
@@ -16,6 +16,7 @@ Run the report validator tests with `npm test`. The full runtime entry point is
 ```sh
 npm run test:collaboration -- \
   --session-artifact /exact/chronolog-peer-session.tgz \
+  --authority-artifact /exact/chronolog-authority.tgz \
   --core-artifact /exact/tendriller-sdk.tgz \
   --core-provenance /exact/provenance.json \
   --output /new/evidence-directory
@@ -25,10 +26,10 @@ The output is immutable evidence for that source tuple: archive and fixture
 digests, source commits/trees, runtime and engine identity, the complete six-role
 journey and an eight-signer scale profile with 32 simultaneous real MessagePort
 attachments. It includes guarded work/result races, raw SQL and DDL bypass
-attempts, independently executed evidence/clarity policies, generation recovery
-and retained operation evidence. The lineage gates reject a borrowed attempt ID,
+attempts, independently executed evidence/clarity policies, independent offline authoring, late-earlier claim outcome revision, optional-finality
+facts and retained original proposals. The lineage gates reject a borrowed proposal ID,
 ignore body-supplied operation references and trace actual signed request, claim,
-result and message attempts. The authority gate reads verified current grants
+result and message proposals. The authority gate reads verified current grants
 through the owner without a host transport and checks that returned objects cannot
 mutate owner state. Captured-read scope probes use real owner attachments:
 events-only and named-query-only consumers cannot read raw SQL, while an
@@ -57,7 +58,7 @@ deployed relay quotas or a real conversational provider. Their report flags rema
 false. The companion repository browser and gateway tests exercise their own
 boundaries; link exact results when publishing a release tuple.
 
-The native report measures command-to-applied, synchronization, concurrent view
+The native report measures command-to-materialized, synchronization, concurrent view
 query and retained-store reopen times, with sample counts and p50/p95 values. It
 records process RSS, sampled heap/external memory, CPU time, the exact grants and
 the observed stream-quota rejection. These are eight retained signers in one
@@ -76,16 +77,17 @@ production deployment graph.
 ```sh
 npm run test:collaboration:browser -- \
   --session-artifact /exact/chronolog-peer-session-with-native-and-browser-sql.tgz \
+  --authority-artifact /exact/chronolog-authority.tgz \
   --core-artifact /exact/tendriller-sdk.tgz \
   --core-provenance /exact/provenance.json \
   --wasm /exact/matching-browser-engine \
   --output /new/browser-evidence-directory
 ```
 
-Both automatic capability selection and the explicitly elected Worker route must
+Both automatic capability selection and the explicitly elected Worker route, each in fresh desktop and 320px phone profiles, must
 preserve independent drafts and operation references, keep focus and selection through another view's update,
 complete an addressed request, explicitly reassign an old endpoint's claim,
-accept a contribution and synthesis, and retain the selected history after
+accept a contribution and synthesis, and retain the captured projection after
 detachment or owner exit. Browser storage uses the actual OPFS SQL/WASM engine.
 Screenshots and exact test dependency locks accompany the observations.
 Physical owner fencing has a separate observation bound: 15 seconds of owner
@@ -102,8 +104,9 @@ nineteen messages. It browses bounded continuations, writes from the companion
 document, keeps the captured pages coherent, explicitly refreshes, and checks
 that independent unsent drafts survive. This qualifies the authored paging flow;
 larger retained-history tests live with the maintained domain implementation.
-The expanded two-mode workload has a twenty-minute process deadline for both
-sequential journeys. Individual browser interactions and seed commands retain
+The four fresh-profile mode/viewport journeys have a forty-minute process deadline.
+Each proves a locally stored/materialized write with network access disabled and
+explicit `FINALITY_UNSUPPORTED` under the configured none policy. Individual browser interactions and seed commands retain
 their thirty-second deadlines; the aggregate allowance is not a runtime
 performance promise.
 When a process deadline fails, the report preserves both its underlying browser
@@ -146,8 +149,8 @@ public values. The builder supplies the [page bootstrap](../snippets/bootstrap.m
 | `page_url` | The actual enrolled application publication URL |
 | `applicationId` | The stable 64-character application ID in the signed descriptor |
 | `profileId` | The retained browser profile name; never a new random value on reload |
-| `descriptor` | The signed application descriptor pinned by enrollment |
-| `schema` | The signed SQL schema prepared from `reviewWorkspace` with these administrators |
+| `executionManifestDigest` | The pinned deterministic engine/platform manifest; it does not freeze application DDL |
+| `members` | Explicit initial per-signer table INSERT grants, separate from crypto enrollment |
 | `administrators` | Exact signing IDs used when creating the immutable collaboration definition |
 | `engineBaseUrl` | `../engine/`, pointing to the exact engine copied into this graph |
 | `participants` | Optional map from actual signer to descriptive `label`, `kind`, `deviceLabel` and `route`; no permission is derived from it |
@@ -159,8 +162,8 @@ signer. The Worker uses public authenticated control and relay introductions and
 keeps its transport alive independently of either page's RPC attachment.
 `serveBrowserOwner({ load })` installs its attachment listeners before waiting for
 configuration, so an early Worker boot event cannot disappear during a fetch.
-The page refreshes eligibility from `session.authority()`, the owner's verified
-local signed control bundle; refreshing the roster does not call the host.
+The page refreshes eligibility from `session.readAuthority()`, the owner's verified
+local authenticated membership bundle; refreshing the roster does not call the host.
 
 An alternative deployment directory may supply a real `bootstrap.mjs` exporting:
 
@@ -182,6 +185,7 @@ The native SQL archive used for conformance is not the browser engine capability
 ```sh
 node cookbooks/coordinate-participants/checks/build-pages.mjs \
   --session /exact/extracted/browser-sql-peer-session \
+  --authority /exact/extracted/chronolog-authority \
   --core /exact/extracted/tendriller-sdk \
   --deployment /reviewed/configuration-directory \
   --wasm /exact/matching-browser-engine \
@@ -191,8 +195,8 @@ node cookbooks/coordinate-participants/checks/build-pages.mjs \
 The builder resolves only public package exports, checks session content hashes,
 rejects symbolic links and writes a manifest for every final file. Supply the
 resulting graph to the normal signed publication workflow. An entry-specific UI
-publication cannot replace the immutable application definition. Use fresh test
-applications or a separately reviewed data migration.
+publication cannot replace the immutable application definition. Apply later authorized DDL through the ordinary transaction path; publication
+is not a database schema change and there is no old-format migration reader.
 
 ## Run the two reference reviewers
 
@@ -222,6 +226,6 @@ a competing signer or retries attachment as independent enrollment. It claims
 only eligible frozen slots, rereads the current fence before computation and
 result submission, emits disposable signed progress and writes full operation
 references to its output. Interrupting the process detaches its client. An old
-active claim needs explicit reassignment or generation revalidation before a
+active claim needs explicit reviewed reassignment when a different endpoint continues it before a
 new run can continue. Replacing these policies with provider I/O also requires
 the maintained effect journal and an explicit reconciliation policy.

@@ -25,9 +25,9 @@ Use one owned application session for commands, queries, events and operation in
 2. **Start a draft.** Capture the stable record ID, reviewed values and domain version together. Keep that snapshot separate from later typing.
 3. **Edit.** Preserve the focused input while updates arrive. Show relevant changes without replacing the local draft.
 4. **Submit.** Assign an operation ID to one immutable edit snapshot, retain its captured revision, and call the definition's declared command.
-5. **Accept or reconcile.** Await `applied()` and inspect the accepted or rejected outcome. Show the reviewed, current and proposed values when a guard fails.
+5. **Accept or reconcile.** Await `materialized()` and inspect the current accepted or rejected outcome. Show the reviewed, current and proposed values when a guard fails.
 6. **Continue.** A late outcome updates its own pending card; it does not clear a newer draft.
-7. **Return or recover.** Inspect the maintained operation journal. Retry the original saved operation, or deliberately reapply abandoned intent after reviewing the selected history.
+7. **Return and rederive.** Inspect the original operation and current snapshot. Retry its exact signed proposal; make a new reviewed decision only when intended.
 
 A dense table, mobile item editor and append-only notebook can share this contract without sharing a renderer or schema.
 
@@ -56,13 +56,13 @@ const operation = await session.command('changeQuantity', {
   itemId,
   expectedVersion: original.version,
   quantity: submittedQuantity,
-}, { operationId, basedOn: reviewed.revision });
-const receipt = await operation.applied();
+}, { operationId });
+const receipt = await operation.materialized();
 ```
 
-These query and command names are application definitions, not built-in methods. The captured `basedOn` revision is an ordering prerequisite. It does not itself assert that the item is unchanged: `expectedVersion` must be checked inside `changeQuantity`. A definition choosing independent field edits can instead guard the relevant values and deletion flag. A quantity/price constraint must check every calculation input and commit all outputs together.
+These query and command names are application definitions, not built-in methods. The captured revision identifies what the person reviewed; it is not an extra operation-order input or an atomic item guard: `expectedVersion` must be checked inside `changeQuantity`. A definition choosing independent field edits can instead guard the relevant values and deletion flag. A quantity/price constraint must check every calculation input and commit all outputs together.
 
-`applied()` reports execution in the selected history; `shared()` observes retained coverage separately. Explicit recovery can abandon an applied suffix. Follow `session.changes` to refresh the projection and the operation journal to explain affected attempts. `session.retry(operationId)` preserves the original signed attempt and its meaning. A stored rejection does not become a new accepted edit when the field later changes; a new decision needs new reviewed intent. An abandoned operation requires deliberate reapplication linked to its original attempt.
+`materialized()` reports the current revisable result; `retained()` observes independent storage separately and `finalized()` requires configured proof. Follow `session.changes()` to invalidate and rederive coherent snapshots and operation inspectors. `session.operations.retry(operationId)` preserves the exact signed intent. A later-in-author-time field change does not move that original proposal forward; a late earlier fact can legitimately change its result. A new decision has new reviewed intent and identity.
 
 ## Separate identity, order, and visibility
 
@@ -78,7 +78,7 @@ Filtering and completed-item hiding are view choices. An item that leaves the vi
 
 Show enough context to resolve meaning: record title, changed field, old accepted value, current accepted value, local proposal, and relevant update attribution if appropriate. Avoid a raw JSON conflict as the only interface. For text, a side-by-side comparison may be safer than a complex automatic merge. For a quantity, an explicit numeric choice is usually clearer.
 
-Distinguish retry from a new decision. The session retains the original command ID, signed attempt and domain inputs across interruption. Applied outcomes belong to the selected history: retry does not reevaluate rejected intent as a newly authored command. Choosing a merged value creates new intent after reading current authority. Never silently refresh a stale domain version or replace an abandoned operation. Query current authorized state for comparison and use the definition's bounded rejection details.
+Distinguish retry from a new decision. The session retains the original command ID, signed attempt and domain inputs across interruption. Materialized outcomes belong to an exact revision and may change after earlier facts arrive; retry does not reevaluate the intent at a new author time. Choosing a merged value creates new intent after reading current authority. Never silently refresh a stale domain version or silently replace a finality-excluded operation. Query current authorized state for comparison and use the definition's bounded rejection details.
 
 If two people repeatedly conflict, offer a lightweight editing indication or an explicit claim policy when it helps. Presence is advisory unless an actual authoritative lock exists. A label saying “Sam is editing” cannot guarantee exclusion, and a disconnected editor needs a defined expiry or release policy. Avoid locking an entire collection when only one record needs coordinated work.
 
@@ -97,10 +97,10 @@ Export current records with their IDs and relevant revision/provenance fields. I
 | A quantity changes away and back before submission. | A field-value guard and a record-version guard follow their deliberately different policies. |
 | An item is reordered while its edit is pending. | The edit affects the same stable ID and the receipt identifies it. |
 | Another writer deletes the edited item. | A stale edit does not resurrect it; recovery requires an intentional action. |
-| The domain round closes or application recovery replaces history while one device is offline. | Original intent remains inspectable; stale domain work rejects and abandoned history requires reviewed reapplication. |
+| An earlier operation changes a guard or schema while one device is offline. | Reconnection recomputes current outcomes; the original intent and newer draft remain inspectable. Configured closed-time exclusion is distinct. |
 | An acknowledgement is lost. | Retrying recovers the original outcome without adding a duplicate item. |
 | A command is saved locally before connectivity returns. | The draft remains visible as pending; shared state does not claim the proposed value is accepted. |
-| A rejected predicate later becomes true. | Delivery of the old command retains its original rejection; a reviewed new save is separate intent. |
+| A rejected predicate becomes true. | A later-in-author-time change cannot retimestamp the old command; an earlier arriving predecessor can revise its original outcome. A reviewed new save is separate intent. |
 | A late rejection arrives after further typing. | The submitted snapshot and current draft remain separately recoverable. |
 | An accepted edit removes the item from the active filter. | The person sees a meaningful saved receipt and can locate the result. |
 

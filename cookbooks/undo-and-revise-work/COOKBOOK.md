@@ -26,11 +26,11 @@ Use this when people need to correct mistakes, explore alternatives, or understa
 
 Tendriller has no default application-wide undo policy. The application definition supplies guarded commands and retained domain history through one session; it chooses which inverse is meaningful. Reading this guide installs neither history nor compensation. A command retry repeats the original intent; it is not undo. A task reset is not an all-purpose history rewind.
 
-## Separate recovery from user Undo
+## Separate late-operation revision from user Undo
 
-Explicit application recovery selects a complete retained prefix and can abandon a recent suffix, including applied work. The session publishes a recovery notice; the page replaces its coherent projection while preserving drafts and the original operation references. Adopted outcomes remain identifiable and abandoned attempts remain inspectable. Recovery does not invent new user intent.
+The operation set is a union ordered by signed author time, so an operation that arrives late with an earlier time can change later provisional outcomes, with no recovery step. `session.changes()` reports the revision and revised proposal IDs. The page rederives a coherent projection while preserving drafts and the original operation references. Outcomes stay identifiable and nothing is silently removed. A configured closed-time frontier can exclude a first-seen older operation; its original intent remains inspectable. Neither mechanism invents new user intent.
 
-Undo of an accepted domain action is a newly reviewed guarded command. Redo is another new decision. Retrying an original operation instead recovers its exact saved attempt. An abandoned attempt cannot be retried as if its meaning still applied; deliberate reapplication creates a new linked operation after current review. External effects must never be dispatched merely because a view rebuilds or history is replayed.
+Undo of an accepted domain action is a newly reviewed guarded command. Redo is another new decision. Retrying an original operation instead resumes its exact signed proposal and author time. A finality-excluded operation is not silently retimestamped or resubmitted; if it is still wanted, a deliberately reviewed new operation is separate intent. External effects must never be dispatched merely because a view rebuilds or history is replayed.
 
 ## Make correction part of the normal journey
 
@@ -65,15 +65,15 @@ const operation = await session.command('reverseCompletion', {
   expectedDone: entry.after,
   done: entry.before,
   reverses: entry.operationId,
-}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
-const receipt = await operation.applied();
+}, { operationId: crypto.randomUUID() });
+const receipt = await operation.materialized();
 ```
 
-These names are illustrative application vocabulary. The UI check helps the person; the command must repeat all required checks inside actual execution. `basedOn` orders the command after the captured application revision and does not replace the domain predicates. A [guarded definition](../run-a-peer-application/snippets/peer-task-board.mjs) owns those rules for every caller.
+These names are illustrative application vocabulary. The UI check helps the person; the command must repeat all required checks inside actual execution. The captured revision records what was reviewed; it is not an order input and does not replace the domain predicates. A [guarded definition](../run-a-peer-application/snippets/peer-task-board.mjs) owns those rules for every caller.
 
 Restoring an absent record needs an explicit policy for identity, references, ordering and access. A tombstone is a retained record, not absence. Reusing a history entry for a new domain round must be an intentional restore-as-new decision. An arithmetic inverse is valid only when the domain explicitly treats the value as additive; subtracting an old increment can be wrong after someone set a chosen total.
 
-Retain the new reversal's operation ID and inspect the session journal after interruption. Show locally saved and applied accepted/rejected separately. Retry uses `session.retry` for that same operation; it does not create another inverse. If recovery abandons either the original action or the reversal, reread the selected history before offering a new correction. Neither `applied()` nor retained coverage is an irreversible settlement promise.
+Retain the new reversal's operation ID and inspect the session journal after interruption. Show stored locally and materialized accepted/rejected separately. Retry uses `session.operations.retry` for that same operation; it does not create another inverse. If a late earlier operation or closed-time exclusion changes either the original action or the reversal, reread a coherent snapshot before offering a new correction. Neither `materialized()` nor retained coverage is an irreversible settlement promise; `finalized()` is only as strong as the configured policy.
 
 A Redo after accepted reversal is also newly reviewed work. Check the current domain version, author authority, referenced evidence and external conditions. A completed publication revision is changed through another signed publication with its real predecessor; restoring old bytes does not reset publication history. External compensation still needs its actual action authority, receipt and reconciliation policy.
 

@@ -56,14 +56,14 @@ A late media grant is closed. Capturing or previewing never uploads bytes.
 Send stages at most 64 KiB per write through `session.content` and transmits only
 after trusted review. Uncertain sends keep their operation identity. An optional
 `retainEvidence(response)` callback must submit the application's declared
-command and inspect its applied accepted/rejected result. The card does not
+command and inspect its materialized accepted/rejected result. The card does not
 invent a durable command in an existing definition. On receiving a confirmed
 read receipt, `card.review.releaseAfterReceipt()` can prune unretained local bytes
 when the installed session exposes `content.prune`; pruning is not remote erasure.
 Before dispatch, discarded stages use `upload.discard()` when available.
 
 Call `lifetime.abort()` and `card?.dispose()` on route teardown. Keep a rejected or
-uncertain dispatched operation available for application recovery; do not
+uncertain dispatched operation available for exact retry and inspection; do not
 automatically send a new identity. The [checks](checks/README.md) include
 deterministic cancellation/bounds cases and an actual Chromium-to-native public
 session run with synthetic microphone audio, encrypted content, correlated
@@ -144,19 +144,19 @@ not be a dead end that asks the person to enable the sensor again.
 
 ## Preserve the meaning of pending work
 
-Capture the task or question with one coherent `session.query` before asynchronous recording or processing. Retain its domain version and application revision with the draft. A submitted operation keeps its original signed attempt and domain inputs across retry. If the question changed while bytes were prepared, the definition's guard rejects the stale meaning instead of silently binding old evidence to a new question.
+Capture the task or question with one coherent `session.query` before asynchronous recording or processing. Retain its domain version and application revision with the draft. A submitted operation keeps its original signed proposal, author time and domain inputs across retry. If the question changed while bytes were prepared, the definition's guard rejects the stale meaning instead of silently binding old evidence to a new question.
 
 Use `session.content.stage` for a bounded immutable content upload, complete it to obtain the content reference, and retain the required bytes with the session content API. Submit that exact reference and the reviewed task version through a command declared by the application definition. Use the same owned session for content, command delivery and observation; do not create a second host upload or capture queue.
 
-Keep a page-owned draft/submission ID for the person's reviewed snapshot and a stable `operationId` for its durable command. Inspect `session.operations` after reopening and use `session.retry(operationId)` to resume the same saved intent. `applied()` reports accepted or rejected execution in the selected history. `shared()` separately observes retained coverage; it does not make the submission irreversible. If recovery abandons the attempt, preserve the draft and offer deliberate reapplication under a new operation ID after reviewing the current question.
+Keep a page-owned draft/submission ID for the person's reviewed snapshot and a stable `operationId` for its durable command. Inspect `session.operations` after reopening and use `session.operations.retry(operationId)` to resume the same saved intent. `materialized()` reports the current accepted or rejected outcome, which an earlier arriving operation can revise. `retained()` separately observes peer retention evidence and `finalized()` requires a configured policy. Neither makes the submission irreversible. If a configured closed frontier excludes the attempt, preserve the draft and offer a deliberate new operation under a new ID after reviewing the current question.
 
-The captured `basedOn` revision is an ordering prerequisite, not a substitute for a task-version guard inside the definition. Retain both the reviewed domain values and the immutable bytes until the outcome is known. If storage rejects staging or command persistence, the current tab may still hold the original bytes; offer an explicit save or review action and describe that limited lifetime. Do not promise reload recovery without a durable copy.
+The captured revision records what was reviewed; it is not an order input and not a substitute for a task-version guard inside the definition. Retain both the reviewed domain values and the immutable bytes until the outcome is known. If storage rejects staging or command persistence, the current tab may still hold the original bytes; offer an explicit save or review action and describe that limited lifetime. Do not promise reload recovery without a durable copy.
 
 **Example choice:** whether sending clears the text immediately or leaves it editable is a product decision. A safe starting point is to snapshot the submitted text and evidence, keep new typing in a separate draft, and clear only the acknowledged snapshot. A delayed rejection must restore or retain the rejected work without overwriting text entered in the meantime.
 
 ## Separate verified bytes from accepted evidence
 
-The session separates content transfer from the semantic evidence command. A completed content stage identifies exact bytes; retention establishes the retained copy described by that receipt. An applied accepted command means the application's guards admitted the reference and context in the selected history. Neither says an agent has examined it. Keep locally saved, content retained, applied, rejected and abandoned meanings distinct even when the interface shows only one concise status at a time.
+The session separates content transfer from the semantic evidence command. A completed content stage identifies exact bytes; retention establishes the retained copy described by that receipt. A materialized accepted command means the application's guards admitted the reference and context in the current replay, which stays revisable. Neither says an agent has examined it. Keep stored locally, content retained, materialized accepted or rejected, finalized and excluded meanings distinct even when the interface shows only one concise status at a time.
 
 Use the immutable content reference when analysis or annotations must refer to the reviewed bytes. A display URL alone does not establish access or permanent retention. An application event does not retain bytes forever: choose the retention policy, obtain the required actual copies, and test missing or partially transferred content. Replication and encryption follow application membership; placing a reference in a filtered query does not make media private from other authorized readers. The [private-response guide](../collect-private-responses/COOKBOOK.md) explains this separate boundary.
 

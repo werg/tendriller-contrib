@@ -3,11 +3,11 @@ id: coordinate-participants
 title: Coordinate people, views and independent agents
 summary: "Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs."
 group: Coordinate people and tools
-tags: ["collaboration", "agents", "claims", "recovery", "participants"]
+tags: ["collaboration", "agents", "claims", "finality", "participants"]
 choices: ["Shared local owner or independently enrolled signer", "One executor or frozen contribution slots", "Durable outcome or disposable progress"]
 capabilities: ["Chronolog application session", "Tendriller collaboration module"]
 related: ["run-a-peer-application", "share-live-signals", "connect-chatgpt", "coordinate-devices", "observe-long-running-process"]
-evidence: exercised
+evidence: explained
 ---
 
 # Coordinate people, views and independent agents
@@ -20,15 +20,16 @@ results informed the final decision. Closing the discussion does not cancel work
 
 The optional `@tendriller/core/collaboration` module provides the application
 definition, guarded commands and client helpers. Chronolog owns every signed
-attempt, materialized view, replica and recovery decision. This cookbook adds the
+proposal, coherent projection, replica and optional finality proof. This cookbook adds the
 review policy and editable example UI; it adds no session owner or retry queue.
 Use the exact compatible public archives identified by the qualification report.
 A current source checkout does not establish what a deployed host supports.
 
-The [independent qualification runners](checks/README.md) exercise 31 native
-observations with eight retained signers and 32 attached views, both Chromium/SQL/OPFS
-ownership journeys, and the seven-route peer composition. Keep raw reports, archive
-hashes, and separate deployed-device/provider acceptance boundaries with each run.
+The [independent qualification runners](checks/README.md) require a fresh public
+operation-set session, standalone authority, matching SDK and rebuilt SQL engine.
+Their authored-operation report formats reject historical reports. **This source
+port is not yet a qualified new-protocol native/browser composition.** Retain new
+raw reports, exact archive hashes and separate deployed-device/provider evidence.
 
 ## Choose identities deliberately
 
@@ -50,9 +51,9 @@ reply references its original interaction and contribution slot; it cannot becom
 a fresh request merely because an observer received it. The public task, claim,
 result and message records expose their authenticated `operation` reference from
 Chronolog's reserved transaction evidence. Application JSON cannot substitute
-another attempt or signer. A late result can retain an old claim generation while
-its actual submission belongs to a newer generation; show both when investigating
-recovery. Historical document labels remain signer assertions.
+another proposal or signer. References bind the authenticated application, actor,
+operation handle and stable proposal ID, while projection revisions bind the
+current derived operation set and execution/policy context. Historical document labels remain signer assertions.
 
 ## Keep the first complete journey small
 
@@ -63,34 +64,48 @@ recovery. Historical document labels remain signer assertions.
    beside the send control and retain the operation reference before waiting.
 3. For independent reviews, create one parent with a frozen set of contribution
    slots. Choose `allSlots`, `firstAccepted` or explicit `manual` synthesis.
-4. Each assigned agent obtains a guarded claim before starting consequential work.
+4. Each assigned agent obtains a provisional guarded claim before reversible local computation.
    It reports disposable progress using a signed stream ID for its run.
 5. Accept a result only under the current claim fence and captured context. Keep
    late and superseded evidence attributed without replacing accepted work.
 6. Finalize against the current parent version and record the exact accepted
    contribution identities. Show failed and missing contributors visibly.
 7. Reopen a view, inspect the same original operations and continue from the
-   selected history. Recovery requires explicit revalidation or reassignment.
+   current projection. A late earlier proposal can revise guards and results;
+   retain the original intent rather than silently creating another operation.
 
-A claim guarantees at most one currently accepted owner in selected history. It
-cannot stop an old disconnected process from using CPU or complete an external
-request that was already dispatched. The application's external-effect boundary
-needs its own retained idempotency identity and reconciliation. Never replay an
-external effect because a recovered suffix no longer includes its receipt.
+A claim describes one currently derived owner in a captured projection, **not
+exclusive offline execution authority**. Two disconnected authors can both observe
+accepted claims; after union and authored-time replay, one outcome may reject.
+An earlier proposal can also remove a previously shown result. Render coherent
+snapshots plus independent local drafts, never append arrivals into a second UI
+state database. Ordinary Save waits only for durable local signing/storage.
+
+Finality defaults to `none`: local materialization continues without any agent or
+finalizer, and explicit finality waits fail as unsupported. Irreversible effects
+require separately verified configured finality plus provider-idempotency and
+receipt reconciliation. An unavailable finalizer may delay those effects, not
+ordinary browser writes. `collab.finalize` means a domain synthesis, not a proof.
+
+`reviewWorkspace({administrators, members})` returns `{definition,
+initializationProgram}`. The root principal submits that ordinary DDL and explicit
+per-signer INSERT grants once, with a retained operation ID. Crypto enrollment is
+not a SQL grant. Later DDL and grant/revoke edits use ordinary authorized programs;
+there is no signed initializer/schema-freezing channel or publication requirement.
 
 ## Separate shared work from local presentation
 
 The shared application holds requests, claims, contributions and final decisions.
 The view store holds an unsent draft and indexed references to journaled work.
-Each pending reference includes the application, history, signer and operation identity;
+Each pending reference includes the application, actor, operation handle and stable proposal identity;
 one view removing a reviewed reference cannot remove another view's reference.
-The operation journal remains the source of signed attempts.
+The operation journal remains the source of signed proposals.
 
 Keep retained history usable as it grows. The maintained
 `captureCollaborationReader(session)` holds one coherent public read view. Read
 task cards, conversation messages and result evidence through its bounded pages;
 close the reader when refreshing, suspending or detaching. A continuation belongs
-to that exact history, revision and query scope. Reusing it with different filters
+to that exact projection revision and query scope. Reusing it with different filters
 or a newer capture raises `CURSOR_RESET_REQUIRED`, so offer an explicit refresh.
 
 The reference shows eight task cards and sixteen messages or results per page.
@@ -118,14 +133,14 @@ are distinct facts.
 
 The [reference checks](checks/README.md) consume packed public artifacts in a new
 directory. Their native fixture uses separately retained signers and a
-coordinator-centered topology; local attachments exercise the same owner API used
+test-only authenticated star topology (no ordering role); local attachments exercise the same owner API used
 by browser pages. This establishes native and attachment semantics, not physical
 phone, browser suspension, deployed relay or conversational resumption claims.
 
 The reference deliberately uses reviewed evidence and independent review slots.
 Adapt the domain inputs, recipient selection and synthesis policy to the task.
 Keep the owner, signed operation journal, guarded command boundary and current
-generation checks in the maintained public modules.
+authenticated proposal/actor and captured-revision checks in the maintained public modules.
 
 The editable [board](page/board.html) and [discussion](page/discussion.html) layouts
 share [one page module](page/app.mjs). Each view keeps its request, conversation,
@@ -135,7 +150,7 @@ offers explicit handoff and cancellation acknowledgment; it never takes a second
 claim on behalf of an observer. Follow the build instructions above to supply the
 real authenticated owner/bootstrap graph and browser SQL engine. For a new
 application, adapt the current service starter's owner-facing `connection.mjs`
-and pairing helper around that bootstrap. The reference bootstrap expects a
+and explicit recipient-bound provisioning controls around that bootstrap. The reference bootstrap expects a
 retained, enrolled profile; `createProfile()` alone does not grant membership.
 Keep the service review and return flow instead of building another enrollment
 or idle polling loop.
@@ -150,9 +165,9 @@ draft but requires explicit transfer before a new endpoint continues the claim.
 The reviewer discovers eligible open work across captured task pages, releases
 its read view before claiming, and suppresses duplicate failed claims until the
 shared task projection changes. A newly freed claim quota can then admit work;
-an unrelated rejected transport attempt cannot create a hot retry loop.
+an unrelated rejected proposal cannot create a hot retry loop.
 
-The executable local scale profile has eight distinct retained signers and 32
+The unqualified replacement scale fixture targets eight distinct retained signers and 32
 simultaneous views, with endpoint quotas that leave a sibling usable. Its report
 includes timing distributions, memory, CPU and exact grants. Treat those measured
 local results as a bounded composition profile; physical devices, public Internet routes
@@ -164,13 +179,13 @@ and provider quotas require their own observations and limits.
 | --- | --- |
 | Two views submit the same action name | Different endpoint/source contexts; replies remain tied to their own interaction |
 | One attachment detaches or sends malformed RPC | Its own waits stop; the sibling still queries and submits |
-| Two agents race for one exclusive slot | One accepted claim; the other sees a conflict and performs no effect |
+| Disconnected agents race for one slot | Both can provisionally accept; merge revises the loser. Neither infers global exclusivity or finality |
 | Two runs share signer, topic and channel | Both signed stream scopes survive filtering and coalescing |
 | An old worker completes after handoff | Its fence is superseded; the new claim remains the only accepted owner |
 | A result is retried with the same ID | Same content is idempotent; changed content conflicts |
 | A new agent joins during collection | The existing slot set and denominator do not change |
 | A request is cancelled while an effect is in flight | Request, acknowledgment and uncertain external outcome stay distinct |
-| Recovery adopts an active claim | Old fence is rejected until guarded rebind or reassignment |
+| An earlier claim arrives late | Current guard/results and counts rederive; old captures stay coherent and unsent drafts survive |
 | A tab reloads after a timeout | Its original full operation reference can be inspected; no automatic resubmission |
 | Another view writes while someone browses a continuation | Existing pages remain coherent; explicit refresh shows the newer revision without changing local drafts |
 | A named-query-only or events-only attachment requests raw SQL | The maintained owner rejects the request and releases the denied capture without closing siblings |

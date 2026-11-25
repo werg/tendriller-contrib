@@ -53,7 +53,7 @@ The field view should distinguish a local draft, a durable queued command, an ac
 
 Bound local media storage and show practical constraints before a large batch exhausts it. Explain whether stopping the inspection leaves pending uploads to resume, discards only unsent candidates, or requires explicit cancellation. Discarding local queued work does not undo a request the service already accepted.
 
-On reconnect, show an item-level reconciliation list. Retry saved operations with their original identity and captured generations. If the checklist, task, access, or asset changed, retain old observations and offer deliberate review. Do not automatically retarget a queued measurement to a new checklist item. Conflicting edits from two devices should show both values or use the chosen authoritative conflict policy.
+On reconnect, show an item-level reconciliation list. Retry saved operations with their original identity and signed intent. If the checklist, task, access, or asset changed, retain old observations and offer deliberate review. Do not automatically retarget a queued measurement to a new checklist item. Conflicting edits from two devices should show both values or use the chosen authoritative conflict policy.
 
 ## Review and hand over a coherent report
 

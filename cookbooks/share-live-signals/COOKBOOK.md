@@ -339,7 +339,7 @@ signal must never grant itself additional rights through its payload.
 Use a durable event for submitted chat, a request that must reach a worker, a
 permission change or an accepted outcome. Use a transaction when a condition and
 its mutation must agree, such as claiming the last available resource. Use an explicitly configured protected action for irreversible external work.
-An ordinary applied event can be abandoned during recovery. Live progress can
+An ordinary materialized event is revisable when an earlier operation arrives, and a configured closed frontier can exclude a delayed one. Live progress can
 accompany the action while its durable service result remains authoritative.
 
 These choices do not require a durable record for every harmless transient
@@ -349,7 +349,7 @@ have an acceptable application meaning. Keep Stop and local mute effective on
 the device, even when no remote signal is delivered.
 
 The [application guarantee guide](../../guides/application-primitives.md) connects
-these decisions to applied outcomes, recovery and protected actions. The
+these decisions to materialized outcomes, finality and protected actions. The
 [public session checks](../run-a-peer-application/checks/README.md) combine
 ephemeral typing with retained messages through the same session API.
 
@@ -357,7 +357,7 @@ ephemeral typing with retained messages through the same session API.
 
 | Scenario | Expected observation |
 | --- | --- |
-| Send signals while the hosted control participant is unavailable | An established authorized signal path still works without new durable records. |
+| Send signals while the host is unavailable | An established authorized signal path still works without new durable records. |
 | Stop sending without a goodbye packet | The UI expires the sender's indication on time. |
 | Two senders type; one stops or expires first | Only that sender's indication disappears. |
 | End or abort the subscription | The live view clears and no timer repaints it. |

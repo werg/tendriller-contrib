@@ -1,0 +1,50 @@
+// Synthetic UNIT-TEST fixtures only. Never publish these as runtime evidence.
+export const h = (digit='a',length=64) => digit.repeat(length);
+export function syntheticReport() {
+  const artifact=(name,digit)=>({name,version:'0.0.0-test',sha256:h(digit),sourceCommit:h('d',40),sourceTree:h('e',40),sourceDirty:false,
+    provenance:{sha256:h('4'),profile:'chronolog-crdt-v1',nativeRtc:true,sqlEngines:['native','wasm-node','browser'],files:name==='@chronolog/authority'?Object.fromEntries(['index.mjs','index.d.ts','participant.mjs','participant.d.ts'].map(path=>[path,h('5')])):{'index.mjs':h('5'),'engine/build/Release/doltlite.node':h('6'),'wasm/sqlite3.wasm':h('7'),'wasm/sqlite3.mjs':h('8'),'wasm/manifest.json':h('9')},runtimeModules:{'index.mjs':{inputs:['packages/peer-session/src/session.ts'],imports:[]}}}});
+  return {format:'operation-set-consumer/v1',protocol:'chronolog-crdt-v1',mode:'runtime',passed:true,error:null,topology:'independent-packed-peers',
+    executionManifestDigest:h(),source:{commit:h('a',40),tree:h('b',40),dirty:false},runtime:{node:'v24.0.0',platform:'linux',dependencies:{lockSha256:h(),packages:[]}},
+    artifacts:[artifact('@chronolog/peer-session','1'),artifact('@chronolog/authority','2')],fixtures:[{path:'checks/fixture.mjs',sha256:h()}],
+    publicBoundary:{imports:['@chronolog/authority','@chronolog/peer-session','@chronolog/peer-session/native'],siblingSourceImports:0,applicationRetryQueues:0,residentRequired:false},
+    finality:['signed-frontier','fixed-validator'].map(policy=>({policy,unavailableProviderLocalAuthoring:true,proofs:2,included:h(),finalized:true,missingBodyBlockedFinalRead:true,lateExcluded:true,lateProposal:h(),originalSignedDigest:h(),retainedSignedDigest:h(),originalTime:'50',retainedTime:'50',reloadFinality:true})),
+    nativeOwnership:{secondOwnerRefused:true,implicitIdentityCreationRefused:true},
+    offline:{independentAuthors:[h('a'),h('b')],stored:[true,true],materialized:['accepted','accepted'],connectedPeers:[0,0],finality:'none',unsupportedWaitRejected:true},
+    reactive:{capturedBefore:h(),capturedAfter:h(),coherentCapturedView:true,snapshot:h(),liveSnapshot:h(),projectionCount:3,earlierInsertionFirst:h('c'),expectedEarlierProposal:h('c'),equalTimeAuthors:[h('a'),h('b')]},
+    merge:{permutations:3,duplicateDeliveries:6,operations:3,digests:[h(),h(),h(),h()],revisions:[h(),h(),h(),h()]},
+    retry:{replyLostAfterStorage:true,originalProposalId:h('c'),retriedProposalId:h('c'),signedBefore:h(),signedAfter:h(),alteredIntentRejected:true,operationCount:3},
+    retention:{evidence:[{payload:{peer:h('b'),storageId:'independent-store',proposalId:h('c')},signature:h('a',128)}],authorStorageId:'author-store',independentPeer:h('b')},
+    reload:{identityBefore:h('a'),identityAfter:h('a'),proposalBefore:h('c'),proposalAfter:h('c'),signedBefore:h(),signedAfter:h(),cachedAuthority:true,disconnectedAuthoring:true,automaticUnion:true,abruptNativeRestart:true,abruptExitCode:73,abruptProposal:h(),abruptSignedBefore:h(),abruptSignedAfter:h(),digest:h(),peerDigest:h()},
+    hostOutage:{boundary:'no-server',requests:0,finalizerProcesses:0},content:{bytes:131095,sha256:h(),receivedSha256:h(),reloadSha256:h(),localReload:true,partialUploadResumed:true,originalStageId:'synthetic-stage',resumedStageId:'synthetic-stage',transport:'authenticated-peer-channel'},
+    live:{observed:true,historyBefore:h(),historyAfter:h()}};
+}
+const rtc=()=>({implementation:'werift',version:'0.27.0',candidateSource:'explicit-loopback-only',connections:[1,2].map(()=>({peers:[h('a'),h('b')],authenticated:true,closed:true,reliable:{sentBytes:10,receivedBytes:10},
+  signaling:{closed:true,sentMessages:2,sentBytes:100},routes:[{route:'direct',localCandidateType:'host',remoteCandidateType:'host'},{route:'direct',localCandidateType:'host',remoteCandidateType:'host'}]}))});
+export function syntheticRtcReport(){const report=syntheticReport();report.topology='independent-native-rtc';report.rtc=rtc();return report;}
+function host(){return {runtime:'workerd',participant:{boundary:'public-authority-record',authorityVerified:true,hostRejected:['database.submit','content.chunk','ephemeral.signal']},fixtureSha256:h(),dependencies:{lockSha256:h()},artifacts:['@tendriller/core','@tendriller/engine'].map((name,index)=>({name,version:'0.0.0-test',sha256:h(String(index+7)),sourceCommit:h('9',40),sourceTree:h('8',40),sourceDirty:false})),
+  provenance:{compiledAuthority:{provenanceSha256:h('4'),files:Object.fromEntries(['index.mjs','index.d.ts','participant.mjs','participant.d.ts'].map(name=>[name,h('5')]))},sha256:h('7'),storageSchemaRevision:9,files:{'worker.mjs':h('9'),'authority-provenance.json':h('4')},embeddedAuthority:{repository:'werg/chronolog-db',source:h('d',40),sourceTree:h('e',40),dirty:false,profile:'chronolog-crdt-v1',sha256:h('4'),files:Object.fromEntries(['index.mjs','index.d.ts','participant.mjs','participant.d.ts'].map(name=>[name,h('5')]))}},
+  publication:{administratorWithoutPublisher:true,exactRetry:true,lostReplyAfterPersistence:true,alteredBytesRejected:true,nonPublisherRejected:true,staleHeadRejected:true,priorCodeRetained:true,headAndCodeSurviveRestart:true,applicationAuthorityUnchanged:true,
+    first:{id:h('1'),expectedCodeDigest:h('4'),servedCodeDigest:h('4')},second:{id:h('2'),previous:h('1'),expectedCodeDigest:h('5'),servedCodeDigest:h('5')}}};}
+export function syntheticHostedReport(){const report=syntheticRtcReport();report.host=host();report.hostOutage={boundary:'tendriller-workerd-http',blockedProbeRejected:true,commandsMaterialized:2,before:{requests:5},after:{requests:5}};return report;}
+function relay(implementation){return {implementation,hostRuntime:'workerd',networkBoundary:'loopback-websocket-to-bounded-test-bridge-to-workerd-websocket',independentLanes:['reliable','live'],security:'shared-authenticated-peer-channel',controlOutageScope:'control-http-only',forcedDirectFailure:true,
+  connections:[1,2].map(()=>({authenticated:true,closed:true,reliable:{sentBytes:10,receivedBytes:10}})),reconnect:{physicalLinksCut:true,reconnected:true},
+  traffic:{boundary:'actual-workerd-websocket-relay',host:{relayUpgrades:8,relaySentBytes:100,relayReceivedBytes:100},sockets:Array.from({length:8},(_,index)=>({lane:index%2?'live':'reliable',closed:true,plaintextMatches:[],sentBytes:10,receivedBytes:10,sentBinaryFrames:1,receivedBinaryFrames:1,maxQueuedBytes:20}))}};}
+export function syntheticRelayReport(){const report=syntheticHostedReport();delete report.rtc;report.topology='independent-native-websocket';report.relay=relay('native-websocket');return report;}
+export function syntheticBrowserReport(){const report=syntheticReport();report.format='operation-set-browser/v1';report.topology='browser-worker-opfs-native-rtc';
+  report.browser={implementation:'chromium',version:'150.0',storage:'OPFS',transportOwner:'owning-worker',resources:{opfsRoots:1}};
+  report.ownership={workerOnly:true,secondOwnerRefused:true,pagePrivateKeys:0,explicitProvisioning:true,storageId:'browser-store'};
+  report.offline={browserStored:true,browserMaterialized:'accepted',nativeMaterialized:'accepted',connectedPeers:[0,0],finality:'none'};
+  report.reactive={before:h('a'),after:h('b'),earlierFirst:'late-earlier',currentDigest:h(),peerDigest:h(),draftPreserved:true,focusPreserved:true};
+  report.retry={originalProposal:h(),retriedProposal:h(),originalTime:'200',retriedTime:'200'};
+  report.reload={identityBefore:h(),identityAfter:h(),cachedAuthority:true,offlineReload:true,offlineWrite:true,startupHttpRequests:0,digest:h(),peerDigest:h(),abruptWorkerRestart:true};
+  report.hostOutage={boundary:'fixture-http',blockedProbeRejected:true,commandsMaterialized:2,before:{requests:5},after:{requests:5}};
+  report.ux={widths:[1280,320],deepLinks:true,back:true,keyboard:true,longContent:true,draftPreserved:true,noHorizontalScroll:true,screenshots:['desktop-before.png','desktop-after.png','1280-before.png','1280-after.png','320-before.png','320-after.png']};
+  report.sqlEngine={digest:h(),abi:7};report.wasmEngine={wasmSha256:h('7'),loaderSha256:h('8')};
+  report.sqlParity={actualBrowserWasm:true,actualNativeEngine:true,browserManifest:h('b'),nativeManifest:h('b'),browserState:h(),nativeState:h(),browserOutcomes:h(),nativeOutcomes:h(),offlineReload:h(),lateDdlBefore:'rejected',lateDdlAfter:'accepted',rollback:'rejected',unauthorizedDrop:'rejected',capturedSchemaCoherent:true,rollbackEvents:0};
+  report.browserFinality={policy:'signed-frontier',nativeFinalizers:0,nativeParticipantClosed:true,pendingBefore:true,finalized:true,excluded:true,stored:true,reloadFinalized:true,reloadExcluded:true,closedThroughMs:'100',proofs:2,originalProposal:h(),retriedProposal:h(),originalTime:'50',retainedTime:'50'};
+  report.rtc=rtc();return report;}
+export function syntheticBrowserRelayReport(){const report=syntheticBrowserReport();delete report.rtc;report.topology='browser-worker-opfs-websocket';report.relay=relay('browser-websocket');report.host=host();report.hostOutage.boundary='tendriller-workerd-http';return report;}
+export function syntheticTaskReport(){const report=syntheticReport();report.topology='independent-packed-tasks';report.executionManifestDigest=h('b');report.sqlEngine={digest:h(),abi:7};report.sqlParity={actualWasm:true,nativeManifest:h('b'),wasmManifest:h('b'),stateNative:h(),stateWasm:h(),outcomesNative:h(),outcomesWasm:h(),wasmReload:h(),wasmSha256:h('7'),loaderSha256:h('8')};
+  report.claims={independentProvisional:['accepted','accepted'],revisedProposal:h(),before:'accepted',after:'rejected',winner:h(),stateDigests:[h(),h()],reactiveDigest:h()};
+  report.schema={initializationProposal:h(),ordinaryTransaction:true,before:'rejected',after:'accepted',rollback:'rejected',unauthorizedDrop:'rejected',alter:'accepted',drop:'accepted',staleQueryError:true,capturedSchemaCoherent:true,rollbackEvents:0};
+  report.tools={exactRetry:true,callerScoped:true,proposalId:h()};report.reload={identityBefore:h(),identityAfter:h(),before:h(),after:h(),cachedAuthority:true};return report;}

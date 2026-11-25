@@ -43,7 +43,7 @@ for (const storage of ['node:sqlite', 'worker']) test(`native and browser eviden
     };
     const provenance = { format: 'chronolog-peer-session-package/v1', repository: 'werg/chronolog-db',
       source: 'd'.repeat(40), sourceTree: 'e'.repeat(40), dirty: false,
-      profile: 'peer-generation-v1', nativeRtc: true, sqlEngines: [],
+      profile: 'chronolog-crdt-v1', nativeRtc: true, sqlEngines: [],
       sha256: Object.fromEntries(Object.entries({ 'package.json': JSON.stringify(metadata), ...files }).map(([path, bytes]) => [path, hash(bytes)])),
       runtimeInputs: [...new Set(Object.values(runtimeModules).flatMap(module => module.inputs))].sort(), runtimeModules };
     const writeEvidence = async (installed, manifest = metadata, evidence = provenance) => {
@@ -115,7 +115,39 @@ for (const storage of ['node:sqlite', 'worker']) test(`native and browser eviden
       await writeEvidence(installed, metadata, evidence);
       await assert.rejects(verifyPeerSessionArtifact({ installed, archive }), message, name);
     }
+    const wasmCode="import locks from 'fs-native-extensions'; export { locks };\n",wasmSource='packages/materializer-doltlite/src/wasm-node.ts';
+    await writeFile(join(installed,'sql-wasm.mjs'),wasmCode);
+    const wasmMetadata={...metadata,dependencies:{...metadata.dependencies,'fs-native-extensions':'1.5.4'},exports:{...metadata.exports,'./sql-wasm':{import:'./sql-wasm.mjs'}}};
+    const wasmProof={...provenance,runtimeInputs:[...provenance.runtimeInputs,wasmSource],sha256:{...provenance.sha256,'sql-wasm.mjs':hash(wasmCode)},
+      runtimeModules:{...provenance.runtimeModules,'sql-wasm.mjs':{inputs:[wasmSource],imports:[{path:'fs-native-extensions',external:true}]}}};
+    await writeEvidence(installed,wasmMetadata,wasmProof);await verifyPeerSessionArtifact({installed,archive});
+    for(const change of [p=>{p.runtimeModules['sql-wasm.mjs'].imports=[];},p=>{p.runtimeModules['sql-wasm.mjs'].inputs=[];},p=>{delete p.sha256['sql-wasm.mjs'];}]){
+      const invalid=structuredClone(wasmProof);change(invalid);await writeEvidence(installed,wasmMetadata,invalid);await assert.rejects(verifyPeerSessionArtifact({installed,archive}));
+    }
+    await writeEvidence(installed,metadata,provenance);
     await writeFile(join(installations[1].installed, 'chunks/data.mjs'), 'changed installed bytes');
     await assert.rejects(verifyPeerSessionArtifact({ installed: installations[1].installed, archive }), /Package content digest mismatch/);
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+// Standalone authority archives must retain their own exact byte/source identity.
+test('authority verifier rejects dirty, external-runtime, path-escaping and altered packed evidence', async () => {
+  const { verifyAuthorityArtifact } = await import('./peer-session-artifact.mjs');
+  const temporary = new URL('../../../test-results/', import.meta.url); await mkdir(temporary,{recursive:true});
+  const root = await mkdtemp(join(fileURLToPath(temporary),'authority-artifact-'));
+  try {
+    const archive=join(root,'authority.tgz');await writeFile(archive,'synthetic unit archive');
+    const names=['index','control','metadata','participant','publication','finality'];
+    const metadata={name:'@chronolog/authority',version:'0.0.0-test',exports:Object.fromEntries(names.map(name=>[name==='index'?'.':`./${name}`,{import:`./${name}.mjs`}]))};
+    const files={'package.json':JSON.stringify(metadata),...Object.fromEntries(names.map(name=>[`${name}.mjs`,'export const synthetic = true;']))};
+    for(const [name,bytes]of Object.entries(files))await writeFile(join(root,name),bytes);
+    const proof={format:'chronolog-authority-package/v1',profile:'chronolog-crdt-v1',repository:'werg/chronolog-db',source:'a'.repeat(40),sourceTree:'b'.repeat(40),dirty:false,
+      inputs:['packages/authority/src/index.ts'],runtimeModules:Object.fromEntries(names.map(name=>[`${name}.mjs`,{inputs:['packages/authority/src/index.ts'],imports:[]} ])),sha256:Object.fromEntries(Object.entries(files).map(([name,bytes])=>[name,hash(bytes)]))};
+    const write=async value=>writeFile(join(root,'provenance.json'),JSON.stringify(value));await write(proof);
+    const observed=await verifyAuthorityArtifact({installed:root,archive});assert.equal(observed.name,metadata.name);assert.equal(observed.sha256,hash('synthetic unit archive'));
+    for(const change of [p=>{p.dirty=true;},p=>{p.profile='retired';},p=>{p.sha256['../escape']='a'.repeat(64);},p=>{p.runtimeModules['index.mjs'].imports=[{path:'node:fs',external:true}];},p=>{p.runtimeModules['index.mjs'].inputs=['packages/peer-session/src/session.ts'];}]){
+      const invalid=structuredClone(proof);change(invalid);await write(invalid);await assert.rejects(verifyAuthorityArtifact({installed:root,archive}));
+    }
+    await write(proof);await writeFile(join(root,'index.mjs'),'changed authority bytes');await assert.rejects(verifyAuthorityArtifact({installed:root,archive}),/content digest mismatch/);
+  }finally{await rm(root,{recursive:true,force:true});}
 });

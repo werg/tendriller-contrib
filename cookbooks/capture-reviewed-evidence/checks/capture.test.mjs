@@ -55,23 +55,24 @@ test('audio late grant after cancellation is closed without creating a recorder'
   const pending = audio.start(gesture); audio.cancel(); await assert.rejects(pending, { name: 'AbortError' });
   grant.resolve({ getTracks: () => [track] }); await tick(); assert.equal(track.stops, 1); assert.equal(Recorder.instances.length, before); audio.dispose();
 });
-const request = { requestId: 'ask-1', requester: 'native', recipient: 'page', question: 'Show the instrument reading.', expiresAt: 20000 };
+const nativeId = '11'.repeat(32), pageId = '22'.repeat(32);
+const request = { requestId: 'ask-1', requester: nativeId, recipient: pageId, question: 'Show the instrument reading.', expiresAt: 20000 };
 function sessionFixture() {
-  const writes = [], sends = [], prunes = [], reference = { id: 'content-1', bytes: 70000, mediaType: 'image/jpeg' };
-  const upload = { async write(index, bytes) { writes.push({ index, size: bytes.length }); }, async commit() { return reference; }, async discard() { prunes.push('upload'); } };
-  return { applicationId: 'app', deviceId: 'page', writes, sends, prunes, upload,
-    content: { async stage() { return upload; }, async prune(ref) { prunes.push(ref.id); } },
+  const writes = [], sends = [], discards = []; let reference = { profile: 'authored-content-v1', applicationId: 'ab'.repeat(32), id: 'cd'.repeat(32), epoch: 0, bytes: 70000, mediaType: 'image/jpeg' };
+  const upload = { async write(index, bytes) { writes.push({ index, size: bytes.length }); }, async commit() { return reference; }, async discard() { discards.push('upload'); } };
+  return { applicationId: 'ab'.repeat(32), identity: { publicKey: pageId }, writes, sends, discards, upload,
+    content: { async stage({ bytes, mediaType }) { reference = { ...reference, bytes, mediaType }; return upload; }, async discard(ref) { discards.push(ref.id); } },
     signals: { async send(topic, payload) { sends.push({ topic, payload }); } } };
 }
 test('agent requests are bounded, addressed, expiring, authenticated and only render a card', async () => {
-  const session = sessionFixture(), payload = { ...request, requester: undefined }, base = { authorId: 'native', scope: 'app', expiresAtMs: 20000, payload };
-  assert.ok(validateObservationRequest(base, { session, requester: 'native', now: 1000 }));
+  const session = sessionFixture(), payload = { ...request, requester: undefined }, base = { authorId: nativeId, scope: session.applicationId, expiresAtMs: 20000, payload };
+  assert.ok(validateObservationRequest(base, { session, requester: nativeId, now: 1000 }));
   for (const event of [{ ...base, authorId: 'stranger' }, { ...base, scope: 'other' }, { ...base, expiresAtMs: 1 },
     { ...base, payload: { ...payload, recipient: 'other' } }, { ...base, payload: { ...payload, question: 'x'.repeat(1001) } }]) {
-    assert.equal(validateObservationRequest(event, { session, requester: 'native', now: 1000 }), null);
+    assert.equal(validateObservationRequest(event, { session, requester: nativeId, now: 1000 }), null);
   }
   session.signals.subscribe = async function* () { yield base; yield base; };
-  const cards = []; await observeRequests({ session, requester: 'native', now: () => 1000, onRequest: card => cards.push(card) });
+  const cards = []; await observeRequests({ session, requester: nativeId, now: () => 1000, onRequest: card => cards.push(card) });
   assert.equal(cards.length, 1); assert.equal(session.sends.length, 0); assert.equal(session.writes.length, 0);
 });
 test('review sends exact bounded chunks only after trusted Send and preserves sample time', async () => {
@@ -82,8 +83,13 @@ test('review sends exact bounded chunks only after trusted Send and preserves sa
   await assert.rejects(review.send({ isTrusted: false }, { text: 'reading' }), /trusted/);
   now = 2000; const response = await review.send(gesture, { text: 'reading' });
   assert.deepEqual(session.writes, [{ index: 0, size: 65536 }, { index: 1, size: 4464 }]);
-  assert.equal(response.observedAt, 1000); assert.equal(response.requestId, 'ask-1'); assert.equal(response.recipient, 'native');
-  assert.equal(session.prunes.length, 0); await review.releaseAfterReceipt(); assert.deepEqual(session.prunes, ['content-1']);
+  assert.equal(Object.isFrozen(response), true); assert.equal(Object.isFrozen(response.reference), true);
+  assert.throws(() => { response.reference.bytes = 1; }, TypeError);
+  assert.equal(response.reference.profile, 'authored-content-v1');
+  assert.equal(response.reference.applicationId, session.applicationId);
+  assert.equal(response.reference.bytes, 70000);
+  assert.equal(response.observedAt, 1000); assert.equal(response.requestId, 'ask-1'); assert.equal(response.recipient, nativeId);
+  assert.equal(session.discards.length, 0); await review.releaseAfterReceipt(); assert.deepEqual(session.discards, ['cd'.repeat(32)]);
 });
 test('discard during an in-flight write never sends and explicitly discards staged bytes', async () => {
   const session = sessionFixture(), writing = deferred(); session.upload.write = () => writing.promise;
@@ -91,7 +97,7 @@ test('discard during an in-flight write never sends and explicitly discards stag
   review.setCandidate(new Blob(['photo'], { type: 'image/jpeg' }));
   const pending = review.send(gesture); await tick(); await review.discard(); writing.resolve();
   await assert.rejects(pending, { name: 'AbortError' });
-  assert.equal(session.sends.length, 0); assert.deepEqual(session.prunes, ['upload']);
+  assert.equal(session.sends.length, 0); assert.deepEqual(session.discards, ['upload']);
 });
 test('retention is an explicit declared callback with stable operation identity; uncertain sends cannot silently duplicate', async () => {
   const session = sessionFixture(), retained = [], review = createObservationReview({ session, request, now: () => 1000, retainEvidence: async value => retained.push(value) });

@@ -22,7 +22,7 @@ const policies = {
 };
 
 function sameFence(a, b) {
-  return !!a && !!b && ['claimant', 'runId', 'endpointIncarnation', 'generation', 'claimEpoch'].every(key => a[key] === b[key]);
+  return !!a && !!b && ['claimant', 'runId', 'endpointIncarnation', 'claimProposalId', 'claimEpoch'].every(key => a[key] === b[key]);
 }
 
 /** Reversible local computation only. Provider calls require a separate effect
@@ -34,19 +34,19 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
   const client = createCollaborationClient({ session, endpoint, runId });
   const submit = async (method, input, operationId) => {
     onOperation({ method, reference: operationReference(session, operationId) });
-    const operation = await client[method](input, { operationId }); return operation.applied({ signal });
+    const operation = await client[method](input, { operationId }); return operation.materialized({ signal });
   };
   signal?.throwIfAborted();
   const before = (await client.inspect(taskId)).value;
   const slot = before.task?.slots.find(value => value.slotId === slotId), previous = before.claims.find(value => value.slotId === slotId);
-  if (!slot || before.task.status !== 'open' || !(!previous && slot.eligibleSigners.includes(session.deviceId)
-      || previous?.status === 'offered' && previous.claimant === session.deviceId)) return { status: 'not-eligible' };
+  if (!slot || before.task.status !== 'open' || !(!previous && slot.eligibleSigners.includes(session.identity.publicKey)
+      || previous?.status === 'offered' && previous.claimant === session.identity.publicKey)) return { status: 'not-eligible' };
   const claimId = crypto.randomUUID();
   const admission = await submit('claim', { taskId, slotId, claimId, expectedEpoch: previous?.claimEpoch ?? 0, taskVersion: 1 }, `${claimId}:claim`);
   if (admission.outcome !== 'accepted') return { status: 'claim-conflict', operation: admission };
   const claimed = (await client.inspect(taskId)).value, fence = claimed.claims.find(value => value.slotId === slotId);
-  if (claimed.task.status !== 'open' || fence?.status !== 'active' || fence.claimant !== session.deviceId ||
-      fence.runId !== runId || fence.endpointIncarnation !== endpoint.endpointIncarnation || fence.generation !== session.status.generation)
+  if (claimed.task.status !== 'open' || fence?.status !== 'active' || fence.claimant !== session.identity.publicKey ||
+      fence.runId !== runId || fence.endpointIncarnation !== endpoint.endpointIncarnation)
     return { status: 'needs-review', claim: fence };
   signal?.throwIfAborted();
   const stream = { streamId: runId, endpointId: endpoint.endpointId, endpointIncarnation: endpoint.endpointIncarnation };
@@ -55,16 +55,16 @@ export async function reviewAssignedTask({ session, endpoint = session.endpoint,
   const content = policies[policy](claimed.task);
   signal?.throwIfAborted();
   const current = (await client.inspect(taskId)).value, latest = current.claims.find(value => value.slotId === slotId);
-  if (!sameFence(fence, latest) || latest.generation !== session.status.generation) return { status: 'superseded', claim: latest };
+  if (!sameFence(fence, latest)) return { status: 'superseded', claim: latest };
   if (current.task.status === 'cancelRequested') {
     const stopped = await submit('acknowledgeCancel', { taskId, slotId, actionId: `${claimId}:stopped`, claimEpoch: fence.claimEpoch,
-      generation: fence.generation, runId: fence.runId, endpointIncarnation: fence.endpointIncarnation }, `${claimId}:ack`);
+      claimProposalId: fence.claimProposalId, runId: fence.runId, endpointIncarnation: fence.endpointIncarnation }, `${claimId}:ack`);
     return { status: stopped.outcome === 'accepted' ? 'cancelled' : 'needs-review', operation: stopped };
   }
   if (current.task.status !== 'open' || latest.status !== 'active') return { status: 'needs-review', claim: latest };
   const resultId = `${claimId}:result`;
   const operation = await submit('result', { taskId, slotId, resultId, claimEpoch: fence.claimEpoch, taskVersion: 1,
-    generation: fence.generation, runId: fence.runId, endpointIncarnation: fence.endpointIncarnation, outcome: 'succeeded', content }, `${claimId}:result`);
+    claimProposalId: fence.claimProposalId, runId: fence.runId, endpointIncarnation: fence.endpointIncarnation, outcome: 'succeeded', content }, `${claimId}:result`);
   const captured = await captureCollaborationReader(session, { signal });
   let result;
   try {
@@ -92,30 +92,29 @@ export async function runReviewer({ session, endpoint = session.endpoint, runId,
     for (;;) {
       lifetime.throwIfAborted();
       const captured = await captureCollaborationReader(session, { signal: lifetime }), candidates = [], versions = [];
-      const eligible = new Set(); let generation;
+      const eligible = new Set();
       try {
         let cursor;
         do {
-          const current = await captured.tasks({ state: 'open', eligibleSigner: session.deviceId, limit: 16, cursor });
-          generation = current.revision.generation;
+          const current = await captured.tasks({ state: 'open', eligibleSigner: session.identity.publicKey, limit: 16, cursor });
           for (const task of current.value.tasks) {
             // Retain only small identifiers while scanning. Task payloads and
             // historical evidence leave memory after each bounded page.
             versions.push([task.taskId, task.version]);
             for (const slot of task.slots) {
               const claim = current.value.claims.find(value => value.taskId === task.taskId && value.slotId === slot.slotId);
-              if (!(!claim && slot.eligibleSigners.includes(session.deviceId) || claim?.status === 'offered' && claim.claimant === session.deviceId)) continue;
-              const key = JSON.stringify([task.taskId, slot.slotId, claim?.claimEpoch ?? 0, generation]);
+              if (!(!claim && slot.eligibleSigners.includes(session.identity.publicKey) || claim?.status === 'offered' && claim.claimant === session.identity.publicKey)) continue;
+              const key = JSON.stringify([task.taskId, slot.slotId, claim?.claimEpoch ?? 0, claim?.claimProposalId ?? null]);
               eligible.add(key); candidates.push({ taskId: task.taskId, slotId: slot.slotId, key });
             }
           }
           cursor = current.value.page.nextCursor;
         } while (cursor);
       } finally { await captured.close(); }
-      // A rejected attempt alone changes the transport revision, but not this
+      // A rejected proposal can change the operation-set revision without changing this
       // projection. Retry eligibility only after meaningful shared work changes;
       // completion of another active claim can free this signer's quota.
-      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify([generation, versions])));
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(versions)));
       const projection = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
       for (const key of attempted.keys()) if (!eligible.has(key)) attempted.delete(key);
       const selected = candidates.find(candidate => attempted.get(candidate.key) !== projection);

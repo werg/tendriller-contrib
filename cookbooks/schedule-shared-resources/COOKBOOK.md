@@ -13,7 +13,7 @@ evidence: "explained"
 
 # Reserve shared resources without double booking
 
-Use this for a meeting room, shared instrument, equipment checkout, or another resource whose availability must be coordinated. A read-only availability board is simpler when reservations occur in another authoritative system. For fixed slots among cooperating authorized writers, core's conditional state batches can claim the selected slots atomically. General interval, capacity, eligibility, approval, and hold-expiry rules need an explicit trusted policy or authoritative external integration. Core provides the concurrency primitive; the task defines its reservation policy.
+Use this for a meeting room, shared instrument, equipment checkout, or another resource whose availability must be coordinated. A read-only availability board is simpler when reservations occur in another authoritative system. For fixed slots among cooperating authorized writers, ordinary guarded Chronolog transactions can claim the selected slots atomically. General interval, capacity, eligibility, approval, and hold-expiry rules need an explicit trusted policy or authoritative external integration. Core provides the concurrency primitive; the task defines its reservation policy.
 
 ## Follow the reservation journey
 
@@ -30,7 +30,7 @@ Availability is a snapshot. Display when it was checked, allow refresh, and keep
 | Capacity | One exclusive instrument. | Any overlapping active reservation conflicts. |
 | Shared capacity | A room with a bounded seat count. | The authoritative check sums overlapping admitted quantities. |
 | Buffers | Setup and cleanup extend occupancy. | Conflict checks use occupied intervals, not only visible appointment times. |
-| Holds | A short tentative hold while completing review. | Server expiry and concurrent claims need explicit policy. |
+| Holds | A short tentative hold while completing review. | Clock authority and concurrent claims need explicit policy. |
 | Cancellation | Release capacity when the authorized operation commits. | Local removal from a calendar does not free the resource. |
 | Recurrence | Explicit instances with reviewed exceptions. | One successful occurrence does not imply the entire series was booked. |
 | Approval | A request waits for a designated approver. | Pending and confirmed occupancy need separate rules. |
@@ -58,19 +58,19 @@ const operation = await session.command('reserveSlots', {
   resourceId,
   slotIds: [...slotIds],
   expectedPolicyVersion: reviewed.value.policyVersion,
-}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
-const receipt = await operation.applied();
+}, { operationId: crypto.randomUUID() });
+const receipt = await operation.materialized();
 ```
 
-The command, not the page, must check the complete bounded unique slot set and write the reservation and occupancy together. In a general interval model it checks every overlapping interval and capacity boundary. Resource eligibility and author rights belong to the same mandatory definition. `basedOn` is an ordering prerequisite; it does not assert current availability or replace these transaction checks. The [guarded SQL definition](../run-a-peer-application/snippets/peer-task-board.mjs) demonstrates atomic claim and signer enforcement through the same command API.
+The command, not the page, must check the complete bounded unique slot set and write the reservation and occupancy together. In a general interval model it checks every overlapping interval and capacity boundary. Resource eligibility and author rights belong to the same mandatory definition. The reviewed revision describes observed state; it neither changes authored-time order nor replaces these atomic transaction checks. The [guarded SQL definition](../run-a-peer-application/snippets/peer-task-board.mjs) demonstrates atomic claim and signer enforcement through the same command API.
 
 Retain the operation ID separately from the domain reservation ID. After a lost reply use the session journal and exact retry; do not create another reservation merely because the UI timed out. Changed terms or policy require new review and new intent. A resource label remains a display value, not identity or authority.
 
-Application exclusivity holds within its selected history. Explicit recovery can abandon a reservation suffix that was previously applied. Describe that recovery policy before treating the page as a consequential booking authority. Stronger guarantees require an explicit protected capability, or an external booking system whose actual result is authoritative. The light host participant does not provide another reservation executor. External conflicts and idempotency must be qualified at that external boundary; if it cannot enforce exclusivity, label the page advisory.
+During a partition, two authors can each see provisional local success. After exchanging the same operation set, chronological replay produces the same current accepted reservation, potentially revising a previous success. Ordinary no-finality mode does not promise irrevocable booking. Choose supported finality with verified complete prerequisites, or an external booking system whose actual receipt is authoritative. A finalizer may close author time, never sort reservations. Qualify external conflicts and idempotency at that real boundary; otherwise label the calendar advisory.
 
 ## Make pending states actionable
 
-Distinguish selecting, checking availability, held, awaiting approval, submitting, confirmed, expired, rejected, and uncertain when the policy supports them. A hold countdown is a local display of a server-owned expiry, not the authority itself. On resume or reconnect, refresh its status; a suspended tab's timer must not extend the hold.
+Distinguish selecting, checking availability, held, awaiting approval, submitting, confirmed, expired, rejected, and uncertain when the policy supports them. A hold countdown is a local display of the declared authoritative expiry, not the authority itself. On resume or reconnect, refresh its status; a suspended tab's timer must not extend the hold.
 
 A confirmation receipt should name the reservation identity, resource, exact interval/timezone, quantity, current status, and allowed change/cancel actions. Avoid exposing another person's private booking details when only occupancy is needed. Notifications should carry the minimum useful information and their own delivery state; confirmation does not depend on a person reading a notification unless the policy explicitly requires it.
 
@@ -86,8 +86,8 @@ For offline use, allow a local proposed booking if useful, but label it as uncon
 
 | Scenario | Expected observation |
 | --- | --- |
-| Two clients confirm the same exclusive interval | The authority accepts only the allowed reservation; the loser keeps a reviewable proposal. |
-| Two clients submit the guarded fixed-slot batch | One claim is accepted; the other changes neither occupancy nor its reservation record. |
+| Two disconnected clients propose the same exclusive interval | Both may initially see provisional success; after merge every replica derives the same guarded outcome. Irrevocable confirmation waits for the configured stronger policy. |
+| Two clients submit the guarded fixed-slot batch | At the same derived revision only one claim is accepted; the rejected program changes neither occupancy nor reservation records. |
 | Capacity fills midway through an interval | The full interval check detects the conflict. |
 | Adjacent bookings include setup buffers | Occupancy follows the declared boundary/buffer policy. |
 | A hold expires while the tab is suspended | Resume shows the authoritative expiry and does not extend it locally. |
@@ -97,4 +97,4 @@ For offline use, allow a local proposed booking if useful, but label it as uncon
 | Change races with another booking | The old and new occupancy follow the real transaction policy without a hidden gap or double booking. |
 | One editor extends a reservation while another moves or cancels its older snapshot | The whole-record guard rejects the stale operation; no newly added slot remains occupied outside the accepted reservation. |
 
-Only actual command execution and, where selected, protected-capability or external-service checks establish the declared booking guarantee. Include explicit history recovery in that qualification. A fixture calendar can exercise the interface but cannot prove exclusivity.
+Only actual command execution and, where selected, configured finality or external-service checks establish the declared booking guarantee. Include disconnected competing successes, late predecessors and optional closed-time exclusion in that qualification. A fixture calendar can exercise the interface but cannot prove exclusivity.

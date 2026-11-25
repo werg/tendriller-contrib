@@ -68,17 +68,17 @@ const operation = await session.command('acceptHandoff', {
   expectedOfferVersion: offer.version,
   expectedTaskVersion: task.version,
   expectedOwner: task.owner,
-}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
-const receipt = await operation.applied();
+}, { operationId: crypto.randomUUID() });
+const receipt = await operation.materialized();
 ```
 
-The command must verify that its authenticated author is the eligible receiver, the exact offer is still open, the brief/version and task owner still match, and the transition is permitted. It then updates offer status, ownership and domain versions atomically. The UI check is advisory; `basedOn` is an ordering prerequisite, not a replacement for those guards. A task or offer version must advance whenever its relevant meaning changes.
+The command must verify that its authenticated author is the eligible receiver, the exact offer is still open, the brief/version and task owner still match, and the transition is permitted. It then updates offer status, ownership and domain versions atomically. The UI check is advisory; the captured revision records what was reviewed and is not an order input or a replacement for those guards. A task or offer version must advance whenever its relevant meaning changes.
 
 Keep access provisioning separate. An `offer.to` value does not grant membership, private keys or external credentials. Real-time expiry needs an explicit capability with an authoritative time policy; replaying a stored timestamp or rendering a countdown cannot establish it. A live “reviewing” signal can reduce collisions but is not permission or a lease.
 
-Retain the acceptance operation ID. Exact retry after a lost reply preserves the same signed attempt and inputs; a rejected or abandoned offer cannot be revived by stamping a newer version onto that operation. Show locally saved and applied outcomes separately, and restore pending cards from the maintained session journal. A late outcome updates its original offer, not whichever task is now open.
+Retain the acceptance operation ID. Exact retry after a lost reply preserves the same signed proposal, author time and inputs; a rejected or finality-excluded offer cannot be revived by stamping a newer version onto that operation. Show stored and materialized outcomes separately, and restore pending cards from the maintained session journal. A late outcome updates its original offer, not whichever task is now open.
 
-An applied transfer belongs to the selected application history and can be abandoned by explicit recovery. Show the recovery notice and reconcile responsibility under the application's declared policy. If that responsibility authorizes an irreversible external action, qualify an explicit protected boundary before dispatch; a displayed owner field or ordinary applied result is insufficient.
+A materialized transfer is a provisional result of the signed operation set. An earlier arriving operation can revise it, and a configured closed frontier can exclude a delayed offline acceptance. Rederive the owner from a coherent snapshot and reconcile responsibility under the application's declared policy. If that responsibility authorizes an irreversible external action, qualify an explicit protected boundary before dispatch; a displayed owner field or ordinary materialized result is insufficient.
 
 ## Handle partial, changed, and uncertain work
 
@@ -108,7 +108,7 @@ Use readable summaries, keyboard-operable decisions, clear focus after a respons
 | Only part of a packet is accepted. | Accepted and unassigned responsibilities are reported separately. |
 | An external request has an uncertain outcome. | The receiver reconciles its original identity before repeating an effect. |
 | The acceptance reply is lost and retried. | One transfer and its original outcome remain, without duplicated assignments. |
-| A queued acceptance survives reload. | Its original offer and operation ID are inspectable through the session journal; ownership follows the actual applied outcome. |
+| A queued acceptance survives reload. | Its original offer and operation ID are inspectable through the session journal; ownership follows the current materialized outcome. |
 | A withdrawn offer is recreated after an old acceptance was rejected. | Delivery of the old command retains its rejection; a newly reviewed offer produces new intent. |
 | An offer's deadline passes without changing its fields. | A value condition is not misrepresented as server-time expiry enforcement. |
 

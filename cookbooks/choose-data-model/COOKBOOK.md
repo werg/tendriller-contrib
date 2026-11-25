@@ -46,17 +46,17 @@ A command can assert prerequisites, change SQL and emit its domain event atomica
 
 ## Make saving and recovery legible
 
-Distinguish a local draft, a saved signed attempt, an applied accepted or rejected result, retained coverage and a separately completed effect. Inspect original operations after reopening. Exact retry preserves the signed attempt; a new decision needs new reviewed input. Do not build another mutation outbox merely to display pending work.
+Distinguish a local draft, a stored signed intent, a revisable materialized accepted/rejected result, peer retention and a separately completed effect. Inspect original operations after reopening. Exact retry preserves the signed attempt; a new decision needs new reviewed input. Do not build another mutation outbox merely to display pending work.
 
-Explicit application recovery selects a complete retained prefix. It can abandon a recent suffix, including work that was previously applied. Preserve adopted operation identities, show abandoned attempts and offer deliberate linked reapplication after reviewing the current domain. Queries and events must come from one coherent selected-history view. Neither `applied()` nor `shared()` is irreversible settlement.
+Merge authenticated operation sets and derive one coherent snapshot. Late earlier operations can change current results, events and schema. Keep signed proposal identities and original intent inspectable while rederiving views. Stored, materialized and retained do not imply optional finality; sealed-time exclusion is a separate explicit policy with visible original intent.
 
-New typing remains a different draft. A delayed result updates its original submitted snapshot and cannot clear newer work. A view replacement should preserve useful focus, selection and explanatory context while removing claims that no longer hold in the selected history.
+New typing remains a different draft. A delayed result updates its original submitted snapshot and cannot clear newer work. A view replacement should preserve useful focus, selection and explanatory context while removing claims that no longer hold at the current materialized revision.
 
 ## Keep privacy in the reader boundary
 
 All readers authorized for an application history may obtain its replicated plaintext. Topic names, query filters and hidden panels are not private collections. Use separate application membership and keys when audiences differ, with explicit cross-application aggregate publication if needed. See [private responses](../collect-private-responses/COOKBOOK.md).
 
-Verified authorship, permission to submit, recovery authority, page ownership and external-tool credentials are separate roles. A payload field called `owner` cannot grant authority. Preserve verified requester provenance through agent work and recheck required rights at the actual action boundary. Revocation limits future authorized access; it cannot erase plaintext already obtained.
+Verified authorship, permission to submit, finality eligibility, publication authority, page ownership and external-tool credentials are separate roles. A payload field called `owner` cannot grant authority. Preserve verified requester provenance through agent work and recheck required rights at the actual action boundary. Revocation limits future authorized access; it cannot erase plaintext already obtained.
 
 ## Preserve content and cursor identity
 

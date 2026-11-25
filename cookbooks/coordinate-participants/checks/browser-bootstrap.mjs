@@ -19,22 +19,21 @@ export const applicationReady = ready.then(attachment => {
   sessionStorage.setItem(key, session.endpoint.context.viewId);
   globalThis.fixtureOwner = attachment; globalThis.fixtureSession = session;
   globalThis.fixtureClient = createCollaborationClient({ session, endpoint: session.endpoint, runId: `fixture-${session.endpoint.endpointIncarnation}` });
-  globalThis.fixtureStore = createViewStore({ storage: localStorage, applicationId: session.applicationId, historyId: session.historyId,
-    profileId: session.deviceId, viewId: session.endpoint.context.viewId });
+  globalThis.fixtureStore = createViewStore({ storage: localStorage, applicationId: session.applicationId, profileId: session.identity.publicKey, viewId: session.endpoint.context.viewId });
   return session;
 });
-globalThis.fixtureReady = applicationReady.then(session => ({ deviceId: session.deviceId, endpoint: session.endpoint, ownerMode: globalThis.fixtureOwner.mode }));
+globalThis.fixtureReady = applicationReady.then(session => ({ deviceId: session.identity.publicKey, endpoint: session.endpoint, ownerMode: globalThis.fixtureOwner.mode }));
 void globalThis.fixtureReady.catch(() => undefined);
 export const detachView = async () => (await ready).detach();
 export const suspendView = async () => (await ready).suspend();
 export const resumeView = async () => (await ready).resume();
 export async function readParticipants(session) {
-  const authority = await verifyAuthorityBundle(await session.authority());
-  const grant = authority.grant(session.deviceId);
+  const authority=await session.readAuthority();await verifyAuthorityBundle(authority);
+  const grant=authority.memberships.at(-1).payload.members.find(member=>member.publicKey===session.identity.publicKey);
   if (!grant?.reader) return [];
-  return (await session.endpoints()).map(endpoint => ({ deviceId: session.deviceId, label: 'Enrolled reviewer',
+  return (await session.endpoints()).map(endpoint => ({ deviceId: session.identity.publicKey, label: 'Enrolled reviewer',
     canRead: grant.reader, authorized: grant.writer === true, revoked: false, applicationAdministrator: true, kind: 'person', route: 'on-demand',
     deviceLabel: 'Qualification browser', viewLabel: endpoint.context.documentPath,
-    endpoint: { ...endpoint, deviceId: session.deviceId }, presence: { phase: endpoint.state, expiresAt: Date.now() + 30_000 },
+    endpoint: { ...endpoint, deviceId: session.identity.publicKey }, presence: { phase: endpoint.state, expiresAt: Date.now() + 30_000 },
     identityEvidence: 'authenticated-signer', labelEvidence: 'qualification-declaration' }));
 }

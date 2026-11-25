@@ -48,9 +48,9 @@ Preserve the original input or an authorized immutable reference when that is ne
 | Existing record update | Preview changed fields against an authoritative revision. | A concurrent change may invalidate the reviewed update and require reconciliation. |
 | Bulk correction | Preview affected rows and sample edge cases before applying. | A convenient global rule can damage outliers if its scope is hidden. |
 
-Capture the reviewed records and application revision with one coherent `session.query`. Submit a declared domain command with stable operation identity and `basedOn`; the definition must check the reviewed domain versions, author and allowed transition before making all covered changes atomically. Keep later typing separate, restore pending work from `session.operations`, and use exact retry after a lost reply. A rejected or abandoned attempt needs current review before new intent. The [concurrent editing guide](../reconcile-concurrent-edits/COOKBOOK.md) explains this common boundary. Content transfer and external effects have their own receipts; a button does not combine separate authorities into a transaction.
+Capture the reviewed records and application revision with one coherent `session.query`. Submit a declared domain command with a stable operation identity; the captured revision identifies what was reviewed but does not guard it, so the definition must check the reviewed domain versions, author and allowed transition before making all covered changes atomically. Keep later typing separate, restore pending work from `session.operations`, and use exact retry after a lost reply. A rejected or finality-excluded attempt needs current review before new intent; a provisional rejection can still change when an earlier operation arrives. The [concurrent editing guide](../reconcile-concurrent-edits/COOKBOOK.md) explains this common boundary. Content transfer and external effects have their own receipts; a button does not combine separate authorities into a transaction.
 
-A replay after a lost reply must recover the original outcome, not create another batch with new identities. Deduplication of delivery differs from deduplication of source records: two identical-looking rows may be intentional, while the same accepted command must not create them twice. For a deliberate corrected import, create new intent and show which previous rows it replaces or supplements.
+A replay after a lost reply must resume the original signed proposal and its current outcome, not create another batch with new identities. Deduplication of delivery differs from deduplication of source records: two identical-looking rows may be intentional, while the same accepted command must not create them twice. For a deliberate corrected import, create new intent and show which previous rows it replaces or supplements.
 
 ## Make review usable at realistic scale
 
@@ -69,7 +69,7 @@ Export a correction report in a format that preserves source locations, decision
 | A quoted field contains a newline, a very long value, or malformed input. | The parser either handles the supported case correctly or reports a bounded, located error. |
 | A duplicate match is ambiguous. | No record is silently overwritten; candidate matches and the chosen policy are inspectable. |
 | A mapping changes after row corrections. | Affected corrections are identified before recomputation, with a way to retain the prior draft. |
-| A partial commit loses its reply. | The original receipt is recoverable and accepted rows are not duplicated on retry. |
+| A partial commit loses its reply. | The original operation and its current outcome are inspectable and accepted rows are not duplicated on retry. |
 | Another editor changes a destination record during review. | The stale update is rejected or reconciled under the declared policy without losing corrections. |
 | The person requests undo after external effects. | The page describes a compensating action and its limits rather than promising erasure. |
 

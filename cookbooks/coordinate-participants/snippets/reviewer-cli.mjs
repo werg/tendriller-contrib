@@ -14,12 +14,12 @@ const lifetime = new AbortController(), stop = () => lifetime.abort();
 process.once('SIGINT', stop); process.once('SIGTERM', stop);
 const token = (await readFile(values['token-file'], 'utf8')).trim(), runId = crypto.randomUUID();
 const owned = await attachNativeSession({ directory: values.directory, token, connect: connectApplicationOwner,
-  applicationId: values['application-id'], definitionId: 'independent-review-workspace', definitionVersion: '1',
+  applicationId: values['application-id'],
   context: { runId, documentPath: `native:${values.policy}` }, signal: lifetime.signal });
 try {
   const actualRunId = owned.session.endpoint.context.runId ?? runId;
   const emit = value => process.stdout.write(`${JSON.stringify(value)}\n`);
-  emit({ status: 'attached', policy: values.policy, signer: owned.session.deviceId, endpoint: owned.session.endpoint, runId: actualRunId });
+  emit({ status: 'attached', policy: values.policy, signer: owned.session.identity.publicKey, endpoint: owned.session.endpoint, runId: actualRunId });
   await runReviewer({ session: owned.session, runId: actualRunId, policy: values.policy, signal: lifetime.signal,
     onOperation: value => emit({ type: 'operation-reference', ...value }), onResult: value => emit({ type: 'review-result', ...value }) });
 } catch (error) { if (!lifetime.signal.aborted) throw error; }

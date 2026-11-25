@@ -21,7 +21,7 @@ Imagine a queue of 200 imported records where a person wants to accept 40 review
 
 Provide select, inspect, preview, confirm, execute, and reconcile stages. Preserve selection across pagination only when that is the defined behavior, and make hidden selected rows discoverable. Offer an accessible list and per-row controls alongside any visual selection gesture. If a record disappears or changes, mark it unresolved rather than quietly substituting another row at the same index.
 
-A selection snapshot should identify the intended operation, target identities, reviewed versions/generations, parameters, and any evidence or approval versions needed to preserve meaning. It is application data; using a field named `batch` does not activate a core workflow or transaction.
+A selection snapshot should identify the intended operation, target identities, reviewed domain versions, parameters, and any evidence or approval versions needed to preserve meaning. It is application data; using a field named `batch` does not activate a core workflow or transaction.
 
 ## Preview consequences at the right level
 
@@ -52,18 +52,17 @@ const selection = reviewed.value.items.map(item => ({
 }));
 const operation = await session.command('archiveItems', { selection }, {
   operationId: crypto.randomUUID(),
-  basedOn: reviewed.revision,
 });
-const receipt = await operation.applied();
+const receipt = await operation.materialized();
 ```
 
-The definition rejects empty, duplicate, unknown or over-limit selections and validates every selected version and transition before updating records. An unrelated record can change without rejecting the batch unless the domain deliberately guards a broader revision. `basedOn` carries the coherent application revision as an ordering prerequisite; it does not replace version checks. These query and command names are application vocabulary, not installed runtime methods.
+The definition rejects empty, duplicate, unknown or over-limit selections and validates every selected version and transition before updating records. An unrelated record can change without rejecting the batch unless the domain deliberately guards a broader revision. The captured application revision identifies what was reviewed; it is not an order input and does not replace version checks. These query and command names are application vocabulary, not installed runtime methods.
 
-Observe locally saved, applied accepted/rejected and retained coverage separately. An atomic applied batch is still part of recoverable application history. Explicit recovery may abandon the whole operation; reread the selected history and preserve the review snapshot before offering deliberate reapplication. Ordinary application execution cannot atomically change host publication, transfer membership across applications, send an email or commit another system's transaction.
+Observe stored locally, materialized accepted/rejected, retained coverage and finality (when configured) separately. An atomic batch is one signed operation whose provisional outcome can be revised when an earlier operation arrives. A configured closed frontier can exclude the whole operation; reread a coherent snapshot and preserve the review snapshot before offering a deliberate new, reviewed batch. Ordinary application execution cannot atomically change host publication, transfer membership across applications, send an email or commit another system's transaction.
 
 Independent per-item commands are useful when partial progress is acceptable. Give each immutable item operation a stable identity and retain a parent batch ID for navigation. Define whether failure stops dependent work or allows independent items to continue. A parent status of “started” does not mean every child succeeded.
 
-Bound the selected count, payload bytes, concurrent requests, retry age and retained diagnostics. If a large workload must be divided into chunks, expose those transaction boundaries and partial completion. Irreversible external actions need their own configured protected boundary, idempotency and reconciliation; a collection of applied receipts does not provide one.
+Bound the selected count, payload bytes, concurrent requests, retry age and retained diagnostics. If a large workload must be divided into chunks, expose those transaction boundaries and partial completion. Irreversible external actions need their own configured protected boundary, idempotency and reconciliation; a collection of materialized outcomes does not provide one.
 
 ## Present progress people can act on
 
@@ -77,9 +76,9 @@ Use accessible status summaries without announcing every result at high volume. 
 
 ## Recover without duplicating effects
 
-Retain the review selection and explanatory progress under an appropriate privacy policy. The session persists admitted command attempts and exposes them through `session.operations`; use original operation IDs to restore the progress view. Retry each saved operation with `session.retry` and correlate its actual result with the frozen selection. Do not build another mutation outbox or create new commands because a waiter timed out. Reauthorize before restoring private details.
+Retain the review selection and explanatory progress under an appropriate privacy policy. The session persists admitted command attempts and exposes them through `session.operations`; use original operation IDs to restore the progress view. Retry each saved operation with `session.operations.retry` and correlate its actual result with the frozen selection. Do not build another mutation outbox or create new commands because a waiter timed out. Reauthorize before restoring private details.
 
-A lost external reply is an uncertain outcome, not proof of failure. Query the real action authority or use its documented idempotency mechanism before retrying. If application recovery abandons an attempt, preserve its identity and review current domain state before `session.reapply` creates a deliberately linked new operation. External effect journals must independently reconcile actions already dispatched.
+A lost external reply is an uncertain outcome, not proof of failure. Query the real action authority or use its documented idempotency mechanism before retrying. If a configured closed frontier excludes an attempt, preserve its identity and review current domain state before authoring a deliberately new operation; never silently retimestamp it. External effect journals must independently reconcile actions already dispatched.
 
 Offer “Retry these original failures” only for cases whose retry meaning is unchanged. If records or parameters must change, create a new reviewed batch and link it to the prior one. Successful items should remain excluded unless the person deliberately selects a new action. External effects still require their own deduplication and compensation policy.
 

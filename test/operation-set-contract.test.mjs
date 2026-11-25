@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { operationSetSourceViolations } from '../cookbooks/run-a-peer-application/checks/operation-set-source.mjs';
+test('single-format public consumer gate rejects retired ordering and schema APIs',()=>{for(const source of ['createGenerationRegistry({})','signTransitionRequest({})','session.reapply(id)','operation.applied()','operation.shared()','session.recoveryPoint()','openNativeApplication({})','prepareSqlApplication({})','schemaDigest: fixed','schemaAdministrator: signer'])assert.ok(operationSetSourceViolations(source).length,source);});
+test('authored operation-set APIs and independent facts remain valid',()=>{assert.deepEqual(operationSetSourceViolations("createApplicationSession({device,definition,authority,createMaterializer}); session.submit({program,operationId,authorTimestampMs}); operation.materialized(); operation.retained(); operation.finalized(); session.finality.closeAuthorTime({throughMs}); session.connectPeer({connection});"),[]);});

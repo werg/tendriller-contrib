@@ -1,260 +1,183 @@
 # Choose application primitives by their guarantees
 
-**Application contract:** one public Chronolog session owns commands, queries,
-events, replication and the operation journal. Native and browser runtimes use
-that contract with explicit storage, transport and engine capabilities. There is
-no application profile selector or separate hosted data implementation.
-`operation.applied()` returns an accepted or rejected result at a selected
-history position. Recovery may abandon a recent suffix, including previously
-applied work; the current session exposes no `final()` wait.
+Chronolog is an authenticated **operation-set CRDT**. Authorized devices author
+immutable signed transactions independently, retain them durably, exchange facts,
+and derive application state locally. There is no operation-ordering server.
 
-The [peer application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
-uses packed public artifacts directly; its
-[checks guide](../cookbooks/run-a-peer-application/checks/README.md) documents the
-native RTC, SQL, hosted, and browser qualification runners. Deployed operating limits
-need their own observations. An implementation or method name alone does not
-establish those qualifications.
+Every replica uses exactly one canonical application comparator:
 
-Start with the recovery contract. A live cursor can disappear. A submitted
-message can be retained by peers yet disappear from the selected application
-history after recovery. A resource reservation needs a guarded transaction.
-External work needs a journal and an explicit policy for recovery and uncertain outcomes.
+`(signed author timestamp, signing public key, stable proposal ID)`.
 
-## Coordinate several participants through public modules
+Network arrival, receipt position, host clocks and transport counters are not
+application-order inputs. Given the same eligible proposals and execution profile,
+replicas derive the same state. SQL convergence is chronological replay of the
+operation set, not a merge of independently modified SQL database files.
 
-Use the maintained optional `@tendriller/core/collaboration` module and the
-[multi-participant reference](../cookbooks/coordinate-participants/COOKBOOK.md)
-when a workspace needs addressed conversation, exclusive execution or specialist
-contributions. Chronolog owns the retained session, authenticated attempts,
-operation journal and attached endpoints. Core owns reusable interaction,
-claim/result guards, participant and receipt models, and browser owner
-composition. Contrib supplies the review policy, authored views and executable
-consumer; it adds no owner election, retry queue or authority protocol.
+## Local work does not require an agent
 
-One browser profile has one live owner and many independently allocated views.
-The retained signer is distinct from its owner instance, attached endpoint,
-document and run. A view detaches its own observers without closing siblings.
-Per-view drafts and references survive independently, while each saved operation
-keeps its original application, authenticated author and operation ID.
+An initialized browser can save and materialize ordinary work without an agent,
+native process, peer connection or finalizer. An unavailable agent affects only
+features that actually invoke it. Retained local identity, permissions, keys and
+state reopen before remote discovery or authority refresh.
 
-A request names its target, response policy and fixed contribution slots. A
-guarded claim binds a claimant, run, endpoint incarnation, claim epoch, task
-version and selected generation. Handoff and recovery invalidate old execution
-authority; late output remains inspectable evidence. Cancellation requested,
-execution stopped, result accepted and synthesis accepted are distinct states.
-Observed history changes never grant authority to execute a tool. Before an
-irreversible action, apply the separately configured external-action guarantee.
+A new browser still needs initial enrollment and the real encryption keys. State
+that was never received is not available offline. Explain missing provisioning,
+missing content and incomplete synchronization honestly rather than inventing an
+empty replacement application or instructing the person to start a mandatory
+agent server.
+
+Use the target service's current [build guide](https://tendriller.dev/docs/BUILD_AN_APP.md)
+and [capability map](https://tendriller.dev/docs/CAPABILITIES.md). On staging or another
+service origin, use that same origin for discovery, readiness, enrollment and its
+guides. Do not install a moving registry version in place of the service's verified
+immutable composition.
 
 ## Choose the smallest sufficient mechanism
 
-| Need | Use | Recovery meaning |
+| Need | Mechanism | Actual guarantee |
 | --- | --- | --- |
-| A value useful only on this device | Local state or a draft | The application chooses whether it survives reload. |
-| Information that may expire or be replaced | Live signals | No offline outbox, retained history or completion guarantee. Reconnect with fresh observations. |
-| Shared conversation or recorded observations | Peer application events | Exact signed attempts and deterministic replay; a selected recovery may abandon a recent suffix. |
-| A conditional shared state transition | One SQL/event program | Assertions, mutations and effective events succeed or fail together in the selected order. |
-| Administration that must not be rolled back | Signed control transition or protected administrative action | Monotonic permissions and recovery floors survive application-tail loss. |
-| Irreversible external work | An explicitly configured protected action or durable external-action service | Preserve the action's prerequisites, stable identity, authorization, provider idempotency and reconciliation independently of a lossy application tail. |
+| An unsent draft, focus or selected tab | Per-view local state | Separate from replicated domain state; persistence is explicit. |
+| Presence, typing, readings or disposable progress | Session signals | Live delivery only; no durable journal or finality. |
+| Shared observations or conversation | Authored event transactions | Local durable identity and deterministic derived events; outcomes can be provisional. |
+| Relational state and business guards | Ordinary SQLite transaction programs | DDL, DML, ownership operations and effective emits are atomic at their authored-time position. |
+| Independent offline editing | Operation-set replication | Each device authors locally; reconnect merges facts and replays affected suffixes. |
+| Retention on another device | Authenticated retention evidence | A named peer retained the specified operation; this is not finality. |
+| Closed history against late first inclusion | Explicit optional finality policy | Verified admission and author-time closure, with declared authority and clock assumptions. |
+| An irreversible external effect | Verified final prerequisites plus an idempotent effect protocol | Neither local materialization nor peer retention alone authorizes the effect. |
 
-Use the [signal guide](../cookbooks/share-live-signals/COOKBOOK.md) for typing,
-presence, cursors, readings, previews and disposable progress. An events-only
-application needs no SQL engine. Add SQL when assertions and relational updates
-make the domain simpler. Neither an agent nor a native process makes SQL or
-strong finality necessary.
+An events-only application needs no SQL engine. A SQL application explicitly
+selects a qualified deterministic engine; do not infer or freeze its schema from
+a setup-time program. Native and browser/WASM adapters must implement the same
+pinned SQL/platform semantics.
 
-Opening the session starts its authenticated protocol participant. Identity,
-membership, control exchange, code publication and live signals use the same
-verified authority without opening application data. The first command, query,
-content request or durable observation loads the session's one data component.
-In the browser, small identity/control metadata uses IndexedDB; OPFS, its
-exclusive lock and any SQL/WASM engine wait for that data demand. Inspecting
-status or subscribing to status changes does not initialize the database.
+## Ordinary schema and permission transactions
 
-Protocol authorization belongs to the participant. The database consumes that
-verified authority and enforces the command's execution and domain guards.
-Database failure can make data operations unavailable while the authenticated
-control and live connection remain usable.
+Application schema is database state. Authorized `CREATE`, `ALTER`, `DROP`,
+index, view, trigger and supported virtual-table changes use the same signed
+transaction flow as data changes. They do not require code publication, a special
+schema transition or an online native participant.
 
-## Follow the authenticated selected history
+DDL authority is explicit. Namespace creation rights differ from rights over an
+existing object; ownership of a row or permission to update it does not authorize
+dropping another party's table. Grants, revocations and collective membership
+changes are normal authorized platform operations. Schema, permission state,
+mutations and effective emits roll back together when a program fails.
 
-An authorized coordinating peer orders commands during one session generation. Other peers retain the original
-signed attempts, verify delegated order and replay it independently. The
-coordinator is a temporary role. The creator and a native process are ordinary
-participants with explicit capabilities.
+The deterministic engine manifest pins SQL semantics, trusted platform code and
+limits—not the application's tables or columns. Chronolog's protected internal
+catalogs and unsafe SQL restrictions remain in force. Ordinary application SQL
+cannot attach host files, load extensions or edit security metadata directly.
 
-Cloudflare publishes assets and supplies discovery, enrollment and occasional
-control/generation transitions. Established direct peer connections keep a
-healthy current generation working while host endpoints are unavailable.
-WebSocket-relayed connections require the host's relay and consume its bandwidth;
-blocking control HTTP and blocking relay delivery are distinct faults. Ordinary
-commands and replication require no hosted append, certificate or backup
-acknowledgement. If both the coordinator and control host are unavailable, keep
-local drafts and wait to select a new generation.
+Do not dependency-sort schema changes ahead of author time. A late earlier schema
+transaction can change a later transaction's outcome; an actually later schema
+transaction cannot retroactively move before it. Query/schema introspection and
+frontends must observe the resulting materialized revision.
 
-A recovery can adopt an earlier **complete prefix of the currently selected
-history**. Recent work outside that ancestry becomes abandoned. It remains
-inspectable and may be deliberately reapplied as a new attempt. A returning old
-branch never silently merges. If G2 excluded G1 positions 81–100, G3 cannot
-readopt them merely because an old peer returns with valid signatures.
+## Four independent observations
 
-The public runtime and independent consumers exercise this selected-history
-contract. Stronger settlement is a separately declared capability. The evidence
-record states which exact package and runtime scenarios have run, without
-promoting local results to browser or deployment readiness.
+These are facts, not a required ladder:
 
-All participants use one public session, command/query vocabulary and journal.
-Storage, transport and declared capability policies supply different roles; they
-do not introduce incompatible application stacks. A lost peer never triggers an
-automatic hosted fallback. Signed protocol format versions identify verified wire data; they do not select
-a different application API or turn author timestamps into generation order.
-
-## One protocol with participant-specific interests
-
-All participants use the same bounded Chronolog envelope. Transports declare
-which facets and actions they carry; routing interest never grants application
-authority. The public session owns one journal and coherent view regardless of
-whether the participant runs in a browser, native process or hosted adapter.
-
-| Exchange | Facet | Default hosted participation |
-| --- | --- | --- |
-| Membership, keys policy and generation selection | Control | Small signed monotonic records; verify each role through the shared authority rules. |
-| Application definition, page HTML and code assets | Publication | Authorized signed revision and exact asset hashes; publication does not rewrite database history or executable semantics. |
-| Available routes and compact recovery hints | Discovery | Authenticated, expiring and coalesced; hints are not grants or retained-history proof. |
-| Invitations and connection introductions | Ephemeral | Only declared introduction actions; short lifetime and bounded traffic. |
-| Typing, cursors and other live UI signals | Ephemeral | Peer transport; filtered before hosted delivery and rejected at host ingress. |
-| Commands, ordered history and retention coverage | Database | Peer transport; no mandatory hosted append, body, acknowledgement or certificate. |
-| Retained attachments and content chunks | Content | Peer transport by default; explicit providers may add separately qualified retention. |
-
-The control transport checks its interests before HTTP and validates scoped
-responses. The host checks the same rules at ingress. Adding a stronger service
-changes an explicit capability and transport policy within the common session;
-it does not introduce another command API, outbox or incompatible replay path.
-
-## Keep authority roles separate
-
-| Role | Decision it owns | What that role does not grant |
-| --- | --- | --- |
-| Author/device | Signs an immutable attempt under its current grants | Another person's identity or unrestricted application access |
-| Data owner or team collective | Data and domain permissions | Sequencing or recovery authority by implication |
-| Schema/control administrator | Protected schema, permission and key changes | Permission to impersonate application authors |
-| Coordinating peer | Order within its selected generation | Row ownership, author grants or permanent authority |
-| Recovery requester | May initiate a policy-permitted transition | Eligibility for an arbitrary peer or adoption of an excluded branch |
-| Hosted control selector | Authenticated atomic selection and monotonic controls | SQL execution proof or permanent survival of ordinary edits |
-| Replica | Retains and verifies usable history | Permission to write, coordinate or discard another participant's work |
-| Effect worker | Performs authorized work and reconciles it across recovery | Authority derived from payload claims or permission to repeat a completed effect |
-
-In this composition, Chronolog owns shared authority verification; Tendriller
-hosts the control participant and provides account integration. Discovery advertisements, account
-login, connection success and possession of the newest database are not authority
-evidence. Application code does not decide which old branch becomes current.
-
-Keep original authenticated event origin attached to projections and agent work.
-A payload's `author`, `role` or `instruction` property is domain data. It cannot
-replace the verified signer, grant private tools or impersonate a missing device.
-A stable application/team identity must outlive the creating device.
-
-## Distinguish completion from recovery
-
-These are distinct observations, not a required ladder of protocol stages.
-`operation.applied()` waits for execution in the selected history;
-`operation.shared()` separately observes retained coverage on another peer.
-Neither promises that an operation survives a later permitted recovery.
-
-| Observation | What it establishes |
+| Observation | Meaning |
 | --- | --- |
-| Saved | The exact attempt is durably recorded locally with its original generation and guards. |
-| Waiting | The original attempt is retained; no current execution outcome is known. |
-| Applied accepted | The selected sequence executed the complete program successfully at a stated position. |
-| Applied rejected | That execution rejected the complete program; no partial mutation or effective event escaped. |
-| Shared | A named independent peer retained a complete usable prefix; reachability may change. |
-| Abandoned | Recovery excluded the original attempt from the selected ancestry. Its evidence is retained. |
+| Stored locally | The exact signed proposal, timestamp and identity are durable on this device. |
+| Materialized locally | This replica has a coherent current result at a projection revision. Success/rejection can change after earlier facts arrive. |
+| Retained by peers | Authenticated availability evidence identifies independent holders. Two tabs sharing one device store are not two copies. |
+| Finalized | The configured policy proves admission/closed time and the relevant final materialization has its bodies, keys and replay complete. |
 
-Reserve `final` for an explicitly supported irrevocable-settlement capability.
-Do not alias a final wait to `applied()` or expose an unsupported wait that never resolves.
+Submission acknowledges local durable storage without waiting for a remote peer
+or SQL warm-up. Inspect current operation facts or subscribe to changes. An
+aborted waiter says nothing about the operation's existence; retry the exact
+original proposal instead of generating another ID or timestamp.
 
-Applied outcomes are stable while their position remains in the selected
-ancestry. Inherited attempts keep their original identity and outcome. An
-excluded attempt does not become a normal rejection and does not silently get
-a new admission generation.
+A different body under the same author/operation handle is a conflict. Encryption
+wrappers and forwarding peers do not become new authors or new logical proposals.
+Do not maintain a second command outbox in a UI, cookbook or hosted adapter.
 
-A timeout or cancelled waiter says nothing about command completion. Recover a
-lost reply by looking up or retrying the same operation. Reusing its ID with new
-payload, guards or definition version is a conflict. A deliberate reapplication
-uses current state and permissions, a new operation ID, and a link to the
-abandoned intent. There is one journal, owned by Chronolog; a cookbook, host MCP
-or UI must not add another command outbox.
+## Optional finality is not an operation sorter
 
-## Read and change one coherent view
+Ordinary offline-first applications default to no finality. Valid eligible
+operations can merge arbitrarily late, so local outcomes remain revisable.
 
-A captured view binds SQL, events, outcomes and revision to one selected history.
-Use it when reading the preconditions for a command. Include business guards in
-the program: a revision token identifies what was observed but cannot prove the
-business condition still holds.
+An application can explicitly select a supported signed-frontier or validator
+policy. Its authenticated configuration names authorities, parameters and clock
+assumptions. An eligible browser can act as a finality authority; a native or host
+provider is a deployment choice, not a privileged operation sequencer.
 
-A generation change between reading and preparation either preserves the
-captured position as inherited ancestry or produces an explicit reread/reapply
-result. The session owns that decision. Do not refresh stale guards inside an
-exact retry.
+A provider can prove inclusion and close an author-time range. It cannot choose
+which transaction executes next, rewrite a timestamp or provide a comparator.
+Missing finality pauses finality only: local authoring and provisional reads keep
+working. A browser being closed or suspended can pause its provider; do not
+promise background execution that the platform cannot provide.
 
-Within a generation, update projections incrementally. At recovery, reuse only
-state within the adopted prefix and publish one coherent replacement. Never
-combine old SQL with new-generation events. Change consumers must handle an
-explicit recovery/reset; the selected history is not an eternally append-only
-stream. A coalesced UI notification is not a durable worker acknowledgement.
+Sealing has a real consequence: an unseen operation first delivered behind the
+closed frontier can be excluded even if it was genuinely authored offline. Keep
+that intent inspectable, show the reason and require an explicit new authored
+intent if the person chooses to resubmit. Never silently retimestamp it.
 
-Draft text, focus and original operation references remain local interaction
-state. A redraw or recovery must not overwrite newer typing. Automatic replay
-is deterministic execution, not user Undo and not permission to invoke a tool.
+Retention, inclusion certification and final materialized state are different.
+Missing bodies, keys, predecessor evidence or execution support must not be
+turned into fabricated final results. Do not claim threshold safety or automatic
+provider replacement beyond the implemented and qualified policy.
 
-## Make recovery honest
+## Derive frontends reactively
 
-Prefer the freshest complete usable peer state on the selected ancestry. Metadata
-alone, a SQL cache, a heartbeat or a large sequence number does not establish
-completeness. Missing bodies inside a candidate prefix must be repaired or the
-candidate must choose an earlier complete point. Two tabs sharing one storage
-owner are one copy.
+Prefer FRP/state-derived rendering without mandating a particular framework:
 
-Five minutes is the initial measured freshness objective with another suitable
-peer available. It is not an unconditional maximum loss. A long partition or a
-single remaining copy can leave much more work exposed. Show the adopted base,
-known abandoned range and unknown loss explicitly. If no usable state survives,
-report unavailable; never silently create a new empty application.
+`render = current materialized snapshot + local view/draft state`.
 
-Revocation, key changes and protected administrative transitions follow a
-monotonic control chain. Rollback of application data cannot widen access or
-remove a protected recovery floor. A remote snapshot signature authenticates
-its producer's claim; it does not by itself prove correct SQL execution.
+Use `createLiveView` and `createViewStore`, or a framework's equivalent subscription
+and derived-state facilities. Subscribe before the first read. Treat notifications
+as invalidation and re-query the snapshot; do not accumulate network arrivals into
+another mutable UI database or increment a counter as truth.
 
-## Keep external effects explicit
+Late earlier operations can move, update or remove rows, revise guard results and
+change schema. Recompute lists, counts, details, inspector outcomes and available
+fields from the new revision. Key DOM/components by stable entity identity rather
+than array index. Preserve local unsent text, selection, focus, scroll and deep
+links. A stale async read must not overwrite a newer snapshot or draft.
 
-An applied event cannot by itself authorize an irreversible email, payment or
-external deletion. Recovery can abandon its business preconditions. A dispatch
-journal and provider idempotency prevent some duplicate calls but cannot make
-those abandoned preconditions true.
+Captured reads bind schema, data, events and outcomes to one immutable local
+revision. New reads use the replacement revision. Missing-table/column errors are
+explicit view errors; retained old data must not masquerade as current, and an
+outdated view must not disable unrelated local authoring.
 
-Select a stronger boundary explicitly: a durable external-action service, or a
-protected checkpoint covering the complete prerequisite program and dependencies.
-Keep stable effect identities, authorization and reconciliation for uncertain
-calls. Do not automatically redispatch after a generation change. If a required
-protected prefix is unavailable, report that action unavailable while ordinary
-collaboration continues.
+Show network health separately from storage/materialization and optional finality.
+Keep locally available content visible offline. Enable ordinary Save from signing
+and storage prerequisites, not from a connection flag, remote refresh or finalizer.
 
-The existing `FinalEventSource` adapter requires immutable accepted-event history
-and must not consume generation-applied events. Reversible computation and
-replaceable caches may instead use an explicit recovery-aware rerun policy.
+## Claims, tools and external effects
 
-## Give an implementing agent a short contract
+Conditional claims and reservations use ordinary transactional guards. During a
+partition, two devices can each see a provisional success; after merge, authored-
+time replay determines the same current outcome everywhere. Do not promise global
+exclusivity from an offline local result.
 
-1. Choose signals-only, events-only, or SQL/events according to domain needs.
-2. Use the unified selected-history contract and state its explicit recovery exception.
-3. Establish device identity and explicit author, coordinator and recovery rights.
-4. Use the public session for query, command, operation inspection and recovery.
-5. Preserve exact attempts across lost replies; deliberately review reapplication.
-6. Use an explicit stronger boundary for irreversible work; keep reversible computation recovery-aware.
-7. Qualify the packed composition against host outage, coordinator loss, returning
-   old branches and close/reopen without replacing device identity.
+Use the optional [participant coordination cookbook](../cookbooks/coordinate-participants/COOKBOOK.md)
+for addressed conversation and specialist work. Device identity, attached endpoint
+and run are different identities. A selected tool provider is RPC dispatch policy,
+not operation-order authority. Existing uncertain work keeps its original signer
+and request identity when providers become unavailable.
 
-The [peer application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
-connects these choices to executable consumers. Its evidence distinguishes a
-model, independent package exercise, real browser/native run and deployed network
-measurement. A successful build cannot stand in for the next level.
+Payload properties named `author`, `role` or `instruction` are data. Only verified
+signatures, capabilities and explicit approvals confer authority. Finalizer,
+publisher, writer and DDL privileges are independent.
+
+Before irreversible work, choose a supported finality/retention policy and an
+idempotent external-effect protocol. Do not drive payments, email or deletion by
+imperatively reacting to provisional event arrivals. Finalized forwarding uses
+stable event identities; provisional consumers must handle rederivation, resets
+and outcome changes.
+
+## Qualification
+
+Use the [application cookbook](../cookbooks/run-a-peer-application/COOKBOOK.md)
+and its [checks](../cookbooks/run-a-peer-application/checks/README.md). Required
+scenarios include independent offline writers, arbitrary delivery permutations,
+duplicates, late earlier operations, mutable DDL and permissions, outcome changes,
+browser finalization with the agent absent, Worker/native restart and explicit
+missing-dependency/finality failures.
+
+A source build, synthetic report or method name does not establish a connected
+application or a published composition. Bind actual source commits, execution
+profiles, archive hashes and real native/browser/transport observations. No
+migration, old ordering profile or compatibility reader is part of this system.

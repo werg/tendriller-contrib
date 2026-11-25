@@ -6,18 +6,18 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { parseArgs } from 'node:util';
-import { verifyPeerSessionArtifact } from '../../run-a-peer-application/checks/peer-session-artifact.mjs';
+import { verifyPeerSessionArtifact, verifyAuthorityArtifact } from '../../run-a-peer-application/checks/peer-session-artifact.mjs';
 import { validateBrowserReport } from './browser-report.mjs';
 
-const { values } = parseArgs({ options: { 'session-artifact': { type: 'string' }, 'core-artifact': { type: 'string' },
+const { values } = parseArgs({ options: { 'session-artifact': { type: 'string' }, 'authority-artifact': { type: 'string' }, 'core-artifact': { type: 'string' },
   'core-provenance': { type: 'string' }, wasm: { type: 'string' }, output: { type: 'string' }, chromium: { type: 'string' },
   'allow-dirty': { type: 'boolean', default: false } } });
-for (const name of ['session-artifact', 'core-artifact', 'core-provenance', 'wasm', 'output']) assert.ok(values[name], `Required --${name} /exact/path`);
+for (const name of ['session-artifact', 'authority-artifact', 'core-artifact', 'core-provenance', 'wasm', 'output']) assert.ok(values[name], `Required --${name} /exact/path`);
 const here = import.meta.dirname, root = resolve(here, '../../..'), output = resolve(values.output), consumer = join(output, 'consumer');
 try { await stat(output); throw Error('Use a new evidence directory'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
-const report = { format: 'tendriller-collaboration-browser/v1', passed: false, error: null,
+const report = { format: 'tendriller-collaboration-authored-browser/v1', passed: false, error: null,
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'), tree: git('rev-parse', 'HEAD^{tree}'),
     dirty: Boolean(git('status', '--porcelain', '--untracked-files=all')) }, artifacts: [], fixtures: [], scenarios: [],
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
@@ -25,6 +25,7 @@ const report = { format: 'tendriller-collaboration-browser/v1', passed: false, e
 await mkdir(consumer, { recursive: true }); const reportPath = join(output, 'report.json');
 try {
   if (!values['allow-dirty']) assert.equal(report.source.dirty, false, 'Commit the authored views before qualification');
+  const authorityArtifact=resolve(values['authority-artifact']);
   const sessionArchive = resolve(values['session-artifact']), coreArchive = resolve(values['core-artifact']);
   const coreBytes = await readFile(resolve(values['core-provenance'])), coreProof = JSON.parse(coreBytes);
   assert.equal(coreProof.repository, 'werg/tendriller');
@@ -32,7 +33,7 @@ try {
   assert.ok(sdk); assert.equal(hash(await readFile(coreArchive)), sdk.sha256);
   if (!values['allow-dirty']) assert.equal(coreProof.dirty, false);
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ private: true, type: 'module', name: 'independent-collaboration-browser-consumer' }));
-  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', sessionArchive, coreArchive,
+  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', sessionArchive, authorityArtifact, coreArchive,
     'playwright@1.65.0', 'esbuild@0.28.2'], { cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
     env: { ...process.env, npm_config_cache: join(output, 'npm-cache') } });
   const session = await verifyPeerSessionArtifact({ installed: join(consumer, 'node_modules/@chronolog/peer-session'),
@@ -41,10 +42,13 @@ try {
   const core = JSON.parse(await readFile(join(consumer, 'node_modules/@tendriller/core/package.json'), 'utf8'));
   assert.ok(core.exports['./browser-owner']); assert.ok(core.exports['./worker-owner']);
   assert.equal(core.version, sdk.version);
-  report.artifacts = [session.artifact, { name: core.name, version: core.version, sha256: sdk.sha256,
+  const authority=await verifyAuthorityArtifact({installed:join(consumer,'node_modules/@chronolog/authority'),archive:authorityArtifact,allowDirty:values['allow-dirty']});
+  assert.equal(authority.sourceCommit,session.artifact.sourceCommit,'Session/authority must come from one exact source');
+  assert.equal(authority.sourceTree,session.artifact.sourceTree,'Session/authority source trees differ');
+  report.artifacts = [session.artifact,authority, { name: core.name, version: core.version, sha256: sdk.sha256,
     sourceCommit: coreProof.source, sourceTree: coreProof.sourceTree, sourceDirty: coreProof.dirty, provenanceSha256: hash(coreBytes) }];
   const tree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/peer-session', '@tendriller/core', 'esbuild', 'playwright']);
+  assert.deepEqual(Object.keys(tree.dependencies).sort(), ['@chronolog/authority', '@chronolog/peer-session', '@tendriller/core', 'esbuild', 'playwright']);
   assert.equal(tree.dependencies.playwright.version, '1.65.0'); assert.equal(tree.dependencies.esbuild.version, '0.28.2');
   report.runtime.dependencies = { playwright: tree.dependencies.playwright.version, esbuild: tree.dependencies.esbuild.version,
     lockSha256: hash(await readFile(join(consumer, 'package-lock.json'))) };
@@ -63,11 +67,12 @@ try {
     ['browser-consumer.mjs', join(here, 'browser-consumer.mjs')],
     ['source/page/deployment/bootstrap.mjs', join(here, 'browser-bootstrap.mjs')],
     ['source/page/deployment/worker.mjs', join(here, 'browser-worker.mjs')],
+    ['source/page/deployment/operation-set-authority.mjs',join(here,'../../run-a-peer-application/checks/operation-set-authority.mjs')],
     ['source/page/domain/review-workspace.mjs', join(here, '../snippets/review-workspace.mjs')],
     ['source/page/domain/live-run.mjs', join(here, '../../share-live-signals/snippets/live-run.mjs')],
     ...['app.mjs', 'board.html', 'discussion.html', 'style.css'].map(name => [`source/page/${name}`, join(here, '../page', name)]),
   ];
-  const allowed = new Set(['@chronolog/peer-session', '@chronolog/peer-session/worker', '@chronolog/peer-session/sql',
+  const allowed = new Set(['@tendriller/core/authority','@chronolog/authority','./operation-set-authority.mjs','./operation-set-participation.mjs','@chronolog/peer-session', '@chronolog/peer-session/worker', '@chronolog/peer-session/sql',
     '@chronolog/peer-session/sql-browser', '@tendriller/core/collaboration', '@tendriller/core/browser-owner',
     '@tendriller/core/worker-owner', './deployment/bootstrap.mjs', './domain/live-run.mjs', '../domain/review-workspace.mjs',
     'esbuild', 'playwright']);
@@ -84,10 +89,10 @@ try {
   }
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0, applicationOwnerProtocols: 0 };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  // Each of the two real-SQL journeys now includes 11 requests and 19 messages.
+  // Each desktop/320px phone real-SQL journey now includes 11 requests and 19 messages.
   // A completed mode has taken 410s in CI (333s in the earlier passing run).
-  // Bound both sequential journeys without changing their 30s action deadlines.
-  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 1_200_000,
+  // Bound all four sequential journeys without changing their 30s action deadlines.
+  const result = spawnSync(process.execPath, [join(consumer, 'browser-consumer.mjs'), reportPath], { cwd: consumer, stdio: 'inherit', timeout: 2_400_000,
     env: { ...process.env, ...(values.chromium ? { COLLABORATION_CHROMIUM: resolve(values.chromium) } : {}) } });
   if (result.error) throw result.error;
   assert.equal(result.signal, null); assert.equal(result.status, 0, 'Authored browser consumer failed');

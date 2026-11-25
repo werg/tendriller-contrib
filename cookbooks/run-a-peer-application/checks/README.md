@@ -1,364 +1,163 @@
-# Qualify one public peer application session
+# Qualify an authored-operation-set application
 
-All current checks consume the same `@chronolog/peer-session` API for device
-ownership, commands, coherent queries, live signals, operation inspection,
-replication and recovery. Native and browser adapters own different storage and
-transports. SQL adds deterministic execution to that session; it does not add
-another command API or journal. The host is a control participant with a filtered
-transport, not an application replica or a per-command service.
+These checks execute public archives installed in an empty consumer directory.
+No sibling checkout, workspace alias, private import, install lifecycle script,
+application retry queue, or alternative production discovery policy is allowed.
+The runners freeze fixture bytes, verify installed files against provenance,
+record exact archive/dependency hashes and consumer commits/trees, and require a
+new output directory. `--allow-dirty` is development evidence only; composition
+validation rejects dirty inputs.
 
-Supply exact packed artifacts. A sibling source checkout, private fixture import,
-new retry queue or copied Worker/RTC lifecycle is not an independent consumer.
-The runners freeze their fixture bytes, install into a fresh directory and record
-source commits/trees, cleanliness, archive hashes and dependency locks. Use a new
-output directory for every run. `--allow-dirty` marks development evidence and
-never turns it into clean release qualification.
+Both `@chronolog/peer-session` and standalone `@chronolog/authority` archives must
+identify `chronolog-crdt-v1`. The authority archive independently supplies signed
+membership, enrollment, publication, and finality APIs. A historical report is
+not evidence for this protocol. No new runtime qualification is claimed until
+these commands successfully execute the exact newly minted clean archives.
 
-## Native events and real RTC
-
-The conversation definition in
-[`peer-conversation.mjs`](../snippets/peer-conversation.mjs) runs through the same
-session in both checks:
+## Native operations and RTC
 
 ```sh
-npm run test:peer-generation -- \
+npm run test:operation-set -- \
   --artifact /exact/chronolog-peer-session.tgz \
-  --output /new/direct-evidence
+  --authority /exact/chronolog-authority.tgz \
+  --output /new/events
 
-npm run test:peer-generation -- \
-  --artifact /exact/chronolog-peer-session-with-native-rtc.tgz \
-  --transport native-rtc --output /new/native-rtc-evidence
-```
-
-Both execute original signed encrypted attempts in independent stores. The
-scenario loses a reply after durable acceptance, retries the exact operation,
-blocks the control host, removes the coordinator's usable store, recovers an
-older complete prefix, joins a fresh peer, isolates the returning abandoned
-branch, deliberately reapplies reviewed intent, rejects excluded ancestry in a
-third generation, and reopens the same durable identity.
-
-The session attaches its explicit control participant without I/O and verifies
-the published definition. A second fault loses a persisted takeover response;
-the maintained recovery journal retries the identical signed request and
-receives the original selection and recovery notice. The fixture does not
-implement another transition queue or recovery policy.
-
-The same independent scenario keeps a fourth peer offline with a complete G1
-prefix while G3 adopts a later G2 body. Learning newer authority cannot expose a
-partial application view. The session identifies the retained G1 ancestor and
-recovers through its normal transition journal, preserving the exact expected
-generation and ancestor proof after a lost control reply. An empty peer cannot
-propose a reset, and a planned handover cannot use this incomplete-view fallback.
-A fresh peer replays the recovered prefix; explicit control then protects a new
-command with a recovery floor. Both the owned recovery API and the host reject
-an otherwise valid prefix below that floor. The fixture supplies transport
-faults and signed control changes; it supplies no alternate recovery policy.
-
-The explicit lost-reply and ancestry faults use public connection primitives.
-The ordinary lifecycle then runs through `session.participate`: it discovers and
-authenticates peers, continues commands with the host blocked, waits reconnect
-grace before an eligible takeover, and requires the exact displayed approval
-when a cold observer has no verified freshness. The fixture supplies only bounded
-byte delivery or SDP introduction; it has no recovery or retry policy.
-
-The portable fixture exposes `discovery.notifications({ signal })` as an async iterable of
-`{ type: 'ready' }` and `{ type: 'changed' }`. Each subscriber gets `ready` first;
-peer-map advertisements, storage-identity changes and withdrawals invalidate its
-snapshot. Unconsumed changes coalesce, identical advertisements stay quiet, and
-aborting its signal or returning the iterator retires the listener and unblocks a
-pending read. There is no advertisement interval, TTL expiry or fallback scan.
-
-The empty-directory consumer exercises notifications through the real kernel
-constructor, automatic connections, exact lost-reply retry, commands with the
-control host blocked, reconnect grace, protected-floor recovery and explicitly
-reviewed recovery for unknown freshness. Retain `report.json`, validated
-`summary.json` and the dependency lock in the explicit run output directory.
-A direct result qualifies in-process delivery; RTC, browser and hosted results
-have their own measured boundaries.
-
-The direct run uses an in-process implementation of the public framed transport
-interface. The RTC run uses the public raw native connection composition and
-real ICE/DTLS/SCTP. Its explicit
-loopback candidate and one-off in-process SDP mailbox do not qualify network
-interface discovery, Internet reachability, deployed WSS fallback or deployed discovery. Both
-record their exact measurement boundary rather than calling a loopback result a
-deployment test.
-
-### Durable derived views
-
-The conversation definition also exports the pure `conversationCounts` reducer.
-The consumer registers it through `session.project(...)`; Chronolog owns the
-checkpoint that binds state to its event filter, reducer version and selected
-history. Repeated reads process only newly relevant events. The independent
-scenario checks that an unchanged read and same-generation reopen run no reducer,
-that an excluded suffix produces an explicit recovery reset, and that changing
-the reducer version rebuilds the view. State and cursor are never saved separately
-by the application. A reducer must not dispatch external effects because recovery
-or a version change may execute it again.
-
-### Measure complete-prefix freshness
-
-The owned participation exercise applies a fixed burst of 32 commands with 1 KiB
-of text each while the host is blocked. Each command waits only for `applied()`.
-After the burst, one `shared()` observation captures the survivor's signed
-retention of the exact complete prefix in a different storage owner. The fixture
-then closes the coordinator and measures automatic takeover after reconnect
-grace with a local monotonic clock.
-
-Reports retain workload size, completion times, the actual retention receipt,
-independent storage identities, adopted point, time to usable recovery and known
-lost commands. The initial five-minute freshness target is checked against the
-last command's observed apply time. This short burst qualifies only its recorded
-workload and topology. It does not establish a five-minute loss bound during a
-partition, sustained mobile operation or device suspension; qualify those
-boundaries separately on the actual devices and networks.
-
-## SQL and guarded domain commands
-
-The [task-board definition](../snippets/peer-task-board.mjs) adds SQL guards and
-relational state to the same application/session contract:
-
-```sh
-npm run test:peer-generation -- \
-  --artifact /exact/chronolog-peer-session-with-sql.tgz \
-  --domain tasks --output /new/sql-evidence
-```
-
-The public `/sql` entry prepares and opens the same application with an explicit engine capability. `prepareSqlApplication` takes the engine needed to prepare its signed schema and execution manifest. `openSqlApplication` takes a `createEngine` callback which Chronolog calls only for real data demand; a browser deployment imports `/sql-browser` inside that callback. `/sql-native` supplies `createNativeSqlEngine` for the same composition. Neither introduces another command API.
-
-This archive includes the exact patched native engine and records its manifest
-and patch digest. Two members race to claim a task; exactly one complete program
-succeeds. Another signer cannot complete the winner's task. SQL, messages and
-outcomes recover coherently to an older prefix, preserve adopted identities,
-expose abandoned attempts, and permit explicit guarded reapplication. A member
-continues after the creator closes, then reopens without replacing identity,
-keys or state. This native gate does not establish WASM equivalence.
-
-## Browser ownership and application UI
-
-```sh
-npm run test:peer-browser -- \
-  --artifact /exact/chronolog-peer-session-with-native-rtc.tgz \
-  --chromium /path/to/chromium --output /new/browser-evidence
-```
-
-The isolated consumer installs declared Playwright/esbuild tools and imports
-only public browser entries. One Worker immediately owns the protocol and
-identity, retained in small IndexedDB metadata transactions. Real data demand
-loads the durable component, OPFS, keyring and attempt journal inside that same
-Worker. `connectApplicationWorker` exposes the same
-commands and queries to the page. The page's `serveWorkerWebRtcConnections`
-supplies RTC mechanics; the Worker calls `openWorkerWebRtcConnection`, owns the
-raw frames and authenticates its peer through the session. The page copies
-neither protocol lifecycle nor request maps.
-The Worker attaches the same session-owned control participant over the shared
-envelope; fixture HTTP hosts the public registry without introducing separate
-application/read and generation/select APIs.
-
-Before showing the data view, the same scenario verifies a cold participant's
-control exchange, signed code publication and served code digest, plus live
-signals in both directions. Browser requests are matched to the exact archive's
-module graph; neither the data implementation nor OPFS adapter may be fetched
-before demand. Actual Window and Worker platform calls must show no OPFS access,
-file writer, synchronous handle or Web Lock. Two concurrent first enrollments
-must obtain one stable identity and close without opening data.
-
-Three concurrent conversation queries then share one durable opening and the
-already connected peer. The gate requires one storage lock, one OPFS root,
-the same identity and no additional Worker. A second participant or a browser
-without OPFS may start the protocol; its first data read must refuse the data
-ownership or missing capability. Closing an unused participant must preserve an
-existing data owner's lock, and closing the active owner must release it.
-
-Board and compact layouts submit domain commands, preserve unsent drafts across
-replacement and recovery, inspect original attempts and deliberately reapply
-reviewed work. The check also exercises a newly granted reader acquiring keys,
-host-blocked commands/signals/encrypted content, second-tab ownership, missing
-storage refusal, graceful and abrupt Worker reopening, interrupted content
-transfer, fresh-peer replay and coherent captured views.
-
-Build complete authored page graphs through
-[`build-peer-pages.mjs`](build-peer-pages.mjs). A real deployment must
-supply its enrollment and discovery configuration. A successful UI or bundle
-build is not evidence that those services ran.
-
-## The actual hosted control participant
-
-```sh
-node cookbooks/run-a-peer-application/checks/run-peer-generation-host.mjs \
-  --artifact /exact/chronolog-peer-session-with-native-rtc.tgz \
-  --artifacts /exact/tendriller-dist --output /new/hosted-evidence
-```
-
-The Tendriller directory must contain its provenance manifest and exactly one
-matching SDK and engine archive. The runner checks their hashes and source
-identities, installs an independent consumer, then starts real workerd through
-`@tendriller/engine/testing`. Synthetic authenticated test accounts make this a
-runtime integration check; they do not qualify deployed login.
-
-Bootstrap, membership controls, definition reads and generation selection travel
-through `chronolog-participant-v1` at `peers/participant`. The public control
-transport filters `database.submit`, `content.chunk` and `ephemeral.signal`
-before HTTP. The fixture bypasses that client filter with valid peer envelopes
-and requires the host to reject them too. This demonstrates selective
-participation in the same protocol.
-
-The publication facet publishes a signed HTML/module graph and verifies actual
-served code. The owned session saves the exact signed publication before a
-deliberately lost persisted response; retry preserves that identity and selected
-version. Tampered bytes, a
-administrator without publisher authority and a stale predecessor fail. A second
-signed revision updates HTML and code while retaining the original immutable
-version. Restarting the Durable Object preserves the publication and served
-bytes without changing application authority.
-
-A bounded test bridge carries compact controls, publication checks and short
-SDP introductions between Node and workerd. The ordinary application connection
-uses authenticated peer RTC. After introduction, the test blocks hosted access
-and requires complete Worker HTTP/body/SDP counters and bridge counters to stay
-unchanged while real peer application bytes increase. Live signals do not append
-history. WebSocket relay traffic uses a separate gate with explicit host byte measurements and control-only outage scope.
-
-The maintained `createPeerIntroductions` adapter also supplies actual hosted
-discovery, invitation listeners and rendezvous to `session.participate`.
-Advertisements contain only peer/storage identities and routes. The session
-checks grants and usable retained history itself. The gate exercises the same
-automatic and explicitly reviewed recoveries as the portable/native lane and
-requires every owned introduction socket to close.
-
-The workflow downloads SDK and engine bytes from the selected immutable public
-source release. `distribution/download-core-release.mjs` verifies URLs, hashes,
-source, composition, provenance and the Chronolog source before retaining those
-bytes; consumers use them without a Core checkout or rebuild. SQL session
-variants require their declared Chronolog capability builds. The current
-[companion tuple](https://github.com/werg/tendriller-contrib/blob/main/distribution/companion-release.json)
-is CI input, not proof that a particular run or deployment passed.
-
-Keep `host-artifacts.json`, the dependency lock, and
-`peers/{report,summary}.json` in each run's explicit output directory. Separate
-deliberate relay failure from ordinary-command measurement. Require unchanged
-control traffic during ordinary work, actual old-connection aborts and
-replacement openings during recovery, a coherent read in the same generation,
-and healthy roles on both participants. Hosted startup declares a 30-second
-reconnect grace covering two 15-second opening budgets; recovery observations
-allow that grace plus a bounded 30-second response margin. Do not infer a
-three-second recovery SLA. These are local packed-workerd/WebSocket checks;
-deployed OAuth and Internet/provider behavior require separate evidence.
-
-## Forced WebSocket relay and browser relay
-
-Run the same application/recovery scenario with direct establishment deliberately
-refused, using a plain or SQL session archive (no Werift capability is needed):
-
-```sh
-npm run test:peer-host -- \
+npm run test:operation-set -- \
   --artifact /exact/chronolog-peer-session.tgz \
-  --artifacts /exact/tendriller-dist --transport websocket \
-  --output /new/relay-evidence
+  --authority /exact/chronolog-authority.tgz \
+  --transport native-rtc --output /new/rtc
+```
 
-npm run test:peer-host -- \
+The event scenario exercises independent disconnected authors, equal author
+timestamps, late earlier insertion, duplicate/permuted fact delivery, exact
+signed retry after a lost local reply, independent authenticated retention,
+coherent captured/reactive snapshots, restart with cached authority, reconnect
+union, actual encrypted content transfer, and explicit no-finality behavior.
+The RTC variant uses actual pinned Werift with deliberately loopback-only
+candidates, authenticates both peers, measures reliable bytes, retires SDP
+introductions, exercises the independent live lane, and closes every transport.
+A bounded in-memory framed pair makes no physical-network claim.
+
+Both variants additionally exercise signed-frontier and two-validator policies
+through the public session APIs: local work before a provider is available,
+threshold enforcement, proof-without-body final-read blocking, certified
+inclusion, delayed offline exclusion without rewriting signed intent, and proof
+and outcome persistence after reopening. Finality never supplies operation order.
+
+## Real native and WASM SQL
+
+```sh
+npm run test:operation-set -- \
+  --artifact /exact/session-with-native-and-wasm-sql.tgz \
+  --authority /exact/chronolog-authority.tgz \
+  --domain tasks --output /new/sql
+```
+
+This gate requires actual `/sql`, `/sql-native`, and `/sql-wasm` public exports and
+verified native/WASM engine bytes. The report retains the archive's actual
+`nativeEngine.implementation` and manifest. These Node/native/WASM runs do not
+qualify an external Celld process or its bridge ABI; that engine needs its own
+exact clean-source qualification. The task definition contains no schema.
+Initialization is a separate ordinary authored transaction. Two disconnected
+writers initially materialize conflicting claims; an earlier claim revises the
+later outcome after merge. Ordinary late DDL changes a rejected insert into an
+accepted one. Permissioned alter/drop/index operations, cross-object denial,
+DDL+DML+emit rollback, coherent captured schemas, explicit stale-query errors,
+scoped public agent-tool exact retry, and reload are checked. The same signed
+facts replay through actual Node WASM and native engines with identical rows,
+outcomes, and execution manifests. Public scoped tools are exercised here; this
+is not an unassisted agent usability study.
+
+## Browser Worker, OPFS, WASM, offline reload and UI
+
+```sh
+npm run test:operation-set:browser -- \
+  --artifact /exact/session-with-native-and-browser-sql.tgz \
+  --authority /exact/chronolog-authority.tgz \
+  --output /new/browser
+```
+
+The browser runner installs pinned Playwright/esbuild only as test tools. Supply
+`--chromium /exact/chromium` to select and hash a specific executable. It launches
+a fresh Chromium context, uses the public owning Worker facade, and explicitly
+provisions a new signing identity with a recipient-bound encrypted key package.
+It keeps the page free of private keys, rejects a second owner, and records real
+OPFS resources.
+
+The browser and native participants independently author while disconnected,
+merge over actual RTC, preserve exact retries, transfer multi-chunk encrypted
+content, send disposable live signals, and continue while control HTTP is
+unavailable. It caches the complete immutable page/Worker/WASM graph in a fixture
+service worker, abruptly terminates the Worker, reloads fully offline, resumes
+cached identity/authority, writes locally, and reconnects. Another browser SQL
+scope executes real WASM/native parity over authenticated peers, including late
+DDL/outcome revision, atomic rollback, unauthorized DDL, and offline SQL reload.
+An authorized browser separately certifies signed-frontier finality with its
+native participant already closed; exclusion and evidence survive offline reload.
+
+The domain page has conversation list/detail, authenticated intent inspection,
+separate drafts and deep links, rather than a JSON editor. Desktop and 320px
+flows check late insertion, draft/focus preservation, Back/Forward, keyboard
+navigation, long content and horizontal overflow, retaining before/after PNGs.
+The page builder `build-peer-pages.mjs` requires explicit real bootstrap assets;
+it does not manufacture deployment or signing material.
+
+## Actual Workerd controls, publication and relay
+
+```sh
+npm run test:operation-set:host -- \
   --artifact /exact/chronolog-peer-session.tgz \
-  --artifacts /exact/tendriller-dist --transport websocket --browser \
-  --output /new/browser-relay-evidence
+  --authority /exact/chronolog-authority.tgz \
+  --artifacts /exact/tendriller-dist --output /new/host
 ```
 
-The native gate forces each direct opener to fail and lets the public host
-adapter choose its relay within the existing participation owner. It cuts relay
-links and observes the same generation reconnecting. The browser gate reuses the
-entire Worker/OPFS, page UI, interrupted-content and recovery scenario, changing
-only the byte-transport fixture. The page owns no WebSocket or private key.
+The host runner installs the exact SDK/engine pairing and Workerd testing tools.
+It checks clean host provenance, every emitted file digest, and embedded authority
+source/file hashes. Public test fixtures sign in synthetic accounts through the
+real auth routes. Device enrollment uses `ownerApi` with cookie and exact origin,
+not a bearer token masquerading as a browser. New member grants use exact retry
+and authenticated membership-head comparison. No epoch keys reach the host.
 
-Native and Chromium clients use real WebSocket sockets. A bounded loopback test
-bridge forwards their unchanged protocol frames into actual authenticated
-Workerd relay sockets. Reports state this boundary; it is not deployed WSS or
-Internet qualification. The fixture scans declared private command/live markers
-at the raw relay boundary and records actual binary traffic on both lanes.
+Publication is independent of data authority. The checks sign actual authored
+HTML, lose a reply after persistence, retry the exact release, reject altered
+bytes/non-publishers/stale heads, retain prior code, restart Workerd, and verify
+served bytes and unchanged application authority. Ordinary data writes do not
+call host control endpoints.
 
-Only control HTTP is blocked during ordinary relayed work. Host relay ingress and
-egress must increase; ciphertext transit has a real availability and bandwidth
-cost. This gate never imports the direct gate's zero-host-traffic claim. Both
-transports use the same authenticated encrypted channel, operation journal,
-replication, projections, content and recovery. TURN is not a required path.
+Use `--transport websocket` to force direct refusal and exercise actual native
+reliable/live WebSocket lanes through a bounded loopback bridge to real Workerd
+relay sockets. Add `--browser` for real browser Worker relay clients. Relay cuts
+and reopenings are deliberate explicit topology faults, not a second production
+connection manager. Reports measure host bytes, check ciphertext for private
+markers, verify queue bounds, and close all lanes. Blocking control HTTP does
+not mean blocking the relay: relayed synchronization still depends on relay
+availability and consumes host bandwidth.
 
-## Independent agent business workflow
-
-Prepare a fresh public-package tool process with the actual native SQL engine:
-
-```sh
-npm run test:peer-generation -- \
-  --artifact /exact/chronolog-peer-session-with-sql.tgz \
-  --domain agent --output /new/agent-evidence
-```
-
-The runner prints an isolated working directory and interactive command. Start
-that command with stdin kept open, then send one JSON object per line using the
-public `{id, tool, input, timeoutMs?}` format. `list` supplies the tool schemas.
-The fixture provides enrolled peers, the task definition and transport delivery;
-it does not perform the agent's business commands. The native peer and owning
-session provide the same journal, guarded SQL execution and recovery as other
-consumers. Every request/result is retained in the raw report.
-
-The bounded exercise reserves `agent-note-1` for a lost-reply conversation
-command and `agent-note-2` for its deliberate replacement containing
-`Ready for review`. It reserves `agent-wrong-author-1` for refusing completion of
-the other author's `locked` task, then `agent-claim-1` and `agent-finish-1` for
-claiming/completing `review`. The fixture closes/reopens the device after accepted
-finish. The agent must discover/query, capture revision guards, inspect the
-uncertain original, observe a recovery reset, inspect actual notices, explicitly
-reapply, and inspect/wait/retry the exact finished identity after reopen.
-
-Record the supplied task, infrastructure, coaching, mistakes and elapsed time.
-This exercise qualifies public business-tool use with provided enrollment.
-Automated artifact installation and fixture-owned enrollment are separate from
-a fresh agent independently configuring the full deployment; do not claim those
-setup steps from the workflow transcript.
-
-## Assemble the exact local composition
-
-After all seven runners pass against the same clean Chronolog and contrib
-revisions, collect their raw reports:
+## Composition and limits
 
 ```sh
-npm run check:peer-composition -- \
-  --report /exact/direct/report.json \
-  --report /exact/native-rtc/report.json \
-  --report /exact/browser/report.json \
-  --report /exact/native-sql/report.json \
-  --report /exact/hosted/peers/report.json \
-  --report /exact/relay/peers/report.json \
-  --report /exact/browser-relay/peers/report.json \
+npm run check:operation-set-composition -- \
+  --report /new/events/report.json \
+  --report /new/rtc/report.json \
+  --report /new/browser/report.json \
+  --report /new/sql/report.json \
+  --report /new/host/peers/report.json \
+  --report /new/relay/peers/report.json \
+  --report /new/browser-relay/peers/report.json \
   --output /new/composition.json
 ```
 
-The assembler reruns every observation validator and rejects missing/failed
-gates, dirty source, mixed source trees, contradictory execution manifests and
-packages with the same version but different bytes. It records raw report
-hashes, all three source identities, session archive variants and content hashes,
-the native engine binary/patch/manifest, host storage schema, embedded portable
-verifier identity, and the actual browser/runtime/topology observations. A newer
-session-only commit can use an older unchanged verifier; both identities remain
-explicit and their interoperability must pass the actual hosted gate.
+Composition requires all seven freshly successful raw gates, hashes original
+report bytes, rejects dirty/mixed sources or differing bytes under one package
+version, binds exact embedded host authority to the independently installed
+archive, and checks native/browser/WASM execution manifests and binary hashes.
+Synthetic report fixtures test validators only and are never written as runtime
+evidence. Historical green reports are never converted or relabeled.
 
-CI emits this manifest only after native events, native RTC, browser Worker,
-native SQL, actual workerd participant, native relay and browser relay jobs all succeed. It qualifies that
-local public-artifact composition. The manifest explicitly leaves real network,
-provider cost, browser SQL/WASM, optional stronger services and an unassisted
-fresh-agent usability study outside that claim. No failed browser run or
-historical result is silently replaced by a passing report from another source.
-
-## Evidence and remaining qualification
-
-The report validators require the observations above. Their synthetic tests prove
-only that missing or contradictory evidence is rejected, not that the runtime
-scenarios passed.
-
-Current consumers use `applied()` for execution and `shared()` for retained
-coverage. Neither is irreversible finality. A protected action is an explicit
-capability of the same session contract and must qualify its stronger boundary.
-It is not an invitation to start a second resident application stack.
-
-Real deployment qualification still needs actual enrollment and controls,
-home/mobile/restrictive networks, deployed WSS fallback, suspension, quota pressure, large content,
-recovery freshness and provider/device costs. Measure the initial five-minute
-freshness objective under a stated workload with another usable peer; do not
-infer a universal loss bound from a heartbeat or a local run.
+These are local loopback artifact qualifications, not deployed login, Internet,
+mobile suspension/eviction, provider cost, guaranteed retention, or exactly-once
+external-effect qualification. Runners close their browsers, links and Workerd
+children on completion. Real pages/native participants must remain open for live
+sync; a finality actor must be available to advance its policy. Neither is needed
+to durably save local work. The separate cost report preserves unknown usage and
+pricing inputs rather than treating missing measurements as zero.

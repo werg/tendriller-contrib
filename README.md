@@ -11,7 +11,7 @@ for a shared application with several tabs, devices or agents. Its board and
 discussion views consume the maintained optional `@tendriller/core/collaboration`
 module: one session owner per retained browser profile, independent local drafts,
 addressed requests, exclusive claims, frozen contribution slots, guarded synthesis
-and explicit recovery. The reference includes browser owner/bootstrap templates
+and revisable materialized outcomes. The reference includes browser owner/bootstrap templates
 and an independent six-signer [public-artifact conformance runner](cookbooks/coordinate-participants/checks/README.md).
 
 The reference's native evidence and the browser owner's qualification are
@@ -19,7 +19,7 @@ separate records. An agent's label, a connected route and active reasoning are
 separate facts. Choose explicit claim and completion policies before starting
 external work; shared data does not make that work exactly once.
 
-## Build and reuse the native first app
+## Build and reuse the browser-first app
 
 For an app request, start with [connected-app setup](guides/connected-app-setup.md).
 Use the origin returned by the selected connector or supplied by the person.
@@ -38,9 +38,11 @@ For camera/file, voice or optional inference, follow the [reviewed media flow](h
 and adapt its supplied `media/` modules. These are editable application files,
 not new contrib exports. Reading a cookbook alone does not integrate them.
 
-Deliver the hosted page with its authorized session connected, a command observed
-by the other participant, retained work after reopening, and the signed publication
-receipt. State which process remains running and how to resume it. On-demand
+Deliver the hosted page with a verified signed publication, browser-local durable
+and materialized work, independent offline authoring, automatic peer convergence
+and persistence after reload. A native process is optional, not a Save prerequisite.
+State which browsers and optional processes remain open for synchronization or
+finality and how to resume them. On-demand
 tools and automatic future chat turns require separate verification. Then use the
 relevant cookbook to refine the task's choices and failure checks. Historical
 specimens below keep their recorded scope; this pointer does not revive them.
@@ -70,16 +72,21 @@ For application architecture, start with
 [application primitives and roles](guides/application-primitives.md). Every
 application uses one public Chronolog session, command/query/event API and
 operation journal. Native and browser peers supply storage, transport and engine
-capabilities. The host is a filtered control/publication participant: membership,
-recovery selections and signed page code use Chronolog envelopes; ordinary
-application work travels between peers.
+capabilities. The host provides account authorization, signed metadata, code publication and
+introductions; ordinary application work is authored and materialized locally.
+There is no ordering coordinator. Canonical order is signed author time, signing
+public key and stable proposal ID only.
 
-`applied()` reports execution in the selected history; `shared()` separately
-observes retained coverage on another peer. Explicit recovery may abandon a
-recent suffix, including previously applied work. Irreversible external work
-requires an explicitly configured protected checkpoint or durable external-action
-service. These stronger guarantees are capabilities of the same application
-model, not alternative profile-selected runtimes.
+Stored, materialized, peer-retained and finalized are independent facts. Late
+earlier operations can revise current outcomes, rows and schema. DDL and permission
+changes are ordinary authored transactions, not fixed setup metadata. Prefer
+reactively derived snapshots plus separate local draft/view state.
+
+Ordinary applications default to no finality. A configured browser/native/host
+provider may prove admission and close author time; it never sorts operations.
+Explain that unseen offline work first delivered behind a sealed frontier can be
+excluded, and retain its original intent visibly. Irreversible external work needs
+verified final prerequisites and an idempotent effect protocol.
 
 The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md)
 uses the public API directly; its [checks guide](cookbooks/run-a-peer-application/checks/README.md)
@@ -90,7 +97,7 @@ require an explicitly supplied matching `@chronolog/peer-session` archive.
 cursors, progress and transient messages without a database. The
 [standalone composition check](cookbooks/share-live-signals/checks/README.md)
 uses the public signal module for live readings and token previews.
-Authenticated provenance, application authorization and recovery-aware journals
+Authenticated provenance, application authorization and proposal-bound revisable journals
 govern agent work; irreversible actions have a separate declared guarantee.
 
 ## Use the collection
@@ -192,7 +199,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
 - [Report live page errors and diagnostics to your agent](cookbooks/report-page-diagnostics/COOKBOOK.md) *(runnable snippets)* — Capture boot-to-runtime browser errors in a redacted ring buffer and stream live diagnostics over ephemeral signals.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
-- [Build a peer application with explicit recovery](cookbooks/run-a-peer-application/COOKBOOK.md) *(runnable snippets)* — Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.
+- [Build a local-first peer application](cookbooks/run-a-peer-application/COOKBOOK.md) *(runnable snippets)* — Author durable signed operations independently, merge operation sets, and derive coherent revisable event or SQL views with explicitly optional finality.
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 - [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 

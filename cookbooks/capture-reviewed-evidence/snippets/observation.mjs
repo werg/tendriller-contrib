@@ -5,7 +5,7 @@ const encoder = new TextEncoder();
 export function validateObservationRequest(event, { session, requester, now = Date.now() }) {
   const value = event?.payload;
   if (event?.authorId !== requester || event.scope !== session.applicationId || !Number.isFinite(event.expiresAtMs) || event.expiresAtMs <= now
-    || !value || !id(value.requestId) || value.recipient !== session.deviceId
+    || !value || !id(value.requestId) || value.recipient !== session.identity.publicKey
     || typeof value.question !== 'string' || !value.question.trim() || value.question.length > 1000
     || !Number.isSafeInteger(value.expiresAt) || value.expiresAt <= now || value.expiresAt > now + 60_000
     || encoder.encode(JSON.stringify(value)).length > 2048) return null;
@@ -61,7 +61,7 @@ export function createObservationReview({ session, request, retainEvidence, onSt
             const bytes = new Uint8Array(await captured.slice(offset, offset + 65_536).arrayBuffer());
             current.signal.throwIfAborted(); await upload.write(offset / 65_536, bytes);
           }
-          current.signal.throwIfAborted(); reference = await upload.commit();
+          current.signal.throwIfAborted(); reference = Object.freeze({ ...await upload.commit() });
         }
         current.signal.throwIfAborted(); expired();
         const response = Object.freeze({ requestId: request.requestId, recipient: request.requester, operationId,
@@ -79,8 +79,8 @@ export function createObservationReview({ session, request, retainEvidence, onSt
       } catch (error) {
         status(dispatched ? 'uncertain' : current.signal.aborted ? 'discarded' : 'error');
         if (!dispatched) {
-          if (reference && typeof session.content.prune === 'function') { await session.content.prune(reference); reference = null; }
-          else await upload?.discard?.();
+          if (reference) { await session.content.discard(reference); reference = null; }
+          else await upload?.discard();
         }
         throw error;
       } finally { if (owner === current) owner = null; }
@@ -89,16 +89,15 @@ export function createObservationReview({ session, request, retainEvidence, onSt
       editable(); owner?.abort(new DOMException('Review discarded.', 'AbortError')); candidate = null; status('discarded');
       // The in-flight sender owns stage cleanup after its last awaited write.
       if (!owner) {
-        if (reference && typeof session.content.prune === 'function') await session.content.prune(reference);
-        else await upload?.discard?.();
+        if (reference) await session.content.discard(reference);
+        else await upload?.discard();
         reference = null;
       }
     },
     async releaseAfterReceipt() {
       if (phase !== 'sent' || retained) throw Error('Release only unretained evidence after the receiver confirms it read the bytes.');
       if (reference) {
-        if (typeof session.content.prune !== 'function') throw Error('This session version has no local pruning. Keep the reference until explicit cleanup is available.');
-        await session.content.prune(reference); reference = null;
+        await session.content.discard(reference); reference = null;
       }
       candidate = null; status('released');
     },

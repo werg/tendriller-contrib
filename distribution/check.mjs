@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, relative } from 'node:path';
 import { readCookbooks, validateLocalLinks, walk } from './catalog.mjs';
 import { publicSourceViolations } from './public-boundaries.mjs';
+import { operationSetSourceViolations } from '../cookbooks/run-a-peer-application/checks/operation-set-source.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const entries=readCookbooks(root);
 const paths=[...walk(resolve(root,'cookbooks')),...walk(resolve(root,'guides')),resolve(root,'README.md'),resolve(root,'PROVENANCE.md'),resolve(root,'agent.md')];
@@ -16,5 +17,10 @@ for(const entry of entries){assert.ok(!(entry.dependencies||entry.requires),'Rea
 for (const path of paths.filter(path => /\.(?:m?js|ts|html|md)$/.test(path))) {
   const violations = publicSourceViolations(readFileSync(path, 'utf8'), { markdown: path.endsWith('.md') });
   assert.deepEqual(violations, [], `${relative(root, path)}: ${violations.join('; ')}`);
+  if (relative(root,path).startsWith('cookbooks/run-a-peer-application/') && !path.endsWith('.test.mjs') && !path.endsWith('/operation-set-source.mjs')) {
+    const removed = operationSetSourceViolations(readFileSync(path,'utf8'));
+    assert.deepEqual(removed, [], `${relative(root,path)}: ${removed.join('; ')}`);
+    assert.ok(!relative(root,path).includes('peer-generation'), 'Retired runner filename remains');
+  }
 }
 console.log(`Validated ${entries.length} guides, local reading links, and public boundaries.`);

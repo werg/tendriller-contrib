@@ -5,9 +5,9 @@ import test from 'node:test';
 import { URL } from 'node:url';
 import { select } from '../distribution/select-companion-release.mjs';
 const tuple = JSON.parse(readFileSync(new URL('../distribution/companion-release.json', import.meta.url)));
-test('peer-generation consumes the canonical tuple and retains exact checkout checks', () => {
+test('operation-set consumes the canonical tuple and retains exact checkout checks', () => {
   const selected = select(tuple, 'contrib');
-  const text = readFileSync(new URL('../.github/workflows/peer-generation.yml', import.meta.url), 'utf8');
+  const text = readFileSync(new URL('../.github/workflows/operation-set.yml', import.meta.url), 'utf8');
   assert.ok(Object.values(selected).every(value => /^[a-f0-9]{40}$/.test(value)));
   assert.ok(text.includes('node distribution/select-companion-release.mjs contrib'));
   assert.doesNotMatch(text, /inputs\.\w+_ref \|\| '[a-f0-9]{40}'/);

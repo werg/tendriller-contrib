@@ -14,7 +14,7 @@ const identify = value => value.artifacts.map(({ name, version, sha256, sourceCo
   ({ name, version, sha256, sourceCommit, sourceTree, sourceDirty })).sort((a, b) => a.name.localeCompare(b.name));
 assert.deepEqual(identify(native), identify(browser), 'Both gates must use the same exact public archives');
 const hash = value => createHash('sha256').update(value).digest('hex');
-const result = { format: 'tendriller-collaboration-composition/v1', qualification: 'clean-local-native-and-browser',
+const result = { format: 'tendriller-collaboration-authored-composition/v1', qualification: 'clean-local-native-and-browser',
   source: native.source, artifacts: identify(native), reports: { native: hash(nativeBytes), browser: hash(browserBytes) },
   native: { topology: native.topology, checks: native.checks.map(value => value.name), runtime: native.runtime, measurements: native.measurements },
   browser: { scenarios: browser.scenarios, runtime: browser.runtime, wasm: browser.wasm }, claims: browser.claims };

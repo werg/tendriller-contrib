@@ -33,7 +33,7 @@ Make stale or incomplete recovery understandable. “This device has a draft fro
 | Stream-view checkpoint | Which model and cursor were saved together? | A complete archive when retention has gaps. |
 | Local draft | What has this device not submitted? | Cross-device durability or current authorization. |
 | Device focus | Where should presentation or attention occur? | Permission to read or change the task. |
-| Pending command | Which original intent still needs reconciliation? | A template that can be rebound to current generations. |
+| Pending operation | Which original signed intent still needs reconciliation? | A template that can be re-signed with a new time or rebound to current state. |
 
 Save each under its appropriate authority and concurrency guard. A task brief should carry enough revision identity to detect an intervening edit. Do not overwrite current decisions with an older agent summary. Use stable task, run, evidence, and request identities rather than names that may be edited or reused.
 
@@ -51,12 +51,12 @@ A new device must reestablish its own permissions and presentation preferences. 
 
 1. Establish the current page/task identity and authorized reader before restoring private content. Clear or segregate caches on identity changes; late reads must not repaint a prior reader's data.
 2. Fetch current authoritative task state and relevant revisions. Compare the saved brief and drafts against it rather than trusting their timestamps alone.
-3. Reconcile pending commands using their original identities, payloads, and generations. Preserve accepted, rejected, and uncertain outcomes separately from new work.
+3. Reconcile pending operations using their original operation and proposal identities, signed payloads and author times. Preserve stored, materialized accepted/rejected, retained and uncertain outcomes separately from new work.
 4. Restore a view and its cursor atomically, or rebuild both from retained history. Validate interpretation/model versions and preserve any incomplete-history marker.
 5. Present a concise changes-since-return summary and unresolved decisions. Let the person choose what to resume; preserve focus when the summary updates.
 6. Attach and verify the receiving agent's exact conversation, then drain work from the handled checkpoint. Probe once after attachment and again after handling/rearming before promising responsiveness.
 
-Use an event's validated generation context for protected results, not an application-provided session label. A known historical intent remains historical after a task reset. If it is still useful, compose new work deliberately against the reviewed current state.
+Use an event's validated proposal identity and materialized revision for protected results, not an application-provided session label. A provisional event can be replaced or retracted by stable event identity when an earlier operation arrives. A known historical intent remains historical after a task reset. If it is still useful, compose new work deliberately against the reviewed current state.
 
 ## Manage overlap and uncertain effects
 
@@ -65,21 +65,28 @@ owned device session independent of the model conversation. Reopening
 the UI restores the session's original operation identities and queries their current
 outcomes. The page may keep a reference to an operation beside its local draft;
 that reference is not another delivery queue. A new LLM conversation consumes
-the session's recorded work with its applied, shared or abandoned status.
+the session's recorded work with its stored, materialized, retained, finalized
+or excluded observations.
 
-The durable event continuation belongs to a group/history and filter version.
-Changing a topic filter requires an explicit cursor decision. Empty matching
+The durable event continuation belongs to an application and filter version, and
+an event cursor is bound to the materialized revision that produced it. A
+revision change from an earlier operation means rereading a coherent batch, not
+appending to an old projection. Changing a topic filter requires an explicit
+cursor decision. Empty matching
 batches can advance scanned progress, while unresolved execution cannot. Commit
 the derived state and its processed cursor together, and bind cache checkpoints
 to the reducer version. Rebuilding a view never dispatches an external effect.
 
-An unavailable control host leaves established peer commands, signals and
-replication useful. Losing the coordinating peer requires an eligible survivor
-to select a complete retained prefix at an explicit recovery boundary. Publish
-the resulting recovery notice, preserve abandoned attempts for inspection, and
-review current preconditions before deliberate reapplication. Restoring a stale
-control store must not silently undo a newer selection. Show retained coverage
-and recovery uncertainty separately from the applied result a user saw.
+An unavailable control host, native participant or agent leaves local
+authoring and materialization on an initialized device useful, along with any
+established peer links. Operations authored meanwhile are immutable signed facts
+that other replicas union by author time, so a late earlier operation can change
+the provisional result a person saw. No peer selects a prefix or reapplies work.
+Show retained coverage and finality separately from the materialized result. If
+a configured closed-time frontier excludes a first-seen older operation, keep its
+original intent visible. Starting new work is a deliberate, reviewed action; the
+old operation is never silently retimestamped. Restoring cached authority must
+not hide newer authenticated facts after refresh.
 
 Two devices may remain active during handoff. Define whether one is authoritative for a particular activity or whether both may edit under conflict detection. A “Continue here” control should explain what changes on the old device; presentation focus does not automatically stop its sensor or revoke its access. Show active-device context when it prevents confusion without exposing private identities unnecessarily.
 
@@ -98,7 +105,7 @@ Let the receiving side acknowledge that it can continue, then retire the old rec
 | Reload with a corrupt checkpoint | Rebuild both model and cursor or show an explicit recovery failure. |
 | Laptop resumes an old brief after a phone edit | The newer decision is preserved and the discrepancy is reviewable. |
 | Old device has an unsent draft | It remains private under the stated policy and is not silently published. |
-| Task reset while a command is queued | Original generations remain attached and stale work is rejected visibly. |
+| Task reset while a command is queued | The original signed intent and its identities remain attached and stale work shows a visible rejection or exclusion. |
 | Agent conversation is replaced | New receiver passes both probes and resumes handled progress, not only delivered progress. |
 | Access is revoked while restoration is pending | Late success or failure handlers cannot repopulate private content. |
 | Two devices remain open | Their writes, focus, and local permissions follow the documented overlap policy. |

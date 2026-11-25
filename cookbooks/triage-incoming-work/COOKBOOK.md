@@ -58,15 +58,15 @@ const operation = await session.command('claimItem', {
   itemId,
   claimId,
   expectedVersion: reviewed.value.version,
-}, { operationId: crypto.randomUUID(), basedOn: reviewed.revision });
-const receipt = await operation.applied();
+}, { operationId: crypto.randomUUID() });
+const receipt = await operation.materialized();
 ```
 
 The definition obtains the claimant from the verified command author, not a payload role. It rejects an unavailable item or changed version and advances the domain version on success. The captured application revision orders the attempt; the guard remains transaction logic. The [actual SQL task example](../run-a-peer-application/snippets/peer-task-board.mjs) and its independent consumer exercise a real two-member claim race and a rejected completion by the wrong signer.
 
-A release must match the exact claim identity and authorized holder so a delayed release cannot remove a later claim. Domain versions protect reviewed state independently of application recovery generations. If a failed claim later becomes possible, offer a new reviewed decision instead of refreshing the old inputs during delivery retry.
+A release must match the exact claim identity and authorized holder so a delayed release cannot remove a later claim. Domain versions protect reviewed state independently of the application revision. If a failed claim later becomes possible, offer a new reviewed decision instead of refreshing the old inputs during delivery retry.
 
-Show saved locally, applied accepted/rejected and retained coverage as separate observations. After reopening, inspect `session.operations` for original operation IDs and inputs; do not build another mutation outbox. A lost reply uses exact `session.retry`. An abandoned claim after explicit history recovery needs current review before reapplication. Human responsibility and irreversible processing cannot be inferred solely from an applied claim that may be abandoned.
+Show stored locally, materialized accepted/rejected, retained coverage and finality (when configured) as separate observations. After reopening, inspect `session.operations` for original operation IDs and inputs; do not build another mutation outbox. A lost reply uses exact `session.operations.retry`. A claim revised by an earlier arriving operation, or excluded by a configured closed frontier, needs current review before any new claim. Human responsibility and irreversible processing cannot be inferred solely from a provisionally materialized claim.
 
 An agent's handled-event checkpoint is separate from a human claim. Its effect journal must retain verified requester provenance and the original action identity. Irreversible work requires the explicitly configured protected boundary; it cannot be dispatched from ordinary replay or inferred from an `assignedTo` field.
 

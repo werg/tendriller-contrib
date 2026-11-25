@@ -54,7 +54,7 @@ source name and allowed operations, never its credential.
 
 The source-pinned collector documents and code in this recipe's `sources` are
 historical provenance for acquisition and spool reasoning, not a current
-installation path. Acquisition health, recorded commands, applied observations,
+installation path. Acquisition health, stored commands, materialized observations,
 retained coverage and agent handling remain distinct.
 
 ## Choose acquisition and its failure meaning
@@ -83,7 +83,7 @@ Set maximum line/frame size, output record size, spool bytes, pending records, r
 
 These are policy alternatives, not promises that every collector exposes each mode. Verify the selected implementation's actual behavior. A nonblocking tail of an existing durable log can leave unread data upstream; a live source may have no recoverable history. Report which boundary lost data and whether replay is possible.
 
-Keep stable record identities through retry and durable spool recovery. Advance a file-tail checkpoint only when the bytes are safely represented under the spool policy. Command recording, applied receipts and local dequeue must survive a crash without either skipping data or inventing a new observation. A bounded chart buffer is a separate presentation decision and cannot conceal collector loss.
+Keep stable record identities through retry and durable spool recovery. Advance a file-tail checkpoint only when the bytes are safely represented under the spool policy. Command recording, materialization receipts and local dequeue must survive a crash without either skipping data or inventing a new observation. A bounded chart buffer is a separate presentation decision and cannot conceal collector loss.
 
 If the acquisition source reports unified GPU memory, verify its hardware and
 field semantics before displaying a combined budget. Missing `nvidia-smi`
@@ -92,7 +92,7 @@ models explicitly unknown, and do not add shared GPU RAM to the host RAM total.
 
 ## Make status actionable
 
-Distinguish “source connected,” “last record acquired,” “last command recorded,” “last observation applied,” and “last page update.” A process can be alive while its input stalls, and a page can be online while the collector is disconnected. Show the age of each meaningful timestamp, pending records/bytes, oldest queued age, rejected-record count, and known gaps. When exact counts are unavailable, label them as estimates.
+Distinguish “source connected,” “last record acquired,” “last command recorded,” “last observation materialized,” and “last page update.” A process can be alive while its input stalls, and a page can be online while the collector is disconnected. Show the age of each meaningful timestamp, pending records/bytes, oldest queued age, rejected-record count, and known gaps. When exact counts are unavailable, label them as estimates.
 
 Choose thresholds from the source cadence rather than a universal stale timeout. A once-per-minute snapshot should not appear broken after ten seconds. Provide plain-language actions for common faults: inspect input format, recover a credential file, free spool space, reconnect a source, or review retention. Use text and icons together; a color-only health lamp is insufficient. Avoid live-announcing every sample to assistive technology; announce transitions into or out of a degraded state.
 

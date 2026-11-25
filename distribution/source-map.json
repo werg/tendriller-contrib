@@ -365,9 +365,7 @@
     },
     {
       "id": "run-a-peer-application",
-      "sources": [
-        "https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/packages/peer-session/README.md"
-      ]
+      "sources": []
     },
     {
       "id": "run-measurement-experiment",

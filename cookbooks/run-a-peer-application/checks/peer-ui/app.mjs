@@ -1,183 +1,81 @@
-// Only domain calls and UI drafts live here; the public Worker session owns work.
+// Materialized snapshots plus separate local drafts/selection. Never append
+// network arrivals to a second mutable application database.
 import { applicationReady } from './deployment/bootstrap.mjs';
-import { observeTyping } from './typing.mjs';
-import { bindRecoveryChoice } from './recovery-choice.mjs';
-
-const $ = selector => document.querySelector(selector);
-const lifetime = new AbortController();
-let session, definition, read, storageKey, draft = '', references = [], painting = false, pending = false, submitting = false;
-let lastSignal = 0;
-const outcomes = new Map();
-const text = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
-const status = (message, failure = false) => { $('#status').textContent = message; $('#status').dataset.failure = String(failure); };
-const canAuthor = () => session && !['awaiting-keys', 'recovering', 'closed'].includes(session.status.phase);
-const save = () => localStorage.setItem(storageKey, JSON.stringify({ draft, references }));
-const describeOutcome = value => value === null ? 'No saved attempt was found; the draft is still available.'
-  : value === undefined ? 'Checking the original attempt…'
-    : value.status === 'applied' ? `Applied · ${value.outcome}`
-      : value.status === 'abandoned' || value.status === 'needsReapply' ? 'Excluded from the selected history · review required'
-        : 'Saved on this device · waiting for the coordinating peer';
-
-function paintOperations() {
-  $('#operations').replaceChildren(...references.slice().reverse().map(reference => {
-    const value = outcomes.get(reference.operationId), row = text('li', '');
-    row.dataset.operation = reference.operationId; row.dataset.status = value?.status ?? 'unknown';
-    row.append(text('strong', reference.label), text('p', describeOutcome(value)));
-    const check = text('button', 'Check original'); check.type = 'button';
-    check.onclick = async () => {
-      try { outcomes.set(reference.operationId, await session.operations.get(reference.operationId)); paintOperations(); }
-      catch (error) { status(`Original status unavailable: ${error.message}`, true); }
-    };
-    row.append(check);
-    if (reference.command === 'postMessage') {
-      const copy = text('button', 'Copy to editor'); copy.type = 'button';
-      copy.onclick = () => { draft = reference.input.text; $('#message').value = draft; save(); $('#message').focus(); };
-      row.append(copy);
-    }
-    if (value?.status === 'saved') {
-      const retry = text('button', 'Retry same attempt'); retry.type = 'button';
-      retry.onclick = () => void session.retry(reference.operationId).then(refresh, error => status(error.message, true));
-      row.append(retry);
-    }
-    if (value?.status === 'abandoned' || value?.status === 'needsReapply') {
-      const reapply = text('button', 'Review and reapply'); reapply.type = 'button'; reapply.dataset.action = 'reapply';
-      reapply.onclick = async () => {
-        reapply.disabled = true;
-        try {
-          // This retained draft is used only for a deliberate new command. The
-          // original signed attempt and its retry state stay in the owned journal.
-          const current = await session.query(definition.queries.some(value => value.name === 'board') ? 'board' : 'conversation', {});
-          paint(current);
-          if (!window.confirm(`Create a new attempt for “${reference.label}” using the current history?`)) return;
-          await submit(reference.command, reference.input, reference.label, reference.operationId);
-        } catch (error) { status(`Reapplication needs review: ${error.message}`, true); }
-        finally { reapply.disabled = false; }
-      };
-      row.append(reapply);
-    }
-    if (value === null || value?.status === 'applied' || value?.status === 'abandoned' || value?.status === 'needsReapply') {
-      const forget = text('button', 'Remove reviewed reference'); forget.type = 'button';
-      forget.onclick = () => {
-        references = references.filter(item => item.operationId !== reference.operationId);
-        outcomes.delete(reference.operationId); save(); paintOperations();
-      };
-      row.append(forget);
-    }
-    return row;
+import { createLiveView } from '@chronolog/peer-session/browser';
+const $ = selector => document.querySelector(selector), nodes = new Map();
+let session, live, snapshot, draft = '', references = [], submitting = false, selected = location.hash.slice(1);
+const storageKey = 'peer-workspace-view-v1';
+try { const saved = JSON.parse(localStorage.getItem(storageKey) ?? '{}'); draft = saved.draft ?? ''; references = saved.references ?? []; } catch { /* View conveniences are optional. */ }
+const saveView = () => { try { localStorage.setItem(storageKey, JSON.stringify({ draft, references })); } catch { /* Never gate durable authoring. */ } };
+const error = failure => { $('#error').hidden = !failure; $('#error').textContent = failure?.message ?? ''; };
+const element = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
+async function derive(view) {
+  const messages = []; let cursor;
+  for (;;) {
+    const batch = await view.readEvents({ topics: ['conversation'], limit: 128, ...(cursor === undefined ? {} : { cursor }) });
+    for (const event of batch.events) if (event.payload?.type === 'message.posted') messages.push({ ...event.payload,
+      author: event.author, operationId: event.operationId, proposalId: event.proposalId, authorTimestampMs: event.authorTimestampMs });
+    if (!batch.hasMore) break; cursor = batch.cursor;
+  }
+  let tasks = null;
+  if (session.describe().queries.some(value => value.name === 'board')) tasks = (await view.query('SELECT id,title,claimed_by,status FROM tasks ORDER BY id LIMIT 200')).rows;
+  return { messages, tasks };
+}
+function detail() {
+  const row = snapshot?.value.messages.find(value => value.proposalId === selected);
+  $('#detail-empty').hidden = !!row; $('#message-detail').replaceChildren();
+  if (!row) { $('#detail-empty').textContent = selected ? 'This message is not effective in the current snapshot. Its signed intent is not rewritten.' : 'Choose a message to inspect its authenticated author and signed intent.'; return; }
+  for (const [label, value] of [['Message', row.text], ['Authenticated author', row.author], ['Proposal ID', row.proposalId], ['Operation ID', row.operationId], ['Signed author time', row.authorTimestampMs]]) $('#message-detail').append(element('dt', label), element('dd', value));
+}
+async function inspect() {
+  const inspected = await Promise.all(references.map(async reference => ({ reference, state: await (await session.operations.get(reference.operationId))?.inspect() })));
+  $('#operations').replaceChildren(...inspected.reverse().map(({ reference, state }) => {
+    const row = element('li', ''); row.dataset.operation = reference.operationId; row.dataset.excluded = String(state?.excluded ?? false);
+    row.append(element('strong', reference.input.text ?? reference.operationId), element('p', !state ? 'Intent unavailable on this device.' :
+      `${state.stored ? 'Stored locally' : 'Not stored'} · ${state.materialized ? `materialized ${state.materialized.outcome}` : 'materialization pending'} · retained by ${state.retained.length} peer(s) · ${state.finalized ? 'finalized' : 'not finalized'}${state.excluded ? ' · excluded under the configured policy' : ''}`));
+    const check = element('button', 'Retry exact intent'); check.type = 'button'; check.onclick = async () => {
+      try { const retried = await session.command(reference.name, reference.input, { operationId: reference.operationId }); await retried.materialized(); await inspect(); } catch (failure) { error(failure); }
+    }; row.append(check); return row;
   }));
 }
-
-function paint(result) {
-  read = result;
-  $('#revision').textContent = `Generation ${result.revision.generation.slice(0, 12)} · position ${result.revision.point.sequence}`;
-  $('#conversation').replaceChildren(...result.value.messages.slice(-200).map(message => {
-    const row = text('li', ''); row.dataset.operation = message.operationId;
-    row.append(text('p', message.text), text('small', `Author ${message.author.slice(0, 12)}`)); return row;
+function paint(value) {
+  snapshot = value; error(null);
+  const ids = new Set(value.value.messages.map(row => row.proposalId));
+  for (const [id, node] of nodes) if (!ids.has(id)) { node.remove(); nodes.delete(id); }
+  for (const row of value.value.messages) {
+    let node = nodes.get(row.proposalId);
+    if (!node) { node = element('li', ''); node.append(element('a', '')); nodes.set(row.proposalId, node); }
+    const link = node.firstChild; link.textContent = row.text; link.href = `#${row.proposalId}`;
+    link.setAttribute('aria-current', String(selected === row.proposalId)); $('#conversation').append(node);
+  }
+  $('#message-count').textContent = String(value.value.messages.length); $('#empty').hidden = value.value.messages.length > 0;
+  $('#revision').textContent = `Coherent local revision ${value.revision.digest.slice(0, 16)}`;
+  $('#tasks-section').hidden = value.value.tasks === null;
+  if (value.value.tasks) $('#tasks').replaceChildren(...value.value.tasks.map(([id,title,claimed,status]) => {
+    const row = element('li', `${title} · ${status}${claimed ? ' · provisionally claimed' : ''}`);
+    const claim = element('button', claimed ? 'Complete task' : 'Claim task'); claim.type = 'button';
+    claim.onclick = () => submit(claimed ? 'finishTask' : 'claimTask', { taskId: id }); row.append(claim); return row;
   }));
-  if (result.value.tasks) $('#tasks').replaceChildren(...result.value.tasks.map(task => {
-    const row = text('li', ''); row.dataset.task = task.id;
-    row.append(text('strong', task.title), text('p', task.claimedBy ? `${task.status} · claimed by ${task.claimedBy.slice(0, 12)}` : 'Open for a claim'));
-    const button = text('button', task.claimedBy ? 'Finish task' : 'Claim task'); button.type = 'button';
-    button.disabled = task.status !== 'open' || Boolean(task.claimedBy && task.claimedBy !== session.deviceId);
-    button.onclick = () => void submit(task.claimedBy ? 'finishTask' : 'claimTask', { taskId: task.id }, `${task.claimedBy ? 'Finish' : 'Claim'}: ${task.title}`).catch(() => undefined);
-    row.append(button); return row;
-  }));
+  detail(); void inspect().catch(error);
 }
-
-async function refresh() {
-  pending = true;
-  if (painting || !session) return;
-  painting = true;
+async function submit(name, input) {
+  if (submitting) return; submitting = true; updateStatus(session.status);
+  const reference = { name, input, operationId: crypto.randomUUID() };
   try {
-    while (pending && !lifetime.signal.aborted) {
-      pending = false;
-      const result = await session.query(definition.queries.some(value => value.name === 'board') ? 'board' : 'conversation', {});
-      const observed = await Promise.all(references.map(async value => [value.operationId, await session.operations.get(value.operationId)]));
-      if (lifetime.signal.aborted) return;
-      for (const [id, value] of observed) outcomes.set(id, value);
-      paint(result); paintOperations();
-    }
-  } catch (error) { status(`Current view unavailable: ${error.message}. Your draft is retained.`, true); }
-  finally { painting = false; }
+    const operation = await session.command(name, input, { operationId: reference.operationId });
+    references.push(reference); if (name === 'postMessage') { draft = ''; $('#message').value = ''; }
+    saveView(); await inspect(); await operation.materialized(); await live.refresh();
+  } catch (failure) { error(failure); }
+  finally { submitting = false; updateStatus(session.status); }
 }
-
-async function submit(command, input, label, original) {
-  if (references.length >= 100) throw Error('This device has 100 saved attempt references; review them before submitting more.');
-  const operationId = crypto.randomUUID(), reference = { operationId, command, input: structuredClone(input), label };
-  references.push(reference); save(); paintOperations();
-  try {
-    const options = { operationId, ...(read ? { basedOn: read.revision } : {}) };
-    const operation = original ? await session.reapply(original, command, input, options) : await session.command(command, input, options);
-    outcomes.set(operationId, await operation.get()); paintOperations();
-    void operation.applied({ signal: lifetime.signal }).then(value => {
-      outcomes.set(operationId, value); paintOperations(); status(describeOutcome(value), value.outcome === 'rejected'); return refresh();
-    }, error => { if (!lifetime.signal.aborted) { status(`Attempt needs review: ${error.message}`, true); void refresh(); } });
-    return operation;
-  } catch (error) { status(`Attempt could not be prepared: ${error.message}. Its review reference is retained.`, true); throw error; }
+function updateStatus(status) {
+  $('#status').textContent = `${status.canAuthor ? 'Local signing and storage ready' : 'Local signing unavailable'} · ${status.connectedPeers} connected peer(s) · local saving does not wait for finality`;
+  $('#message').disabled = !status.canAuthor; $('#send').disabled = !status.canAuthor || submitting;
 }
-
-$('#message-form').onsubmit = async event => {
-  event.preventDefault(); if (submitting || !draft.trim()) return;
-  submitting = true; $('#send').disabled = true;
-  const snapshot = draft;
-  try {
-    await submit('postMessage', { messageId: crypto.randomUUID(), text: snapshot.trim() }, snapshot.trim());
-    if (draft === snapshot) { draft = ''; $('#message').value = ''; save(); }
-  } catch { /* Keep the user's current draft and original review reference. */ }
-  finally { submitting = false; $('#send').disabled = !canAuthor(); }
-};
-$('#task-form').onsubmit = async event => {
-  event.preventDefault(); const title = $('#task-title').value.trim(); if (!title) return;
-  try { await submit('addTask', { taskId: crypto.randomUUID(), title }, `Add: ${title}`); if ($('#task-title').value.trim() === title) $('#task-title').value = ''; }
-  catch { /* Current task title remains reviewable. */ }
-};
-$('#message').oninput = () => {
-  draft = $('#message').value;
-  try { save(); } catch (error) { status(`Draft storage failed: ${error.message}`, true); }
-  if (session && performance.now() - lastSignal > 750) {
-    lastSignal = performance.now(); void session.signals.send('typing', { typing: Boolean(draft) }, { ttlMs: 2500 }).catch(() => undefined);
-  }
-};
-window.addEventListener('pagehide', () => { lifetime.abort(); void session?.close(); }, { once: true });
-
-try {
-  session = await applicationReady;
-  // Live observation belongs to this same session and starts before any query.
-  void observeTyping(session.signals, { signal: lifetime.signal,
-    onChange: ({ count }) => { $('#typing').textContent = count ? `${count} ${count === 1 ? 'person is' : 'people are'} typing…` : ''; },
-  }).catch(() => { $('#typing').textContent = ''; });
-  definition = await session.describe();
-  bindRecoveryChoice(session.participation, { panel: $('#recovery-choice'), message: $('#recovery-choice-message'),
-    details: $('#recovery-choice-details'), button: $('#approve-recovery'), signal: lifetime.signal,
-    onError: () => status('Recovery was not approved. Review the current choice before trying again.', true) });
-  storageKey = `peer-page/${session.applicationId}/${session.deviceId}`;
-  const stored = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
-  if (stored && typeof stored.draft === 'string' && stored.draft.length <= 4096 && Array.isArray(stored.references) && stored.references.length <= 100 &&
-      stored.references.every(value => value && typeof value.operationId === 'string' && typeof value.command === 'string' && typeof value.label === 'string' && value.input && typeof value.input === 'object')) {
-    draft = stored.draft; references = stored.references;
-  }
-  $('#message').value = draft;
-  session.onStatus(value => {
-    $('#message').disabled = !canAuthor(); $('#send').disabled = !canAuthor() || submitting;
-    if (value.phase === 'awaiting-keys') status('Waiting for an authorized peer to share this history’s keys. Your draft is retained.');
-    else if (value.phase === 'recovering') status('Restoring the selected history. Your draft is retained.');
-    else if (value.phase === 'closed') status('This device session is closed. Your draft is retained.');
-  });
-  $('#tasks-section').hidden = !definition.commands.some(value => value.name === 'claimTask');
-  await refresh(); if (canAuthor()) status('Ready. Attempts and recovery remain visible below.');
-  const notices = await session.inspectRecovery();
-  if (notices.length) {
-    const latest = notices[notices.length - 1];
-    $('#recovery').hidden = false;
-    $('#recovery-message').textContent = `This device retains a recovery notice for ${latest.abandoned.length} excluded attempts. Additional lost work may be unknown.`;
-  }
-  void (async () => {
-    for await (const change of session.changes({ signal: lifetime.signal })) {
-      if (change.kind === 'recovery') {
-        $('#recovery').hidden = false;
-        $('#recovery-message').textContent = `A new history was selected. ${change.recovery?.abandoned.length ?? 0} retained attempts were excluded; additional lost work may be unknown.`;
-      }
-      await refresh();
-    }
-  })().catch(error => { if (!lifetime.signal.aborted) status(`Live view paused: ${error.message}`, true); });
-} catch (error) { status(`Application unavailable: ${error.message}`, true); }
+$('#message').value = draft;
+$('#message').addEventListener('input', () => { draft = $('#message').value; saveView(); });
+$('#message-form').addEventListener('submit', event => { event.preventDefault(); if (draft.trim()) void submit('postMessage', { messageId: crypto.randomUUID(), text: draft }); });
+$('#task-form').addEventListener('submit', event => { event.preventDefault(); void submit('addTask', { taskId: crypto.randomUUID(), title: $('#task-title').value }); });
+addEventListener('hashchange', () => { selected = location.hash.slice(1); if (snapshot) paint(snapshot); });
+try { session = await applicationReady; session.onStatus(updateStatus); live = createLiveView(session, derive, { onError: error }); live.subscribe(paint); await live.ready(); }
+catch (failure) { error(failure); $('#status').textContent = 'Local application unavailable; draft retained.'; }

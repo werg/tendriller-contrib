@@ -71,7 +71,7 @@ Let the person pause, skip, reduce or retire a routine without erasing useful hi
 
 Local mute should work immediately while a remote cancellation waits. An in-flight provider request may still display. A late accepted receipt must not resurrect a schedule that was subsequently replaced. Read the current routine and actual scheduling state before showing the outcome.
 
-Application history recovery may abandon a recent observation or scheduling intent. Keep the original attempts inspectable and offer deliberate reapplication after current review. External effects follow their qualified action journal and protected boundary; do not blindly repeat them when a view rebuilds. Travel, illness or a changed goal should remain a meaningful domain adjustment, not a hidden failure or fictional completed day.
+A late earlier operation can revise a recent observation or scheduling outcome, and a configured closed frontier can exclude delayed offline work. Keep the original intent inspectable, rederive from a coherent snapshot and offer a deliberate new reviewed operation if still wanted; never retimestamp the old one. External effects follow their qualified action journal and protected boundary; do not blindly repeat them when a view rebuilds. Travel, illness or a changed goal should remain a meaningful domain adjustment, not a hidden failure or fictional completed day.
 
 ## Present progress with an honest denominator
 
@@ -85,7 +85,7 @@ Offer a reflection prompt that helps adjust the routine: whether the time, size,
 | --- | --- |
 | Midnight, travel, or a daylight-saving transition changes the displayed day. | The declared occurrence and day-boundary policy determines credit; reminder formatting does not move an observation silently. |
 | Reminder creation commits but its reply is lost before a reload. | The restored command retains its CID and guards, yields one timer, and leaves completion counts unchanged. |
-| A reminder is rejected before claim or lifetime extension, and its reply is lost. | Retrying that CID recovers the original rejection; a new reviewed reminder is needed, and routine completion history stays unchanged. |
+| A reminder is rejected before claim or lifetime extension, and its reply is lost. | Retrying that CID resumes the original proposal and its current outcome; a new reviewed reminder is needed, and routine completion history stays unchanged. |
 | Two devices change the same reminder revision. | One change wins; the rejected proposal remains reviewable and does not cancel the winner's notification intents. |
 | A reminder runs while its pause form is open. | The alarm's newer revision rejects an obsolete cancellation; a fresh review decides whether to cancel the current schedule. |
 | Pause is requested offline, or a provider accepts a push before cancellation. | Local mute works; pending server cancellation and possible late notification remain clear; the task is not marked done. |

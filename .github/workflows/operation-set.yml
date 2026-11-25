@@ -1,0 +1,181 @@
+name: Independent operation-set consumer
+run-name: "Companion core=${{ inputs.tendriller_ref || 'tuple' }} kernel=${{ inputs.chronolog_ref || 'tuple' }}"
+on:
+  push:
+    paths:
+      - 'distribution/download-core-release.mjs'
+      - 'distribution/companion-release.json'
+      - 'distribution/select-companion-release.mjs'
+      - 'test/companion-workflow-pins.test.mjs'
+      - '.github/workflows/operation-set.yml'
+      - 'cookbooks/run-a-peer-application/checks/*operation-set*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-session-artifact*'
+      - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
+      - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
+  pull_request:
+    paths:
+      - 'distribution/download-core-release.mjs'
+      - 'distribution/companion-release.json'
+      - 'distribution/select-companion-release.mjs'
+      - 'test/companion-workflow-pins.test.mjs'
+      - '.github/workflows/operation-set.yml'
+      - 'cookbooks/run-a-peer-application/checks/*operation-set*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-composition*'
+      - 'cookbooks/run-a-peer-application/checks/*peer-session-artifact*'
+      - 'cookbooks/run-a-peer-application/checks/peer-ui/**'
+      - 'cookbooks/run-a-peer-application/checks/shared/typing.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-conversation.mjs'
+      - 'cookbooks/run-a-peer-application/snippets/peer-task-board.mjs'
+  workflow_dispatch:
+    inputs:
+      chronolog_ref:
+        description: Exact Chronolog source commit containing the public peer-session package
+        required: false
+        type: string
+      tendriller_ref:
+        description: Exact Tendriller source commit for the hosted participant gate
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: operation-set-${{ github.head_ref || github.ref_name }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ inputs.chronolog_ref }}-${{ inputs.tendriller_ref }}-${{ github.event_name == 'workflow_dispatch' && 'explicit' || 'ordinary' }}
+  cancel-in-progress: true
+jobs:
+  public-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        transport: [direct, native-rtc, browser-native, native-sql, hosted, relay, browser-relay]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Select verified companion tuple
+        env:
+          TENDRILLER_REF: ${{ inputs.tendriller_ref }}
+          CHRONOLOG_REF_INPUT: ${{ inputs.chronolog_ref }}
+        run: node distribution/select-companion-release.mjs contrib >> "$GITHUB_ENV"
+      - name: Require immutable companion commits
+        shell: bash
+        run: |
+          [[ "$CHRONOLOG_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'chronolog_ref must be a full commit SHA'; exit 1; }
+          [[ "$HOST_REF" =~ ^[0-9a-f]{40}$ ]] || { echo 'tendriller_ref must be a full commit SHA'; exit 1; }
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.12.4'
+      - uses: actions/checkout@v4
+        with:
+          repository: werg/chronolog-db
+          ref: ${{ env.CHRONOLOG_REF }}
+          path: .chronolog-build
+          persist-credentials: false
+      - name: Verify Chronolog source
+        run: test "$(git -C .chronolog-build rev-parse HEAD)" = "$CHRONOLOG_REF"
+      - name: Install pinned build dependencies and the patched engine when SQL is selected
+        working-directory: .chronolog-build
+        run: pnpm install --frozen-lockfile ${{ matrix.transport != 'native-sql' && matrix.transport != 'browser-native' && matrix.transport != 'browser-relay' && '--ignore-scripts' || '' }}
+      - uses: mymindstorm/setup-emsdk@v14
+        if: ${{ matrix.transport == 'native-sql' || matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
+        with:
+          version: '4.0.20'
+      - name: Build exact WASM engine for SQL parity
+        if: ${{ matrix.transport == 'native-sql' || matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
+        working-directory: .chronolog-build
+        run: node tools/build-wasm-engine.mjs --emsdk "$EMSDK" --output artifacts/wasm
+      - name: Build clean standalone authority archive
+        working-directory: .chronolog-build
+        run: node tools/package-authority.mjs --output artifacts/authority
+      - name: Build clean public session archive
+        working-directory: .chronolog-build
+        shell: bash
+        run: |
+          flags=()
+          case "${{ matrix.transport }}" in
+            native-sql) flags=(--sql-native --sql-wasm --wasm-dir artifacts/wasm) ;;
+            browser-native|browser-relay) flags=(--sql-native --sql-browser --wasm-dir artifacts/wasm) ;;
+          esac
+          node tools/package-peer-session.mjs --output artifacts/peer-session "${flags[@]}"
+      - name: Download the exact promoted public host graph
+        if: ${{ matrix.transport == 'hosted' || matrix.transport == 'relay' || matrix.transport == 'browser-relay' }}
+        run: node distribution/download-core-release.mjs --source "$HOST_REF" --chronolog-source "$CHRONOLOG_REF" --output .tendriller-build/dist
+      - name: Install pinned Chromium and browser system dependencies
+        if: ${{ matrix.transport == 'browser-native' || matrix.transport == 'browser-relay' }}
+        run: npm exec --yes --package=playwright@1.65.0 -- playwright install --with-deps chromium
+      - name: Exercise independent application through the packed public API
+        shell: bash
+        run: |
+          archives=(.chronolog-build/artifacts/peer-session/chronolog-peer-session-*.tgz)
+          test "${#archives[@]}" -eq 1
+          authorities=(.chronolog-build/artifacts/authority/chronolog-authority-*.tgz)
+          test "${#authorities[@]}" -eq 1
+          if [ "${{ matrix.transport }}" = browser-native ]; then
+            node cookbooks/run-a-peer-application/checks/run-operation-set-browser.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --output test-results/operation-set
+          elif [ "${{ matrix.transport }}" = hosted ]; then
+            node cookbooks/run-a-peer-application/checks/run-operation-set-host.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --artifacts .tendriller-build/dist --output test-results/operation-set
+          elif [ "${{ matrix.transport }}" = relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-operation-set-host.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --artifacts .tendriller-build/dist --transport websocket --output test-results/operation-set
+          elif [ "${{ matrix.transport }}" = browser-relay ]; then
+            node cookbooks/run-a-peer-application/checks/run-operation-set-host.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --artifacts .tendriller-build/dist --transport websocket --browser --output test-results/operation-set
+          elif [ "${{ matrix.transport }}" = native-sql ]; then
+            node cookbooks/run-a-peer-application/checks/run-operation-set.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --domain tasks --output test-results/operation-set
+          else
+            node cookbooks/run-a-peer-application/checks/run-operation-set.mjs --artifact "${archives[0]}" --authority "${authorities[0]}" --transport "${{ matrix.transport }}" --output test-results/operation-set
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-operation-set-${{ matrix.transport }}-evidence
+          path: |
+            test-results/operation-set/report.json
+            test-results/operation-set/summary.json
+            test-results/operation-set/consumer/package-lock.json
+            test-results/operation-set/peers/report.json
+            test-results/operation-set/peers/summary.json
+            test-results/operation-set/peers/consumer/package-lock.json
+            test-results/operation-set/peers/*.png
+            test-results/operation-set/peers/assets/*
+            test-results/operation-set/host-artifacts.json
+            test-results/operation-set/host/package-lock.json
+            .tendriller-build/dist/manifest.json
+            .tendriller-build/dist/composition.json
+            .tendriller-build/dist/provenance.json
+            .tendriller-build/dist/*.tgz
+            test-results/operation-set/*.png
+            .chronolog-build/artifacts/authority/*.tgz
+            .chronolog-build/artifacts/authority/provenance.json
+            .chronolog-build/artifacts/peer-session/*.tgz
+            .chronolog-build/artifacts/peer-session/package/provenance.json
+
+  composition:
+    needs: public-session
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: independent-operation-set-*-evidence
+          path: evidence
+      - name: Bind all independently observed gates to one exact composition
+        shell: bash
+        run: |
+          args=()
+          while IFS= read -r -d '' report; do args+=(--report "$report"); done < <(find evidence -type f -name report.json -print0)
+          node cookbooks/run-a-peer-application/checks/peer-composition.mjs "${args[@]}" --output composition.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualified-local-peer-composition
+          path: composition.json

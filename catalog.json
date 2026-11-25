@@ -600,7 +600,7 @@
         "collaboration",
         "agents",
         "claims",
-        "recovery",
+        "finality",
         "participants"
       ],
       "choices": [
@@ -619,10 +619,11 @@
         "coordinate-devices",
         "observe-long-running-process"
       ],
-      "evidence": "exercised",
+      "evidence": "explained",
       "path": "cookbooks/coordinate-participants/COOKBOOK.md",
       "runnable": true,
       "snippets": [
+        "cookbooks/coordinate-participants/snippets/bootstrap-authority.mjs",
         "cookbooks/coordinate-participants/snippets/bootstrap.mjs",
         "cookbooks/coordinate-participants/snippets/review-workspace.mjs",
         "cookbooks/coordinate-participants/snippets/reviewer-cli.mjs",
@@ -1396,7 +1397,7 @@
       "group": "Keep work dependable",
       "tags": [
         "commands",
-        "generations",
+        "operations",
         "drafts"
       ],
       "choices": [
@@ -1528,20 +1529,20 @@
     },
     {
       "id": "run-a-peer-application",
-      "title": "Build a peer application with explicit recovery",
-      "summary": "Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication.",
+      "title": "Build a local-first peer application",
+      "summary": "Author durable signed operations independently, merge operation sets, and derive coherent revisable event or SQL views with explicitly optional finality.",
       "group": "Keep work dependable",
       "tags": [
         "peers",
         "events",
         "sql",
-        "agent",
-        "recovery"
+        "offline",
+        "finality"
       ],
       "choices": [
-        "Signals, events or SQL/events",
-        "Applied outcomes or protected actions",
-        "Recover a selected prefix and review abandoned intent"
+        "Events or permissioned SQL",
+        "Provisional reads or configured finality",
+        "Local durability and independent peer retention"
       ],
       "capabilities": [],
       "evidence": "explained",
@@ -1554,16 +1555,13 @@
         "manage-sensitive-data",
         "publish-coherent-updates"
       ],
-      "sources": [
-        "https://github.com/werg/chronolog-db/blob/b6e3f2774bb82d52755359df3a415133f3018f07/packages/peer-session/README.md"
-      ],
       "path": "cookbooks/run-a-peer-application/COOKBOOK.md",
       "runnable": true,
       "snippets": [
         "cookbooks/run-a-peer-application/snippets/peer-conversation.mjs",
         "cookbooks/run-a-peer-application/snippets/peer-task-board.mjs"
       ],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Use replaceable coordinating peers, coherent views and exact attempts for shared conversation and guarded work, with explicit recovery and deliberate reapplication. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/run-a-peer-application/COOKBOOK.md. Author durable signed operations independently, merge operation sets, and derive coherent revisable event or SQL views with explicitly optional finality. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "run-measurement-experiment",
@@ -1964,7 +1962,7 @@
       ],
       "choices": [
         "Saved publication versus unsaved optional capabilities",
-        "Local work versus accepted server outcomes",
+        "Local materialization versus retention and finality",
         "Original retries versus reviewed reconciliation"
       ],
       "related": [

@@ -42,14 +42,14 @@ try {
   const origin = `http://127.0.0.1:${server.address().port}`;
   browser = await chromium.launch({ headless: true, ...(process.env.COLLABORATION_CHROMIUM ? { executablePath: process.env.COLLABORATION_CHROMIUM } : {}) });
   report.runtime.browser = browser.version();
-  for (const mode of ['auto', 'elected']) {
-    const context = await browser.newContext({ viewport: { width: 1320, height: 1000 } });
+  for (const mode of ['auto', 'elected']) for (const viewportWidth of [1320,320]) {
+    const context = await browser.newContext({ viewport: { width: viewportWidth, height: 1000 } });
     context.on('console', message => { if (['error', 'warning'].includes(message.type())) diagnostic('browser', { mode, type: message.type(), text: message.text(), location: message.location() }); });
     context.on('requestfailed', request => diagnostic('browser', { mode, type: 'requestfailed', url: request.url(), error: request.failure() }));
     const board = await context.newPage(), discussion = await context.newPage(), errors = [];
     activePages = [board, discussion];
     for (const page of [board, discussion]) { page.setDefaultTimeout(30_000); page.on('pageerror', error => errors.push(error.message)); }
-    const profile = `authored-${mode}`, url = document => `${origin}/${document}?profile=${profile}&mode=${mode}`;
+    const profile = `authored-${mode}-${viewportWidth}`, url = document => `${origin}/${document}?profile=${profile}&mode=${mode}`;
     const ready = async (page, entry) => {
       await page.goto(url(entry));
       try {
@@ -62,7 +62,7 @@ try {
           status: await page.locator('#status').textContent().catch(() => null),
           dom: await page.locator('body').innerText().catch(() => null) };
         report.diagnostics.bootstrap = details; console.error(JSON.stringify(details, null, 2));
-        await page.screenshot({ path: join(dirname(reportPath), `${mode}-bootstrap-failed.png`), fullPage: true }).catch(() => undefined);
+        await page.screenshot({ path: join(dirname(reportPath), `${mode}-${viewportWidth}-bootstrap-failed.png`), fullPage: true }).catch(() => undefined);
         throw error;
       }
     };
@@ -150,16 +150,29 @@ try {
     assert.equal(outcome.task.status, 'completed'); assert.equal(outcome.results.filter(value => value.disposition === 'accepted').length, 1);
     assert.equal(outcome.task.source.endpointId, a.endpoint.endpointId);
     assert.equal(outcome.claims[0].endpointIncarnation, reopened.endpoint.endpointIncarnation);
+    await context.setOffline(true);
+    let offlineObservation;
+    try {
+      offlineObservation=await board.evaluate(async()=>{
+        const operation=await globalThis.fixtureClient.message({threadId:'offline-proof',text:'Saved with all network access disabled',messageId:'offline-proof'});
+        const stored=operation.stored;await operation.materialized({timeoutMs:30_000});const inspection=await operation.inspect();
+        let finalityError;try{await operation.finalized({timeoutMs:1000});}catch(error){finalityError=error.code??error.message;}
+        return{stored,inspection,finalityError};
+      });
+    } finally {await context.setOffline(false);}
+    assert.equal(offlineObservation.stored,true);assert.equal(offlineObservation.inspection.materialized.outcome,'accepted');assert.equal(offlineObservation.inspection.finalized,false);
+    assert.equal(offlineObservation.finalityError,'FINALITY_UNSUPPORTED');assert.match(offlineObservation.inspection.materialized.revision.digest,/^[a-f0-9]{64}$/u);
+    assert.equal(offlineObservation.inspection.materialized.revision.view,'local');
     // Grow the actual authored workspace through public commands. A continuation
     // stays on its captured revision while another document writes new work.
     const createRequests = async (page, ids) => page.evaluate(async ids => {
       for (const id of ids) {
-        const signer = globalThis.fixtureSession.deviceId;
+        const signer = globalThis.fixtureSession.identity.publicKey;
         const operation = await globalThis.fixtureClient.request({ interactionId: id, kind: 'reviewEvidence', title: `Paged ${id}`,
           input: { text: 'Evidence for paging.' }, context: { source: 'browser-qualification' },
           target: { kind: 'signer', deviceId: signer }, responsePolicy: 'one',
           slots: [{ slotId: 'review', eligibleSigners: [signer], label: 'Review' }] });
-        const result = await operation.applied({ signal: AbortSignal.timeout(30_000) });
+        const result = await operation.materialized({ signal: AbortSignal.timeout(30_000) });
         if (result.outcome !== 'accepted') throw Error(JSON.stringify(result));
       }
     }, ids);
@@ -181,7 +194,7 @@ try {
     const postMessages = async (page, messages) => page.evaluate(async ({ taskId, messages }) => {
       for (const text of messages) {
         const operation = await globalThis.fixtureClient.message({ threadId: taskId, messageId: crypto.randomUUID(), text });
-        const result = await operation.applied({ signal: AbortSignal.timeout(30_000) });
+        const result = await operation.materialized({ signal: AbortSignal.timeout(30_000) });
         if (result.outcome !== 'accepted') throw Error(JSON.stringify(result));
       }
     }, { taskId, messages });
@@ -199,8 +212,8 @@ try {
     await board.locator('#thread-next').click();
     await board.locator('#messages').getByText('Message after captured conversation', { exact: true }).waitFor();
     assert.equal(await board.locator('#message').inputValue(), 'Unsent message while browsing retained conversation.');
-    await board.screenshot({ path: join(dirname(reportPath), `${mode}-board.png`), fullPage: true });
-    await discussion.screenshot({ path: join(dirname(reportPath), `${mode}-discussion.png`), fullPage: true });
+    await board.screenshot({ path: join(dirname(reportPath), `${mode}-${viewportWidth}-board.png`), fullPage: true });
+    await discussion.screenshot({ path: join(dirname(reportPath), `${mode}-${viewportWidth}-discussion.png`), fullPage: true });
     await discussion.evaluate(() => globalThis.fixtureOwner.suspend()); await discussion.evaluate(() => globalThis.fixtureOwner.resume());
     assert.equal((await discussion.evaluate(() => globalThis.fixtureReady)).endpoint.endpointIncarnation,
       reopened.endpoint.endpointIncarnation);
@@ -242,10 +255,10 @@ try {
     const successor = await survivor.evaluate(() => globalThis.fixtureReady);
     assert.equal(successor.deviceId, a.deviceId); assert.notEqual(successor.endpoint.ownerInstanceId, c.endpoint.ownerInstanceId);
     const after = await survivor.evaluate(async ({ id, reference }) => ({ task: (await globalThis.fixtureSession.query('collab.task', { taskId: id })).value.task,
-      operation: await globalThis.fixtureSession.operations.get(reference.operationId, { author: reference.author }) }), { id: taskId, reference: retained[0] });
-    assert.equal(after.task.status, 'completed'); assert.equal(after.operation.status, 'applied');
+      operation: await (await globalThis.fixtureSession.operations.get(reference.proposalId)).inspect() }), { id: taskId, reference: retained[0] });
+    assert.equal(after.task.status, 'completed'); assert.equal(after.operation.stored,true);assert.equal(after.operation.materialized.outcome,'accepted');
     assert.deepEqual(errors, []);
-    report.scenarios.push({ mode, ownerMode: a.ownerMode, sharedStorageUnsupported: true, capabilityRouteObserved: true, realSqlWasm: true, twoDocuments: true, independentDrafts: true, remoteRepaintPreservedFocus: true,
+    report.scenarios.push({ mode, viewportWidth, offlineLocalSubmission:true, provisionalNotFinal:true, operationSetRevision:true,ownerMode: a.ownerMode, sharedStorageUnsupported: true, capabilityRouteObserved: true, realSqlWasm: true, twoDocuments: true, independentDrafts: true, remoteRepaintPreservedFocus: true,
       draftAndOperationAfterReload: true, addressedRequest: true, explicitEndpointReassignment: true,
       acceptedContributionAndSynthesis: true, suspendResume: true, detachIsolation: true, retainedAfterOwnerExit: true,
       boundedTaskPages: true, stableThreadPages: true, paginationPreservedDrafts: true,

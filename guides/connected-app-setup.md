@@ -1,218 +1,184 @@
-# Set up a connected application on the selected service
+# Set up a browser-first application on the selected service
 
-Use this entry when a person asks for a new Tendriller page or wants an existing
-page connected to an assistant. Core owns the runnable setup procedure and its
-public packages. This guide explains how to select that procedure and recognize
-its checkpoints; cookbook specimens and historical qualification reports do not
-choose a deployment or an installation baseline.
+Use this entry for a new Tendriller application or an assistant connection. Core
+owns runnable setup and public packages; this collection helps choose guarantees
+and recognize completion. A cookbook or source checkout does not choose the
+person's deployment or certify its installed release.
 
-## Discover the selected host before doing setup work
+## Discover the selected service first
 
 Keep the exact origin supplied by the person or returned as `serviceOrigin` by
-the selected connector. Use that origin for discovery, readiness, creation,
-saved handles, owner sign-in and assistant access. A production example in a
-source document does not choose the user's host. If the connector supplies no
-origin, establish its configured origin before creating an application. Never
-switch deployments because creation is paused or an installation step fails.
+the selected connector. Use it for discovery, readiness, setup, saved handles,
+owner sign-in and assistant access. Never switch deployments because creation is
+paused or an installation fails.
 
-In MCP, call `tendril_guide` with `topic: "start"` when that tool is available.
-Profile, application-list and guide responses advertise the host identity and
-setup links. An empty `list_tendrils` means the account has no assistant-connected
-applications; it does not imply that the plugin is missing or that creation is
-available.
+Start at `/api/service` and `/.well-known/tendriller.json` on that origin. In MCP,
+call `tendril_guide` with `topic: "start"` when available; otherwise follow the
+returned same-origin setup/build links. An empty application list is not evidence
+that the connector is missing or that creation is permitted.
 
-An older installed tool catalog can omit `tendril_guide`. Follow the returned
-`setup.startHere`, `setup.buildGuide` or `setup.discoveryUrl` on the same origin.
-The public discovery path is `/.well-known/tendriller.json`; it links to the
-host's MCP workflow, build guide, service contract, readiness and release
-artifacts. Refresh the installed catalog when possible, but a missing guide tool
-does not require registering an independent agent or selecting another host.
+**Before new-app downloads or installation**, read `/api/readiness`. Use the
+current guide's `describeReadiness` and `requireCreationReady` helpers. Require
+schema version 1, the exact selected `serviceOrigin`, `mode: "open"` and
+`creation.available: true`. Compare release/runtime identities with the service
+descriptor and advertised composition. Do not follow a redirect to another host.
 
-Before downloading packages, installing dependencies or requesting an owner's
-email for a **new** application, read the selected host's `/api/readiness` and
-`/api/service`. Use the current core guide's validation or its public
-`describeReadiness` and `requireCreationReady` helpers. The readiness response
-must have schema version 1, the exact selected `serviceOrigin`, `mode: "open"`
-and `creation.available: true`. Compare the release and runtime identity with
-the service descriptor and advertised composition as the guide requires.
-Do not follow a descriptor redirect to a different origin.
-
-| Observation | Next step |
+| Observation | Next action |
 | --- | --- |
-| Creation is available and identities agree | Follow this host's build guide and matching release. Creation will check current admission again. |
-| `creation_paused` or `read_only` | Stop new-app setup and report `creation.nextAction`; retain any existing work. |
-| Missing readiness, network failure, unavailable service or invalid identity | Report the unavailable or incompatible host; do not assume creation is safe to try. |
-| A saved application already exists | Resume its retained identity and inspect its current permissions, participants and write availability. A new-creation pause alone does not disable existing applications. |
+| Open creation and matching identities | Follow this service's build guide and immutable release; creation rechecks admission. |
+| Paused or read-only creation | Stop setup and report `creation.nextAction`; retain existing work. |
+| Missing, unavailable or unsupported readiness | Stop and name the missing prerequisite; do not optimistically create or install. |
+| Existing application | Resume retained device identity, keys and local state first; refresh authority/discovery in the background. A new-creation pause alone does not disable it. |
 
-The [core source guide](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
-and [MCP source workflow](https://github.com/werg/tendriller/blob/master/docs/MCP_AGENT_GUIDE.md)
-explain the maintained contract. Source changes and open pull requests do not
-establish what the selected service has deployed. A missing endpoint or artifact
-is a specific host/release upgrade boundary to report.
+The [core build guide](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md)
+and [MCP workflow](https://github.com/werg/tendriller/blob/master/docs/MCP_AGENT_GUIDE.md)
+explain the source contract. Open pull requests and source changes do not establish
+what the selected origin has deployed. Report a missing endpoint or release as a
+specific upgrade boundary.
 
-## Use one qualified release composition
+## Use one verified immutable composition
 
-For a new first app, use the immutable first-app release advertised by the host's
-discovery document under `firstApp.release`. Its versioned archive carries the
-starter and matching SDK, tools and Chronolog session packages. Follow the core
-guide to verify the release manifest, composition identity and component hashes
-against the host **before installing**. Retain that provenance and the generated
-package lock with the application.
+Use the discovery document's `firstApp.release`. Verify its manifest, composition
+identity and every required archive hash before installation. Retain provenance
+and the application lockfile. A mutable source-download URL or several packages
+with the same version do not prove a qualified composition.
 
-The mutable `/downloads/tendriller-first-app.tgz` source archive is useful for
-inspection; it does not establish that separately acquired same-version packages
-form the same tested composition. If the complete advertised release is missing
-or incompatible, report the missing release. Ordinary app setup should not
-reconstruct Chronolog from source or combine artifacts from unrelated checkouts.
-Source builds and explicitly supplied archives remain useful for deliberate core
-development and the separate qualification runners in this repository.
+If the complete advertised release is unavailable, report that prerequisite.
+Ordinary application setup must not rebuild Chronolog from sibling source trees,
+combine unrelated archives or silently use registry latest. Deliberate core
+qualification is separate and records its exact source/byte boundary.
 
-Reuse the starter's actual session, browser Worker and helpers when adapting the
-interaction. Keep the starter's `connection.mjs` owner-facing connection component
-and browser pairing helper together. They retain this browser's signer, show the
-normal owner review, resume after approval and bound retries to the page lifetime.
-Do not replace that flow with a collection of setup buttons, invent an identity
-fallback or poll the host while an enrolled app is idle. The low-level ownership
-specimens in this collection assume an already enrolled profile; they do not
-replace first-visit enrollment.
+Import and adapt the supplied browser Worker, local-owner, bootstrap, connection,
+view and submission helpers. Do not invent another signer, store, command queue,
+discovery loop or Worker lifecycle. Retained profiles reopen local state before
+background host access; a cold browser needs real enrollment and key provisioning.
 
-Select the state model before configuring its immutable definition.
-The [capability map](https://github.com/werg/tendriller/blob/master/docs/CAPABILITIES.md),
-[application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md)
-and [reviewed media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
-help choose those public primitives. A static preview checks authored UI; it
-does not prove an application is connected.
+Choose an event or ordinary-SQL state model and an explicit finality/availability
+policy. Ordinary apps default to no finality. Engine manifests pin execution
+semantics, not the application schema. Initial application DDL is an ordinary
+authored transaction; later authorized DDL and grants use that same flow.
 
-## Prepare the ready page before the owner's review
+## Prepare and publish before owner sign-in
 
-Check that the execution environment can run the required native participant
-and retain its private store. After a successful creation preflight, follow the
-selected host's implemented setup route. Current core supplies account-bound
-setup through `prepare_tendril_setup`, `inspect_tendril_setup` and bounded
-`list_tendril_setups`, using the connector's existing configured and granted `tendrils:create` scope. The same public `/api/setup` boundary is available through `@tendriller/core/setup`; existing grants gain no implicit rights.
-The starter's `setup:prepare` saves one private credential and operation before
-printing public arguments; the host derives the verified owner and accepts only
-the credential commitment. `setup:finish` combines the exact ready receipt with
-that original private credential. Inspect the original operation after a lost
-reply; do not create another intent or switch routes as a retry.
+The intended route is:
 
-When the selected host supports only the explicit email route, or that route is deliberately chosen for a new application, it needs the
-actual owner's verified email. An opaque connector profile ID does not reveal
-that email, grant ownership or substitute for a missing configured/granted
-scope. Source changes do not upgrade an installed tool catalog. Report that
-specific boundary rather than silently broadening consent.
+**create → choose policy → publish signed UI → owner sign-in → initialize browser
+locally → author and replicate → verify**.
 
-Create once and retain its private setup handle. Configure the application,
-initialize its native session, build and publish the first signed UI, prepare
-any assistant-access proposal, and start the participant before giving the owner
-the ready page and permission-review URLs. Do not pause implementation for a
-“claimed” reply or publish an empty shell merely to get a claim link.
+A native participant is optional. Do not make its executable, private store or
+reachability a prerequisite for ordinary browser reads or durable writes. A
+separately hosted application backend needs a concrete feature requirement;
+Tendriller is not the application database.
 
-Owner sign-in retains the prepared authority and code. Browser device enrollment
-and assistant access are separate reviewed grants. A host token is not a device
-signer; an assistant account connection is not a browser's application membership.
-Keep credentials and private stores out of published files. Use the current
-host's actual enrollment and consent procedures; cookbooks cannot grant those
-permissions or replace them with payload labels.
+For account-linked MCP, use `setup:prepare`, submit its public arguments to
+`prepare_tendril_setup`, and pass the exact ready result to `setup:finish`. The
+starter retains the original private credential and intent before the request;
+the host derives the verified owner. After a lost reply use
+`inspect_tendril_setup`, not a new allocation. Bounded setup listing is an
+inspection mechanism, not permission to reconstruct missing secrets.
 
-### Keep the three approval checkpoints distinct
+If the explicit email route is deliberately selected and supported, use the
+actual owner's verified address with their authorization. An opaque connector
+profile ID neither reveals it nor substitutes for missing scope. Never silently
+broaden consent or switch routes to work around an installed catalog.
 
-| Checkpoint | What it establishes | What still needs evidence |
+Create once, retain the private setup handle, configure the execution and finality
+policy, and publish the first verified signed UI. Prepare optional assistant
+access separately. Give the person the ready page URL without waiting for a
+“claimed” reply; do not publish an empty shell just to obtain a claim link.
+
+Code publication is independent of data ownership: its authorized publisher may
+prepare the UI before the first browser creates the data root. A host credential,
+device data grant, finalizer role, SQL permission and publication right are not
+interchangeable.
+
+## Initialize and provision browsers explicitly
+
+| Checkpoint | What it establishes | What it does not establish |
 | --- | --- | --- |
-| Owner sign-in and claim | The intended account owns the already-prepared page. | The browser device has its own retained signer and an approved application grant. |
-| Assistant permission review | The account approves the displayed queries, commands and optional events. | The native participant is running, its adapter is online and a requested tool round trip succeeds. |
-| Browser device enrollment | The browser proves possession; the native owner stages the exact signed proposal; the owner reviews its key, rights and retained history before normal control commitment. | The enrolled browser connects, observes a command and reopens the same identity and retained work. |
+| Owner sign-in | The intended authenticated account owns the prepared page. | Application encryption keys or a running agent. |
+| Device-key proof | The account/origin-bound browser proves possession of its retained device identity; epoch commitment is inside the signed proof. | Possession of an existing application's private epoch keys. |
+| Explicit data grant and key provisioning | An authorized reader provisions the enrolled recipient through a recipient-encrypted package, validated against authenticated key commitments. | SQL namespace/object privileges, finality or publication rights. |
+| Assistant consent | The account approves the displayed queries, commands and optional events. | That a tool provider is running, or that this conversation can wake later. |
 
-A successful sign-in in the person's browser does not authenticate an agent's
-separate browser session. Inspect the actual session being used; when it needs
-login, let the owner complete that sign-in there. Reuse the saved application,
-device store and operation references after each checkpoint instead of creating
-a second page or signer when a review is delayed.
+The first authorized browser durably creates its identity and bootstrap key before
+an uncertain enrollment response. It must reconcile the same signed intent after
+reply loss. Additional devices require explicit authenticated key transfer;
+creating an empty local store cannot invent absent keys or replace application
+history. Retain request identities and private recipient agreement keys in the
+owning device store across reload and retry.
 
-Core's [session bootstrap](https://github.com/werg/tendriller/blob/master/docs/SESSION_BOOTSTRAP.md)
-and [MCP agent guide](https://github.com/werg/tendriller/blob/master/docs/MCP_AGENT_GUIDE.md)
-describe account-bound setup and reviewed device pairing. Use them through the
-selected host's matching guide and complete release. A missing endpoint, incompatible
-storage or absent release remains an explicit upgrade boundary; this guide does not
-establish deployment.
+Use the supplied owner review for independent reader/writer/administrator,
+publisher and finalizer grants. Host membership metadata does not overwrite
+application SQL membership or grants: those are ordinary authorized authored
+transactions. Provisioning keeps raw encryption keys and signing keys outside the
+host, authored assets, public URLs and repository.
 
-For ordinary browser pairing, start the retained native peer before review.
-The browser saves one public request and proves possession using its own key.
-The same native owner saves the intent, durably pauses command ordering and
-stages the complete signed control proposal before approval. On the service
-origin, the owner reviews its fingerprint, account, application, origins, narrow
-rights, generation, retained prefix and proposal digest. The normal selector
-rechecks current authority and account access before committing that exact
-proposal. Neither the host nor the browser receives the native signer.
+No enrollment step pauses application ordering or chooses retained history.
+Initialized devices continue authoring locally while another device awaits
+approval or keys. A keyless browser can display the provisioning path, but must
+not advertise Save readiness or fabricate an empty current application.
 
-The starter's native pairing window is at most ten minutes, with idle checks
-backing off to thirty seconds. Browser checks are explicit, including a single check on returning from
-review; requests are not automatically renewed. Closing a window or process
-does not clear a durable ordering pause. Reopen the same participant and inspect
-the original request after an uncertain reply. Exact receipt reconciliation or
-a verified terminal request with no committed transition can release the pause;
-deleting local records or silently rebasing the proposal cannot. Keep `pending`, `approved`, `committing` and `committed` distinct; a later revoked grant stays revoked on retry. Pairing status
-alone is not a successful application connection.
+A sign-in in the person's browser does not sign in an agent's separate browser.
+Let the owner complete their own authentication. A delayed review does not
+justify a second application or signer. Follow the selected service's current
+[session bootstrap](https://github.com/werg/tendriller/blob/master/docs/SESSION_BOOTSTRAP.md)
+and troubleshooting next action.
 
-Keep the native peer or assistant running through preparation, owner review,
-commitment and independent receipt verification. The single-pass `npm run pair`
-command is a deliberate inspection/retry step while that resident owner is
-stopped; it does not wait for human approval or the later verification pass.
-If it prepares or submits a proposal, restart the same retained native owner to
-finish or reconcile that request before application ordering can resume.
+For expired setup credentials, use only an actually supported same-application,
+owner-approved continuation route. Preserve application identity, device storage
+and original request. A host delegation is not new data membership or assistant
+consent. Never retry uncertain redemption by automatically issuing another secret.
 
-If a setup reference is lost, the current core owner view at `/dashboard/setups`
-lists bounded retained operations, and its page-specific view inspects the
-original allocation. These views require the active owner's service session and
-remain read-only after connector revocation. They expose no replacement secret.
-Preserve the original private checkpoint and use an actually available reviewed
-recovery route when authority is missing.
+## Verify behavior, not just an HTML preview
 
-For a claimed page whose setup credential expires or is lost, the core guide's
-[same-app continuation](https://github.com/werg/tendriller/blob/master/docs/BUILD_AN_APP.md#continue-the-same-app-after-setup-credential-expiry-or-loss)
-uses an owner-approved **Add agent** binding and the starter's `host:adopt`
-command. Confirm that the selected host supports this route before submitting
-the private one-use code. Keep the original application identity, descriptor,
-device store and setup operation; host delegation grants no new device membership
-or assistant consent. An uncertain redemption needs inspection of that named
-binding and renewed owner approval, never an automatic second submission.
+Demonstrate all of the following with real participants:
 
-## Verify the connected result and state its lifetime
+- Verified signed publication of the exact delivered files.
+- A browser operation stored and materialized locally with no native/agent process.
+- Independent disconnected authoring, including authorized ordinary SQL DDL when
+  SQL is selected; local views stay usable and Save is not connectivity-gated.
+- Automatic convergence with another independent participant after reconnection,
+  with late earlier facts correctly revising domain views and operation outcomes.
+- Persistence after reload of identity, keys, local state and exact uncertain
+  operations; no silently retimestamped retry.
+- Honest independent stored, materialized, retained and configured-finality facts.
+- If requested, an authorized assistant round trip and actual browser finality
+  proof generation—not just a configured role or a connected socket.
 
-Verify the signed publication receipt, a real browser command observed by the
-native participant, an authorized assistant query/command when requested, and
-retained work after reopening. Keep the original operation identity through an
-uncertain response and inspect its receipt before retrying. Name an uncompleted
-browser, account or permission step precisely; file generation alone is not that
-observation.
+Use reactively derived domain views, not a JSON editor or appended arrival log.
+Keep unsent drafts, stable selection, keyboard focus and deep links while incoming
+facts reorder rows or change schema. Exercise desktop and phone widths, Back,
+empty/error/loading states and the second-pass flow matrix in core delivery.
 
-State which participant remains running, where its private state persists and
-how it is resumed. A hosted page does not host a resident native peer or an agent
-reasoning process. On-demand MCP tools can work without automatic future chat
-turns. Promise unattended replies only after the actual host's supported wake
-path passes the [two-probe rehearsal](../cookbooks/connect-resuming-agent/COOKBOOK.md).
-Otherwise expose the on-demand or manual handoff described in
+Finality is optional admission/closed-time evidence, never an operation sorter.
+If enabled, explain that unseen offline work first delivered behind a sealed
+frontier can be excluded. Retain the original intent visibly; do not silently
+retimestamp it. Missing finality cannot block ordinary local provisional work.
+
+## State actual lifetimes and limits
+
+State which browser tabs, Workers and optional processes must stay open for live
+synchronization, an assistant or finality progress. They are not required to save
+local work. A page does not host a resident native participant or reasoning
+process, and browser suspension does not promise future execution.
+
+Read a private checkpoint before promising resume. It should retain the setup
+handle, device-store location, exact pending references and installed composition.
+Keep it outside authored files, public archives and version control; never open
+one retained signer/store through two independent simultaneous owners. A preview
+also needs a reachable route; a local URL alone is not delivery to the person.
+
+MCP and page residency do not establish a supported future wake or handoff into an
+existing conversation. Promise unattended responses only after the selected
+host's supported wake route passes the
+[two-probe rehearsal](../cookbooks/connect-resuming-agent/COOKBOOK.md); otherwise
+provide the honest on-demand/manual path from
 [assistant connection choices](../cookbooks/connect-chatgpt/COOKBOOK.md).
 
-Verify a private checkpoint exists and can be read before promising resume. It
-must preserve the setup handle, device store, exact pending operation references
-and installed composition; report the actual storage and process lifetime of
-the execution environment. Keep the checkpoint outside authored UI, public
-archives and version control, and do not copy it into a second simultaneous
-store owner. A preview requires a working preview route in that environment;
-a local URL alone does not make the page reachable by the person.
-
-With the current starter, the assistant adapter runs on the same owned native
-participant. Close the owned supervisor when that process stops; a CLI or page
-attachment detaches from the owner and must not shut down sibling clients.
-Optional event forwarding is an explicit reviewed choice, separate from ordinary
-queries and commands. It creates neither a subscription nor a future chat turn,
-and it does not keep the native process alive after its environment ends.
-
-Historical source pins and evidence labels below retain their original scope.
-They neither certify these newer setup contracts nor substitute for deployment,
-account, browser or conversation checks on the selected host.
-
-## Keep application traffic direct when possible
-
-Use the selected host’s `/docs/PEER_CONNECTIONS.md` and the maintained native and browser owner helpers. They share one direct-first policy and automatic encrypted relay fallback. Native RTC is part of the standard session package; browser RTC runs in an attached page with the protocol owner retained in its Worker. Do not add a second discovery/retry loop or silently disable the direct opener. Verify a real command or transfer and actual direct traffic; retain relay fallback for devices or networks that cannot connect directly.
+For networking, use the selected service's `PEER_CONNECTIONS` guide and existing
+native/browser transport helpers. Prefer direct RTC with authenticated relay
+fallback and bounded backpressure. Verify real traffic and content transfer, not
+just a connection indicator. A loopback test does not qualify Internet or mobile
+reachability. Historical receipts retain their historical scope; qualify this
+new protocol and exact release graph independently.

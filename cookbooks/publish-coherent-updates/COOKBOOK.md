@@ -33,62 +33,47 @@ Review the visible changes, full asset snapshot, entry HTML, current signed pred
 
 A selected release does not prove that a browser loaded it, an application synchronized or an agent handled a request. Record those observations separately. Do not let an unverified health report rewrite the signed head.
 
-## Publish through the owned participant
+## Publish with an independent signed publisher
 
-Open the application's ordinary session and attach the host's public exchange transport. Attachment performs no request; explicit publication operations do the work:
+Code publication is a separate signed chain. It is not an application operation,
+does not enter the data operation set and neither orders nor is ordered by data.
+A publisher can sign the complete UI before any browser has created the data
+root, and a later data operation never requires a new code release.
 
-The signing device needs the current signed `publisher` grant. That permission
-is independent of `administrator`, data access and coordination: a publisher
-can release code without controlling membership, and an administrator without
-the publisher grant cannot release code. Enrollment must supply the intended
-permission explicitly.
+The signing key needs the current signed `publisher` grant. That right is
+independent of `administrator`, reader/writer data access, finalizer eligibility
+and application SQL permissions. A publisher can release code without controlling
+membership, and an administrator without the publisher grant cannot release code.
+Keep the publisher's private signing identity outside authored assets and the
+repository.
 
-```js
-const control = session.connectControlParticipant({ exchange: host.peers.exchange });
-const publication = await control.preparePublication({
-  operationId,
-  entry: 'index.html',
-  files, // complete { path, type, size, hash } manifest of reviewed authored bytes
-});
-const receipt = await control.publish(publication, assets);
-const selected = await control.publication();
-```
+The supplied tutorial's [publish.mjs](https://github.com/werg/tendriller/blob/master/docs/tutorial/publish.mjs)
+shows the actual helpers. It enumerates the complete authored directory, rejects
+symbolic links and records each file's path, type, size and SHA-256 hash. It reads
+the host's prepared `publicationAuthority` and current head, then calls
+`signPublicationManifest` from `@chronolog/authority` under the imported
+publisher identity. The manifest binds the application, publisher grant,
+execution manifest digest, author, operation ID, revision, predecessor, entry and
+file list. `host.peers.publish(signedPublication, assets)` uploads every distinct
+hash with its exact base64 bytes. The host verifies authority, hashes and the
+compare-and-set predecessor before selecting the graph. The tutorial also saves
+the signed publication record under its graph digest before upload.
 
-`assets` carries each distinct hash and its exact base64 bytes. The public tools' packer enumerates the complete authored directory, validates the entry and paths, preserves bytes and enforces limits. The manifest binds application, definition, execution manifest, author, control revision, operation ID, revision and predecessor. The session journals the signed publication; the host verifies its authority, hashes and compare-and-set predecessor before selecting the graph.
+After a lost reply, reload that exact saved signed record and publish it again.
+Compare the receipt's publication ID with the retained intent. The host returns
+its original receipt rather than making another release. An old exact retry can
+succeed after a newer release was selected, so read the current head separately
+with `host.peers.publication()`. Do not mint a new operation ID to recover a
+timeout. Changing a file or accepting a different predecessor is a new review
+and a new signed publication. A verified receipt means the host acknowledged the
+publication; a later local save or head read can still fail, so report those
+facts separately. Cancellation stops local waiting and does not retract a host
+commit.
 
-After a lost reply, inspect `control.publicationOperation(operationId)` to recover
-the saved signed intent and any retained receipt. Reopen the same signing profile
-first if the previous session closed. Pass the same intent to `preparePublication`
-and retry the exact saved signed publication when reconciliation requires it.
-The host returns its original receipt without making another release. An old
-exact retry can succeed after a newer release was selected; use
-`control.publication()` for the current verified head. Do not invent a new
-operation ID to recover a timeout. Changing a file or accepting a different
-predecessor is a new review and operation.
+Browser readiness, application synchronization and agent handling are separate
+observations that a signed head does not establish.
 
-The receipt-aware contract distinguishes a rejected call from a rejected
-publication. `ApplicationPublicationError` carries `outcome` (`unknown` or
-`committed`), `operationId`, `publicationId`, `phase` and `receipt`. A verified
-receipt means the host acknowledged the publication even if the call failed
-during local retention or selection refresh. A retention failure can expose the
-receipt in the error without saving it locally; report those two facts
-separately. With no receipt, preserve the uncertainty. Inspect these typed fields
-instead of inferring acceptance from the exception's message.
-
-Cancellation or a closed session stops local waiting; it does not retract a host
-commit. Let the owned session close finish so any already-verified receipt write
-can settle before its private store changes owners. Preserve the exact intent
-and reconcile from the same retained profile after reopening. Do not turn a
-timeout into a second publication or promise rollback from a client abort.
-
-These public outcome and cancellation changes are coordinated in
-[Chronolog PR #12](https://github.com/werg/chronolog-db/pull/12) and
-[core PR #68](https://github.com/werg/tendriller/pull/68). Use a qualified release
-composition containing the APIs before adapting this flow. The historical
-source pins and hosted evidence below retain their original scope; an open
-pull request does not qualify a deployment.
-
-The host transport accepts control, discovery, invitation and publication messages according to its policy. It rejects database submissions, application content chunks and live UI signals. Code publication does not make the host an application replica or an alternate command executor. Application data and immutable evidence content continue through the common session's peer transport.
+The host's participant transport accepts signed authority, discovery, introduction and publication messages according to its policy. It rejects application operations, application content chunks and live UI signals. Code publication does not make the host an application replica, an ordering authority or an alternate command executor. Application data and immutable evidence content continue through the common session's peer transport.
 
 ## Keep the file graph coherent
 

@@ -6,15 +6,15 @@ import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { verifyPeerSessionArtifact } from '../../run-a-peer-application/checks/peer-session-artifact.mjs';
+import { verifyPeerSessionArtifact, verifyAuthorityArtifact } from '../../run-a-peer-application/checks/peer-session-artifact.mjs';
 import { validateCollaborationReport } from './report.mjs';
 
 const { values } = parseArgs({ options: {
-  'session-artifact': { type: 'string' }, 'core-artifact': { type: 'string' },
+  'session-artifact': { type: 'string' }, 'authority-artifact': { type: 'string' }, 'core-artifact': { type: 'string' },
   'core-provenance': { type: 'string' }, output: { type: 'string' },
   'allow-dirty': { type: 'boolean', default: false },
 } });
-for (const name of ['session-artifact', 'core-artifact', 'core-provenance', 'output']) {
+for (const name of ['session-artifact', 'authority-artifact', 'core-artifact', 'core-provenance', 'output']) {
   assert.ok(values[name], `Required: --${name} /exact/path`);
 }
 const here = dirname(fileURLToPath(import.meta.url)), root = resolve(here, '../../..');
@@ -24,7 +24,7 @@ catch (error) { if (error.code !== 'ENOENT') throw error; }
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 const report = {
-  format: 'tendriller-collaboration-consumer/v1', mode: 'native-public-artifacts', passed: false, error: null,
+  format: 'tendriller-collaboration-authored-consumer/v1', mode: 'native-public-artifacts', passed: false, error: null,
   source: { repository: 'werg/tendriller-contrib', commit: git('rev-parse', 'HEAD'),
     tree: git('rev-parse', 'HEAD^{tree}'), dirty: Boolean(git('status', '--porcelain', '--untracked-files=all')) },
   runtime: { node: process.version, platform: process.platform, architecture: process.arch },
@@ -42,6 +42,7 @@ try {
   if (!values['allow-dirty']) assert.equal(report.source.dirty, false, 'Commit the consumer before release qualification');
   const fixtures = await Promise.all([
     ['consumer.mjs', join(here, 'consumer.mjs')],
+    ...['operation-set-authority.mjs','operation-set-participation.mjs'].map(name=>[name,join(here,'../../run-a-peer-application/checks',name)]),
     ['review-workspace.mjs', join(here, '../snippets/review-workspace.mjs')],
     ['reviewer.mjs', join(here, '../snippets/reviewer.mjs')],
     ['live-run.mjs', join(here, '../../share-live-signals/snippets/live-run.mjs')],
@@ -50,6 +51,7 @@ try {
     if (!report.source.dirty) assert.equal(hash(bytes), hash(execFileSync('git', ['show', `${report.source.commit}:${sourcePath}`], { cwd: root })));
     return { name, bytes, sourcePath };
   }));
+  const authorityArtifact=resolve(values['authority-artifact']);
   const sessionArtifact = resolve(values['session-artifact']), coreArtifact = resolve(values['core-artifact']);
   const coreProofBytes = await readFile(resolve(values['core-provenance'])), coreProof = JSON.parse(coreProofBytes);
   assert.equal(coreProof.repository, 'werg/tendriller');
@@ -60,7 +62,7 @@ try {
   assert.ok(declaredCore, 'Core provenance must identify the public SDK archive');
   assert.equal(hash(await readFile(coreArtifact)), declaredCore.sha256, 'Core archive digest mismatch');
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-collaboration-consumer', private: true, type: 'module' }));
-  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', sessionArtifact, coreArtifact], {
+  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', sessionArtifact, authorityArtifact, coreArtifact], {
     cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') },
   });
   const session = await verifyPeerSessionArtifact({ installed: join(consumer, 'node_modules/@chronolog/peer-session'),
@@ -70,15 +72,18 @@ try {
   assert.equal(core.name, '@tendriller/core'); assert.equal(core.version, declaredCore.version);
   assert.ok(core.exports['./collaboration'], 'Core archive must export the maintained collaboration module');
   const installedTree = JSON.parse(execFileSync('npm', ['ls', '--all', '--json'], { cwd: consumer, encoding: 'utf8' }));
-  assert.deepEqual(Object.keys(installedTree.dependencies).sort(), ['@chronolog/peer-session', '@tendriller/core']);
+  assert.deepEqual(Object.keys(installedTree.dependencies).sort(), ['@chronolog/authority', '@chronolog/peer-session', '@tendriller/core']);
   assert.equal(installedTree.dependencies['@chronolog/peer-session'].dependencies.werift.version, '0.27.0',
     'The standard archive must install its declared native RTC dependency automatically');
-  report.artifacts = [session.artifact, { name: core.name, version: core.version, sha256: declaredCore.sha256,
+  const authority=await verifyAuthorityArtifact({installed:join(consumer,'node_modules/@chronolog/authority'),archive:authorityArtifact,allowDirty:values['allow-dirty']});
+  assert.equal(authority.sourceCommit,session.artifact.sourceCommit,'Session/authority must come from one exact source');
+  assert.equal(authority.sourceTree,session.artifact.sourceTree,'Session/authority source trees differ');
+  report.artifacts = [session.artifact,authority, { name: core.name, version: core.version, sha256: declaredCore.sha256,
     sourceCommit: coreProof.source, sourceTree: coreProof.sourceTree, sourceDirty: coreProof.dirty,
     provenanceSha256: hash(coreProofBytes) }];
   report.runtime.sqlEngine = session.provenance.nativeEngine;
   const imports = new Set();
-  const allowed = new Set(['@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql',
+  const allowed = new Set(['@chronolog/authority','./operation-set-authority.mjs','./operation-set-participation.mjs','@chronolog/peer-session', '@chronolog/peer-session/native', '@chronolog/peer-session/sql',
     '@chronolog/peer-session/sql-native', '@chronolog/peer-session/worker', '@chronolog/peer-session/browser',
     '@tendriller/core/collaboration', './review-workspace.mjs', './reviewer.mjs', './live-run.mjs']);
   for (const { name, sourcePath, bytes } of fixtures) {
