@@ -38,7 +38,7 @@ try {
   report.executionManifestDigest = authority.descriptor.payload.executionManifestDigest;
   await build({ entryPoints: { page:'operation-set-browser-page.mjs', worker:'operation-set-browser-worker.mjs', app:'app.mjs', sql:'operation-set-browser-sql.mjs' },
     absWorkingDir:process.cwd(), outdir:assets, bundle:true, splitting:true, format:'esm', platform:'browser', target:'es2022',
-    external:['./deployment/bootstrap.mjs'], metafile:true });
+    external:['./deployment/bootstrap.mjs'], outExtension:{'.js':'.mjs'}, metafile:true });
   for (const name of ['board.html','compact.html','style.css']) await writeFile(join(assets,name),await readFile(name));
   await mkdir(join(assets,'deployment')); await writeFile(join(assets,'deployment/bootstrap.mjs'),"export { applicationReady } from '../page.mjs';\n");
   await mkdir(join(assets,'wasm'),{recursive:true});
