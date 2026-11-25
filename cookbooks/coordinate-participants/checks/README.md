@@ -228,3 +228,10 @@ references to its output. Interrupting the process detaches its client. An old
 active claim needs explicit reviewed reassignment when a different endpoint continues it before a
 new run can continue. Replacing these policies with provider I/O also requires
 the maintained effect journal and an explicit reconciliation policy.
+
+The native eight-signer/32-attachment journey has an eight-minute aggregate
+runner budget. An instrumented Node 24 run completed all 32 checks in 256.3 s,
+exceeding the former four-minute aggregate cap while continuing to make progress.
+The larger whole-scenario budget includes load headroom; individual peer-sync,
+subscription, operation and reviewer deadlines remain unchanged. Diagnostic
+timing runs do not qualify a release; rerun the clean public consumer for evidence.

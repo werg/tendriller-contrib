@@ -98,7 +98,7 @@ try {
   report.publicBoundary = { imports: [...imports].sort(), siblingSourceImports: 0, applicationRetryQueues: 0 };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   const result = spawnSync(process.execPath, [join(consumer, 'consumer.mjs'), reportPath], {
-    cwd: consumer, stdio: 'inherit', timeout: 240_000,
+    cwd: consumer, stdio: 'inherit', timeout: 480_000,
   });
   if (result.error) throw result.error;
   assert.equal(result.signal, null, 'Consumer terminated'); assert.equal(result.status, 0, 'Consumer failed');
