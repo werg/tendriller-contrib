@@ -46,6 +46,13 @@ try {
   let link = await connectDirect(a, b); links.push(link); await link.synchronize();
   const accepted = await submit(b, 'accept', 12n, program(platformOp.acceptMembership(GROUP_COLLECTIVE_ID)));
   assert.equal((await accepted.materialized()).outcome, 'accepted'); await link.synchronize();
+  // Enrollment/membership is not permission to update shared rows. The group
+  // administrator explicitly grants only the domain columns this writer needs.
+  const writerGrant = await submit(a, 'task-writer', 13n, program(platformOp.grant({
+    table: 'tasks', grantor: GROUP_COLLECTIVE_ID, grantee: hexToBytes(b.identity.publicKey),
+    operations: ['update'], columns: ['claimed_by', 'status'],
+  })));
+  assert.equal((await writerGrant.materialized()).outcome, 'accepted'); await link.synchronize();
   const created = await command(a, 'addTask', { taskId: 'race', title: 'Provisional claim race' }, 'add-race', 20n);
   assert.equal((await created.materialized()).outcome, 'accepted'); await link.synchronize(); await link.close();
   const [later, earlier] = await Promise.all([
