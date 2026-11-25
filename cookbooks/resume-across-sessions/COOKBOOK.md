@@ -83,6 +83,14 @@ and recovery uncertainty separately from the applied result a user saw.
 
 Two devices may remain active during handoff. Define whether one is authoritative for a particular activity or whether both may edit under conflict detection. A “Continue here” control should explain what changes on the old device; presentation focus does not automatically stop its sensor or revoke its access. Show active-device context when it prevents confusion without exposing private identities unnecessarily.
 
+A native page owner staying connected does not preserve the lifetime of the
+assistant worker or its host conversation. Restore the exact private
+workspace-to-thread binding, keep application/history/request identities when
+several pages share it, and verify host admission separately from application
+receipts and answers. Presence resumes only when the actual handler is ready;
+filter it by consumer and handled topic. After a worker-only restart, check a
+second request after the first turn ends while leaving the native owner running.
+
 Two receivers must not race a shared handled cursor without explicit coordination. Use a suitable public named-consumer policy or a single receiver owner, and verify lease/acknowledgement behavior in the actual service when chosen. A crash after an external effect requires reconciliation against that external system before retrying. Neither a brief nor a checkpoint proves exactly-once execution elsewhere.
 
 When records have expired, restore the current truth and expose missing history. Do not reconstruct a convincing narrative from partial summaries. A bounded view can remain useful with a clear gap and a link to an intentional archive, if one exists.
