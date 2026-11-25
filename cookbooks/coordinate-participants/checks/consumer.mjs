@@ -81,7 +81,8 @@ try {
   const clients = sessions.map((session, index) => reviewClient({ session, endpoint: endpoint(index), runId: `run-${roles[index]}` }));
   const connect = async hub => {
     for (let index = 0; index < sessions.length; index++) if (index !== hub) {
-      const link = await connectDirect(sessions[hub], sessions[index]); links.push(link);
+      // Disposable signals use the authenticated live datagram channel, not reliable facts.
+      const link = await connectDirect(sessions[hub], sessions[index], { live: true }); links.push(link);
     }
     await synchronize();
   };

@@ -6,3 +6,16 @@ test('bounded fixture rejects queued overflow and oversize frames',async()=>{con
 test('cancellation wakes a blocked fixture reader',async()=>{const pair=framedPair(),controller=new AbortController(),iterator=pair.connections[0].frames(controller.signal)[Symbol.asyncIterator]();const next=iterator.next();controller.abort();assert.equal((await next).done,true);await pair.connections[0].close();});
 test('one-off signaling retires after the actual offer and answer',async()=>{const pair=signalingPair(),offer={type:'offer',sdp:'opaque'},answer={type:'answer',sdp:'opaque'};const incoming=pair.b.messages[Symbol.asyncIterator]().next();await pair.a.send(offer);assert.deepEqual((await incoming).value,offer);await pair.b.send(answer);assert.deepEqual((await pair.a.messages[Symbol.asyncIterator]().next()).value,answer);await pair.a.close();assert.equal(pair.snapshot().closed,false);await pair.b.close();assert.equal(pair.snapshot().closed,true);assert.equal(pair.snapshot().sentMessages,2);assert.ok(pair.snapshot().sentBytes>0);});
 test('a rejected authenticated endpoint closes both physical transports',async()=>{const pair=framedPair(),a={identity:{publicKey:'a'},connectPeer:async()=>{throw Error('AUTH_FAILED');}},b={identity:{publicKey:'b'},connectPeer:async()=>({peerIdentity:'a'})};await assert.rejects(connectFramedSessions(a,b,pair.connections),/AUTH_FAILED/);assert.ok(pair.connections.every(connection=>connection.signal.aborted));});
+test('opt-in live datagrams are copied, bounded, congestion-refused and separate from reliable accounting',async()=>{
+  assert.equal(framedPair().connections[0].live,undefined);
+  const pair=framedPair({live:true}),[a,b]=pair.connections,iterator=b.live.frames()[Symbol.asyncIterator](),next=iterator.next(),frame=new Uint8Array([4,5]);
+  assert.equal(await a.live.trySend(frame,{signal:new AbortController().signal}),true);frame[0]=9;
+  assert.deepEqual((await next).value,new Uint8Array([4,5]));
+  assert.deepEqual(pair.inspectLive(),{sentBytes:2,receivedBytes:2});assert.deepEqual(pair.inspect(),{sentBytes:0,receivedBytes:0});
+  for(let i=0;i<64;i++)assert.equal(await a.live.trySend(new Uint8Array([1])),true);
+  assert.equal(await a.live.trySend(new Uint8Array([1])),false);
+  await assert.rejects(a.live.trySend(new Uint8Array(20_001)));
+  const controller=new AbortController();controller.abort();await assert.rejects(a.live.trySend(new Uint8Array([1]),{signal:controller.signal}),{name:'AbortError'});
+  const blocked=framedPair({live:true}).connections[1].live.frames(controller.signal)[Symbol.asyncIterator]();assert.equal((await blocked.next()).done,true);
+  await a.close();assert.ok(b.live.signal.aborted);await assert.rejects(a.live.trySend(new Uint8Array([1])));
+});

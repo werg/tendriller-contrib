@@ -39,10 +39,36 @@ export async function connectFramedSessions(a, b, connections) {
 
 // Bounded framed queues exercise the public authenticated/encrypted channel.
 // They deliberately make no physical-network claim.
-export function framedPair() {
-  const states = [0, 1].map(() => ({ queue: [], wake: null, controller: new AbortController(), sentBytes: 0, receivedBytes: 0 }));
+// `live` adds the optional unreliable, bounded datagram channel that carries
+// disposable signals. Congestion is refused before dispatch (`false`), never queued.
+export function framedPair({ live = false } = {}) {
+  const states = [0, 1].map(() => ({ queue: [], wake: null, controller: new AbortController(), sentBytes: 0, receivedBytes: 0,
+    liveQueue: [], liveWake: null, liveSentBytes: 0, liveReceivedBytes: 0 }));
+  const liveEndpoint = index => ({
+    signal: states[index].controller.signal,
+    async trySend(frame, { signal } = {}) {
+      assert.ok(frame instanceof Uint8Array && frame.length <= 20_000);
+      signal?.throwIfAborted(); states[index].controller.signal.throwIfAborted();
+      const remote = states[1 - index]; remote.controller.signal.throwIfAborted();
+      if (remote.liveQueue.length >= 64) return false;
+      states[index].liveSentBytes += frame.length; remote.liveReceivedBytes += frame.length;
+      remote.liveQueue.push(frame.slice()); remote.liveWake?.(); return true;
+    },
+    async *frames(signal) {
+      const state = states[index], wake = () => state.liveWake?.();
+      signal?.addEventListener('abort', wake);
+      try {
+        while (!state.controller.signal.aborted && !signal?.aborted) {
+          if (!state.liveQueue.length) await new Promise(resolve => { state.liveWake = resolve; });
+          while (state.liveQueue.length) yield state.liveQueue.shift();
+        }
+      } finally { signal?.removeEventListener('abort', wake); }
+    },
+    async close() { for (const state of states) { state.controller.abort(); state.wake?.(); state.liveWake?.(); } },
+  });
   const endpoint = index => ({
     signal: states[index].controller.signal,
+    ...(live ? { live: liveEndpoint(index) } : {}),
     async send(frame) {
       assert.ok(frame instanceof Uint8Array && frame.length <= 1_100_000);
       const remote = states[1 - index]; assert.ok(!remote.controller.signal.aborted);
@@ -60,11 +86,12 @@ export function framedPair() {
         }
       } finally { signal?.removeEventListener('abort', wake); }
     },
-    async close() { for (const state of states) { state.controller.abort(); state.wake?.(); } },
+    async close() { for (const state of states) { state.controller.abort(); state.wake?.(); state.liveWake?.(); } },
   });
-  return { connections: [endpoint(0), endpoint(1)], inspect: () => ({ sentBytes: states.reduce((n, s) => n + s.sentBytes, 0), receivedBytes: states.reduce((n, s) => n + s.receivedBytes, 0) }) };
+  return { connections: [endpoint(0), endpoint(1)], inspect: () => ({ sentBytes: states.reduce((n, s) => n + s.sentBytes, 0), receivedBytes: states.reduce((n, s) => n + s.receivedBytes, 0) }),
+    inspectLive: () => ({ sentBytes: states.reduce((n, s) => n + s.liveSentBytes, 0), receivedBytes: states.reduce((n, s) => n + s.liveReceivedBytes, 0) }) };
 }
-export async function connectDirect(a, b) {
-  const pair = framedPair(), link = await connectFramedSessions(a, b, pair.connections);
-  return { ...link, inspect: pair.inspect };
+export async function connectDirect(a, b, options) {
+  const pair = framedPair(options), link = await connectFramedSessions(a, b, pair.connections);
+  return { ...link, inspect: pair.inspect, inspectLive: pair.inspectLive };
 }
