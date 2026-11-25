@@ -45,13 +45,13 @@ await mkdir(consumer, { recursive: true });
 const reportPath = join(output, 'report.json');
 const report = { format: 'operation-set-browser/v1', protocol: 'chronolog-crdt-v1', mode: 'runtime',
   topology: relay ? 'browser-worker-opfs-websocket' : 'browser-worker-opfs-native-rtc', passed: false, source, artifacts: [], fixtures: [], error: null,
-  runtime: { node: process.version, platform: process.platform, architecture: process.arch } };
+  runtime: { node: process.version, platform: process.platform, architecture: process.arch, npmCache: process.env.OPERATION_SET_NPM_CACHE ? 'reused-public-integrity-cache' : 'isolated' } };
 try {
   if (relay) report.host = JSON.parse(await readFile(process.env.OPERATION_SET_HOST_EVIDENCE, 'utf8'));
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'independent-browser-peer-consumer', private: true, type: 'module' }));
   execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', artifact, resolve(values.authority),
     ...(relay ? [resolve(hostSdk)] : []), 'playwright@1.65.0', 'esbuild@0.28.2'], { cwd: consumer, stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, npm_config_cache: join(output, 'empty-npm-cache') } });
+    env: { ...process.env, npm_config_cache: process.env.OPERATION_SET_NPM_CACHE ? resolve(process.env.OPERATION_SET_NPM_CACHE) : join(output, 'empty-npm-cache') } });
   const installed = join(consumer, 'node_modules/@chronolog/peer-session');
   const { metadata, provenance, artifact: verifiedArtifact } = await verifyPeerSessionArtifact({
     installed, archive: artifact, allowDirty: values['allow-dirty'],
