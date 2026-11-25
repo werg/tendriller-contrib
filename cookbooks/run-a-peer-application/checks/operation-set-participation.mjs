@@ -95,3 +95,21 @@ export async function connectDirect(a, b, options) {
   const pair = framedPair(options), link = await connectFramedSessions(a, b, pair.connections);
   return { ...link, inspect: pair.inspect, inspectLive: pair.inspectLive };
 }
+
+/** Test-driver deadline for one awaited fixture phase. It bounds the named wait only,
+ * so unrelated driver work (for example heavy multi-peer syncs) cannot consume it.
+ * Expiry aborts the supplied worker lifetime first, then rejects with a labelled
+ * TimeoutError. The timer is always cleared when the phase settles. */
+export function awaitPhase(work, { label, milliseconds, abort }) {
+  assert.ok(Number.isSafeInteger(milliseconds) && milliseconds > 0, 'A phase deadline must be a positive integer');
+  let timer;
+  const expiry = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      const error = new DOMException(`${typeof label === 'function' ? label() : label} exceeded its own ${milliseconds} ms phase`, 'TimeoutError');
+      try { abort?.(error); } finally { reject(error); }
+    }, milliseconds);
+    // Deliberately referenced: a stalled phase must still fire rather than let the process exit silently.
+  });
+  // Race attaches handlers to both promises, so a late rejection of `work` is observed.
+  return Promise.race([work, expiry]).finally(() => clearTimeout(timer));
+}

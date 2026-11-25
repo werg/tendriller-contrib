@@ -235,3 +235,8 @@ exceeding the former four-minute aggregate cap while continuing to make progress
 The larger whole-scenario budget includes load headroom; individual peer-sync,
 subscription, operation and reviewer deadlines remain unchanged. Diagnostic
 timing runs do not qualify a release; rerun the clean public consumer for evidence.
+
+Reviewer refusal and post-release completion each have a separate 45 s phase
+limit. The worker remains supervised until stopped, so the test driver's own
+result publication and multi-peer synchronization do not consume either response
+phase. Expiry aborts and joins the reviewer, retaining the labelled primary error.

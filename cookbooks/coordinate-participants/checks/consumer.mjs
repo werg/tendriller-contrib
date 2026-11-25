@@ -8,7 +8,7 @@ import { bytesToHex, createApplicationSession, createViewStore, defineApplicatio
   executionManifestArtifacts, sqlStatement, verifyAuthorityBundle } from '@chronolog/peer-session';
 import { createApplicationOwner } from '@chronolog/peer-session/worker';
 import { createFixtureAuthority } from './operation-set-authority.mjs';
-import { connectDirect } from './operation-set-participation.mjs';
+import { awaitPhase, connectDirect } from './operation-set-participation.mjs';
 import { openNativeDevice } from '@chronolog/peer-session/native';
 import { connectApplicationOwner } from '@chronolog/peer-session/browser';
 import { createSqlMaterializationRuntime } from '@chronolog/peer-session/sql';
@@ -23,11 +23,23 @@ const startedAt = performance.now(), samples = { commandMaterializedMs: [], conv
 const measure = async (name, operation) => {
   const start = performance.now(); try { return await operation(); } finally { samples[name].push(performance.now() - start); }
 };
-const signal = () => AbortSignal.timeout(15_000);
+// Failure context only: deadlines keep their original durations. A timeout aborts with the
+// same TimeoutError name, but its message names the wait, stage and current operation.
+const context = { stage: 'before ordinaryInitialization', stageStartedAt: startedAt, operation: null, events: [] };
+const note = event => { context.events.push({ atMs: Math.round(performance.now() - startedAt), event }); if (context.events.length > 40) context.events.shift(); };
+const timeoutSignal = (milliseconds, label) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new DOMException(`${label} exceeded ${milliseconds} ms at ${Math.round(performance.now() - startedAt)} ms (after stage ${context.stage}, ${Math.round(performance.now() - context.stageStartedAt)} ms into the next stage; operation ${context.operation ?? 'none'})`, 'TimeoutError')), milliseconds);
+  timer.unref(); return controller.signal;
+};
+const signal = (label = 'operation wait') => timeoutSignal(15_000, label);
 let synchronizeAll = async () => {};
 const projected = async (client, method, input, operationId) => measure('commandMaterializedMs', async () => {
-  const operation = await client[method](input, { operationId });
-  await operation.materialized({signal:signal()});await synchronizeAll();const state=await operation.inspect();return{...state,...state.materialized};
+  const previous = context.operation; context.operation = `${method} ${operationId}`; note(`start ${context.operation}`);
+  try {
+    const operation = await client[method](input, { operationId });
+    await operation.materialized({signal:signal(`materialization of ${method} ${operationId}`)});await synchronizeAll();const state=await operation.inspect();note(`done ${context.operation}`);return{...state,...state.materialized};
+  } finally { context.operation = previous; }
 });
 const accepted = async (...args) => {
   const result = await projected(...args); assert.equal(result.outcome, 'accepted', JSON.stringify(result)); return result;
@@ -35,6 +47,7 @@ const accepted = async (...args) => {
 const observed = (name, observation) => {
   assert.ok(!report.checks.some(value => value.name === name), `Duplicate check ${name}`);
   report.checks.push({ name, passed: true, observation });
+  context.stage = name; context.stageStartedAt = performance.now(); note(`stage ${name}`);
   memory.push(process.memoryUsage());
   console.log(`✓ ${name}`);
 };
@@ -525,12 +538,18 @@ try {
     await accepted(clients[4], 'claim', claimInput(taskId, 'review', 4), `${taskId}-claim`);
   }
   await accepted(clients[0], 'request', request('waiting-capacity', [sessions[4].identity.publicKey]), 'waiting-capacity-request');
-  const stopped = new AbortController(), lifetime = AbortSignal.any([stopped.signal, AbortSignal.timeout(45_000)]);
+  // The worker lives until stopped or its session closes; each awaited reviewer phase has its own
+  // 45 s deadline, so the driver's own commands and heavy syncs never consume the reviewer's budget.
+  const stopped = new AbortController(), lifetime = stopped.signal;
+  const reviewerPhase = (work, label) => awaitPhase(work, { milliseconds: 45_000, abort: error => stopped.abort(error),
+    label: () => `${label} (after stage ${context.stage}; operation ${context.operation ?? 'none'}; ${Math.round(performance.now() - startedAt)} ms since start)` });
+  note('observing reviewer started');
   const blocked = Promise.withResolvers(), completed = Promise.withResolvers();
   void completed.promise.catch(() => undefined);
   const outcomes = [];
   const reviewer = runReviewer({ session: sessions[4], endpoint: endpoint(4), runId: 'observing-reviewer-b', policy: 'clarity', signal: lifetime,
     onResult(value) {
+      note(`reviewer ${value.taskId}/${value.slotId} ${value.status}`);
       if (value.taskId !== 'waiting-capacity') return;
       outcomes.push(value.status);
       if (value.status === 'claim-conflict') blocked.resolve(value);
@@ -538,12 +557,13 @@ try {
     } });
   void reviewer.catch(error => { blocked.reject(error); completed.reject(error); });
   try {
-    const refused = await blocked.promise;
+    const refused = await reviewerPhase(blocked.promise, 'observing reviewer refusing waiting-capacity at the claim limit');
     assert.equal(refused.operation.outcome, 'rejected');
     assert.equal((await clients[0].inspect('waiting-capacity')).value.claims.length, 0);
     const occupied = (await clients[4].inspect(quotaTasks[0])).value.claims[0];
     await accepted(clients[4], 'result', resultInput(quotaTasks[0], 'review', occupied, 'released-capacity-result'), 'released-capacity-result-operation');
-    const finished = await completed.promise;
+    note('release accepted; observing reviewer completion phase starts');
+    const finished = await reviewerPhase(completed.promise, 'observing reviewer completing waiting-capacity after capacity release');
     assert.equal(finished.result.disposition, 'accepted'); assert.equal(finished.result.content.policy, 'clarity');
     assert.deepEqual(outcomes, ['claim-conflict', 'accepted']);
     observed('reviewerCapacityRecovery', { activeClaimsAtStart: 4, rejectedBeforeRelease: true,
@@ -603,7 +623,12 @@ try {
     originalOperationId: reference.operationId, foreignApplicationRejected: true, foreignSignerRetryRejected: true, journalChanged: false });
   report.passed = true;
 } catch (error) {
-  report.passed = false; report.error = error instanceof Error ? error.stack ?? error.message : String(error); throw error;
+  report.passed = false; report.error = error instanceof Error ? error.stack ?? error.message : String(error);
+  // The original error remains primary; context is evidence beside it.
+  report.errorContext = { elapsedMs: Math.round(performance.now() - startedAt), afterStage: context.stage,
+    msIntoNextStage: Math.round(performance.now() - context.stageStartedAt), operation: context.operation, recentEvents: context.events };
+  console.error('Consumer error context', JSON.stringify(report.errorContext));
+  throw error;
 } finally {
   memory.push(process.memoryUsage());
   const usage = process.resourceUsage();
