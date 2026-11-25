@@ -45,7 +45,9 @@ try {
   const sessionRoot=new URL('./',import.meta.resolve('@chronolog/peer-session'));
   for(const name of ['manifest.json','sqlite3.wasm','sqlite3.mjs','sqlite3-opfs-async-proxy.js'])await writeFile(join(assets,'wasm',name),await readFile(new URL(`wasm/${name}`,sessionRoot)));
   const files = await walk(assets), precache = ['/', ...files.map(name => `/${name}`)];
-  await writeFile(join(assets,'sw.mjs'), `const CACHE='qualified-immutable-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(${JSON.stringify(precache)})).then(()=>self.skipWaiting())));self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin===location.origin&&!u.pathname.startsWith('/fixture/')&&!u.pathname.startsWith('/signaling/'))e.respondWith(caches.match(u.pathname).then(r=>r||fetch(e.request)));});`);
+  // A cached queryless Response.url must not replace a Worker's requested
+  // configuration URL (name/applicationId); fresh responses preserve that URL.
+  await writeFile(join(assets,'sw.mjs'), `const CACHE='qualified-immutable-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(${JSON.stringify(precache)})).then(()=>self.skipWaiting())));self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin===location.origin&&!u.pathname.startsWith('/fixture/')&&!u.pathname.startsWith('/signaling/'))e.respondWith(caches.match(u.pathname).then(r=>r?new Response(r.body,{status:r.status,statusText:r.statusText,headers:r.headers}):fetch(e.request)));});`);
   const body = async req => { const parts=[]; let size=0; for await(const chunk of req){size+=chunk.length;assert.ok(size<=1_048_576);parts.push(chunk);} return size?JSON.parse(Buffer.concat(parts)):{}; };
   server = createServer(async(req,res)=>{
     const json=(status,value)=>res.writeHead(status,{'Content-Type':'application/json'}).end(JSON.stringify(value));
