@@ -30,7 +30,14 @@ export async function qualifyFinality(directory) {
         await assert.rejects(a.finality.closeAuthorTime({throughMs:100n}),/FINALITY_QUORUM_REQUIRED/);
         const [votesA,votesB]=await Promise.all([a.finality.voteAuthorTime({throughMs:100n}),b.finality.voteAuthorTime({throughMs:100n})]);
         proofs=await Promise.all(votesA.map(async vote=>{const matching=await Promise.all(votesB.map(async other=>({other,same:await recordDigest(other.payload)===await recordDigest(vote.payload)})));const other=matching.find(value=>value.same)?.other;assert.ok(other);return{statement:vote.payload,signatures:[vote,other]};}));
-        const insufficient=proofs.map(proof=>({...proof,signatures:proof.signatures.slice(0,1)}));await assert.rejects(a.finality.submitProofs(insufficient),/FINALITY_THRESHOLD_MISSING/);
+        // Authenticated partial votes remain pending dependencies so peers can
+        // combine the quorum; accepting storage is not certifying finality.
+        const insufficient=proofs.map(proof=>({...proof,signatures:proof.signatures.slice(0,1)}));
+        await a.finality.submitProofs(insufficient);
+        await a.readView().then(view=>view.release());
+        assert.equal(admitted.inspect().finalized,false);
+        assert.ok(a.status.pendingDependencies?.some(dependency=>dependency.startsWith('quorum/')));
+        await assert.rejects(a.readView({view:'final'}),/FINAL_READ_UNAVAILABLE/);
         await a.finality.submitProofs(proofs);
       }
       assert.equal((await admitted.finalized()).outcome,'accepted');
