@@ -8,6 +8,8 @@ Use the [common application session](guides/application-primitives.md): one auth
 
 Keep account authority, data membership, SQL permissions, publication, finality and external-tool authority separate. Schema and permission changes are ordinary authored transactions. Payload roles grant no credentials. No-finality is the ordinary default; configured providers prove admission and closed time, never operation order. Explain late exclusion behind a sealed frontier. Irreversible work needs verified final prerequisites and an idempotent external-effect protocol.
 
+For unattended replies, read [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) and the selected core host's conversation-delivery guide when it advertises one. Bind ephemeral availability to the actual request worker and handled topics, not the native session owner or one-shot waiter. Qualify the exact conversation through a request, receipt and answer, then a second request after the turn ends. Preserve private thread bindings and durable handled checkpoints; queue admission is not completed work, and no existing ChatGPT conversation wake is implied.
+
 For multi-participant workspaces, start with [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md). Use maintained public owner, collaboration and view-reference primitives; the reference includes two authored layouts and exact-artifact native conformance. Labels and availability do not establish agent execution authority.
 
 The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) uses public @chronolog/peer-session APIs directly. Prefer createLiveView/createViewStore or equivalent FRP derivation: materialized snapshot plus separate local drafts/view state. Invalidate and rederive after changed order, outcomes or schema; preserve stable selection and focus. Executable checks require matching immutable archives and fresh evidence for this protocol.
@@ -78,7 +80,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 
 - [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
-- [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work.
+- [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work.
 - [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
 - [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) *(runnable snippets)* — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.

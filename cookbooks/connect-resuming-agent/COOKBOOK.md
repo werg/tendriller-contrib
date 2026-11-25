@@ -1,10 +1,10 @@
 ---
 id: "connect-resuming-agent"
 title: "Connect an agent that actually resumes"
-summary: "Choose and verify a host receiver that wakes the intended conversation and acknowledges only handled work."
+summary: "Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work."
 group: "Keep work dependable"
 tags: ["agents", "delivery", "recovery"]
-choices: ["Socket/IPC, wait task, webhook, or scheduled check", "Exact receiver identity and count-only wake notices", "Delivered versus handled checkpoints and rearming"]
+choices: ["Active-turn steering or idle queue/resume", "Exact receiver identity and reference-only notices", "Delivered versus handled checkpoints and rearming"]
 capabilities: []
 evidence: "explained"
 related: ["recover-outdated-work", "resume-across-sessions", "choose-interruptions"]
@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2
 
 # Connect an agent that actually resumes
 
-Use this when a page expects an agent to respond after its current turn ends. A running process, HTTP success, or an open WebSocket proves only one transport stage. The person needs the intended conversation to resume, handle their request, and leave a useful outcome. If the host has no dependable wake mechanism, use an explicitly supported schedule with its disclosed delay, or let the person invoke the connected chat. A dashboard that needs no conversation can avoid this dependency.
+Use this when a page expects requests to reach an agent during its current turn or to resume that same conversation after the turn ends. A running process, HTTP success, or an open WebSocket proves only one transport stage. The person needs the intended conversation to resume, handle their request, and leave a useful outcome. If the host has no dependable wake mechanism, use an explicitly supported schedule with its disclosed delay, or let the person invoke the connected chat. A dashboard that needs no conversation can avoid this dependency.
 
 An ordinary request to connect a page can use on-demand tools without this
 background requirement. Start with [connected-app setup](../../guides/connected-app-setup.md)
@@ -33,7 +33,8 @@ Offer explicit cancellation or supersession only if the application has a define
 
 | Host capability | Receiver shape | Verify |
 | --- | --- | --- |
-| Session queue or IPC | Persistent WebSocket receiver submits a count-only notice to an exact conversation ID. | Host admission, identity binding, restart, and acknowledgement after effects. |
+| Active-turn input/steering | Receiver binds a reference-only notice to the observed active turn in the exact conversation. | The notice reaches that same running turn at its next continuation boundary; queueing until completion fails this case. |
+| Session queue or IPC | Persistent receiver submits a reference-only notice to an exact conversation ID when idle. | Host admission, identity binding, restart, and acknowledgement after effects; a busy-thread queue need not inject into the active turn. |
 | Background task completion | A bounded WebSocket wait task ends when work is available. | Completion resumes the originating conversation and the agent rearms immediately. |
 | Authenticated webhook or routine | Server wake notice routes to a known host session. | Authentication, delivery retries, and whether it starts a new session instead. |
 | No idle wake, but supported scheduled execution | Explicitly configured queue checks. | The schedule remains active and the person knows the expected delay. |
@@ -45,16 +46,80 @@ The [native session CLI](https://github.com/werg/tendriller/blob/ecf3851957d8089
 
 Choose process ownership deliberately. A bounded task must be rearmed when it finishes; an ongoing participant needs durable device storage, a named owner, restart policy and teardown. Device identity and the command journal belong to the session. A measurement process continuing to run does not prove an agent conversation can resume.
 
+### Codex mechanisms require an exact host binding
+
+The current [Codex CLI developer commands](https://learn.chatgpt.com/docs/developer-commands?surface=cli)
+document `codex queue --thread UUID --message TEXT --resume`: submit a notice
+to an existing daemon-managed thread and attempt to resume an unloaded thread.
+It waits while a turn is active; that command alone cannot satisfy a requirement
+to inject incoming work into the running turn.
+Check the installed version and help before choosing it. Queue success alone
+does not prove a turn started; resume can fail with a warning after the message
+was queued. Preserve that distinction in delivery status instead of blindly
+submitting a second notice. Explicit `--remote unix://...` selection can bind to
+the intended daemon; keep the private address out of page assets. An interrupted
+thread stays paused until the user resumes it. `--resume` does not override that
+choice. Each CLI invocation gets a new client message identity, so retrying an
+uncertain timeout can enqueue duplicates: persist the original notice and
+reconcile admission before a deliberate retry.
+
+The current Tendriller receiver inspects the configured thread through the
+same daemon and uses `turn/steer` with the observed `expectedTurnId` when that
+turn is active. It uses queue/resume when idle or unloaded. Steering supplies
+input to the running turn's next applicable continuation boundary; it does not
+preempt a running tool or bypass approvals. After a known pre-admission
+no-active-turn or expected-turn-mismatch rejection, reread current state: steer
+a freshly observed active turn with a bounded retry, or queue when now idle.
+Preserve explicit interrupted state and stop on repeated state churn. An
+uncertain timeout or disconnect cannot safely be retried by queueing another notice.
+
+The [Codex App Server](https://developers.openai.com/codex/app-server) API also
+exposes `thread/resume` and `turn/start`; its interface is experimental and must
+be qualified against the installed version. A separately launched server does
+not prove that the desktop UI's current thread is attached to it. Verify the
+exact store, runtime, thread and receiver. Do not launch one agent per page as a
+substitute for the person's existing point-person conversation.
+
+Keep a single explicit workspace-to-thread binding and treat steer/queue admission,
+turn execution, application receipt and application answer as distinct stages.
+Use only a count or safe request reference in an unsolicited notice; the resumed
+agent rereads authorized application state. Respect the host's normal approval
+and sandbox settings. See the maintained core
+[conversation-delivery guide](https://github.com/werg/tendriller/blob/master/docs/CONVERSATION_DELIVERY.md)
+for current host qualification, reconnect and failure handling. These documented
+mechanisms require the active/idle rehearsal below; they are not evidence that
+this cookbook has exercised the person's live conversation.
+
+### Bind availability to the actual worker
+
+In a split-process application, the native page owner may keep replication and
+setup working while a separate request worker is stopped. Give workers distinct
+consumer/run identities and advertise only their handled topics. The assistant
+availability indicator must match the authenticated participant, intended
+consumer and request topic. A thread-fetching worker or one-shot waiter cannot
+make the assistant available merely because it shares the native owner's signer.
+
+Start ephemeral presence only after the handler is ready, bind it to that
+handler's lifetime and close it in the handler's cleanup. A final stopped
+announcement is best effort; stale expiry also handles a crash. Keep periodic
+presence out of durable history, and retain actual receipts and answers as
+separate application facts. Use core's maintained
+[agent request helpers and worker example](https://github.com/werg/tendriller/blob/master/docs/AGENT_REQUESTS.md)
+rather than attaching a durable heartbeat to the native owner's transport loop.
+A stopped worker must make the UI unavailable while requests remain queued and
+the independent native session stays connected.
+
 ## Commission the complete path
 
 1. Identify the page, intended host conversation, and authorized owner. Store the administrative handle privately, separate from published source and user-facing URLs.
 2. Inspect the service contract and the host's supported admission mechanism. Set up the receiver against the exact conversation; refuse an accidental rebind to another session.
 3. Restore the page-bound handled checkpoint or start from a deliberate initial position. A successful connection must also check already pending work, not wait only for a new notice.
-4. Submit a harmless probe command declared by the actual application through its ordinary session. End the current agent turn, confirm that the intended conversation resumes, reads the verified request and records its handling through the maintained journal.
-5. Handle work, rearm or remain listening, and run a second probe. The second round detects one-shot integrations that appeared healthy during setup.
-6. Send a real page request, observe the reply in the intended interface, and verify that a new draft typed during delivery survives. Record the tested receiver identity privately and expose a safe readiness summary.
+4. While the intended Codex thread has an active turn, submit a harmless request through its declared application command. Verify it is injected into that same turn before completion and handled through the maintained journal. A queue entry left waiting for completion does not pass this check.
+5. End the current turn and submit an idle probe. Confirm the same conversation resumes, reads the verified request and records its handling through the maintained journal.
+6. Let that turn end, rearm or remain listening, and run a second idle probe from another page. This detects one-shot integrations that appeared healthy during setup.
+7. Send a real page request, observe the reply in the intended interface, and verify that a new draft typed during delivery survives. Record the tested receiver identity privately and expose a safe readiness summary.
 
-Signed code publication and application-agent readiness are separate. Before promising an agent response, complete the actual two-probe rehearsal. A readiness result describes that tested moment; preserve monitoring and recovery afterward.
+Signed code publication and application-agent readiness are separate. Before promising an agent response, complete the actual active-turn and two-idle-probe rehearsal. A readiness result describes that tested moment; preserve monitoring and recovery afterward.
 
 ## Keep delivered and handled progress separate
 
@@ -64,7 +129,20 @@ Process batches in order under the selected consumer policy. Advance the handled
 
 External side effects need their own deduplication or reconciliation. If a worker crashes after an external action but before acknowledgement, first find the action's authoritative result. Blindly repeating it is unsafe, while marking it handled without evidence loses the request. A durable Tendriller receipt does not make another system exactly once. A chart checkpoint is unrelated to this consumer acknowledgement.
 
-Use the maintained application/effect journal and actual device ownership rules for concurrent or restarted agents. Do not let multiple uncoordinated processes overwrite a handled position or invent a second checkpoint file beside the session. A late earlier operation can revise a materialized event, and a configured closed frontier can exclude a delayed one: reversible computation may follow a declared rederive policy, while irreversible work requires an explicit protected checkpoint or independently durable action capability. The pinned sources record historical origins, not an alternate active bridge implementation.
+Use the maintained application/effect journal and actual device ownership rules
+for concurrent or restarted agents. Give each application/history/consumer/filter
+checkpoint one supervised writer. Save an external cursor atomically in a private
+durable store, retain exact uncertain operation inputs and IDs, and keep it
+distinct from the session's signed command journal; do not invent a second
+checkpoint file beside the session. Another process must not overwrite that
+handled position or mistake a wake-delivery cursor for completed work. A late
+earlier operation can revise a materialized event, and a configured closed
+frontier can exclude a delayed one: when an event cursor reports a stale
+revision, stop, retain the old handled cursor, and rescan a fresh coherent view
+with durable deduplication. Reversible computation may follow a declared rederive
+policy, while irreversible work requires an explicit protected checkpoint or
+independently durable action capability. The pinned sources record historical
+origins, not an alternate active bridge implementation.
 
 ## Recover and retire visibly
 
@@ -76,8 +154,13 @@ On deliberate teardown, stop the owned receiver, remove its binding, and describ
 
 | Fault or transition | Expected observation |
 | --- | --- |
+| Request arrives while the Codex turn is active | Inject into that same observed turn; the next applicable continuation handles it. A notice queued until completion fails active delivery. |
+| Active-turn admission is uncertain | Retain its original identity and reconcile; do not blindly queue a second copy. |
 | First probe succeeds, then the agent turn ends | A second probe still resumes the intended conversation after rearming. |
 | Receiver restarts with old delivered state | Reads resume from handled progress; pending work remains visible. |
+| Assistant worker stops while the native page owner remains connected | Only that worker becomes stopped or stale; requests stay retained and unrelated worker presence cannot make it available. |
+| Codex queues a notice but reports resume failure | Show queued/blocked delivery; no receipt, answer or handled checkpoint is fabricated. |
+| Two pages target the same existing Codex conversation | Both retain their page/request identity and one receiver serializes dispatch, steering a running turn or queueing while idle without creating a conversation per page. |
 | Duplicate wake notices or more than one read page | Every event is handled under its identity; coalescing does not discard a page. |
 | Host refuses admission | Handled progress does not advance; the delivery panel explains the blocked stage. |
 | Crash after reply but before acknowledgement | Recovery reconciles stable outcomes and avoids a second unintended effect. |

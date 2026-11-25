@@ -80,8 +80,8 @@ This route depends on [core PR #60](https://github.com/werg/tendriller/pull/60)
 and a matching released host/package composition; its source is not a claim of
 deployed availability or an extension of this cookbook's historical test evidence.
 
-Use the supplied `media/panel.mjs` composition and import or adapt
-`media/camera.mjs`, `media/voice.mjs` and `helpers/reviewed-input.mjs` for the task.
+Use the supplied `shared/media/panel.mjs` composition and import or adapt
+`shared/media/camera.mjs`, `shared/media/voice.mjs` and `shared/helpers/reviewed-input.mjs` for the task.
 The [application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md)
 keep coherent views and uncertain operation identity attached to the same session.
 Optional inference uses `media/inference-client.mjs` and a deliberately enabled

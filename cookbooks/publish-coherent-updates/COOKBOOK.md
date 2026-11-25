@@ -79,16 +79,19 @@ The host's participant transport accepts signed authority, discovery, introducti
 
 A UI-only release does not require stopping a compatible native owner and
 disconnecting its listeners. Use the existing local attachment with publication
-explicitly granted by the owner: `policy.capabilities: ['publish']`. No broader
-administrative attachment is needed for a UI-only release.
-The owner provisions that binding through `supervisor.createBinding(...)` and
-retains its token privately. The underlying signer still needs its signed
-publisher grant; local attachment access alone does not supply it.
+granted to it: the agent program's one local terminal binding carries the
+ordinary application capabilities and `publish`, not `ownerAdmin`, and is reused
+on restart and never broadened. No broader administrative attachment is needed for
+a UI-only release. The agent's shared signer still needs its signed publisher
+grant in the page application; local attachment access alone does not supply it.
+Publish with `tendril --page <slug> publish`. Browser-first publication before the
+first owner sign-in does not need the agent program: the workspace's one shared
+signer signs under the prepared publisher policy.
 
 ```sh
-tendril --session ./session.mjs --mode attach publish ./page --operation reviewed-ui-001
-tendril --session ./session.mjs --mode attach publication-operation reviewed-ui-001
-tendril --session ./session.mjs --mode attach publication
+tendril --page notes publish ./pages/notes/dist --operation reviewed-ui-001
+tendril --page notes publication-operation reviewed-ui-001
+tendril --page notes publication
 ```
 
 On an uncertain reply, inspect the original operation and retry the same reviewed

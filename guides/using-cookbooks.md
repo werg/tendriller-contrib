@@ -19,16 +19,18 @@ browser Worker, enrollment and signed publication. Source changes do not prove
 that a selected deployment serves the required endpoint or artifact; report the
 specific missing host/release capability instead of rebuilding unrelated sources.
 
-Reuse the starter's account-setup and reviewed-pairing helpers when that exact
-host/release supplies them. Keep the setup credential private, prepare the full
-native pairing proposal before owner review, and preserve its durable ordering
-pause while the result is uncertain. A finite helper window does not promise
-an always-running participant or automatic recovery from lost private storage.
+Reuse the starter's workspace commands and browser bootstrap/provisioning helpers
+when that exact host/release supplies them. Keep the agent credential and
+`.tendriller/` private. Run `npm run agent` only when native participation, control
+notices or an agent tool is wanted: the one optional agent program serves every
+page's control traffic, and browser Save never depends on it. Preserve exact
+operation identities while a result is uncertain. The program promises no future
+wake and no restoration of lost private storage.
 
 Import `createLiveView` from `@chronolog/peer-session/browser` (or `@chronolog/peer-session`); use its
 bounded `ready()` for the first coherent read so ordinary recovery does not
 tear down a healthy connection. Import or adapt the starter's
-`helpers/operation-view.mjs` and, when needed, `helpers/reviewed-input.mjs` as
+`shared/helpers/operation-view.mjs` and, when needed, `shared/helpers/reviewed-input.mjs` as
 described in [Application patterns](https://github.com/werg/tendriller/blob/master/docs/APP_PATTERNS.md).
 The [media guide](https://github.com/werg/tendriller/blob/master/docs/AI_INPUT.md)
 supplies the camera/voice controllers and explicit native inference example.

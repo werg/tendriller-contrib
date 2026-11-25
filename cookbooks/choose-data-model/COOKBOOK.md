@@ -68,4 +68,4 @@ Bound records, retained bytes, pending work and diagnostic payloads. Show missin
 
 ## Verify through user outcomes
 
-Race independent sessions on the same guarded record. Lose a reply and reopen the original operation. Recover an older prefix and inspect consistent SQL, events and abandoned attempts. Interrupt content transfer and verify actual retained bytes. Remove reader authority and test direct access, not only rendering. Publish signed code without changing application state. Exercise optional capabilities independently and name their actual runtime and storage evidence.
+Race independent sessions on the same guarded record. Lose a reply and reopen the original operation. Reopen an older retained checkpoint and inspect consistent SQL, events and uncertain attempts. Interrupt content transfer and verify actual retained bytes. Remove reader authority and test direct access, not only rendering. Publish signed code without changing application state. Exercise optional capabilities independently and name their actual runtime and storage evidence.

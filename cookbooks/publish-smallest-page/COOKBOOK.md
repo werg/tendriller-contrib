@@ -51,14 +51,14 @@ are not current executable fixtures.
 
 Follow [connected-app setup](../../guides/connected-app-setup.md) to check the
 selected host's creation readiness before installation and obtain its matching
-release composition. Save the returned administrative handle privately. The
+release composition. Register the workspace agent and keep its credential and `.tendriller/` private. The
 application bootstrap creates or resumes the signing device, establishes initial
 authority and keys, and opens the same application definition used by other peers.
-Prepare and publish the first signed UI and start the native participant before
+Prepare and publish the first signed UI and start the agent program (`npm run agent`) before
 giving the intended owner the ready page and any permission-review URL. Their
 sign-in adopts the prepared app; do not wait for a “claimed” reply before doing
-that work. Browser enrollment remains a separate reviewed grant. Explain the
-page's lifetime and any remaining owner action. Page ownership, a host token and
+that work. Browser enrollment remains a separate grant, processed by the agent program. Explain the
+page's lifetime and any remaining owner action. Page ownership, the agent credential and
 application signing authority are distinct roles.
 
 For a page promising agent responses, connect the agent's own session and test a
@@ -73,7 +73,7 @@ signed code operation; it does not wait for an agent listener or manufacture a
 browser-health receipt.
 
 Verify original signer provenance and application permissions before invoking
-private tools. Text such as `role: "owner"` grants no authority. Keep host tokens,
+private tools. Text such as `role: "owner"` grants no authority. Keep the agent credential,
 signing keys, receiver state and private credentials out of HTML, shared history
 and diagnostics.
 
