@@ -182,8 +182,37 @@ try {
 
 The change stream coalesces UI invalidations. It is not a durable consumer cursor
 and must not acknowledge external work. Query results bind events, SQL where
-selected, and operation outcomes to one captured history. A stale event cursor
-from an excluded generation requires an explicit reset/reread.
+selected, and operation outcomes to one captured history. Event cursors are
+generation-bound: routine browser enrollment can invalidate one even when the
+selected transition retains the previous prefix.
+
+A matching session package reports `APPLICATION_VIEW_RECOVERED` with the current
+`revision` and `recovery`. The latter is either `null` or
+`{ reason, adopted, unknownLoss }`; `reason` may be `null` or one of
+`create`, `handover`, `takeover`, `control-change`, and `adopted` may be
+`null`. A stale forwarder checkpoint at startup can surface
+`APPLICATION_VIEW_RECOVERED`. A live transition halts the public event
+forwarder with `EVENT_FORWARDER_REVIEW_RECOVERY`; both paths preserve the
+available revision and recovery evidence.
+
+These fields describe the selected verified transition, not every intervening
+generation or proof that an arbitrary old cursor is continuous. Missing evidence
+is unknown. Do not automatically translate a cursor, ignore recovery because the
+reason is `control-change`, or skip to the end.
+
+Stop the consumer, retain its last handled checkpoint and inspect the selected
+history. After an explicit recovery decision, rebuild the coherent inbox or open
+a fresh read view and rescan retained events without the old cursor; always
+release the view. Replace a displayed projection rather than unioning excluded
+events back into it. Deduplicate work by full authenticated request identity
+(application, history, author, operation ID), adding event identity for per-event
+effects when one command emits several events. Keep external-action outcomes
+through the rescan and advance a new handled cursor only after durable handling.
+Deliberate reapplication may create a new operation or attempt identity; retain
+the application's stable request/idempotency reference when it represents the
+same external effect.
+The [agent consumer guide](../connect-resuming-agent/COOKBOOK.md) explains that
+delivered progress is not an acknowledgment or exactly-once execution.
 
 If the host is unavailable while the current coordinator remains reachable,
 ordinary work continues. If both disappear, keep the saved attempt and show a
