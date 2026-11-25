@@ -154,6 +154,10 @@ archive, and checks native/browser/WASM execution manifests and binary hashes.
 Synthetic report fixtures test validators only and are never written as runtime
 evidence. Historical green reports are never converted or relabeled.
 
+These checks run against SDK, engine and Chronolog archives you select from published
+builds. Contrib CI does not pin, download or qualify a core release, and these
+gates remain manual independent qualifiers.
+
 These are local loopback artifact qualifications, not deployed login, Internet,
 mobile suspension/eviction, provider cost, guaranteed retention, or exactly-once
 external-effect qualification. Runners close their browsers, links and Workerd

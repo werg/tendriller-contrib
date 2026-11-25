@@ -49,6 +49,32 @@ A staged test should leave a recoverable environment. Identify which identities,
 
 Fixtures should identify simulated data and capabilities explicitly. A missing capability must fail or show the chosen fallback; do not infer it from an obsolete workflow manifest or silently install support. Preview should use the production runtime and public support primitives, not a second permissive server implementation.
 
+## Exercise connected flows locally before the owner's final handoff
+
+Choose the route according to the claim. `tendril-preview` serves authored files
+for layout inspection; an explicit synthetic bootstrap can exercise UI states
+but does not prove owner sign-in, key provisioning or persistence. The starter's origin
+guard intentionally keeps an unrelated localhost preview disconnected.
+
+For connected desktop/phone flows before production sign-in, use the
+[verified local release host](https://github.com/werg/tendriller/blob/master/docs/LOCAL_HOST.md)
+with the same exact package composition. Create a separate local test project,
+synthetic owner and fresh device storage. Create, prepare, publish, sign in as the
+owner, explicitly provision a second device key and exercise that application's real command/read path on localhost.
+Keep production handles, signing profiles and journals out of that fixture;
+never bridge a layout preview to a production owner merely to remove a gate.
+
+Walk the important empty, editing, save/Undo and error paths at desktop and
+390 × 844 phone widths and retain before/after captures of observed friction.
+Then verify the delivered application's actual signed publication, authorized
+connection, remote read and persistence. Local synthetic authentication does
+not qualify live OAuth, account-linked MCP, Internet NAT traversal or physical
+phone behavior. A screenshot alone does not establish those results.
+
+Use the available real browser for interactive checks, or the documented
+Playwright setup for headless checks. A missing runner is a tooling prerequisite,
+not a reason to add another preview server or report an unexecuted test as passed.
+
 ## Adapt the checks
 
 Choose scenarios from the consequential decisions in the cookbook. Two different pilot layouts can prove that reasoning transfers without a common root element, CSS vocabulary, or state namespace. They do not need pixel equality. Keep a custom page with no contrib metadata and at least one nested or fullscreen/canvas adaptation.

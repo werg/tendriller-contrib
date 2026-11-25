@@ -13,3 +13,18 @@ The catalog contains design guides. The checks below exercise shared capabilitie
 | Hands-free help while cooking or doing maintenance | `choose-interruptions`, `choose-voice-interaction`, `guide-practice-and-feedback` | Core browser checks cover permission, transcript, speech and interruption. Qualify real microphone and speaker behavior, background restrictions and manual fallback on each target device. |
 
 Use the seven-mode package workflow described in [peer application checks](../cookbooks/run-a-peer-application/checks/README.md) for exact source qualification. For deployed staging coverage, see the [core operations guide](https://github.com/werg/tendriller/blob/master/docs/OPERATIONS.md). Package and staging checks cover different failure modes.
+
+## Qualify the selected composition before claiming these paths
+
+The live-editor, scoped attach-publication, operation-fact evidence and signal-counter
+guidance requires packages that contain those APIs. Prose updates do not
+qualify a new artifact or deployment.
+
+For the selected candidate, retain exact core/session identities and test
+immutable snapshot/save ordering, explicit publication permission and exact retry,
+explicit key provisioning plus late-arriving earlier operations in consumers, and signed clock drops
+while reliable commands continue. The maintained core and Chronolog suites own
+those regressions; the independent package matrix checks their composed boundary.
+A local `npm run check` here validates content and existing deterministic
+specimens, not the new native/browser or hosted guarantees. Keep connected local
+UX checks separate from production sign-in and physical-device evidence.

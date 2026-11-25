@@ -21,6 +21,16 @@ When a person uses a Tendriller page on a phone or tablet away from your desk, b
 2. **Stream ephemerally when connected (`dev/telemetry`):** Forward buffered and live errors plus connectivity transitions over `session.signals.send('dev/telemetry', ...)`. Rate-limit and deduplicate so an error loop never floods signals, and write **zero durable Chronolog records**.
 3. **Tail live from the agent terminal:** Run `tendril --session ./session.mjs --mode attach logs` (or `npm run logs` in the starter) to receive NDJSON error and health events straight from the user's device while hot-publishing fixes with `npm run deploy`.
 
+## When the telemetry channel itself is silent
+
+Successful local echo does not prove that the agent received `dev/telemetry`.
+Keep the copyable local report available and inspect the receiving participant's
+[signal rejection counters](../share-live-signals/COOKBOOK.md#diagnose-clock-rejection-without-confusing-it-with-lost-authority).
+An authorized expired/future frame can be dropped while reliable commands remain
+healthy. Missing counters mean unreported; a receive-link counter is not a
+measurement of an original author's clock. Avoid another heartbeat service or
+durable telemetry stream merely to observe this failure.
+
 ## Runnable snippet and check
 
 - [Bounded error buffer and signal forwarder](snippets/page-diagnostics.mjs)

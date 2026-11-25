@@ -112,9 +112,8 @@ performance promise.
 When a process deadline fails, the report preserves both its underlying browser
 failure and the runner timeout rather than overwriting either diagnosis.
 
-The [composition workflow](../../../.github/workflows/collaboration.yml) builds
-immutable companion commits and the pinned Emscripten engine, then runs both
-gates. `composition.mjs --native .../report.json --browser .../report.json
+These gates run locally against the core and Chronolog builds you select; contrib
+CI does not run them. `composition.mjs --native .../report.json --browser .../report.json
 --output /new/composition.json` refuses mismatched archives, dirty source,
 missing observations and unobserved physical-device/provider claims. A blocked
 browser launch or skipped test remains a failed gate.

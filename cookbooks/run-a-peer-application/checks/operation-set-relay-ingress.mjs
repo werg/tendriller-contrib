@@ -1,16 +1,24 @@
+import assert from 'node:assert/strict';
+
 // Raw fixture transport only. Never decode, retry or acknowledge application work.
-export function createRelayIngress(socket, { limits, forward }) {
+export function createRelayIngress(socket, { limits, lane = 'reliable', forward, onFailure }) {
+  assert.ok(lane === 'reliable' || lane === 'live', 'Unknown fixture relay lane');
+  const window = lane === 'live' ? limits.livePendingPackets : limits.pendingPackets;
+  assert.ok([window, limits.pendingBytes, limits.packetBytes].every(value => Number.isSafeInteger(value) && value > 0));
   // A socket carries both the sender's binary window and receipts for the
-  // opposite window. Physical Chronolog credits are binary relay packets too.
-  const maxFrames = 2 * limits.pendingPackets;
-  const maxBytes = limits.pendingBytes + limits.pendingPackets * (4 + 256);
-  const highWater = Math.max(1, Math.floor(limits.pendingPackets / 2));
+  // opposite window. One forwarded frame can release public credit before its
+  // HTTP completion reaches us; pause cannot retract an already-read TCP chunk.
+  const maxFrames = 2 * window + 1;
+  const maxBytes = Math.min(limits.pendingBytes, window * limits.packetBytes)
+    + window * (4 + 256) + limits.packetBytes + 4;
+  assert.ok(Number.isSafeInteger(maxFrames) && Number.isSafeInteger(maxBytes));
+  const highWater = Math.max(1, Math.floor(window / 2));
   const lowWater = Math.floor(highWater / 2);
   let stopped = false, failure, pendingFrames = 0, pendingBytes = 0, paused = false;
   let maxPendingFrames = 0, maxPendingBytes = 0, tail = Promise.resolve();
   const fail = error => {
     if (stopped) return;
-    failure = error; stopped = true; socket.terminate();
+    failure = error; stopped = true; onFailure?.(error); socket.terminate();
   };
   const receive = (bytes, binary) => {
     if (stopped) return;
@@ -39,6 +47,8 @@ export function createRelayIngress(socket, { limits, forward }) {
     get stats() { return { pendingFrames, pendingBytes, maxPendingFrames, maxPendingBytes, maxFrames, maxBytes }; },
     async close() {
       stopped = true; socket.removeListener('message', receive);
+      // Keep application frames fenced while allowing ws to read its close reply.
+      if (paused) { paused = false; socket.resume(); }
       await tail;
       if (failure) throw failure;
     },

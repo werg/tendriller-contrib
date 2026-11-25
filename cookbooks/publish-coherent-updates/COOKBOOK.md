@@ -75,6 +75,40 @@ observations that a signed head does not establish.
 
 The host's participant transport accepts signed authority, discovery, introduction and publication messages according to its policy. It rejects application operations, application content chunks and live UI signals. Code publication does not make the host an application replica, an ordering authority or an alternate command executor. Application data and immutable evidence content continue through the common session's peer transport.
 
+## Publish through a running native owner
+
+A UI-only release does not require stopping a compatible native owner and
+disconnecting its listeners. Use the existing local attachment with publication
+explicitly granted by the owner: `policy.capabilities: ['publish']`. No broader
+administrative attachment is needed for a UI-only release.
+The owner provisions that binding through `supervisor.createBinding(...)` and
+retains its token privately. The underlying signer still needs its signed
+publisher grant; local attachment access alone does not supply it.
+
+```sh
+tendril --session ./session.mjs --mode attach publish ./page --operation reviewed-ui-001
+tendril --session ./session.mjs --mode attach publication-operation reviewed-ui-001
+tendril --session ./session.mjs --mode attach publication
+```
+
+On an uncertain reply, inspect the original operation and retry the same reviewed
+file graph and operation ID through the same application and binding. Publication
+IDs are scoped by application and binding, as command IDs are. The signed payload
+may return a full namespaced operation ID; keep it opaque. The original
+short ID and returned full ID identify that binding's same operation, not work
+belonging to another agent. A new graph or reviewed predecessor needs a new ID.
+
+Old bindings without `publish` remain restricted: have the owner deliberately
+provision the intended scope rather than widening a retained policy, exposing
+the signer or falling back to a second owner process. Credential rotation retains
+the stable binding's namespace; revoked bindings cannot publish or recover access
+by restarting. Do not grant publication to an ordinary assistant as a side effect.
+
+Use a matching qualified core/session composition containing this scoped attach
+path. Publication acceptance, current host selection and a browser loading the
+new UI remain separate observations; inspect them explicitly rather than adding
+another polling or publication service.
+
 ## Keep the file graph coherent
 
 Validate canonical relative paths, duplicate entries, byte sizes, digests and the existing HTML entry before transfer. Include every authored dependency the page needs. Nested HTML and lazy modules must resolve against their publication directory; absolute application paths can accidentally escape that graph. A framework router fallback is a serving choice to implement and test explicitly.

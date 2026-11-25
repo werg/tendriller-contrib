@@ -7,9 +7,9 @@ import { copyFile, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/pro
 import { createServer } from 'node:http';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createRelayIngress } from './operation-set-relay-ingress.mjs';
 import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
+import { createRelayIngress } from './operation-set-relay-ingress.mjs';
 
 const { values } = parseArgs({ options: {
   artifact: { type: 'string' }, authority: { type: 'string' }, artifacts: { type: 'string' }, output: { type: 'string' },
@@ -138,7 +138,7 @@ function run(command, args, cwd, environment = {}) {
 }
 
 async function createBridge(WebSocketServer, relayLimits) {
-  const queue = [], pending = new Map(), relayTasks = new Set();
+  const queue = [], pending = new Map(), relayTasks = new Set(), bridgeSockets = [];
   let nextId = 0, blocked = false, requests = 0, requestBodyBytes = 0, reader, markReady;
   const ready = new Promise(resolve => { markReady = resolve; });
   const enqueue = job => new Promise((resolve, reject) => {
@@ -168,7 +168,7 @@ async function createBridge(WebSocketServer, relayLimits) {
       if (url.pathname === '/testing/page') return json(res, 200, await enqueue({ kind: 'page', applicationId: body.applicationId }));
       if (url.pathname === '/testing/asset') return json(res, 200, await enqueue({ kind: 'asset', path: url.searchParams.get('path') ?? '' }));
       if (url.pathname === '/testing/restart') return json(res, 200, await enqueue({ kind: 'restart' }));
-      if (url.pathname === '/testing/relay-traffic') return json(res, 200, await enqueue({ kind: 'relay.traffic' }));
+      if (url.pathname === '/testing/relay-traffic') return json(res, 200, { ...await enqueue({ kind: 'relay.traffic' }), bridgeSockets });
       if (url.pathname === '/testing/relay-cut') return json(res, 200, await enqueue({ kind: 'relay.cut' }));
       if (url.pathname === '/testing/traffic') return json(res, 200, { requests, requestBodyBytes, applicationBodyBytes: 0, worker: await enqueue({ kind: 'traffic' }) });
       requests++; requestBodyBytes += body === undefined ? 0 : Buffer.byteLength(JSON.stringify(body));
@@ -195,25 +195,42 @@ async function createBridge(WebSocketServer, relayLimits) {
     const url = new URL(request.url, 'http://localhost');
     if (url.pathname !== '/relay') { socket.destroy(); return; }
     sockets.handleUpgrade(request, socket, head, client => {
-      const task = relaySocket(client, url.searchParams).finally(() => relayTasks.delete(task));
-      relayTasks.add(task); void task.catch(() => client.terminate());
+      const diagnostic = { channel: url.searchParams.get('channel'), peerId: url.searchParams.get('peerId'),
+        lane: url.searchParams.get('lane'), pendingSendsHighWater: 0, terminationCause: null };
+      bridgeSockets.push(diagnostic);
+      const terminate = (cause, error) => {
+        diagnostic.terminationCause ??= error === undefined ? cause : `${cause}: ${String(error)}`;
+        client.terminate();
+      };
+      const task = relaySocket(client, url.searchParams, diagnostic).finally(() => relayTasks.delete(task));
+      relayTasks.add(task); void task.catch(error => terminate('FIXTURE_RELAY_TASK_FAILED', error));
     });
   });
-  async function relaySocket(client, parameters) {
+  async function relaySocket(client, parameters, diagnostic) {
     const fields = Object.fromEntries(['channel', 'peerId', 'remotePeerId', 'lane'].map(key => [key, parameters.get(key)]));
     const opened = enqueue({ kind: 'relay.open', ...fields });
     let closed = false;
-    const ingress = createRelayIngress(client, { limits: relayLimits, forward: async frame => {
-      const { id } = await opened;
-      if (!closed) await enqueue({ kind: 'relay.send', id, frame });
-    } });
     const close = async () => {
       if (closed) return; closed = true;
       const { id } = await opened;
       await enqueue({ kind: 'relay.close', id });
     };
-    client.on('error', () => { void close().catch(() => {}); });
+    client.on('error', error => {
+      diagnostic.terminationCause ??= `FIXTURE_RELAY_SOCKET_ERROR: ${String(error)}`;
+      void close().catch(() => {});
+    });
     client.on('close', () => { void close().catch(() => {}); });
+    const ingress = createRelayIngress(client, { limits: relayLimits, lane: fields.lane,
+      onFailure: error => { diagnostic.terminationCause ??= String(error); },
+      forward: async frame => {
+        const { id } = await opened;
+        if (!closed) await enqueue({ kind: 'relay.send', id, frame });
+      },
+    });
+    Object.defineProperties(diagnostic, {
+      pendingSendsHighWater: { enumerable: true, get: () => ingress.stats.maxPendingFrames },
+      pendingBytesHighWater: { enumerable: true, get: () => ingress.stats.maxPendingBytes },
+    });
     try {
       const { id } = await opened;
       while (!closed) {
