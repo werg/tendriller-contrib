@@ -226,13 +226,9 @@ checks grants and usable retained history itself. The gate exercises the same
 automatic and explicitly reviewed recoveries as the portable/native lane and
 requires every owned introduction socket to close.
 
-The workflow downloads SDK and engine bytes from the selected immutable public
-source release. `distribution/download-core-release.mjs` verifies URLs, hashes,
-source, composition, provenance and the Chronolog source before retaining those
-bytes; consumers use them without a Core checkout or rebuild. SQL session
-variants require their declared Chronolog capability builds. The current
-[companion tuple](https://github.com/werg/tendriller-contrib/blob/main/distribution/companion-release.json)
-is CI input, not proof that a particular run or deployment passed.
+These checks run against SDK and engine bytes you select from a published core
+release; contrib CI does not pin or qualify a core release. SQL session variants
+require their declared Chronolog capability builds.
 
 Keep `host-artifacts.json`, the dependency lock, and
 `peers/{report,summary}.json` in each run's explicit output directory. Separate
