@@ -97,7 +97,7 @@ A route change should produce a comparison: which stop was renamed, moved, remov
 
 The browser may suggest that the person is nearby. The person may report arrival. A completed inspection may require measurements or a reviewed note. Model these separately so an automatic geofence does not silently finish work.
 
-For protected task updates, use the current public command/scoping contract and retain the original generation on retry. An old queued completion after replanning must stay associated with its original route, not be relabelled as new work. The [checkpoint guide](../guide-explicit-checkpoints/COOKBOOK.md) covers intentional completion, while [recovery](../recover-outdated-work/COOKBOOK.md) covers stale outcomes.
+For protected task updates, use the current public command/scoping contract and retain the original operation ID, signed author time and guards on retry. An old queued completion after replanning must stay associated with its original route, not be relabelled as new work. The [checkpoint guide](../guide-explicit-checkpoints/COOKBOOK.md) covers intentional completion, while [recovery](../recover-outdated-work/COOKBOOK.md) covers stale outcomes.
 
 Emit meaningful changes rather than waking the agent on every fix. A local distance display can update quietly. An interruption might be useful when the person deliberately asks for help or a reviewed exception needs attention. Neither a push notification nor an agent reply guarantees dependable background navigation.
 

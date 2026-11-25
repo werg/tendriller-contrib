@@ -2,9 +2,9 @@
 const definitions = [
   [1, 'No native toolchain for events packages'], [2, 'Portable SQL execution and persistence'],
   [3, 'Windows pipe / Unix path / loopback IPC'], [4, 'HTTP gateway and remote/local MCP'],
-  [5, 'Browser coordination and diagnostics'], [6, 'Capability probe and bootstrap fixture'],
+  [5, 'Browser coordination and diagnostics'], [6, 'Capability probe and source-handoff fixture'],
   [7, 'Startup convergence and bounded mode'], [8, 'Pre-submission outbox and exact operation identity'],
-  [9, 'SQL starter and composition profiles'], [10, 'OS and JavaScript runtime matrix'],
+  [9, 'Release composition and SQL profile archive integrity'], [10, 'OS and JavaScript runtime matrix'],
   [11, 'Encrypted checkpoint retirement/restore fixture'], [12, 'Host deployment templates'],
   [13, 'Explicit kernel fast-test process'], [14, 'Live external cloud-agent surfaces'],
 ];
@@ -12,8 +12,12 @@ const definitions = [
 export function collectorGates(observations = {}) {
   return definitions.map(([id, name]) => {
     let status = 'not_executed', evidence = 'Not executed by this collector. Source presence, configured CI and another gate are not pass evidence.';
-    if (id === 6 && Number.isFinite(observations.bootstrapVerifiedExtractMs) && Number.isFinite(observations.probeCapabilitiesMs)) {
-      status = 'measured_local_fixture'; evidence = 'Probe and synthetic bootstrap extraction completed; no live app, public composition or cross-platform qualification implied.';
+    if (id === 6 && Number.isFinite(observations.sourceHandoffMs) && Number.isFinite(observations.probeCapabilitiesMs)) {
+      status = 'measured_local_fixture'; evidence = 'The verified tools archive\'s runner CLI completed a local capability probe and a synthetic source handoff; no live app, public composition or cross-platform qualification implied.';
+    }
+    if (id === 9 && /^[a-f0-9]{64}$/u.test(observations.releaseComposition?.compositionId ?? '')) {
+      status = 'archive_integrity_verified';
+      evidence = `Manifest, composition ${observations.releaseComposition.compositionId.slice(0, 12)}, clean sources, exact events/SQL profiles and every selected archive size and SHA-256 were verified. The starter, SQL engine and browser were NOT executed.`;
     }
     if (id === 11 && typeof observations.checkpointRecoveryPass === 'boolean') {
       status = observations.checkpointRecoveryPass ? 'measured_local_fixture' : 'failed_local_fixture';

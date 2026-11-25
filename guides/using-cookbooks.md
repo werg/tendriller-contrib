@@ -59,8 +59,8 @@ and cookbook reading support that result; neither establishes it on its own.
 
 ## Read the strength of a statement
 
-A **platform invariant**, such as retaining a protected command's original generation
-on retry, survives any layout choice. A **conditional requirement**, such as private
+A **platform invariant**, such as retaining a command's original operation ID, signed
+author time and bytes on retry, survives any layout choice. A **conditional requirement**, such as private
 records for private responses, applies when you choose that branch. An **example
 choice**, such as a five-hundred-point display model or a one-step guide, can change.
 

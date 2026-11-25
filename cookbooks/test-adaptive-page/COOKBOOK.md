@@ -79,7 +79,7 @@ not a reason to add another preview server or report an unexecuted test as passe
 
 Choose scenarios from the consequential decisions in the cookbook. Two different pilot layouts can prove that reasoning transfers without a common root element, CSS vocabulary, or state namespace. They do not need pixel equality. Keep a custom page with no contrib metadata and at least one nested or fullscreen/canvas adaptation.
 
-Test both success and the failure that could lose meaning: delayed rejection, changed generation, revoked access, expired history, quota failure, or a stopped sensor's late callback. Record exact artifacts/revisions, commands, and observed limits. Keep “explained,” “exercised,” and “used in a real adaptation” distinct.
+Test both success and the failure that could lose meaning: delayed rejection, a late earlier operation that revises the outcome, revoked access, expired history, quota failure, or a stopped sensor's late callback. Record exact artifacts/revisions, commands, and observed limits. Keep “explained,” “exercised,” and “used in a real adaptation” distinct.
 
 ## Browser suspension and cached restoration
 

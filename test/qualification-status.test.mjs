@@ -8,13 +8,13 @@ test('missing artifacts and source inspection grant no gate pass', () => {
 });
 
 test('synthetic measurements qualify only the observed fixtures', () => {
-  const gates = collectorGates({ bootstrapVerifiedExtractMs: 12, probeCapabilitiesMs: 3, checkpointRecoveryPass: true });
+  const gates = collectorGates({ sourceHandoffMs: 12, probeCapabilitiesMs: 3, checkpointRecoveryPass: true });
   assert.deepEqual(gates.filter(gate => gate.status !== 'not_executed').map(gate => gate.id), [6, 11]);
   assert(gates.filter(gate => [6, 11].includes(gate.id)).every(gate => gate.status === 'measured_local_fixture'));
 });
 
 test('failed fixture, malformed timing and explicit process observations remain distinct', () => {
-  const gates = collectorGates({ bootstrapVerifiedExtractMs: NaN, probeCapabilitiesMs: Infinity, checkpointRecoveryPass: false,
+  const gates = collectorGates({ sourceHandoffMs: NaN, probeCapabilitiesMs: Infinity, checkpointRecoveryPass: false,
     chronologFastLane: { passedFiles: null } });
   assert.equal(gates.find(gate => gate.id === 6).status, 'not_executed');
   assert.equal(gates.find(gate => gate.id === 11).status, 'failed_local_fixture');
@@ -29,4 +29,13 @@ test('installed runtime version strings do not prove archive, WASM or platform e
   assert.equal(gates.find(gate => gate.id === 10).status, 'not_executed');
   assert.equal(gates.find(gate => gate.id === 2).status, 'not_executed');
   assert(gates.every(gate => gate.status === 'not_executed'));
+});
+
+test('release archive integrity is reported as exactly that and nothing broader', () => {
+  const gates = collectorGates({ releaseComposition: { compositionId: 'a'.repeat(64) } });
+  const gate = gates.find(item => item.id === 9);
+  assert.equal(gate.status, 'archive_integrity_verified');
+  assert.match(gate.evidence, /NOT executed/);
+  assert(gates.filter(item => item.id !== 9).every(item => item.status === 'not_executed'));
+  assert.equal(collectorGates({ releaseComposition: { compositionId: 'short' } }).find(item => item.id === 9).status, 'not_executed');
 });

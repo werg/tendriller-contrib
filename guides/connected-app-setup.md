@@ -62,28 +62,35 @@ authored transaction; later authorized DDL and grants use that same flow.
 
 The intended route is:
 
-**create → choose policy → publish signed UI → owner sign-in → initialize browser
-locally → author and replicate → verify**.
+**register the agent once → create the page → choose policy → publish signed UI →
+owner sign-in → initialize browser locally → author and replicate → verify**.
+
+One agent (one account-level credential and one signing key, kept in the starter
+workspace) maintains every page it is granted; it is not a per-page identity.
 
 A native participant is optional. Do not make its executable, private store or
 reachability a prerequisite for ordinary browser reads or durable writes. A
 separately hosted application backend needs a concrete feature requirement;
 Tendriller is not the application database.
 
-For account-linked MCP, use `setup:prepare`, submit its public arguments to
-`prepare_tendril_setup`, and pass the exact ready result to `setup:finish`. The
-starter retains the original private credential and intent before the request;
-the host derives the verified owner. After a lost reply use
-`inspect_tendril_setup`, not a new allocation. Bounded setup listing is an
-inspection mechanism, not permission to reconstruct missing secrets.
+For account-linked MCP, generate the workspace's shared key with `tendril
+workspace key`, call `register_agent` with exactly its public arguments, and retain
+the result with `tendril workspace adopt`; the host derives the verified owner.
+The workspace retains the signing key before the request; `workspace adopt` retains
+the returned agent credential. After a lost reply preserve that key and use only
+an owner-authorized continuation. Re-registering the same name rotates its token,
+so adopt the new result and account for interruption of existing control connections;
+do not allocate a replacement agent, key or page. A page the agent
+creates is granted to it automatically, while an existing page needs the owner's
+explicit per-agent grant.
 
 If the explicit email route is deliberately selected and supported, use the
 actual owner's verified address with their authorization. An opaque connector
 profile ID neither reveals it nor substitutes for missing scope. Never silently
 broaden consent or switch routes to work around an installed catalog.
 
-Create once, retain the private setup handle, configure the execution and finality
-policy, and publish the first verified signed UI. Prepare optional assistant
+Create each page once, retain the private workspace, configure the execution and
+finality policy, and publish the first verified signed UI. Prepare optional tool
 access separately. Give the person the ready page URL without waiting for a
 “claimed” reply; do not publish an empty shell just to obtain a claim link.
 
@@ -125,10 +132,12 @@ justify a second application or signer. Follow the selected service's current
 [session bootstrap](https://github.com/werg/tendriller/blob/master/docs/SESSION_BOOTSTRAP.md)
 and troubleshooting next action.
 
-For expired setup credentials, use only an actually supported same-application,
-owner-approved continuation route. Preserve application identity, device storage
-and original request. A host delegation is not new data membership or assistant
-consent. Never retry uncertain redemption by automatically issuing another secret.
+For a lost, revoked or expired agent credential (a dashboard join code lasts ten
+minutes), use only an owner-approved route from the selected service's
+troubleshooting guide. Preserve application identity, device storage and the
+original request. A host credential or grant is not new data membership or
+assistant consent. Never retry an uncertain registration by automatically issuing
+another secret, and never create another page to work around a credential problem.
 
 ## Verify behavior, not just an HTML preview
 
@@ -163,8 +172,8 @@ synchronization, an assistant or finality progress. They are not required to sav
 local work. A page does not host a resident native participant or reasoning
 process, and browser suspension does not promise future execution.
 
-Read a private checkpoint before promising resume. It should retain the setup
-handle, device-store location, exact pending references and installed composition.
+Read a private checkpoint before promising resume. It should retain the
+workspace location, agent identity, device-store location, exact pending references and installed composition.
 Keep it outside authored files, public archives and version control; never open
 one retained signer/store through two independent simultaneous owners. A preview
 also needs a reachable route; a local URL alone is not delivery to the person.

@@ -36,7 +36,7 @@ A definition describes steps, dependencies, completion rules, and its revision. 
 
 A progress fact can include the step identity, definition revision, completion basis, evidence reference if any, and accepted outcome. View position, expanded help, and a local draft belong elsewhere. A shared “current step” may be useful for a facilitator-led session; for independent work, separate each person's view position from authoritative task progress.
 
-Definition revision and server concurrency generation solve different problems. A revision explains the instructions the person saw; a generation guards protected work against an authoritative reset or rebinding. Preserve the original command and guards when retrying. A replan must not silently stamp current context onto an old offline completion.
+Definition revision and a command's guards solve different problems. A revision explains the instructions the person saw; the guard (an expected record version or current-state precondition evaluated at replay) keeps a late or earlier operation from silently overwriting newer work. Preserve the original operation ID, signed author time and guards when retrying; a late earlier fact can revise the outcome. A replan must not silently stamp current context onto an old offline completion.
 
 ## Decide what counts as complete
 

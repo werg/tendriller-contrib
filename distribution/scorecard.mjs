@@ -1,13 +1,14 @@
 // Honest qualification telemetry and cross-platform matrix generator (W12).
 // Measures real local artifacts and workloads; never fabricates vendor cloud-agent results.
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { collectorGates } from './qualification-status.mjs';
+import { inspectRelease, profileBytes } from './release-selection.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const verifyOnly = process.argv.includes('--verify-only');
@@ -29,9 +30,23 @@ const SCENARIOS = [
   'checkpoint_and_resume_across_replacement',
 ];
 
-function fileSize(path) {
-  return existsSync(path) ? statSync(path).size : null;
+function git(cwd, ...args) {
+  return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 }
+
+// The explicit kernel fast-test process may only run on the exact clean source
+// the verified composition names; otherwise it is reported blocked, never run.
+function kernelSourceBlock(release) {
+  try {
+    const head = git(chronologRoot, 'rev-parse', 'HEAD');
+    if (head !== release.source.chronolog.source) return `Chronolog checkout is ${head.slice(0, 12)}, not the composition source ${release.source.chronolog.source.slice(0, 12)}.`;
+    if (git(chronologRoot, 'status', '--porcelain') !== '') return 'Chronolog checkout has uncommitted changes.';
+    return null;
+  } catch { return 'The Chronolog checkout is not a readable git repository.'; }
+}
+
+const runTendril = (tool, args, options = {}) => execFileSync(process.execPath, ['--no-warnings', join(tool, 'bin/tendril.mjs'), ...args],
+  { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, maxBuffer: 4 * 1024 * 1024, ...options });
 
 async function collectLocalTelemetry() {
   const telemetry = {
@@ -41,122 +56,78 @@ async function collectLocalTelemetry() {
       arch: process.arch,
       nodeVersion: process.version,
     },
+    release: null,
     artifacts: {},
     benchmarks: {},
     gates: [],
   };
 
-  const hasTendriller = existsSync(join(tendrillerRoot, 'dist/tendriller-sdk-0.3.0-rc.17.tgz'));
-  if (!hasTendriller) {
-    return { ...telemetry, gates: collectorGates(), note: 'Sibling tendriller build artifacts not present; no gates were executed.' };
+  // Select the exact release composition; never glob for "the" archive.
+  const inspection = inspectRelease(join(tendrillerRoot, 'dist'));
+  if (inspection.status !== 'verified') {
+    telemetry.release = { status: inspection.status, code: inspection.code, reason: inspection.reason };
+    return { ...telemetry, gates: collectorGates(), note: `${inspection.reason} No gates were executed.` };
   }
-
-  const artifactsDir = join(tendrillerRoot, 'test/artifacts');
-  const artifactFiles = existsSync(artifactsDir) ? readdirSync(artifactsDir) : [];
-  const findArtifact = pattern => {
-    const matches = artifactFiles.filter(name => pattern.test(name));
-    // Multiple checkpoints are ambiguous; never label the first arbitrary one current.
-    return matches.length === 1 ? join(artifactsDir, matches[0]) : '';
+  const { release } = inspection;
+  telemetry.release = {
+    status: 'verified', version: release.version, contract: release.contract, compositionId: release.compositionId,
+    coreSource: release.source.core.source, chronologSource: release.source.chronolog.source,
+    archives: Object.fromEntries(Object.values(release.components).map(item => [item.role, { file: item.file, size: item.size, sha256: item.sha256 }])),
+    verification: 'Manifest/composition identity, clean sources, exact profiles and every selected archive size and SHA-256. No product gate was run.',
   };
-  const coreTgz = join(tendrillerRoot, 'dist/tendriller-sdk-0.3.0-rc.17.tgz');
-  const runtimeTgz = join(tendrillerRoot, 'dist/tendriller-runtime-0.3.0-rc.17.tgz');
-  const toolsTgz = join(tendrillerRoot, 'dist/tendriller-tools-0.3.0-rc.17.tgz');
-  const bootstrapScript = join(tendrillerRoot, 'scripts/tendriller-bootstrap.mjs');
-  const fullSessionTgz = findArtifact(/^chronolog-peer-session-[a-f0-9]{8}\.tgz$/u);
-  const relaySessionTgz = findArtifact(/^chronolog-peer-session-[a-f0-9]{8}-relay\.tgz$/u);
-  const controlTgz = findArtifact(/^chronolog-peer-generation-control-[a-f0-9]{8}\.tgz$/u);
-  const wasmBinaryPath = join(chronologRoot, 'artifacts/wasm/sqlite3.wasm');
-  const wasmManifestPath = join(chronologRoot, 'artifacts/wasm/manifest.json');
-
-  const coreBytes = fileSize(coreTgz);
-  const runtimeBytes = fileSize(runtimeTgz);
-  const toolsBytes = fileSize(toolsTgz);
-  const bootstrapBytes = fileSize(bootstrapScript);
-  const fullSessionBytes = fileSize(fullSessionTgz);
-  const relaySessionBytes = fileSize(relaySessionTgz);
-  const controlBytes = fileSize(controlTgz);
-  const wasmBinaryBytes = fileSize(wasmBinaryPath);
-
-  const total = (...values) => values.every(Number.isFinite) ? values.reduce((sum, value) => sum + value, 0) : null;
+  const bytes = role => release.components[role].size;
   telemetry.artifacts = {
-    coreSdkBytes: coreBytes,
-    runtimeBytes,
-    toolsBytes,
-    bootstrapScriptBytes: bootstrapBytes,
-    chronologControlBytes: controlBytes,
-    chronologSessionFullBytes: fullSessionBytes,
-    chronologSessionRelayBytes: relaySessionBytes,
-    chronologWasmSqlBinaryBytes: wasmBinaryBytes,
-    chronologWasmManifestPresent: existsSync(wasmManifestPath),
-    profileEventsRelayOnlyTotalBytes: total(coreBytes, runtimeBytes, relaySessionBytes),
-    profileEventsFullTotalBytes: total(coreBytes, runtimeBytes, fullSessionBytes),
+    coreSdkBytes: bytes('sdk'),
+    runtimeBytes: bytes('runtime'),
+    toolsBytes: bytes('tools'),
+    chronologAuthorityBytes: bytes('authority'),
+    chronologSessionEventsBytes: bytes('session'),
+    chronologSessionSqlBrowserBytes: bytes('session-sql-browser'),
+    profileEventsTotalBytes: profileBytes(release, 'events'),
+    profileSqlTotalBytes: profileBytes(release, 'sql'),
   };
 
-  // Measure real local capability probe + nondestructive bootstrapper extraction time.
-  const { probeCapabilities } = await import(pathToFileURL(join(tendrillerRoot, 'contract/transport-probe.mjs')).href);
-  const { packTarGz } = await import(pathToFileURL(join(tendrillerRoot, 'contract/archive.mjs')).href);
-  const { exportSqliteCheckpoint, restoreSqliteCheckpoint } = await import(pathToFileURL(join(tendrillerRoot, 'tools/cli/lib/handoff.mjs')).href);
-  const { DatabaseSync } = await import('node:sqlite');
-
-  const probeStart = performance.now();
-  const probe = await probeCapabilities();
-  const probeMs = Math.round((performance.now() - probeStart) * 100) / 100;
-
+  // Measure the current runner CLI extracted from the verified tools archive:
+  // local capability probe and a real source handoff. Neither needs a network.
   const scratch = mkdtempSync(join(tmpdir(), 'tendriller-scorecard-'));
-  let bootstrapExtractMs = null;
-  let checkpointRecoveryPass = false;
-  let peakRssMb = null;
+  let probe = null, probeMs = null, handoffMs = null, handoffPass = false;
   try {
-    const sampleTgz = join(scratch, 'starter.tgz');
-    const archiveBytes = packTarGz([
-      { path: 'starter/index.html', data: '<!doctype html><title>Starter</title>' },
-      { path: 'starter/page.mjs', data: 'export const ready = true;\n' },
-    ]);
-    writeFileSync(sampleTgz, archiveBytes);
-    const dest = join(scratch, 'project');
-    const bootStart = performance.now();
-    execFileSync(process.execPath, [bootstrapScript, '--archive-file', sampleTgz, '--project', dest], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    bootstrapExtractMs = Math.round((performance.now() - bootStart) * 100) / 100;
-
-    // Measure checkpoint export, retirement enforcement, and clean restore.
-    const srcDb = join(scratch, 'src.sqlite');
-    const dstDb = join(scratch, 'dst.sqlite');
-    const db = new DatabaseSync(srcDb);
-    db.exec('CREATE TABLE stored_bytes(key TEXT PRIMARY KEY, value BLOB NOT NULL)');
-    db.prepare('INSERT INTO stored_bytes(key, value) VALUES(?, ?)').run('peer-session/device/v1', Buffer.from('verified-device-state'));
-    db.close();
-    const secret = 'e'.repeat(64);
-    const cp = await exportSqliteCheckpoint({ devicePath: srcDb, outputPath: join(scratch, 'device.clcp'), secret, retireSource: true });
-    let retiredBlocked = false;
-    try {
-      await exportSqliteCheckpoint({ devicePath: srcDb, outputPath: join(scratch, 'dup.clcp'), secret });
-    } catch (error) {
-      retiredBlocked = error?.code === 'DEVICE_RETIRED_BY_CHECKPOINT';
-    }
-    const restored = await restoreSqliteCheckpoint({ inputPath: cp.output, devicePath: dstDb, secret });
-    checkpointRecoveryPass = retiredBlocked && restored.restoredEntries === 1;
-    peakRssMb = Math.round((process.memoryUsage().rss / (1024 * 1024)) * 100) / 100;
+    const tool = join(scratch, 'tools'), project = join(scratch, 'project');
+    mkdirSync(tool); mkdirSync(project);
+    execFileSync('tar', ['-xzf', release.components.tools.path, '-C', tool], { stdio: ['ignore', 'ignore', 'pipe'] });
+    writeFileSync(join(project, 'package.json'), '{"name":"scorecard-fixture","private":true}\n');
+    writeFileSync(join(project, 'page.mjs'), 'export const ready = true;\n');
+    let t0 = performance.now();
+    probe = JSON.parse(runTendril(tool, ['probe'], { cwd: project }));
+    probeMs = Math.round((performance.now() - t0) * 100) / 100;
+    t0 = performance.now();
+    const out = JSON.parse(runTendril(tool, ['handoff', 'source', join(scratch, 'handoff.tgz'), '--project', project], { cwd: project }));
+    handoffMs = Math.round((performance.now() - t0) * 100) / 100;
+    handoffPass = out.manifest?.fileCount === 2 && out.size === statSync(join(scratch, 'handoff.tgz')).size;
+  } catch (error) {
+    telemetry.note = `Runner CLI fixture did not complete: ${String(error?.message ?? error).split('\n')[0]}`;
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
 
-  let chronologFastLane = null;
-  if (process.argv.includes('--run-fast-tests') && existsSync(join(chronologRoot, 'tools/run-fast-tests.mjs'))) {
-    const t0 = performance.now();
-    const out = execFileSync(process.execPath, [join(chronologRoot, 'tools/run-fast-tests.mjs')], {
-      cwd: chronologRoot,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    const durationSec = Math.round(((performance.now() - t0) / 1000) * 100) / 100;
-    const match = out.match(/Test Files\s+(\d+)\s+passed/i);
-    chronologFastLane = {
-      durationSec,
-      passedFiles: match ? Number(match[1]) : null,
-    };
+  let chronologFastLane = null, fastLaneBlocked = null;
+  if (process.argv.includes('--run-fast-tests')) {
+    fastLaneBlocked = kernelSourceBlock(release);
+    if (!fastLaneBlocked && !existsSync(join(chronologRoot, 'tools/run-fast-tests.mjs'))) fastLaneBlocked = 'The Chronolog checkout has no tools/run-fast-tests.mjs.';
+    if (!fastLaneBlocked) {
+      const t0 = performance.now();
+      const out = execFileSync(process.execPath, [join(chronologRoot, 'tools/run-fast-tests.mjs')], {
+        cwd: chronologRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      const durationSec = Math.round(((performance.now() - t0) / 1000) * 100) / 100;
+      const match = out.match(/Test Files\s+(\d+)\s+passed/i);
+      chronologFastLane = {
+        durationSec,
+        passedFiles: match ? Number(match[1]) : null,
+      };
+    }
   }
 
   let bunVersion = null;
@@ -170,19 +141,19 @@ async function collectLocalTelemetry() {
 
   telemetry.benchmarks = {
     probeCapabilitiesMs: probeMs,
-    probeRuntime: probe.runtime,
-    probeIpc: probe.ipc,
-    bootstrapVerifiedExtractMs: bootstrapExtractMs,
-    checkpointRecoveryPassRate: checkpointRecoveryPass ? 1.0 : 0.0,
-    measuredProcessRssMb: peakRssMb,
+    probeRuntime: probe?.runtime ?? null,
+    probeIpc: probe?.lifecycle?.ipc ?? null,
+    sourceHandoffMs: handoffPass ? handoffMs : null,
     chronologFastLane,
+    chronologFastLaneBlocked: fastLaneBlocked,
     bunVersion,
     denoVersion,
   };
 
   telemetry.gates = collectorGates({
-    bootstrapVerifiedExtractMs: bootstrapExtractMs, probeCapabilitiesMs: probeMs,
-    checkpointRecoveryPass, chronologFastLane,
+    releaseComposition: { compositionId: release.compositionId },
+    sourceHandoffMs: handoffPass ? handoffMs : null, probeCapabilitiesMs: probeMs,
+    chronologFastLane,
   });
 
   return telemetry;
@@ -217,6 +188,10 @@ function renderMarkdown(doc) {
     '',
     `Generated: \`${doc.generatedAt}\` on \`${t.host.platform}/${t.host.arch}\` (\`Node ${t.host.nodeVersion}\`).`,
     '',
+    `> Release selection: ${!t.release ? 'not attempted.' : t.release.status === 'verified'
+      ? `verified composition ${t.release.compositionId.slice(0, 12)} (core ${t.release.coreSource.slice(0, 12)}, Chronolog ${t.release.chronologSource.slice(0, 12)}). Archive integrity is the only thing verified from it.`
+      : `${t.release.status} (${t.release.code}). ${t.release.reason}`}`,
+    '',
     '> Measurements describe only this collector run. Unexecuted gates are `not_executed`; synthetic fixture measurements do not qualify a public release, platform, deployment or live external agent. Use exact source/artifact-bound CI evidence for those claims.',
     '',
     '## Measured Local Artifact Footprint & Benchmarks',
@@ -226,16 +201,14 @@ function renderMarkdown(doc) {
     `| \`@tendriller/core\` SDK tarball | ${kb(a.coreSdkBytes)} | — |`,
     `| \`@tendriller/runtime\` tarball | ${kb(a.runtimeBytes)} | — |`,
     `| \`@tendriller/tools\` tarball | ${kb(a.toolsBytes)} | — |`,
-    `| Standalone \`tendriller-bootstrap.mjs\` | ${kb(a.bootstrapScriptBytes)} | Zero-dependency single file |`,
-    `| \`chronolog-peer-session\` (\`events-full\`) | ${kb(a.chronologSessionFullBytes)} | — |`,
-    `| \`chronolog-peer-session\` (\`events-relay-only\`, zero \`werift\`) | ${kb(a.chronologSessionRelayBytes)} | Smaller / zero native RTC |`,
-    `| Compiled DoltLite + \`sqlite-vec\` WASM binary (\`sqlite3.wasm\`) | ${kb(a.chronologWasmSqlBinaryBytes)} | Portable SQL without C++ compiler |`,
-    `| Total \`events-relay-only\` core+runtime+session archive size | ${kb(a.profileEventsRelayOnlyTotalBytes)} | < 15 MB |`,
-    `| Capability probe (\`probeCapabilities\`) | ${b.probeCapabilitiesMs ?? 'n/a'} ms | < 500 ms |`,
-    `| Verified local bootstrap extract (\`tendriller-bootstrap.mjs\`) | ${b.bootstrapVerifiedExtractMs ?? 'n/a'} ms | < 15,000 ms |`,
-    `| Encrypted checkpoint export + retire + restore pass rate | ${typeof b.checkpointRecoveryPassRate === 'number' ? (b.checkpointRecoveryPassRate * 100) + '%' : 'not measured'} | 100% |`,
-    `| Measured Node process RSS (probe + SQLite checkpoint) | ${b.measuredProcessRssMb ?? 'n/a'} MB | < 150 MB |`,
-    `| \`chronolog-db\` \`pnpm test:fast\` (${b.chronologFastLane?.passedFiles ?? 'n/a'} pure-JS test files) | ${b.chronologFastLane?.durationSec ?? 'n/a'} s | < 30 s target |`,
+    `| \`@chronolog/authority\` tarball | ${kb(a.chronologAuthorityBytes)} | — |`,
+    `| \`@chronolog/peer-session\` events profile tarball | ${kb(a.chronologSessionEventsBytes)} | — |`,
+    `| \`@chronolog/peer-session\` browser SQL profile tarball | ${kb(a.chronologSessionSqlBrowserBytes)} | — |`,
+    `| Events profile total (sdk + tools + authority + session) | ${kb(a.profileEventsTotalBytes)} | < 15 MB |`,
+    `| SQL profile total (sdk + tools + authority + browser SQL session) | ${kb(a.profileSqlTotalBytes)} | < 15 MB |`,
+    `| Capability probe (\`tendril probe\`, verified tools archive) | ${b.probeCapabilitiesMs ?? 'n/a'} ms | < 500 ms |`,
+    `| Source handoff (\`tendril handoff source\`, synthetic two-file project) | ${b.sourceHandoffMs ?? 'n/a'} ms | < 15,000 ms |`,
+    `| \`chronolog-db\` \`pnpm test:fast\` (${b.chronologFastLane?.passedFiles ?? 'n/a'} pure-JS test files) | ${b.chronologFastLane ? b.chronologFastLane.durationSec + ' s' : b.chronologFastLaneBlocked ? 'blocked: ' + b.chronologFastLaneBlocked : 'n/a'} | < 30 s target |`,
     '',
     '## Acceptance Gates (W1–W12)',
     '',
@@ -251,7 +224,7 @@ function renderMarkdown(doc) {
       `| ${p.name} | \`${p.mode}\` | \`${p.scenarios.use_existing_app_via_connector.status}\` | \`${p.scenarios.create_and_run_events_app.status}\` | \`${p.scenarios.create_and_run_sql_app.status}\` | \`${p.scenarios.checkpoint_and_resume_across_replacement.status}\` |`
     ),
     '',
-    'Collect optional local fixture measurements from explicit sibling checkouts. This does not run product qualification. Run heavy checks only on an approved remote runner:',
+    'Collect optional local fixture measurements from an explicit sibling Tendriller checkout whose `dist/` holds a complete release (set `TENDRILLER_ROOT`; `CHRONOLOG_ROOT` only for the fast-test process). A missing, ambiguous or unverifiable release is reported blocked and no gate runs. This does not run product qualification. Run heavy checks only on an approved remote runner:',
     '',
     '```sh',
     'node distribution/scorecard.mjs',
