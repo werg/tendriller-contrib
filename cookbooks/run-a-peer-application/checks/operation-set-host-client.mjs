@@ -46,6 +46,11 @@ export function createHostedFixture(base) {
     }
     const participant={boundary:'public-authority-record',authorityVerified:true,hostRejected};
     const qualifyPublication = async () => {
+      // Explicit device enrollment may have advanced authority since createHost.
+      // Publication itself must preserve the verified head present when it starts.
+      const publicationAuthority = decodeRecord(authorityRecordBytes((await client.application()).authority));
+      await verifyAuthorityBundle(publicationAuthority);
+      const beforePublicationAuthority = await recordDigest(publicationAuthority);
       const signed = async (text, operationId, revision, previous, identity = signer, extraFiles = []) => {
         const bytes = Buffer.from(text), digest = hash(bytes), path = `page-${revision}.html`;
         const publication = await signPublicationManifest({ applicationId, membershipId: publicationScope.grantId,
@@ -81,7 +86,7 @@ export function createHostedFixture(base) {
       const restartedSecond = await served('page-1.html', second.bytes, secondReceipt);
       assert.equal(restartedSecond.authoredSourceDigest, second.digest); assert.equal((await pinnedFirst()).authoredSourceDigest, first.digest);
       assert.equal(restartedSecond.injection.runtimeId, servedFirst.injection.runtimeId);
-      const after = decodeRecord(authorityRecordBytes((await client.application()).authority)); assert.equal(await recordDigest(after), beforeAuthority);
+      const after = decodeRecord(authorityRecordBytes((await client.application()).authority)); assert.equal(await recordDigest(after), beforePublicationAuthority);
       return { administratorWithoutPublisher:true, exactRetry: true, lostReplyAfterPersistence: true, alteredBytesRejected: true, nonPublisherRejected: true,
         staleHeadRejected: true, priorCodeRetained: true, headAndCodeSurviveRestart: true, applicationAuthorityUnchanged: true,
         first: { id: first.publication.id, version: original.version, ...servedFirst },
