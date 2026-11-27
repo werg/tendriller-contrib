@@ -145,11 +145,13 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Collect and discuss a sketch](cookbooks/collect-sketch/COOKBOOK.md) — Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context.
 - [Import information for review](cookbooks/import-for-review/COOKBOOK.md) — Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.
 - [Keep evidence and interpretation separate](cookbooks/separate-evidence-interpretation/COOKBOOK.md) — Preserve original observations while allowing conclusions, labels, and explanations to evolve.
+- [Store rich media lazily over P2P without bloating host storage](cookbooks/store-lazy-peer-media/COOKBOOK.md) — Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.
 
 ### Coordinate people and tools
 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
 - [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) *(runnable snippets)* — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
+- [Federate queries across multiple pages from Hosted MCP or a local agent](cookbooks/query-across-pages/COOKBOOK.md) — Introspect live chronolog-db schemas and run parallel read-only SQL or declared queries across several pages with strict per-page capability isolation.
 
 ### Decide and act
 
@@ -189,7 +191,9 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 
 - [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
+- [Choose page governance and public access honestly](cookbooks/choose-page-governance/COOKBOOK.md) — Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private.
 - [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work.
+- [Evolve live schemas, RLS rules, and ES Module reducers without redeploys](cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md) — Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely.
 - [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
 - [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) *(runnable snippets)* — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.
@@ -197,6 +201,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 - [Publish coherent page updates](cookbooks/publish-coherent-updates/COOKBOOK.md) — Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
+- [Export portable app blueprints, remix pages, and schedule optional finality](cookbooks/remix-and-snapshot-apps/COOKBOOK.md) — Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed.
 - [Report live page errors and diagnostics to your agent](cookbooks/report-page-diagnostics/COOKBOOK.md) *(runnable snippets)* — Capture boot-to-runtime browser errors in a redacted ring buffer and stream live diagnostics over ephemeral signals.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
 - [Build a local-first peer application](cookbooks/run-a-peer-application/COOKBOOK.md) *(runnable snippets)* — Author durable signed operations independently, merge operation sets, and derive coherent revisable event or SQL views with explicitly optional finality.
@@ -205,6 +210,7 @@ boundaries, correction and recovery paths, and scenarios with expected outcomes.
 
 ### Make sense of information
 
+- [Build local-first encrypted AI memory and hybrid search](cookbooks/build-local-hybrid-memory/COOKBOOK.md) — Combine chronolog-db FTS5 full-text search, sqlite-vec vector similarity, and write RLS inside Merkle-paged CAS for zero-infrastructure offline semantic search.
 - [Present live measurements honestly](cookbooks/present-live-measurements/COOKBOOK.md) *(runnable snippets)* — Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs.
 - [Run a bounded measurement experiment](cookbooks/run-measurement-experiment/COOKBOOK.md) — Choose acquisition, aggregation, intervention, and export policies before treating a dashboard as an experimental record.
 - [Turn messy records into useful signals](cookbooks/turn-records-into-signals/COOKBOOK.md) — Project fields, preserve units, and bound flattening without silently changing the meaning of a source record.

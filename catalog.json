@@ -133,6 +133,39 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/build-correctable-forms/COOKBOOK.md. Choose progressive fields, validation, saved drafts, review, and submission recovery that preserve meaning and user-entered work. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "build-local-hybrid-memory",
+      "title": "Build local-first encrypted AI memory and hybrid search",
+      "summary": "Combine chronolog-db FTS5 full-text search, sqlite-vec vector similarity, and write RLS inside Merkle-paged CAS for zero-infrastructure offline semantic search.",
+      "group": "Make sense of information",
+      "tags": [
+        "search",
+        "memory",
+        "sqlite-vec",
+        "fts5",
+        "ai",
+        "sql"
+      ],
+      "choices": [
+        "Deterministic local embeddings vs agent-supplied external vectors",
+        "Hybrid RRF fusion vs keyword-only or semantic-only ranking",
+        "Author-owned RLS vs shared collaborative memory grants"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "search-and-filter-collections",
+        "choose-data-model",
+        "run-a-peer-application"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/STATE_MODELS.md"
+      ],
+      "path": "cookbooks/build-local-hybrid-memory/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/build-local-hybrid-memory/COOKBOOK.md. Combine chronolog-db FTS5 full-text search, sqlite-vec vector similarity, and write RLS inside Merkle-paged CAS for zero-infrastructure offline semantic search. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "capture-rendered-evidence",
       "title": "Capture rendered evidence",
       "summary": "Choose between DOM rendering, browser capture, and underlying source data, and review what the capture leaves out.",
@@ -277,6 +310,40 @@
       "runnable": false,
       "snippets": [],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-interruptions/COOKBOOK.md. Match quiet telemetry, agent wake, local cues, timers, and notifications to a meaningful decision point. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "choose-page-governance",
+      "title": "Choose page governance and public access honestly",
+      "summary": "Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private.",
+      "group": "Keep work dependable",
+      "tags": [
+        "authority",
+        "governance",
+        "public",
+        "multisig",
+        "privacy"
+      ],
+      "choices": [
+        "Private E2EE (attestedMembers) vs unencrypted public (openMembers)",
+        "Public read-only vs open-contribution write rules (chronolog/rls)",
+        "Single-owner attestation vs M-of-N multisigMembers or custom $permissions"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "collect-private-responses",
+        "manage-sensitive-data",
+        "run-a-peer-application"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/MEMBERSHIP.md",
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/session/admission.mjs"
+      ],
+      "path": "cookbooks/choose-page-governance/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-page-governance/COOKBOOK.md. Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "choose-voice-interaction",
@@ -737,6 +804,38 @@
       "runnable": false,
       "snippets": [],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/document-a-field-inspection/COOKBOOK.md. Combine a versioned checklist, measurements, annotated evidence, exceptions, offline draft recovery, and a reviewed handover report. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "evolve-live-schema-and-reducers",
+      "title": "Evolve live schemas, RLS rules, and ES Module reducers without redeploys",
+      "summary": "Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely.",
+      "group": "Keep work dependable",
+      "tags": [
+        "schema",
+        "reducers",
+        "sql",
+        "rls",
+        "evolution"
+      ],
+      "choices": [
+        "Admin SQL migrations vs non-admin user-owned dynamic tables",
+        "Hot-evolving $reducers vs frozenReducers",
+        "Dry-run validation before signing live reducer updates"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "run-a-peer-application",
+        "publish-coherent-updates"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/STATE_MODELS.md"
+      ],
+      "path": "cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md. Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "explore-what-if-scenarios",
@@ -1355,6 +1454,38 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/publish-smallest-page/COOKBOOK.md. Start with ordinary authored files and one useful event/reply loop, then add structure only when the task needs it. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "query-across-pages",
+      "title": "Federate queries across multiple pages from Hosted MCP or a local agent",
+      "summary": "Introspect live chronolog-db schemas and run parallel read-only SQL or declared queries across several pages with strict per-page capability isolation.",
+      "group": "Coordinate people and tools",
+      "tags": [
+        "mcp",
+        "multi-page",
+        "federation",
+        "sql",
+        "agents"
+      ],
+      "choices": [
+        "Hosted MCP query_multiple_applications vs local workspace queryMultipleSessions",
+        "Live schema introspection via describe_application vs hardcoded query assumptions",
+        "Per-page error isolation without hiding missing pages"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "connect-chatgpt",
+        "coordinate-participants",
+        "build-local-hybrid-memory"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/MULTI_PAGE_AGENTS.md"
+      ],
+      "path": "cookbooks/query-across-pages/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/query-across-pages/COOKBOOK.md. Introspect live chronolog-db schemas and run parallel read-only SQL or declared queries across several pages with strict per-page capability isolation. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "reconcile-concurrent-edits",
       "title": "Maintain a shared editable collection",
       "summary": "Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.",
@@ -1425,6 +1556,38 @@
       "runnable": false,
       "snippets": [],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/recover-outdated-work/COOKBOOK.md. Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "remix-and-snapshot-apps",
+      "title": "Export portable app blueprints, remix pages, and schedule optional finality",
+      "summary": "Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed.",
+      "group": "Keep work dependable",
+      "tags": [
+        "blueprint",
+        "remix",
+        "fork",
+        "finality",
+        "snapshots"
+      ],
+      "choices": [
+        "Portable PageBlueprint export vs one-click host Remix",
+        "Copying schema DDL + RLS rules without copying private rows",
+        "Keeping finality: none vs scheduling signed-frontier or fixed-validator finality"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "export-and-restore-work",
+        "guide-explicit-checkpoints",
+        "publish-coherent-updates"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/AUTHORITY_AND_PUBLICATIONS.md"
+      ],
+      "path": "cookbooks/remix-and-snapshot-apps/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/remix-and-snapshot-apps/COOKBOOK.md. Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "report-page-diagnostics",
@@ -1786,6 +1949,38 @@
         "cookbooks/share-live-signals/snippets/token-preview.mjs"
       ],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/share-live-signals/COOKBOOK.md. Send typing, presence, cursors, progress and transient messages through a bounded live channel with explicit expiry and delivery policy. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "store-lazy-peer-media",
+      "title": "Store rich media lazily over P2P without bloating host storage",
+      "summary": "Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.",
+      "group": "Collect evidence",
+      "tags": [
+        "media",
+        "content",
+        "p2p",
+        "blobs",
+        "publications"
+      ],
+      "choices": [
+        "Private epoch-encrypted blobs vs public hash-addressed blobs",
+        "Keyed-convergent deduplication vs randomized per-upload nonces",
+        "Peer-backed history recovery when the host prunes older R2 versions"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "capture-reviewed-evidence",
+        "choose-data-model",
+        "publish-coherent-updates"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/session/publication-blobs.mjs"
+      ],
+      "path": "cookbooks/store-lazy-peer-media/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/store-lazy-peer-media/COOKBOOK.md. Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "test-adaptive-page",

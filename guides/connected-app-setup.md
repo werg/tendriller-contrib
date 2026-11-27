@@ -68,10 +68,7 @@ profile; they do not replace first-visit enrollment. Retained profiles reopen lo
 state before background host access; a cold browser needs real enrollment and key
 provisioning.
 
-Choose an event or ordinary-SQL state model and an explicit finality/availability
-policy. Ordinary apps default to no finality. Engine manifests pin execution
-semantics, not the application schema. Initial application DDL is an ordinary
-authored transaction; later authorized DDL and grants use that same flow.
+Choose an event, declarative `chronolog/sql` (`chronolog-db`), or local hybrid FTS5 + `sqlite-vec` memory state model (`templates/knowledge/`), an authority model (default private OAuth E2EE `attestedMembers`, zero-OAuth public `openMembers`, or M-of-N `multisigMembers`), and an explicit finality/availability policy. Ordinary apps default to no finality. Engine manifests pin execution semantics, not the application schema. Initial application DDL, write RLS rules, and `$reducers` ES Module updates are ordinary authored transactions; later authorized DDL and grants use that same flow. Owners can also remix existing pages or import a portable `PageBlueprint` directly from `/dashboard`.
 
 ## Register the workspace agent and prepare the ready page
 

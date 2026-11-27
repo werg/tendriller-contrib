@@ -31,6 +31,12 @@ work. A user-visible completion message should name the result it actually prove
 | Keep a private case notebook portable and recoverable | [Sensitive information](../cookbooks/manage-sensitive-data/COOKBOOK.md) | [Data ownership](../cookbooks/choose-data-model/COOKBOOK.md), [export and restore](../cookbooks/export-and-restore-work/COOKBOOK.md) |
 | Review and apply a change to many items | [Reviewed batch actions](../cookbooks/run-reviewed-batch-actions/COOKBOOK.md) | [Exact proposal review](../cookbooks/review-exact-proposal/COOKBOOK.md), [outdated-work recovery](../cookbooks/recover-outdated-work/COOKBOOK.md) |
 | Start with a small page that can grow without losing work | [Smallest useful page](../cookbooks/publish-smallest-page/COOKBOOK.md) | [Adaptive interfaces](../cookbooks/adapt-without-losing-work/COOKBOOK.md), [coherent publication](../cookbooks/publish-coherent-updates/COOKBOOK.md) |
+| Publish a zero-OAuth public page or M-of-N multisig space | [Page governance & public access](../cookbooks/choose-page-governance/COOKBOOK.md) | [Sensitive information](../cookbooks/manage-sensitive-data/COOKBOOK.md) |
+| Build local-first encrypted AI memory with FTS5 + vector search | [Local hybrid AI memory](../cookbooks/build-local-hybrid-memory/COOKBOOK.md) | [Data ownership](../cookbooks/choose-data-model/COOKBOOK.md) |
+| Evolve SQL schemas, write RLS, or ES Module reducers live | [Live schema & reducer evolution](../cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md) | [Outdated-work recovery](../cookbooks/recover-outdated-work/COOKBOOK.md) |
+| Store photos/audio lazily over P2P with peer-backed version history | [Lazy P2P media & version history](../cookbooks/store-lazy-peer-media/COOKBOOK.md) | [Reviewed capture](../cookbooks/capture-reviewed-evidence/COOKBOOK.md) |
+| Share a secret-free app blueprint, remix a page, or opt into finality | [Remix, blueprints & finality](../cookbooks/remix-and-snapshot-apps/COOKBOOK.md) | [Export and restore](../cookbooks/export-and-restore-work/COOKBOOK.md) |
+| Query and federate answers across multiple independent pages | [Federated multi-page queries](../cookbooks/query-across-pages/COOKBOOK.md) | [Coordinate participants](../cookbooks/coordinate-participants/COOKBOOK.md) |
 
 ## 1. An intake that ends in a useful receipt
 
