@@ -1,8 +1,19 @@
 # Tendriller cookbooks
 
+Practical guides for building local-first, offline-capable web apps with Tendriller and Chronolog v2 — from encrypted AI memory and live schema evolution to zero-login public pages, M-of-N multisig, lazy P2P media, portable blueprints, and multi-agent workspaces.
+
 Find an approach for what you want to build, understand the consequential choices,
 and adapt it to the person and task. This collection contributes reasoning—not a
 component library, complete starter catalog, or application schema.
+
+## Featured Chronolog v2 patterns
+
+- **[Build local-first encrypted AI memory with FTS5 and sqlite-vec](cookbooks/build-local-hybrid-memory/COOKBOOK.md)** — combined keyword + semantic vector search with Postgres-style write RLS and zero cloud vector DB.
+- **[Choose page governance and public access honestly](cookbooks/choose-page-governance/COOKBOOK.md)** — default private E2EE, zero-OAuth public read/write with moderation, M-of-N multisig with 6-digit verification codes, and honest security badges.
+- **[Store rich media lazily over P2P without bloating host storage](cookbooks/store-lazy-peer-media/COOKBOOK.md)** — streaming encrypted/public blobs, LRU cache pinning, agent auto-pinning, and Service Worker P2P recovery of pruned releases.
+- **[Evolve SQL schemas and ES Module reducers live](cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md)** — dry-run and hot-publish reducers + DDL migrations without redeploying.
+- **[Remix apps and share secret-free PageBlueprints](cookbooks/remix-and-snapshot-apps/COOKBOOK.md)** — clone app logic and schemas into a fresh encrypted log with zero private data or keys.
+- **[Query across multiple pages](cookbooks/query-across-pages/COOKBOOK.md)** — fan out read-only SQL queries across independent sessions or up to 8 Hosted MCP pages.
 
 ## Build a workspace with people and independent agents
 

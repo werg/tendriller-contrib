@@ -31,7 +31,7 @@ Never let a visitor type personal or confidential information into an unencrypte
 - Standard private E2EE pages stay calm and clutter-free — UNLESS an opt-in Hosted MCP assistant is active, in which case `mountGovernanceBanner` displays an honest notice reminding the user that keys are unsealed strictly in RAM during `/mcp` requests and can be revoked anytime.
 - Public read-only pages clearly indicate **Public · Read-only (unencrypted)** and explain that anyone with the URL can view and sync peer-to-peer without signing in (with blind mailbox hydration even while the creator is offline).
 - Public open-write pages display a prominent warning badge (**Public · Open contributions**) reminding visitors not to enter private secrets, keep author-owned SQL guards (`NEW.author = actor()` / `OLD.author = actor()`) active, and allow admins to mute/block abusive keys (`blockAuthor` / `unblockAuthor`) — immediately rejecting future writes and purging blocked authors from the host mailbox.
-- Multisig pages surface the active `M-of-N` threshold and any pending proposals awaiting co-signatures.
+- Multisig pages surface the active `M-of-N` threshold and any pending proposals awaiting co-signatures. Use `mountMultisigPanel({ root, session, peers, identity, wrapKey })` for 1-click signed join requests with a deterministic 6-digit out-of-band `verificationCode(logId, publicKey, wrapKey)` (`482-917`) and 1-click `approveMultisigAndSeal` co-signing.
 
 ## Keep host-level administration isolated
 

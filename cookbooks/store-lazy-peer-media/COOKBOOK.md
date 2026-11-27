@@ -19,12 +19,12 @@ Never stuff photos, PDFs, audio recordings, or large attachments into eager CAS 
 
 - **Private logs (`privateLog: true`, default):** Use `putMedia(session, file, { visibility: 'private', deduplicate: true })` (from `shared/helpers/lazy-media.mjs`). Chunks are encrypted with your current epoch key and can only be decrypted by admitted readers.
 - **Public logs (`privateLog: false`):** Use `visibility: 'public'` so any anonymous reader can verify and fetch chunks by SHA-256 hash. Always label public attachments honestly in the UI.
-- **Streaming & local LRU cache budgets:** For large audio/video files, stream chunk-by-chunk with `session.content.putStream(chunks, { totalBytes })` and `session.content.readStream(ref)` without buffering the whole file in RAM. Pin critical assets with `session.content.pin(ref)` and bound local IndexedDB/OPFS growth with `session.content.pruneCache({ maxBytes })` (inspectable via `session.content.stats()`).
+- **Streaming, local LRU cache budgets & agent auto-pinning:** For large audio/video files, stream chunk-by-chunk with `session.content.putStream(chunks, { totalBytes })` and `session.content.readStream(ref)` without buffering the whole file in RAM. Pin critical assets with `session.content.pin(ref)` and bound local IndexedDB/OPFS growth with `session.content.pruneCache({ maxBytes })` (inspectable via `session.content.stats()`). Running `tendril agent run` automatically pins recent `session.content` references (`attachAgentContentPinner`) under a bounded budget so mobile uploads stay recoverable after the phone goes offline.
 - **LRU URL cleanup:** Use `createMediaUrlCache(session, { maxEntries: 64 })` to manage `blob:` ObjectURLs and deterministically call `URL.revokeObjectURL` on eviction or teardown.
 
-## Peer-backed `$publications` version history & rollbacks
+## Peer-backed `$publications` version history, SW P2P recovery & rollbacks
 
-The Tendriller host keeps a short rolling 3-version R2 HTTP cache for fast cold loads, while every signed release manifest stays forever in `$publications`. Connected agents and browsers seed published assets into `session.content` via `retainPublicationBlobs`; if the host prunes an older version, any peer can still recover every exact SHA-256-verified file with `tendril publication-recover <rev> [dir]` (or `mountPublicationsHistory`) and roll back cleanly via a signed `$publications` `rollback` operation.
+The Tendriller host keeps a short rolling 3-version R2 HTTP cache for fast cold loads, while every signed release manifest stays forever in `$publications`. Connected agents and browsers seed published assets into `session.content` via `retainPublicationBlobs` (pinned by default). Call `wireServiceWorkerP2pRecovery({ runtime, session })` so the page Service Worker automatically recovers host-pruned (`404`/`410`) publication assets from connected peers with SHA-256 verification, or recover manually with `tendril publication-recover <rev> [dir]` and roll back cleanly via a signed `$publications` `rollback` operation.
 
 ## Verify
 
