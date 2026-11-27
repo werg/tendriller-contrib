@@ -13,7 +13,11 @@ import { inspectRelease, profileBytes } from './release-selection.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const verifyOnly = process.argv.includes('--verify-only');
 const tendrillerRoot = process.env.TENDRILLER_ROOT ? resolve(process.env.TENDRILLER_ROOT) : resolve(root, '../tendriller');
-const chronologRoot = process.env.CHRONOLOG_ROOT ? resolve(process.env.CHRONOLOG_ROOT) : resolve(root, '../chronolog-db');
+const chronologRoot = process.env.CHRONOLOG_ROOT
+  ? resolve(process.env.CHRONOLOG_ROOT)
+  : existsSync(resolve(root, '../chronolog'))
+    ? resolve(root, '../chronolog')
+    : resolve(root, '../chronolog-db');
 
 const CLOUD_AGENT_PLATFORMS = [
   { id: 'meta-muse', name: 'Meta Muse', mode: 'outbound-https-mcp-or-polling-gateway' },
@@ -208,7 +212,7 @@ function renderMarkdown(doc) {
     `| SQL profile total (sdk + tools + authority + browser SQL session) | ${kb(a.profileSqlTotalBytes)} | < 15 MB |`,
     `| Capability probe (\`tendril probe\`, verified tools archive) | ${b.probeCapabilitiesMs ?? 'n/a'} ms | < 500 ms |`,
     `| Source handoff (\`tendril handoff source\`, synthetic two-file project) | ${b.sourceHandoffMs ?? 'n/a'} ms | < 15,000 ms |`,
-    `| \`chronolog-db\` \`pnpm test:fast\` (${b.chronologFastLane?.passedFiles ?? 'n/a'} pure-JS test files) | ${b.chronologFastLane ? b.chronologFastLane.durationSec + ' s' : b.chronologFastLaneBlocked ? 'blocked: ' + b.chronologFastLaneBlocked : 'n/a'} | < 30 s target |`,
+    `| \`chronolog\` \`pnpm test:fast\` (${b.chronologFastLane?.passedFiles ?? 'n/a'} pure-JS test files) | ${b.chronologFastLane ? b.chronologFastLane.durationSec + ' s' : b.chronologFastLaneBlocked ? 'blocked: ' + b.chronologFastLaneBlocked : 'n/a'} | < 30 s target |`,
     '',
     '## Acceptance Gates (W1–W12)',
     '',

@@ -28,7 +28,7 @@ export function publicSourceViolations(source, { markdown = false } = {}) {
   if (/\btendrilSnippets\b|\bTendrilWorkflows\b|\bsessions\s*\.\s*activate\b|\btendril\s*\.\s*control\b|\bconnectHostedSignals\b|\bconnectSignals\b/u.test(code)) {
     errors.push('retains a retired API');
   }
-  if (/(?:\.\.\/)+(?:tendriller|chronolog-db)\/(?:server|runtime|contract|packages)\//u.test(code)) {
+  if (/(?:\.\.\/)+(?:tendriller|chronolog|chronolog-db)\/(?:server|runtime|contract|packages)\//u.test(code)) {
     errors.push('imports private sibling source');
   }
   return errors;

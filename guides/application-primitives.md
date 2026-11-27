@@ -45,10 +45,13 @@ immutable composition.
 | Closed history against late first inclusion | Explicit optional finality policy | Verified admission and author-time closure, with declared authority and clock assumptions. |
 | An irreversible external effect | Verified final prerequisites plus an idempotent effect protocol | Neither local materialization nor peer retention alone authorizes the effect. |
 
-An events-only application needs no SQL engine. A SQL application explicitly
-selects a qualified deterministic engine; do not infer or freeze its schema from
-a setup-time program. Native and browser/WASM adapters must implement the same
-pinned SQL/platform semantics.
+An events-only application needs no SQL engine. A SQL application binds the
+built-in `chronolog/sql` reducer (`chronolog-db` — Merkle-paged `sqlite-cas.wasm`
+with FTS5, `sqlite-vec`, and Postgres-style `chronolog/rls` write triggers) or a
+custom QuickJS-NG ES Module pinned in `$reducers`; never infer or freeze its
+schema from host metadata. Every peer — browser, Node 22.15+ agent, and opt-in
+RAM-only hosted MCP — runs the exact same hash-pinned ES Module reducers with
+zero native C/C++ builds.
 
 ## Ordinary schema and permission transactions
 

@@ -68,8 +68,8 @@ reference, an independent peer retained it or an agent examined it. Measure thos
 facts separately. A document correction uses a new immutable byte reference and
 a guarded domain transaction.
 
-Page code has independent publication authorization and a signed predecessor
-chain. Use the supplied publication helper to persist the exact signed manifest
+Page code has independent publication authorization in the signed `$publications`
+control topic. Use the supplied publication helper to persist the exact signed manifest
 and graph before sending. After an uncertain reply reconcile and resend those
 same bytes. A publication-head conflict needs explicit new review, not silent
 predecessor replacement. Publishing does not require data-root ownership or

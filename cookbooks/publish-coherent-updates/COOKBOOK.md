@@ -35,8 +35,8 @@ A selected release does not prove that a browser loaded it, an application synch
 
 ## Publish with an independent signed publisher
 
-Code publication is a separate signed chain. It is not an application operation,
-does not enter the data operation set and neither orders nor is ordered by data.
+Code publication is a separate signed `$publications` control-topic log (`chronolog/publications`). It is not an application-data operation,
+does not enter private encrypted application topics and neither orders nor is ordered by data.
 A publisher can sign the complete UI before any browser has created the data
 root, and a later data operation never requires a new code release.
 
@@ -129,7 +129,7 @@ Cookbook provenance names where an idea came from. A selected executable depende
 
 The host supplies the selected runtime and injects its configuration into served HTML. Verify that actual runtime binding and complete graph as well as authored module bytes. Do not compare transformed HTML with the unmodified authored digest and call it the same representation.
 
-Prior selected publications retain their own immutable URLs. An existing tab can stay coherent while canonical navigation selects a new graph. A reversion publishes earlier reviewed authored bytes as a new signed revision after the current head; it does not reset the predecessor chain or erase application history.
+Prior selected publications retain their own immutable URLs while cached on the host (short rolling R2 cache), and pruned historical releases remain recoverable from connected Chronolog peers by SHA-256 hash via `session.content`. An existing tab can stay coherent while canonical navigation selects a new graph. A reversion publishes a signed `$publications` `rollback` operation referencing an earlier revision; it appends a new signed release rather than erasing application or publication history.
 
 ## Preserve the person's work
 
