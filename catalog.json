@@ -451,6 +451,39 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/collect-sketch/COOKBOOK.md. Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "combine-crdt-and-finality",
+      "title": "Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances",
+      "summary": "Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas.",
+      "group": "Coordinate state",
+      "tags": [
+        "finality",
+        "crdt",
+        "ledger",
+        "allowances",
+        "agents",
+        "consensus"
+      ],
+      "choices": [
+        "Provisional CRDT writes with Pending -> Confirmed badges",
+        "Offline Escrow CRDT quotas via chronolog/ledger",
+        "Graduated decentralization from none to notary to witness quorum"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guard-crdt-assumptions",
+        "choose-page-governance",
+        "work-offline-and-reconnect"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/finality-ux.mjs"
+      ],
+      "path": "cookbooks/combine-crdt-and-finality/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/combine-crdt-and-finality/COOKBOOK.md. Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "compare-options",
       "title": "Build a comparison and decision workspace",
       "summary": "Make criteria, units, provenance, and uncertainty inspectable instead of disguising assumptions behind a single score.",
@@ -934,6 +967,38 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/follow-location-progress/COOKBOOK.md. Filter uncertain fixes, choose arrival semantics, and keep a route usable when foreground location stops. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "guard-crdt-assumptions",
+      "title": "Guard CRDT edits with causal and row assumptions",
+      "summary": "Attach signed causal dependencies (afterOps, requiresRejected) and ergonomic SQL row guards (based_on_row, row_matches) so offline edits self-heal or surface cleanly in a conflict inbox.",
+      "group": "Coordinate state",
+      "tags": [
+        "crdt",
+        "assumptions",
+        "preconditions",
+        "sql",
+        "conflicts"
+      ],
+      "choices": [
+        "Causal afterOps dependencies vs row-level based_on_row guards",
+        "Automatic fallback actions with requiresRejected",
+        "Silent reject vs first-class _chronolog_conflicts inbox"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-data-model",
+        "reconcile-concurrent-edits",
+        "preview-agent-sql-branches"
+      ],
+      "sources": [
+        "https://github.com/werg/chronolog/blob/9df55f0358482a71308cf3b1f235429d66b39a3b/packages/peer-session/src/assumptions.test.ts"
+      ],
+      "path": "cookbooks/guard-crdt-assumptions/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/guard-crdt-assumptions/COOKBOOK.md. Attach signed causal dependencies (afterOps, requiresRejected) and ergonomic SQL row guards (based_on_row, row_matches) so offline edits self-heal or surface cleanly in a conflict inbox. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "guide-explicit-checkpoints",
       "title": "Guide a task with explicit checkpoints",
       "summary": "Separate task definition from progress, and choose intentional completion, resume, and replanning behavior.",
@@ -1388,6 +1453,38 @@
         "cookbooks/present-live-measurements/snippets/measurements.mjs"
       ],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/present-live-measurements/COOKBOOK.md. Choose a bounded data model, rendering approach, and recovery policy without hiding gaps or mixing runs. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "preview-agent-sql-branches",
+      "title": "Preview AI agent edits with zero-copy SQL branches",
+      "summary": "Let agents fork a Merkle-paged chronolog-db in O(1), compute exact row diffs, and submit guarded proposals humans can approve with one click.",
+      "group": "Coordinate state",
+      "tags": [
+        "sql",
+        "branching",
+        "agents",
+        "workflow",
+        "diff"
+      ],
+      "choices": [
+        "Direct agent writes vs human-reviewed Data PRs",
+        "Automatic based_on_row guards on proposed updates",
+        "Time-travel inspection with queryAsOf and audit logs"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "guard-crdt-assumptions",
+        "choose-data-model",
+        "evolve-live-schema-and-reducers"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/proposals.mjs"
+      ],
+      "path": "cookbooks/preview-agent-sql-branches/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/preview-agent-sql-branches/COOKBOOK.md. Let agents fork a Merkle-paged chronolog-db in O(1), compute exact row diffs, and submit guarded proposals humans can approve with one click. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "publish-coherent-updates",
@@ -1913,6 +2010,37 @@
       "runnable": false,
       "snippets": [],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/separate-evidence-interpretation/COOKBOOK.md. Preserve original observations while allowing conclusions, labels, and explanations to evolve. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "setup-social-recovery",
+      "title": "Set up trusted backup contacts for social recovery",
+      "summary": "Protect encrypted spaces against total device loss using M-of-N trusted backup contacts who hold only encrypted recovery shares and can never read private data.",
+      "group": "Access and identity",
+      "tags": [
+        "recovery",
+        "guardians",
+        "permissions",
+        "encryption",
+        "ux"
+      ],
+      "choices": [
+        "2-of-3 trusted contacts vs backup hardware device",
+        "Zero-read guardian isolation",
+        "6-digit verbal match codes without hex keys"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-page-governance",
+        "coordinate-participants"
+      ],
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/social-recovery.mjs"
+      ],
+      "path": "cookbooks/setup-social-recovery/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/setup-social-recovery/COOKBOOK.md. Protect encrypted spaces against total device loss using M-of-N trusted backup contacts who hold only encrypted recovery shares and can never read private data. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "share-live-signals",

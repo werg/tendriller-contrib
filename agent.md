@@ -16,6 +16,10 @@ The [peer application cookbook](cookbooks/run-a-peer-application/COOKBOOK.md) us
 
 Start from an [application journey](guides/use-cases.md) when the user names an outcome rather than a technical decision. Follow the person through first use, correction, completion, and return; preserve the evidence boundary of every claimed check.
 
+### Access and identity
+
+- [Set up trusted backup contacts for social recovery](cookbooks/setup-social-recovery/COOKBOOK.md) — Protect encrypted spaces against total device loss using M-of-N trusted backup contacts who hold only encrypted recovery shares and can never read private data.
+
 ### Choose inputs and algorithms
 
 - [Choose a voice interaction](cookbooks/choose-voice-interaction/COOKBOOK.md) *(runnable snippets)* — Compare typed input, push-to-talk, energy detection, and explicit wake engines with consent and reliable stop behavior.
@@ -43,6 +47,12 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Connect an application to an assistant and choose a fallback](cookbooks/connect-chatgpt/COOKBOOK.md) — Keep application state in Chronolog while combining account-linked tools, subscribed events, explicit widget actions, and retained deployment or local-agent routes.
 - [Coordinate people, views and independent agents](cookbooks/coordinate-participants/COOKBOOK.md) *(runnable snippets)* — Use one session owner per signing profile, explicitly addressed interactions and guarded contribution slots to coordinate several people, devices, views and agent runs.
 - [Federate queries across multiple pages from Hosted MCP or a local agent](cookbooks/query-across-pages/COOKBOOK.md) — Introspect live chronolog-db schemas and run parallel read-only SQL or declared queries across several pages with strict per-page capability isolation.
+
+### Coordinate state
+
+- [Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances](cookbooks/combine-crdt-and-finality/COOKBOOK.md) — Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas.
+- [Guard CRDT edits with causal and row assumptions](cookbooks/guard-crdt-assumptions/COOKBOOK.md) — Attach signed causal dependencies (afterOps, requiresRejected) and ergonomic SQL row guards (based_on_row, row_matches) so offline edits self-heal or surface cleanly in a conflict inbox.
+- [Preview AI agent edits with zero-copy SQL branches](cookbooks/preview-agent-sql-branches/COOKBOOK.md) — Let agents fork a Merkle-paged chronolog-db in O(1), compute exact row diffs, and submit guarded proposals humans can approve with one click.
 
 ### Decide and act
 
