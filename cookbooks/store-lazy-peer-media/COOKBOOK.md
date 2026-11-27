@@ -1,7 +1,7 @@
 ---
 id: "store-lazy-peer-media"
 title: "Store rich media lazily over P2P without bloating host storage"
-summary: "Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history."
+summary: "Use Chronolog's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history."
 group: "Collect evidence"
 tags: ["media", "content", "p2p", "blobs", "publications"]
 choices: ["Private epoch-encrypted blobs vs public hash-addressed blobs", "Keyed-convergent deduplication vs randomized per-upload nonces", "Peer-backed history recovery when the host prunes older R2 versions"]
@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Store rich media lazily over P2P without bloating host storage
 
-Never stuff photos, PDFs, audio recordings, or large attachments into eager CAS or JSON operation payloads. Chronolog v2 provides a unified lazy-pull blob pipe (`session.content.put` / `session.content.get`) that chunks and encrypts private blobs under your log's epoch key (with optional keyed-convergent deduplication) or addresses public blobs by raw SHA-256 hash. Only a tiny JSON reference (`MediaRef`) enters your `chronolog-db` row or note; peers fetch the actual bytes on demand when a user views or downloads the item.
+Never stuff photos, PDFs, audio recordings, or large attachments into eager CAS or JSON operation payloads. Chronolog provides a unified lazy-pull blob pipe (`session.content.put` / `session.content.get`) that chunks and encrypts private blobs under your log's epoch key (with optional keyed-convergent deduplication) or addresses public blobs by raw SHA-256 hash. Only a tiny JSON reference (`MediaRef`) enters your `chronolog-db` row or note; peers fetch the actual bytes on demand when a user views or downloads the item.
 
 ## Match visibility to the log's privacy boundary
 

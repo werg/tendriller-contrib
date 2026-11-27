@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Build local-first encrypted AI memory and hybrid search
 
-With Chronolog v2's `chronolog-db` (`sqlite-cas.wasm` compiled with both **FTS5** and **`sqlite-vec`**), an application or AI assistant does not need a hosted vector database or separate search cluster. Full-text indexes (`CREATE VIRTUAL TABLE ... USING fts5(...)`) and vector indexes (`CREATE VIRTUAL TABLE ... USING vec0(embedding float[D])`) live inside the exact same encrypted, 4 KiB Merkle-paged CAS database that syncs peer-to-peer across browsers, local agents, and opt-in Hosted MCP.
+With Chronolog's `chronolog-db` (`sqlite-cas.wasm` compiled with both **FTS5** and **`sqlite-vec`**), an application or AI assistant does not need a hosted vector database or separate search cluster. Full-text indexes (`CREATE VIRTUAL TABLE ... USING fts5(...)`) and vector indexes (`CREATE VIRTUAL TABLE ... USING vec0(embedding float[D])`) live inside the exact same encrypted, 4 KiB Merkle-paged CAS database that syncs peer-to-peer across browsers, local agents, and opt-in Hosted MCP.
 
 ## Choose an embedding strategy honestly
 

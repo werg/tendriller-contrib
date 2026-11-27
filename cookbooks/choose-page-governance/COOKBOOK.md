@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Choose page governance and public access honestly
 
-Most people assume a Tendriller page is private, sign-in protected, and end-to-end encrypted—because that is the default (`attestedMembers` with `privateLog: true`). Chronolog v2 lets any page choose its `$permissions` ES Module reducer a-la-carte at genesis, unlocking zero-OAuth public pages, embeddable dashboards, open community boards, and M-of-N multisig governance. Whenever a page departs from that private default, make its actual privacy and write model unmistakable in the interface.
+Most people assume a Tendriller page is private, sign-in protected, and end-to-end encrypted—because that is the default (`attestedMembers` with `privateLog: true`). Chronolog lets any page choose its `$permissions` ES Module reducer a-la-carte at genesis, unlocking zero-OAuth public pages, embeddable dashboards, open community boards, and M-of-N multisig governance. Whenever a page departs from that private default, make its actual privacy and write model unmistakable in the interface.
 
 ## Compare the four governance models
 

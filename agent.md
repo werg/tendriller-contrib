@@ -36,7 +36,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Collect and discuss a sketch](cookbooks/collect-sketch/COOKBOOK.md) — Choose a drawing model, preserve local work, and submit a reviewed snapshot with meaningful context.
 - [Import information for review](cookbooks/import-for-review/COOKBOOK.md) — Turn pasted or uploaded data into a correctable model with preserved originals and explicit partial acceptance.
 - [Keep evidence and interpretation separate](cookbooks/separate-evidence-interpretation/COOKBOOK.md) — Preserve original observations while allowing conclusions, labels, and explanations to evolve.
-- [Store rich media lazily over P2P without bloating host storage](cookbooks/store-lazy-peer-media/COOKBOOK.md) — Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.
+- [Store rich media lazily over P2P without bloating host storage](cookbooks/store-lazy-peer-media/COOKBOOK.md) — Use Chronolog's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.
 
 ### Coordinate people and tools
 

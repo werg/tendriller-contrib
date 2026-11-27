@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Evolve live schemas, RLS rules, and ES Module reducers without redeploys
 
-In Chronolog v2, application logic and database schema live directly inside the log—not frozen in host metadata or a separate `domain.js` bundle. Administrators and authorized agents can add columns, create tables, update Postgres-style write RLS predicates, or bind brand-new hash-pinned ES Module reducers in `$reducers` via ordinary signed operations. Every connected browser, local agent, and opt-in Hosted MCP Worker picks up the evolution deterministically at the exact canonical author timestamp.
+In Chronolog, application logic and database schema live directly inside the log. Administrators and authorized agents can add columns, create tables, update Postgres-style write RLS predicates, or bind brand-new hash-pinned ES Module reducers in `$reducers` via ordinary signed operations. Every connected browser, local agent, and opt-in Hosted MCP Worker picks up the evolution deterministically at the exact canonical author timestamp.
 
 ## Always dry-run candidate reducers first
 

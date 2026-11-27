@@ -1953,7 +1953,7 @@
     {
       "id": "store-lazy-peer-media",
       "title": "Store rich media lazily over P2P without bloating host storage",
-      "summary": "Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.",
+      "summary": "Use Chronolog's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history.",
       "group": "Collect evidence",
       "tags": [
         "media",
@@ -1980,7 +1980,7 @@
       "path": "cookbooks/store-lazy-peer-media/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/store-lazy-peer-media/COOKBOOK.md. Use Chronolog v2's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/store-lazy-peer-media/COOKBOOK.md. Use Chronolog's unified session.content pipe for encrypted or public chunked blobs pulled on demand from peers, alongside peer-backed $publications history. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "test-adaptive-page",

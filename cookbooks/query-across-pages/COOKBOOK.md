@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Federate queries across multiple pages from Hosted MCP or a local agent
 
-Users naturally keep separate Tendriller pages for separate privacy boundaries (for example, a personal knowledge base, a family kitchen list, and a team project tracker). With Chronolog v2's zero-bundle RAM-only Hosted MCP engine and multi-page local workspaces, an assistant can inspect live `chronolog-db` schemas and fan out read-only queries across up to 8 pages in parallel while keeping each page's encryption keys, membership, and read permissions strictly isolated.
+Users naturally keep separate Tendriller pages for separate privacy boundaries (for example, a personal knowledge base, a family kitchen list, and a team project tracker). With Chronolog's RAM-only Hosted MCP engine and multi-page local workspaces, an assistant can inspect live `chronolog-db` schemas and fan out read-only queries across up to 8 pages in parallel while keeping each page's encryption keys, membership, and read permissions strictly isolated.
 
 ## Inspect live schemas before querying
 
@@ -33,6 +33,6 @@ Never merge cross-page rows silently without labeling which page each result cam
 
 ## Verify
 
-1. Opt two pages into Hosted MCP under one OAuth grant and call `describe_application`—verify `sqlSchemas` lists live tables/columns without any `domain.js`.
+1. Opt two pages into Hosted MCP under one OAuth grant and call `describe_application`—verify `sqlSchemas` lists live tables and columns directly from `$reducers`.
 2. Call `query_sql` with a `SELECT` (succeeds) and with an `INSERT`/`DROP TABLE` (rejected with `sql_read_only`).
 3. Call `query_multiple_applications` targeting both opted-in pages plus one unauthorized `applicationId`—verify the two authorized pages succeed in parallel while the unauthorized target fails cleanly in isolation.

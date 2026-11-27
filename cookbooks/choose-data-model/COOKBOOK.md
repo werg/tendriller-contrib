@@ -28,7 +28,7 @@ Keep display choices such as filters and expanded panels separate from shared do
 | Unsubmitted draft | Page-owned state with an explicit local persistence policy. | Storage failure and shared-device privacy remain visible. |
 | Typing, cursor or replaceable live reading | Session live signals with bounded expiry. | No durable replay, history or completion guarantee. |
 | Commands, conversation and retained events | One application definition and owned session journal. | Applied outcomes belong to selected recoverable history. |
-| Relational guards, FTS5 and vector search | `chronolog-db` (`chronolog/sql` Merkle-paged SQLite-CAS + `chronolog/rls` write triggers) pinned in `$reducers`. | Deterministic replay across browser, Node and hosted MCP; zero native C/C++ builds. |
+| Relational guards, FTS5 and vector search | `chronolog-db` (`chronolog/sql` Merkle-paged SQLite-CAS + `chronolog/rls` write triggers) pinned in `$reducers`. | Deterministic replay across browser, Node 22.15+, and hosted MCP. |
 | Immutable application bytes | Unified lazy `session.content` (`put`/`get` with `public` or encrypted `private` visibility and optional dedup). | A reference in JSON/SQL does not itself retain another usable copy; peers pull chunks on demand. |
 | Membership, governance and keys | Public `$*` control topics (`$permissions`, `$keys`, `$reducers`, `$finality`) replayed by the blind host. | Choose `attestedMembers`, `openMembers`, `multisigMembers`, or custom ES Module reducers a-la-carte. |
 | Authored page code | Signed `$publications` control-topic release with exact SHA-256 file hashes. | Independent from application data; pruned host R2 cache versions remain P2P-recoverable by hash. |

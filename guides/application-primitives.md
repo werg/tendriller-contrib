@@ -50,8 +50,7 @@ built-in `chronolog/sql` reducer (`chronolog-db` — Merkle-paged `sqlite-cas.wa
 with FTS5, `sqlite-vec`, and Postgres-style `chronolog/rls` write triggers) or a
 custom QuickJS-NG ES Module pinned in `$reducers`; never infer or freeze its
 schema from host metadata. Every peer — browser, Node 22.15+ agent, and opt-in
-RAM-only hosted MCP — runs the exact same hash-pinned ES Module reducers with
-zero native C/C++ builds.
+RAM-only hosted MCP — runs the exact same hash-pinned ES Module reducers.
 
 ## Ordinary schema and permission transactions
 

@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b254
 
 # Export portable app blueprints, remix pages, and schedule optional finality
 
-Because every Chronolog v2 app is defined by hash-pinned ES Modules in `$reducers`, declarative SQL DDL + write-RLS policies in `chronolog-db`, and content-addressed UI files in `$publications`, any page can be packaged as a **secret-free `PageBlueprint`** (`tendriller-page-blueprint/v1`) or forked with one click into a brand-new, completely isolated encrypted log.
+Because every Chronolog app is defined by hash-pinned ES Modules in `$reducers`, declarative SQL DDL + write-RLS policies in `chronolog-db`, and content-addressed UI files in `$publications`, any page can be packaged as a **secret-free `PageBlueprint`** (`tendriller-page-blueprint/v1`) or forked with one click into a brand-new, completely isolated encrypted log.
 
 ## Separate application structure from private user data
 
