@@ -84,13 +84,13 @@ from platform gaps we can fix.
 ## Stay inside the current platform contract
 
 A guide teaches one protocol. Application order is the signed author timestamp,
-signing key and stable proposal ID; no coordinator, selected history, generation,
+signing key and stable `opId`; no coordinator, selected history, generation,
 recovery transition, migration path or compatibility reader exists to describe.
 Name the four independent facts (stored, materialized and revisable, peer-retained,
-finalized) rather than "saved" or "synced", treat `none` as the default finality
-policy, and describe schema and permission changes as ordinary authorized
-transactions. Explain that a late earlier operation can revise outcomes and that
-a sealed finality frontier can exclude late-delivered original intent without
+finalized) rather than "saved" or "synced", treat `open` as the default `$admission`
+history policy, and describe schema, `$seals`, and `$admission` changes as ordinary
+authorized transactions. Explain that a late earlier operation can revise outcomes and that
+a sealed admission frontier can exclude late-delivered original intent without
 retimestamping it. Preserve operation ID, author time and signed bytes on retry.
 One account-level agent (one credential and signing key) maintains many granted
 pages; its optional program carries control traffic only. `npm run check` rejects

@@ -30,7 +30,8 @@ Keep display choices such as filters and expanded panels separate from shared do
 | Commands, conversation and retained events | One application definition and owned session journal. | Applied outcomes belong to selected recoverable history. |
 | Relational guards, FTS5 and vector search | `chronolog-db` (`chronolog/sql` Merkle-paged SQLite-CAS + `chronolog/rls` write triggers) pinned in `$reducers`. | Deterministic replay across browser, Node 22.15+, and hosted MCP. |
 | Immutable application bytes | Unified lazy `session.content` (`put`/`get` with `public` or encrypted `private` visibility and optional dedup). | A reference in JSON/SQL does not itself retain another usable copy; peers pull chunks on demand. |
-| Membership, governance and keys | Public `$*` control topics (`$permissions`, `$keys`, `$reducers`, `$finality`) replayed by the blind host. | Choose `attestedMembers`, `openMembers`, `multisigMembers`, or custom ES Module reducers a-la-carte. |
+| Membership, governance, seals, and keys | Public `$*` control topics (`$admission`, `$seals`, `$keys`, `$reducers`, `$publications`, `$mounts`, `$builders`) replayed by the blind host. | Choose `attestedAdmission`, `openAdmission`, `multisigAdmission`, or custom `createAdmission` a-la-carte; lock rules irreversibly with `$seals`. |
+| Fine-grained private rows or subgroups | Private Capability Vaults (`chronolog/vaults` + `session.vaults`), `session.sealFor()`, or `$keys.topicRings` compartments. | Encrypted inside the private partition (invisible to blind hosts) and enforced at write time with `chronolog/rls` (`vaultBoxPolicy`, `sealRecipientsPolicy`). |
 | Authored page code | Signed `$publications` control-topic release with exact SHA-256 file hashes. | Independent from application data; pruned host R2 cache versions remain P2P-recoverable by hash. |
 | Irreversible external action | An explicit protected checkpoint or durable action capability. | Ordinary applied/shared outcomes cannot authorize irreversible replay. |
 
@@ -38,7 +39,7 @@ Event-only applications avoid an unnecessary SQL engine. SQL adds transactional 
 
 ## Declare the transaction in the definition
 
-Use a coherent `session.query` or captured read view for review. Retain its application revision and any domain versions or values that influenced the decision. Submit a stable operation ID with `basedOn` for the application ordering prerequisite. The definition must still check the authenticated author, domain predicates and allowed transition inside actual execution.
+Use a coherent `session.query` or captured read view for review. Retain its application revision and any domain versions or values that influenced the decision. Submit a stable operation ID with signed `assumptions` (`afterOps`, `requiresRejected`, `topic_revision`, `query_match`) or SQL `preconditions` (`based_on_row`, `row_matches`) for the application ordering prerequisite. The definition must still check the authenticated author, domain predicates and allowed transition inside actual execution.
 
 A field-value guard permits unrelated edits and may permit change-and-change-back. A record version can reject every relevant intervening mutation if the definition advances it consistently. Choose the domain policy deliberately. The [editing guide](../reconcile-concurrent-edits/COOKBOOK.md) and [guarded SQL definition](../run-a-peer-application/snippets/peer-task-board.mjs) show that common boundary.
 
@@ -48,13 +49,16 @@ A command can assert prerequisites, change SQL and emit its domain event atomica
 
 Distinguish a local draft, a stored signed intent, a revisable materialized accepted/rejected result, peer retention and a separately completed effect. Inspect original operations after reopening. Exact retry preserves the signed attempt; a new decision needs new reviewed input. Do not build another mutation outbox merely to display pending work.
 
-Merge authenticated operation sets and derive one coherent snapshot. Late earlier operations can change current results, events and schema. Keep signed proposal identities and original intent inspectable while rederiving views. Stored, materialized and retained do not imply optional finality; sealed-time exclusion is a separate explicit policy with visible original intent.
+Merge authenticated operation sets and derive one coherent snapshot. Late earlier operations can change current results, events and schema. Keep signed `opId` identities and original intent inspectable while rederiving views. Stored, materialized and retained do not imply optional finality; sealed-time exclusion is a separate explicit policy with visible original intent.
 
 New typing remains a different draft. A delayed result updates its original submitted snapshot and cannot clear newer work. A view replacement should preserve useful focus, selection and explanatory context while removing claims that no longer hold at the current materialized revision.
 
 ## Keep privacy in the reader boundary
 
-All readers authorized for an application history may obtain its replicated plaintext. Topic names, query filters and hidden panels are not private collections. Use separate application membership and keys when audiences differ, with explicit cross-application aggregate publication if needed. See [private responses](../collect-private-responses/COOKBOOK.md).
+All readers authorized for a plain unencrypted table or topic may obtain its replicated plaintext. Query filters and hidden panels are not private collections. Chronolog gives you three real cryptographic privacy boundaries—choose the right tier:
+1. **Whole-log E2EE (`privateLog: true`):** Separate logs with independent membership and keys when metadata and audience isolation must be complete.
+2. **Fail-closed topic compartments (`$keys.topicRings`):** Bind sensitive topics to dedicated key rings enforced directly by `TopicKernel`.
+3. **Row/field-level encryption inside one shared log:** Use **Private Capability Vaults (`chronolog/vaults` + `session.vaults`)** or **`session.sealFor()`/`unseal()`**, enforced at write time with SQL `chronolog/rls` (`vaultBoxPolicy`, `sealRecipientsPolicy`). See [Compartmentalize secrets with Private Vaults, SQL RLS crypto, TreeKEM, and anonymous envelopes](../encrypt-rows-and-scale-group-keys/COOKBOOK.md) and [private responses](../collect-private-responses/COOKBOOK.md).
 
 Verified authorship, permission to submit, finality eligibility, publication authority, page ownership and external-tool credentials are separate roles. A payload field called `owner` cannot grant authority. Preserve verified requester provenance through agent work and recheck required rights at the actual action boundary. Revocation limits future authorized access; it cannot erase plaintext already obtained.
 

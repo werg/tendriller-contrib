@@ -109,6 +109,12 @@
       ]
     },
     {
+      "id": "combine-crdt-and-finality",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/finality-ux.mjs"
+      ]
+    },
+    {
       "id": "compare-options",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/approval-remote/AGENT.md",
@@ -193,6 +199,13 @@
       ]
     },
     {
+      "id": "encrypt-rows-and-scale-group-keys",
+      "sources": [
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/SUBLINEAR_GROUP_ROTATION.md",
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/CRDT_CONTRACT.md"
+      ]
+    },
+    {
       "id": "evolve-live-schema-and-reducers",
       "sources": [
         "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/STATE_MODELS.md"
@@ -218,6 +231,12 @@
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/components/geo.js",
         "https://github.com/werg/tendriller/blob/a0a84cc9e0db104313caf6ece2cbe0d009a9e19d/runtime/src/rules.ts"
+      ]
+    },
+    {
+      "id": "guard-crdt-assumptions",
+      "sources": [
+        "https://github.com/werg/chronolog/blob/9df55f0358482a71308cf3b1f235429d66b39a3b/packages/peer-session/src/assumptions.test.ts"
       ]
     },
     {
@@ -326,6 +345,12 @@
       ]
     },
     {
+      "id": "preview-agent-sql-branches",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/proposals.mjs"
+      ]
+    },
+    {
       "id": "publish-coherent-updates",
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/docs/ARTIFACTS.md",
@@ -421,6 +446,13 @@
       ]
     },
     {
+      "id": "seal-rules-and-enforce-invariants",
+      "sources": [
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/CRDT_CONTRACT.md",
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/packages/materializer/src/std/seals.ts"
+      ]
+    },
+    {
       "id": "search-and-filter-collections",
       "sources": [
         "https://github.com/werg/tendriller/blob/7668af4ae59ae7dced87eba999bd040836f9fc06/docs/BROWSER_API.md",
@@ -440,6 +472,12 @@
       "sources": [
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/AGENT.md",
         "https://github.com/werg/tendriller-contrib/blob/6554970c5b1dbf8a7cfb2ffcc22eeb437eede6ce/recipes/field-notebook/model.mjs"
+      ]
+    },
+    {
+      "id": "setup-social-recovery",
+      "sources": [
+        "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/social-recovery.mjs"
       ]
     },
     {

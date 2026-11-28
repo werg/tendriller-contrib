@@ -1,29 +1,29 @@
 ---
 id: "combine-crdt-and-finality"
-title: "Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances"
-summary: "Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas."
+title: "Combine offline CRDT speed with Pending-to-Confirmed admission and agent allowances"
+summary: "Keep authoring instant offline while settling contentious claims via opt-in $admission history policies and giving autonomous agents hard offline spending quotas."
 group: "Coordinate state"
-tags: ["finality", "crdt", "ledger", "allowances", "agents", "consensus"]
-choices: ["Provisional CRDT writes with Pending -> Confirmed badges", "Offline Escrow CRDT quotas via chronolog/ledger", "Graduated decentralization from none to notary to witness quorum"]
+tags: ["finality", "admission", "crdt", "ledger", "allowances", "agents", "consensus"]
+choices: ["Provisional CRDT writes with Pending -> Confirmed badges", "Offline Escrow CRDT quotas via chronolog/ledger", "Graduated decentralization from open to signed-frontier, threshold-quorum, member-quorum, or pinned-checkpoint"]
 capabilities: []
 evidence: "explained"
-related: ["guard-crdt-assumptions", "choose-page-governance", "work-offline-and-reconnect"]
+related: ["guard-crdt-assumptions", "choose-page-governance", "work-offline-and-reconnect", "seal-rules-and-enforce-invariants"]
 sources: ["https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/finality-ux.mjs"]
 ---
 
-# Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances
+# Combine offline CRDT speed with Pending-to-Confirmed admission and agent allowances
 
-Because Chronolog separates canonical ordering from optional finality checkpoints (`$finality`), you never have to choose between responsive offline authoring and strict settlement guarantees.
+Because Chronolog separates canonical ordering (`(authorTimestampMs, author, opId)`) from optional history admission (`$admission.schedule` and `$admission.admit()`), you never have to choose between responsive offline authoring and strict settlement guarantees.
 
 ## 1. Calm Pending -> Confirmed UX
 
-Ordinary notes and comments stay `finality: none` (pure offline CRDT). For contentious claims like room bookings, equipment checkouts, or payouts, opt into a `$finality` policy (a fast blind notary or an M-of-N witness committee) and render each record's status with `describeOpSettlement` from `shared/helpers/finality-ux.mjs`:
+Ordinary notes and comments stay `open` (pure offline CRDT). For contentious claims like room bookings, equipment checkouts, or payouts, schedule a `$admission` history policy (`signed-frontier`, `threshold-quorum`, `member-quorum`, `optimistic-challenge`, `merkle-anchor`, or surgical `pinned-checkpoint` + local `pinnedFrontier` descent) and render each record's status with `describeOpSettlement` from `shared/helpers/finality-ux.mjs`:
 
 - **Saved locally** (`local`) → authored offline.
 - **Pending confirmation** (`synced`) → replicated, waiting for the closed-time frontier to pass.
-- **Confirmed** (`finalized`) → sealed by a verified finality checkpoint; late backdated claims before that frontier are excluded.
+- **Confirmed** (`finalized`) → sealed by verified admission evidence; late backdated claims before that frontier are excluded.
 - **Needs attention** (`excluded`) → lost an offline race; pair with `_chronolog_conflicts` so an agent offers a 1-click alternative.
-- **Witness conflict detected** (`equivocated`) → self-evidencing cryptographic fraud proof caught a dishonest notary (`session.equivocationProofs()`).
+- **Witness conflict detected** (`equivocated`) → self-evidencing cryptographic fraud proof caught a dishonest signer (`(await session.admission.status()).equivocations` or `session.admissionStatus(opId)`).
 
 ## 2. Offline Agent Allowances (Escrow CRDTs)
 

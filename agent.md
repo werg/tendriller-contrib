@@ -4,9 +4,9 @@ For initial setup, read [connected-app setup](guides/connected-app-setup.md). Ke
 
 Inspect the task and existing files first. Select only relevant guides; related links are optional reading, not dependencies. Explain consequential choices and a plausible rejected alternative. Implement page-owned source through the public core contract. Reading a guide installs nothing.
 
-Use the [common application session](guides/application-primitives.md): one authored operation set and coherent derived views across native and browser peers. Application order is signed author time, signing key and stable proposal ID only. Stored, materialized, retained and finalized are independent observations. Initialized browsers save and materialize offline without an agent, peer or finalizer. Preserve exact signed intents and retry identities; late earlier facts can revise outcomes.
+Use the [common application session](guides/application-primitives.md): one authored operation set and coherent derived views across native and browser peers. Application order is signed author time, signing key and stable opId only. Stored, materialized, retained and finalized are independent observations. Initialized browsers save and materialize offline without an agent, peer or finalizer. Preserve exact signed intents and retry identities; late earlier facts can revise outcomes. Preview mutations safely with session.simulate().
 
-Keep account authority, data membership, SQL permissions, publication, finality and external-tool authority separate. Schema and permission changes are ordinary authored transactions. Payload roles grant no credentials. No-finality is the ordinary default; configured providers prove admission and closed time, never operation order. Explain late exclusion behind a sealed frontier. Irreversible work needs verified final prerequisites and an idempotent external-effect protocol.
+Keep account authority, unified $admission (authorization, verify() post-conditions, optional history admission, live signals), kernel-enforced $seals, $keys (PQ X-Wing, TreeKEM, anonymous padded envelopes, topicRings), Private Capability Vaults (chronolog/vaults), SQL write RLS, publication and external-tool authority separate. Schema and permission changes are ordinary authored transactions. Payload roles grant no credentials. Open history admission is the ordinary default; configured providers prove admission and closed time, never operation order. Explain late exclusion behind a sealed frontier. Irreversible work needs verified final prerequisites and an idempotent external-effect protocol.
 
 For unattended replies, read [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) and the selected core host's conversation-delivery guide when it advertises one. Bind ephemeral availability to the actual request worker and handled topics, not the native session owner or one-shot waiter. Qualify the exact conversation through a request, receipt and answer, then a second request after the turn ends. Preserve private thread bindings and durable handled checkpoints; queue admission is not completed work, and no existing ChatGPT conversation wake is implied.
 
@@ -18,6 +18,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 
 ### Access and identity
 
+- [Compartmentalize secrets with Private Vaults, SQL RLS crypto, TreeKEM, and anonymous envelopes](cookbooks/encrypt-rows-and-scale-group-keys/COOKBOOK.md) — Encrypt individual SQL rows or deal rooms inside a shared log with chronolog/vaults and chronolog/rls, harden metadata with hybrid PQ X-Wing and padded anonymous envelopes, and scale large group rotations to O(log N) with Key-Tagged TreeKEM.
 - [Set up trusted backup contacts for social recovery](cookbooks/setup-social-recovery/COOKBOOK.md) — Protect encrypted spaces against total device loss using M-of-N trusted backup contacts who hold only encrypted recovery shares and can never read private data.
 
 ### Choose inputs and algorithms
@@ -50,7 +51,7 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 
 ### Coordinate state
 
-- [Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances](cookbooks/combine-crdt-and-finality/COOKBOOK.md) — Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas.
+- [Combine offline CRDT speed with Pending-to-Confirmed admission and agent allowances](cookbooks/combine-crdt-and-finality/COOKBOOK.md) — Keep authoring instant offline while settling contentious claims via opt-in $admission history policies and giving autonomous agents hard offline spending quotas.
 - [Guard CRDT edits with causal and row assumptions](cookbooks/guard-crdt-assumptions/COOKBOOK.md) — Attach signed causal dependencies (afterOps, requiresRejected) and ergonomic SQL row guards (based_on_row, row_matches) so offline edits self-heal or surface cleanly in a conflict inbox.
 - [Preview AI agent edits with zero-copy SQL branches](cookbooks/preview-agent-sql-branches/COOKBOOK.md) — Let agents fork a Merkle-paged chronolog-db in O(1), compute exact row diffs, and submit guarded proposals humans can approve with one click.
 
@@ -92,9 +93,9 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 
 - [Adapt an interface without losing work](cookbooks/adapt-without-losing-work/COOKBOOK.md) — Choose ordinary DOM, framework state, or declarative rendering while preserving drafts, focus, and stable task identity.
 - [Choose the right home for application data](cookbooks/choose-data-model/COOKBOOK.md) — Match authority, ordering, lifetime, and privacy to each kind of information instead of putting everything in shared state.
-- [Choose page governance and public access honestly](cookbooks/choose-page-governance/COOKBOOK.md) — Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private.
+- [Choose page governance and public access honestly](cookbooks/choose-page-governance/COOKBOOK.md) — Select between default private OAuth E2EE, on-log org-group rules, zero-OAuth public read/write, M-of-N multisig, or custom $admission reducers—and surface clear security UX whenever a page is not private.
 - [Connect an agent that actually resumes](cookbooks/connect-resuming-agent/COOKBOOK.md) — Route requests into an active turn or resume the intended idle conversation, and acknowledge only handled work.
-- [Evolve live schemas, RLS rules, and ES Module reducers without redeploys](cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md) — Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely.
+- [Evolve live schemas, RLS rules, and ES Module reducers without redeploys](cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md) — Author declarative reducers with defineReducer, dry-run upgrades and simulate edits before signing, hot-publish to $reducers, and lock finalized rules irreversibly with $seals.
 - [Export, inspect, and restore portable work](cookbooks/export-and-restore-work/COOKBOOK.md) — Make exports explicit about their contents and limits, then preview identity mappings and conflicts before restoring reviewed work.
 - [Ingest telemetry with a bounded budget](cookbooks/ingest-bounded-telemetry/COOKBOOK.md) *(runnable snippets)* — Choose acquisition and spool behavior while making backpressure, retention, and data loss explicit.
 - [Keep an active task usable](cookbooks/keep-task-active/COOKBOOK.md) — Choose foreground wake lock and interruption behavior without promising background execution.
@@ -102,10 +103,11 @@ Start from an [application journey](guides/use-cases.md) when the user names an 
 - [Publish coherent page updates](cookbooks/publish-coherent-updates/COOKBOOK.md) — Keep authored assets, runtime identity, nested paths, and draft-aware updates consistent within one target system.
 - [Maintain a shared editable collection](cookbooks/reconcile-concurrent-edits/COOKBOOK.md) — Choose stable identities and explicit conflict behavior for additions, edits, ordering, and deletion.
 - [Recover from queued, repeated, and outdated work](cookbooks/recover-outdated-work/COOKBOOK.md) — Keep original command meaning across interruption and distinguish retry from a new, deliberately reviewed action.
-- [Export portable app blueprints, remix pages, and schedule optional finality](cookbooks/remix-and-snapshot-apps/COOKBOOK.md) — Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed.
+- [Export portable app blueprints, remix pages, and schedule optional history admission](cookbooks/remix-and-snapshot-apps/COOKBOOK.md) — Clone a page's code, hash-pinned $reducers, $seals templates, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $admission history policies when needed.
 - [Report live page errors and diagnostics to your agent](cookbooks/report-page-diagnostics/COOKBOOK.md) *(runnable snippets)* — Capture boot-to-runtime browser errors in a redacted ring buffer and stream live diagnostics over ephemeral signals.
 - [Resume across devices and agent sessions](cookbooks/resume-across-sessions/COOKBOOK.md) — Keep task context, consumer progress, view checkpoints, and device focus separate so a handoff does not skip work.
 - [Build a local-first peer application](cookbooks/run-a-peer-application/COOKBOOK.md) *(runnable snippets)* — Author durable signed operations independently, merge operation sets, and derive coherent revisable event or SQL views with explicitly optional finality.
+- [Seal immutable rules, verify cross-topic invariants, and preview edits with simulate()](cookbooks/seal-rules-and-enforce-invariants/COOKBOOK.md) — Write self-describing reducers with defineReducer, enforce global cross-topic invariants via $admission.verify(), lock finalized rules forever with kernel-enforced $seals, verify WebAuthn P-256 proofs, and dry-run mutations with session.simulate().
 - [Test an adaptive page honestly](cookbooks/test-adaptive-page/COOKBOOK.md) — Use exact authored files and explicit fixtures, then verify authority and transactions at the real service boundary.
 - [Keep a task useful offline and reconnect deliberately](cookbooks/work-offline-and-reconnect/COOKBOOK.md) — Prepare the exact page for offline use, preserve local drafts and pending intent, and reconcile current authority and task context on return.
 

@@ -52,7 +52,7 @@ a fresh request merely because an observer received it. The public task, claim,
 result and message records expose their authenticated `operation` reference from
 Chronolog's reserved transaction evidence. Application JSON cannot substitute
 another proposal or signer. References bind the authenticated application, actor,
-operation handle and stable proposal ID, while projection revisions bind the
+operation handle and stable `opId`, while projection revisions bind the
 current derived operation set and execution/policy context. Historical document labels remain signer assertions.
 
 ## Keep the first complete journey small
@@ -81,7 +81,7 @@ An earlier proposal can also remove a previously shown result. Render coherent
 snapshots plus independent local drafts, never append arrivals into a second UI
 state database. Ordinary Save waits only for durable local signing/storage.
 
-Finality defaults to `none`: local materialization continues without any agent or
+History admission defaults to `open`: local materialization continues without any agent or
 finalizer, and explicit finality waits fail as unsupported. Irreversible effects
 require separately verified configured finality plus provider-idempotency and
 receipt reconciliation. An unavailable finalizer may delay those effects, not
@@ -97,7 +97,7 @@ there is no signed initializer/schema-freezing channel or publication requiremen
 
 The shared application holds requests, claims, contributions and final decisions.
 The view store holds an unsent draft and indexed references to journaled work.
-Each pending reference includes the application, actor, operation handle and stable proposal identity;
+Each pending reference includes the application, actor, operation handle and stable `opId` identity;
 one view removing a reviewed reference cannot remove another view's reference.
 The operation journal remains the source of signed proposals.
 

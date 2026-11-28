@@ -6,10 +6,10 @@ and derive application state locally. There is no operation-ordering server.
 
 Every replica uses exactly one canonical application comparator:
 
-`(signed author timestamp, signing public key, stable proposal ID)`.
+`(signed author timestamp, signing public key, stable opId)`.
 
 Network arrival, receipt position, host clocks and transport counters are not
-application-order inputs. Given the same eligible proposals and execution profile,
+application-order inputs. Given the same eligible operations and execution profile,
 replicas derive the same state. SQL convergence is chronological replay of the
 operation set, not a merge of independently modified SQL database files.
 
@@ -39,10 +39,13 @@ immutable composition.
 | An unsent draft, focus or selected tab | Per-view local state | Separate from replicated domain state; persistence is explicit. |
 | Presence, typing, readings or disposable progress | Session signals | Live delivery only; no durable journal or finality. |
 | Shared observations or conversation | Authored event transactions | Local durable identity and deterministic derived events; outcomes can be provisional. |
-| Relational state and business guards | Ordinary SQLite transaction programs | DDL, DML, ownership operations and effective emits are atomic at their authored-time position. |
+| Relational state and business guards | Ordinary SQLite transaction programs (`chronolog/sql` + `chronolog/rls`) | DDL, DML, write RLS (including `vaultBoxPolicy`/`sealRecipientsPolicy`), and effective emits are atomic at their authored-time position. |
+| Fine-grained row or topic confidentiality | Private Capability Vaults (`chronolog/vaults`), `session.sealFor()`, or `$keys.topicRings` | Encrypted-partition vaults with $O(1)$ adds and forward-secret removals, or fail-closed topic compartments; blind hosts never see vault topology. |
+| Irreversible rule locks & cross-topic invariants | Kernel-enforced `$seals` & `$admission.verify()` | Monotonic reducer hash + transitive import locks, `frozen`/`append-only` JSON paths, and atomic multi-topic post-conditions enforced by `TopicKernel`. |
+| Pre-flight preview without signing | `session.simulate()` | Runs the exact reducer, RLS, `$seals`, and `$admission.verify()` pipeline against current state without mutating the log. |
 | Independent offline editing | Operation-set replication | Each device authors locally; reconnect merges facts and replays affected suffixes. |
 | Retention on another device | Authenticated retention evidence | A named peer retained the specified operation; this is not finality. |
-| Closed history against late first inclusion | Explicit optional finality policy | Verified admission and author-time closure, with declared authority and clock assumptions. |
+| Closed history against late first inclusion | Explicit optional `$admission.schedule` policy | Verified admission and author-time closure (`signed-frontier`, `threshold-quorum`, `member-quorum`, `optimistic-challenge`, `merkle-anchor`, `pinned-checkpoint`), with declared authority and clock assumptions. |
 | An irreversible external effect | Verified final prerequisites plus an idempotent effect protocol | Neither local materialization nor peer retention alone authorizes the effect. |
 
 An events-only application needs no SQL engine. A SQL application binds the
@@ -118,13 +121,14 @@ Do not maintain a second command outbox in a UI, cookbook or hosted adapter.
 
 ## Optional finality is not an operation sorter
 
-Ordinary offline-first applications default to no finality. Valid eligible
+Ordinary offline-first applications default to `open` history admission in `$admission.schedule`. Valid eligible
 operations can merge arbitrarily late, so local outcomes remain revisable.
 
-An application can explicitly select a supported signed-frontier or validator
-policy. Its authenticated configuration names authorities, parameters and clock
-assumptions. An eligible browser can act as a finality authority; a native or host
-provider is a deployment choice, not a privileged operation sequencer.
+An application can explicitly schedule a supported history admission policy (`signed-frontier`,
+`threshold-quorum`, `member-quorum`, `optimistic-challenge`, `merkle-anchor`, `pinned-checkpoint`,
+plus locally pinned non-rewinding `pinnedFrontier`). Its authenticated configuration names
+authorities, parameters and clock assumptions. An eligible browser can act as a finality
+authority; a native or host provider is a deployment choice, not a privileged operation sequencer.
 
 A provider can prove inclusion and close an author-time range. It cannot choose
 which transaction executes next, rewrite a timestamp or provide a comparator.

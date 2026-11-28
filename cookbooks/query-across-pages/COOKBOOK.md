@@ -20,7 +20,7 @@ Users naturally keep separate Tendriller pages for separate privacy boundaries (
 Call `describe_application` on an opted-in page first. Because Hosted MCP hydrates directly from `$reducers` with static QuickJS-NG + `sqlite-cas.wasm`, `describe_application` returns:
 - Live non-control `$reducers` topic bindings (including recently hot-added topics),
 - Automatic `sqlSchemas` (`tables`, `columns`, `policies`, `schemaVersion`) for every `chronolog/sql` topic, and
-- `permissionsSummary` (`openReaders`, `openWriters`, `memberCount`).
+- `$admission` summary (`openReaders`, `openWriters`, `memberCount`).
 
 ## Fan out read-only queries safely
 

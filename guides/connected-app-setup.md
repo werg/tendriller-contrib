@@ -68,7 +68,7 @@ profile; they do not replace first-visit enrollment. Retained profiles reopen lo
 state before background host access; a cold browser needs real enrollment and key
 provisioning.
 
-Choose an event, declarative `chronolog/sql` (`chronolog-db`), or local hybrid FTS5 + `sqlite-vec` memory state model (`templates/knowledge/`), an authority model (default private OAuth E2EE `attestedMembers`, zero-OAuth public `openMembers`, or M-of-N `multisigMembers`), and an explicit finality/availability policy. Ordinary apps default to no finality. Engine manifests pin execution semantics, not the application schema. Initial application DDL, write RLS rules, and `$reducers` ES Module updates are ordinary authored transactions; later authorized DDL and grants use that same flow. Owners can also remix existing pages or import a portable `PageBlueprint` directly from `/dashboard`.
+Choose an event (`defineReducer`), declarative `chronolog/sql` (`chronolog-db`), or local hybrid FTS5 + `sqlite-vec` memory state model (`templates/knowledge/`), a unified `$admission` authority model (default private OAuth E2EE `attestedAdmission` + on-log `groupPolicy`, zero-OAuth public `openAdmission`, or M-of-N `multisigAdmission`), optional `$seals` locks, optional `$keys.policy` (hybrid PQ X-Wing `minSuite`, `distribution: 'tree'` Key-Tagged TreeKEM, `hideEnvelopeAuthor` + `paddingBucketBytes`), and an explicit history admission policy (default `open`). Engine manifests pin execution semantics, not the application schema. Initial application DDL, write RLS rules (including `vaultBoxPolicy` / `sealRecipientsPolicy`), and `$reducers` ES Module updates are ordinary authored transactions; later authorized DDL and grants use that same flow. Owners can also remix existing pages or import a portable `PageBlueprint` directly from `/dashboard`.
 
 ## Register the workspace agent and prepare the ready page
 
@@ -193,14 +193,7 @@ host-delivery bridge has its own supervised lifetime. The native owner may stay
 connected when that worker is stopped; it must not advertise the worker's request
 topics or renew its listening state.
 
-The agent's shared key joins a page's data session only through explicit steps:
-the owner's browser creates an account-bound challenge for that exact key, then
-`npm run sign-enrollment`, `provisioning-request` and `import-provisioning` run
-natively, and the owner reviews the exact rights and fingerprint before an
-authorized device wraps the epoch key to that recipient. No step pauses
-application ordering or selects history, and an initialized browser keeps saving
-while it waits. A host token alone never grants data access, and there is no
-shortcut that bypasses owner review.
+Cold browsers bootstrap genesis + public control state in 1 RTT (`GET _tendril/application?bootstrap=1`) and enroll in 1 RTT with a fresh timestamped proof carrying their Ed25519 signing key, X25519 `wrapKey`, and hybrid post-quantum X-Wing `pqWrapKey` (falling back to 2-RTT challenge only on legacy hosts). The agent's shared key joins a page's data session only through explicit host grants and administrator admission into `$admission` / `$keys`, and the owner reviews the exact rights before an authorized device seals epoch keys to that recipient. No step pauses application ordering or selects history, and an initialized browser keeps saving while it waits. A host token alone never grants data access, and there is no shortcut that bypasses owner review.
 
 ### Continue after a lost credential or device
 

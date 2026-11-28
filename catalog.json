@@ -314,19 +314,20 @@
     {
       "id": "choose-page-governance",
       "title": "Choose page governance and public access honestly",
-      "summary": "Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private.",
+      "summary": "Select between default private OAuth E2EE, on-log org-group rules, zero-OAuth public read/write, M-of-N multisig, or custom $admission reducers—and surface clear security UX whenever a page is not private.",
       "group": "Keep work dependable",
       "tags": [
         "authority",
         "governance",
         "public",
         "multisig",
-        "privacy"
+        "privacy",
+        "admission"
       ],
       "choices": [
-        "Private E2EE (attestedMembers) vs unencrypted public (openMembers)",
+        "Private E2EE (attestedAdmission) vs unencrypted public (openAdmission)",
         "Public read-only vs open-contribution write rules (chronolog/rls)",
-        "Single-owner attestation vs M-of-N multisigMembers or custom $permissions"
+        "Single-owner attestation vs M-of-N multisigAdmission or custom createAdmission({ authorize, verify, admit })"
       ],
       "capabilities": [],
       "evidence": "explained",
@@ -334,7 +335,9 @@
         "choose-data-model",
         "collect-private-responses",
         "manage-sensitive-data",
-        "run-a-peer-application"
+        "run-a-peer-application",
+        "seal-rules-and-enforce-invariants",
+        "encrypt-rows-and-scale-group-keys"
       ],
       "sources": [
         "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/MEMBERSHIP.md",
@@ -343,7 +346,7 @@
       "path": "cookbooks/choose-page-governance/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-page-governance/COOKBOOK.md. Select between default private OAuth E2EE, zero-OAuth public read/write, M-of-N multisig, or custom $permissions reducers—and surface clear security UX whenever a page is not private. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/choose-page-governance/COOKBOOK.md. Select between default private OAuth E2EE, on-log org-group rules, zero-OAuth public read/write, M-of-N multisig, or custom $admission reducers—and surface clear security UX whenever a page is not private. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "choose-voice-interaction",
@@ -452,11 +455,12 @@
     },
     {
       "id": "combine-crdt-and-finality",
-      "title": "Combine offline CRDT speed with Pending-to-Confirmed finality and agent allowances",
-      "summary": "Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas.",
+      "title": "Combine offline CRDT speed with Pending-to-Confirmed admission and agent allowances",
+      "summary": "Keep authoring instant offline while settling contentious claims via opt-in $admission history policies and giving autonomous agents hard offline spending quotas.",
       "group": "Coordinate state",
       "tags": [
         "finality",
+        "admission",
         "crdt",
         "ledger",
         "allowances",
@@ -466,14 +470,15 @@
       "choices": [
         "Provisional CRDT writes with Pending -> Confirmed badges",
         "Offline Escrow CRDT quotas via chronolog/ledger",
-        "Graduated decentralization from none to notary to witness quorum"
+        "Graduated decentralization from open to signed-frontier, threshold-quorum, member-quorum, or pinned-checkpoint"
       ],
       "capabilities": [],
       "evidence": "explained",
       "related": [
         "guard-crdt-assumptions",
         "choose-page-governance",
-        "work-offline-and-reconnect"
+        "work-offline-and-reconnect",
+        "seal-rules-and-enforce-invariants"
       ],
       "sources": [
         "https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3eed78f6d2e1/docs/tutorial/shared/helpers/finality-ux.mjs"
@@ -481,7 +486,7 @@
       "path": "cookbooks/combine-crdt-and-finality/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/combine-crdt-and-finality/COOKBOOK.md. Keep authoring instant offline while settling contentious claims via opt-in finality checkpoints and giving autonomous agents hard offline spending quotas. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/combine-crdt-and-finality/COOKBOOK.md. Keep authoring instant offline while settling contentious claims via opt-in $admission history policies and giving autonomous agents hard offline spending quotas. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "compare-options",
@@ -839,28 +844,67 @@
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/document-a-field-inspection/COOKBOOK.md. Combine a versioned checklist, measurements, annotated evidence, exceptions, offline draft recovery, and a reviewed handover report. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
+      "id": "encrypt-rows-and-scale-group-keys",
+      "title": "Compartmentalize secrets with Private Vaults, SQL RLS crypto, TreeKEM, and anonymous envelopes",
+      "summary": "Encrypt individual SQL rows or deal rooms inside a shared log with chronolog/vaults and chronolog/rls, harden metadata with hybrid PQ X-Wing and padded anonymous envelopes, and scale large group rotations to O(log N) with Key-Tagged TreeKEM.",
+      "group": "Access and identity",
+      "tags": [
+        "encryption",
+        "vaults",
+        "rls",
+        "treekem",
+        "post-quantum",
+        "privacy",
+        "compartments"
+      ],
+      "choices": [
+        "Whole-log E2EE vs $keys.topicRings compartments vs row-level Private Vaults / sealFor()",
+        "Flat HPKE epochs vs O(log N) Key-Tagged TreeKEM (distribution: 'tree')",
+        "Standard envelopes vs hybrid PQ X-Wing + padded anonymous envelopes (hideEnvelopeAuthor)"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "choose-page-governance",
+        "manage-sensitive-data",
+        "collect-private-responses",
+        "setup-social-recovery"
+      ],
+      "sources": [
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/SUBLINEAR_GROUP_ROTATION.md",
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/CRDT_CONTRACT.md"
+      ],
+      "path": "cookbooks/encrypt-rows-and-scale-group-keys/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/encrypt-rows-and-scale-group-keys/COOKBOOK.md. Encrypt individual SQL rows or deal rooms inside a shared log with chronolog/vaults and chronolog/rls, harden metadata with hybrid PQ X-Wing and padded anonymous envelopes, and scale large group rotations to O(log N) with Key-Tagged TreeKEM. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
       "id": "evolve-live-schema-and-reducers",
       "title": "Evolve live schemas, RLS rules, and ES Module reducers without redeploys",
-      "summary": "Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely.",
+      "summary": "Author declarative reducers with defineReducer, dry-run upgrades and simulate edits before signing, hot-publish to $reducers, and lock finalized rules irreversibly with $seals.",
       "group": "Keep work dependable",
       "tags": [
         "schema",
         "reducers",
         "sql",
         "rls",
-        "evolution"
+        "evolution",
+        "seals",
+        "simulate"
       ],
       "choices": [
         "Admin SQL migrations vs non-admin user-owned dynamic tables",
-        "Hot-evolving $reducers vs frozenReducers",
-        "Dry-run validation before signing live reducer updates"
+        "Hot-evolving $reducers vs selective kernel-enforced $seals",
+        "Pre-flight session.simulate() and dryRunReducerModule before signing"
       ],
       "capabilities": [],
       "evidence": "explained",
       "related": [
         "choose-data-model",
         "run-a-peer-application",
-        "publish-coherent-updates"
+        "publish-coherent-updates",
+        "seal-rules-and-enforce-invariants"
       ],
       "sources": [
         "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/STATE_MODELS.md"
@@ -868,7 +912,7 @@
       "path": "cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md. Dry-run and hot-publish hash-pinned QuickJS-NG reducers into $reducers, migrate chronolog-db schemas atomically, and let writers manage personal tables safely. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/evolve-live-schema-and-reducers/COOKBOOK.md. Author declarative reducers with defineReducer, dry-run upgrades and simulate edits before signing, hot-publish to $reducers, and lock finalized rules irreversibly with $seals. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "explore-what-if-scenarios",
@@ -1656,27 +1700,29 @@
     },
     {
       "id": "remix-and-snapshot-apps",
-      "title": "Export portable app blueprints, remix pages, and schedule optional finality",
-      "summary": "Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed.",
+      "title": "Export portable app blueprints, remix pages, and schedule optional history admission",
+      "summary": "Clone a page's code, hash-pinned $reducers, $seals templates, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $admission history policies when needed.",
       "group": "Keep work dependable",
       "tags": [
         "blueprint",
         "remix",
         "fork",
         "finality",
+        "admission",
         "snapshots"
       ],
       "choices": [
         "Portable PageBlueprint export vs one-click host Remix",
         "Copying schema DDL + RLS rules without copying private rows",
-        "Keeping finality: none vs scheduling signed-frontier or fixed-validator finality"
+        "Keeping open admission vs scheduling signed-frontier, threshold-quorum, or member-quorum admission"
       ],
       "capabilities": [],
       "evidence": "explained",
       "related": [
         "export-and-restore-work",
         "guide-explicit-checkpoints",
-        "publish-coherent-updates"
+        "publish-coherent-updates",
+        "combine-crdt-and-finality"
       ],
       "sources": [
         "https://github.com/werg/tendriller/blob/7b963a6085d8e5c57054f3045b2540328336420d/docs/AUTHORITY_AND_PUBLICATIONS.md"
@@ -1684,7 +1730,7 @@
       "path": "cookbooks/remix-and-snapshot-apps/COOKBOOK.md",
       "runnable": false,
       "snippets": [],
-      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/remix-and-snapshot-apps/COOKBOOK.md. Clone a page's code, hash-pinned $reducers, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $finality when needed. Reading this cookbook does not install software or activate a trusted capability."
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/remix-and-snapshot-apps/COOKBOOK.md. Clone a page's code, hash-pinned $reducers, $seals templates, and SQL schema into a fresh isolated encrypted log with zero private data copied, and opt into $admission history policies when needed. Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "report-page-diagnostics",
@@ -1916,6 +1962,42 @@
       "runnable": false,
       "snippets": [],
       "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/schedule-shared-resources/COOKBOOK.md. Guide people from availability to a confirmed reservation with explicit holds, time interpretation, capacity, and authoritative conflict checks. Reading this cookbook does not install software or activate a trusted capability."
+    },
+    {
+      "id": "seal-rules-and-enforce-invariants",
+      "title": "Seal immutable rules, verify cross-topic invariants, and preview edits with simulate()",
+      "summary": "Write self-describing reducers with defineReducer, enforce global cross-topic invariants via $admission.verify(), lock finalized rules forever with kernel-enforced $seals, verify WebAuthn P-256 proofs, and dry-run mutations with session.simulate().",
+      "group": "Keep work dependable",
+      "tags": [
+        "seals",
+        "immutability",
+        "invariants",
+        "admission",
+        "reducers",
+        "simulate",
+        "webauthn"
+      ],
+      "choices": [
+        "Mutable $reducers vs selective kernel-enforced $seals (frozen / append-only)",
+        "Per-topic ctx.can() attenuation vs cross-topic $admission.verify(before, after) post-conditions",
+        "Ed25519 device signers vs WebAuthn P-256 (crypto@2) hardware/passkey proofs"
+      ],
+      "capabilities": [],
+      "evidence": "explained",
+      "related": [
+        "evolve-live-schema-and-reducers",
+        "choose-page-governance",
+        "combine-crdt-and-finality",
+        "guard-crdt-assumptions"
+      ],
+      "sources": [
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/docs/CRDT_CONTRACT.md",
+        "https://github.com/werg/chronolog/blob/a320a63969c6006cb6adb331f07e8dd70903a82e/packages/materializer/src/std/seals.ts"
+      ],
+      "path": "cookbooks/seal-rules-and-enforce-invariants/COOKBOOK.md",
+      "runnable": false,
+      "snippets": [],
+      "prompt": "Read https://github.com/werg/tendriller-contrib/blob/main/cookbooks/seal-rules-and-enforce-invariants/COOKBOOK.md. Write self-describing reducers with defineReducer, enforce global cross-topic invariants via $admission.verify(), lock finalized rules forever with kernel-enforced $seals, verify WebAuthn P-256 proofs, and dry-run mutations with session.simulate(). Reading this cookbook does not install software or activate a trusted capability."
     },
     {
       "id": "search-and-filter-collections",

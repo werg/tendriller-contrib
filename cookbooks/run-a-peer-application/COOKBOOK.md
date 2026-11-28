@@ -18,7 +18,7 @@ without another participant, application server, or finalizer. Replicas union
 immutable authenticated operations and derive their own application views.
 
 The only application order is signed author timestamp, signing public-key bytes,
-and stable proposal-ID bytes. Delivery order is not application order. Earlier
+and stable `opId` bytes. Delivery order is not application order. Earlier
 operations arriving later can revise a previously displayed SQL outcome, remove
 its effective events, change schema, or reorder a list. A provisional successful
 claim is not globally exclusive authority for irreversible external work.
@@ -37,12 +37,12 @@ application database or production connection manager.
 | Durable conversation or observations | [Conversation definition](snippets/peer-conversation.mjs) | Lazy event materialization; no SQL engine required. |
 | Guarded tasks or schema/data programs | [Task-board definition](snippets/peer-task-board.mjs) | Explicit compatible SQL engine factory; atomic permissioned SQL and emits. |
 
-Ordinary offline-first applications choose `{ kind: 'none' }`. Local authoring and
+Ordinary offline-first applications choose `{ kind: 'open' }` in `$admission.schedule`. Local authoring and
 provisional reads do not depend on a provider. `operation.finalized()` explicitly
 rejects as unsupported under this policy; it never reports fake finality.
 
-Applications that need admission or closed-time evidence explicitly configure
-signed-frontier or fixed-validator finality. Browser and native actors use the
+Applications that need admission or closed-time evidence explicitly schedule
+`signed-frontier`, `threshold-quorum`, `member-quorum`, `optimistic-challenge`, `merkle-anchor`, or `pinned-checkpoint` admission. Browser and native actors use the
 same verified proof contract. Unavailable finality does not block durable local
 writes. A genuinely offline operation first seen behind a sealed time frontier
 can be excluded. Keep its original ID, timestamp, and signed intent inspectable;
@@ -100,7 +100,7 @@ second retry queue or regenerate signed time on retry.
 The [page specimen](checks/peer-ui/board.html) and compact layout render coherent
 materialized snapshots plus separate local view state. `createLiveView`
 invalidation re-derives lists, counts, and details. It does not append transport
-arrivals to another mutable UI database. Stable proposal IDs preserve selection
+arrivals to another mutable UI database. Stable `opId`s preserve selection
 and links while earlier facts revise the view. Unsent text and keyboard focus
 remain local. Schema invalidation exposes an explicit view error without
 corrupting state or disabling unrelated offline authoring.

@@ -28,9 +28,9 @@ Tendriller has no default application-wide undo policy. The application definiti
 
 ## Separate late-operation revision from user Undo
 
-The operation set is a union ordered by signed author time, so an operation that arrives late with an earlier time can change later provisional outcomes, with no recovery step. `session.changes()` reports the revision and revised proposal IDs. The page rederives a coherent projection while preserving drafts and the original operation references. Outcomes stay identifiable and nothing is silently removed. A configured closed-time frontier can exclude a first-seen older operation; its original intent remains inspectable. Neither mechanism invents new user intent.
+The operation set is a union ordered by signed author time, so an operation that arrives late with an earlier time can change later provisional outcomes, with no recovery step. `session.changes()` reports the revision and revised `opId`s. The page rederives a coherent projection while preserving drafts and the original operation references. Outcomes stay identifiable and nothing is silently removed. A configured closed-time frontier can exclude a first-seen older operation; its original intent remains inspectable. Neither mechanism invents new user intent.
 
-Undo of an accepted domain action is a newly reviewed guarded command. Redo is another new decision. Retrying an original operation instead resumes its exact signed proposal and author time. A finality-excluded operation is not silently retimestamped or resubmitted; if it is still wanted, a deliberately reviewed new operation is separate intent. External effects must never be dispatched merely because a view rebuilds or history is replayed.
+Undo of an accepted domain action is a newly reviewed guarded command. Redo is another new decision. Retrying an original operation instead resumes its exact signed operation and author time. A finality-excluded operation is not silently retimestamped or resubmitted; if it is still wanted, a deliberately reviewed new operation is separate intent. External effects must never be dispatched merely because a view rebuilds or history is replayed.
 
 ## Make correction part of the normal journey
 

@@ -13,7 +13,7 @@ sources: ["https://github.com/werg/tendriller/blob/f637d182075b5b734dd3c216a0fa3
 
 # Set up trusted backup contacts for social recovery
 
-End-to-end encrypted spaces should never have a host password-reset backdoor — yet losing every phone and laptop shouldn't mean losing your data forever. Chronolog supports threshold social recovery built directly into `$permissions` and `$keys`, with zero cryptographic jargon exposed to humans.
+End-to-end encrypted spaces should never have a host password-reset backdoor — yet losing every phone and laptop shouldn't mean losing your data forever. Chronolog supports threshold social recovery built directly into `$admission` and `$keys` (supporting both X25519 `wrapKey` and hybrid post-quantum X-Wing `pqWrapKey`, and restoring epoch keys, compartment rings, and Private Capability Vault keys), with zero cryptographic jargon exposed to humans.
 
 ## 1. Configure trusted contacts (zero-read guarantee)
 
